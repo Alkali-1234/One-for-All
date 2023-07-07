@@ -246,10 +246,20 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  //HomeScreen State
+  int MABSelectedFilter = 0;
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    void setMABSelectedFilter(int filter) {
+      setState(() {
+        MABSelectedFilter = filter;
+      });
+      debugPrint("Selected Filter: $MABSelectedFilter");
+    }
+
     return Column(
       children: [
         //WIDGET
@@ -269,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     dropdownColor: theme.secondary,
                     iconEnabledColor: Colors.white,
                     iconDisabledColor: Colors.white,
-                    hint: Text("Select Widget", style: textTheme.displayMedium),
+                    hint: Text("MAB - Widget", style: textTheme.displayMedium),
                     items: [
                       DropdownMenuItem(
                         value: 1,
@@ -281,14 +291,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       DropdownMenuItem(
                         value: 2,
                         child: Text(
-                          "MAB",
+                          "More coming soon!",
                           style: textTheme.displayMedium,
                         ),
                       ),
                       DropdownMenuItem(
                         value: 3,
                         child: Text(
-                          "MAB",
+                          "More coming soon!",
                           style: textTheme.displayMedium,
                         ),
                       ),
@@ -323,16 +333,24 @@ class _HomeScreenState extends State<HomeScreen> {
                               height: 38,
                               width: 120,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                gradient: getPrimaryGradient,
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black,
-                                    blurRadius: 2,
-                                    offset: Offset(0, 2),
-                                  )
-                                ],
-                              ),
+                                  //Bit spaghetti but it works
+                                  //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
+                                  borderRadius: BorderRadius.circular(10),
+                                  gradient: MABSelectedFilter == 0
+                                      ? getPrimaryGradient
+                                      : null,
+                                  boxShadow: MABSelectedFilter == 0
+                                      ? [
+                                          const BoxShadow(
+                                            color: Colors.black,
+                                            blurRadius: 2,
+                                            offset: Offset(0, 2),
+                                          )
+                                        ]
+                                      : null,
+                                  color: MABSelectedFilter == 0
+                                      ? null
+                                      : theme.secondary),
                               child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.transparent,
@@ -341,7 +359,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
-                                  onPressed: () => {},
+                                  onPressed: () => {setMABSelectedFilter(0)},
                                   child: Text(
                                     "All",
                                     style: textTheme.displaySmall!.copyWith(
@@ -349,49 +367,96 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   )),
                             ),
-                            SizedBox(height: 2)
+                            SizedBox(height: MABSelectedFilter == 0 ? 2 : 0),
                           ],
                         ),
                         //Filter 2 (Announcements)
-                        Container(
-                          height: 38,
-                          width: 120,
-                          //TODO if this button is selected, change bg color to gradient just like the ALL button
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: theme.secondary,
-                                  foregroundColor: theme.onSecondary,
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                        Column(
+                          children: [
+                            Container(
+                              height: 38,
+                              width: 120,
+                              decoration: BoxDecoration(
+                                  //Bit spaghetti but it works
+                                  //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
+                                  borderRadius: BorderRadius.circular(10),
+                                  gradient: MABSelectedFilter == 1
+                                      ? getPrimaryGradient
+                                      : null,
+                                  boxShadow: MABSelectedFilter == 1
+                                      ? [
+                                          const BoxShadow(
+                                            color: Colors.black,
+                                            blurRadius: 2,
+                                            offset: Offset(0, 2),
+                                          )
+                                        ]
+                                      : null,
+                                  color: MABSelectedFilter == 1
+                                      ? null
+                                      : theme.secondary),
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: theme.onSecondary,
+                                      shadowColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      )),
+                                  onPressed: () => setMABSelectedFilter(1),
+                                  child: Text(
+                                    "Announces",
+                                    style: textTheme.displaySmall!.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   )),
-                              onPressed: () => {},
-                              child: Text(
-                                "Announces",
-                                style: textTheme.displaySmall!.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )),
+                            ),
+                            SizedBox(height: MABSelectedFilter == 1 ? 2 : 0),
+                          ],
                         ),
-                        Container(
-                          height: 38,
-                          width: 120,
-                          //TODO if this button is selected, change bg color to gradient just like the ALL button
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: theme.secondary,
-                                  foregroundColor: theme.onSecondary,
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+
+                        Column(
+                          children: [
+                            Container(
+                              height: 38,
+                              width: 120,
+                              decoration: BoxDecoration(
+                                  //Bit spaghetti but it works
+                                  //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
+                                  borderRadius: BorderRadius.circular(10),
+                                  gradient: MABSelectedFilter == 2
+                                      ? getPrimaryGradient
+                                      : null,
+                                  boxShadow: MABSelectedFilter == 2
+                                      ? [
+                                          const BoxShadow(
+                                            color: Colors.black,
+                                            blurRadius: 2,
+                                            offset: Offset(0, 2),
+                                          )
+                                        ]
+                                      : null,
+                                  color: MABSelectedFilter == 2
+                                      ? null
+                                      : theme.secondary),
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: theme.onSecondary,
+                                      shadowColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      )),
+                                  onPressed: () => setMABSelectedFilter(2),
+                                  child: Text(
+                                    "Tasks",
+                                    style: textTheme.displaySmall!.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   )),
-                              onPressed: () => {},
-                              child: Text(
-                                "Tasks",
-                                style: textTheme.displaySmall!.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )),
+                            ),
+                            SizedBox(height: MABSelectedFilter == 2 ? 2 : 0),
+                          ],
                         ),
                       ],
                     ),
@@ -404,57 +469,77 @@ class _HomeScreenState extends State<HomeScreen> {
                       shrinkWrap: true,
                       itemCount: getMabData.posts.length,
                       itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 5.0),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              side:
-                                  BorderSide(color: theme.secondary, width: 1),
-                              padding: const EdgeInsets.all(8),
-                              backgroundColor: theme.secondary,
-                              foregroundColor: theme.onSecondary,
-                              shadowColor: Colors.black,
-                              elevation: 2,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            onPressed: () => {},
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(
-                                  width: 250,
-                                  height: 30,
-                                  child: FittedBox(
-                                    child: Text(
-                                      getMabData.posts[index].title,
-                                      style: textTheme.displaySmall!.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      textAlign: TextAlign.left,
+                        return MABSelectedFilter == 0 ||
+                                getMabData.posts[index].type ==
+                                    MABSelectedFilter
+                            ? Padding(
+                                padding: const EdgeInsets.only(bottom: 5.0),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    side: BorderSide(
+                                        color: theme.secondary, width: 1),
+                                    padding: const EdgeInsets.all(8),
+                                    backgroundColor: theme.secondary,
+                                    foregroundColor: theme.onSecondary,
+                                    shadowColor: Colors.black,
+                                    elevation: 2,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
+                                  ),
+                                  onPressed: () => {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) => MABModal(
+                                              title:
+                                                  getMabData.posts[index].title,
+                                              description: getMabData
+                                                  .posts[index].description,
+                                              image:
+                                                  getMabData.posts[index].image,
+                                              attatchements: getMabData
+                                                  .posts[index]
+                                                  .fileAttatchments,
+                                            ))
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      SizedBox(
+                                        width: 250,
+                                        height: 30,
+                                        child: FittedBox(
+                                          child: Text(
+                                            getMabData.posts[index].title,
+                                            style: textTheme.displaySmall!
+                                                .copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            textAlign: TextAlign.left,
+                                          ),
+                                        ),
+                                      ),
+                                      ClipRRect(
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(8.0)),
+                                        child: Container(
+                                          color: theme.secondary,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(6.0),
+                                            child: Text(
+                                              //days left due, and the day it is due
+                                              "${getMabData.posts[index].dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(getMabData.posts[index].dueDate)})",
+                                              style: textTheme.displaySmall,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(8.0)),
-                                  child: Container(
-                                    color: theme.secondary,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(6.0),
-                                      child: Text(
-                                        //days left due, and the day it is due
-                                        "${getMabData.posts[index].dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(getMabData.posts[index].dueDate)})",
-                                        style: textTheme.displaySmall,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        );
+                              )
+                            : const SizedBox.shrink();
                       },
                     ),
                   ],
@@ -464,6 +549,141 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         )
       ],
+    );
+  }
+}
+
+//Mab Modal
+class MABModal extends StatelessWidget {
+  const MABModal(
+      {super.key,
+      required this.title,
+      required this.description,
+      this.image,
+      required this.attatchements});
+  final String title, description;
+  final List<String> attatchements;
+  final String? image;
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    return Dialog(
+      elevation: 2,
+      backgroundColor: theme.background,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            //Main header
+            Text(
+              title,
+              style: textTheme.displayMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            //Sub header
+            Text(description,
+                style: textTheme.displaySmall, textAlign: TextAlign.center),
+            const SizedBox(height: 8),
+            //Image
+            Container(
+                width: double.infinity,
+                height: 250,
+                decoration: BoxDecoration(
+                    color: theme.primaryContainer,
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    border: Border.all(color: theme.secondary, width: 1)),
+                child: Center(
+                  child: image == null
+                      ? Text(
+                          "No Image",
+                          style: textTheme.displaySmall,
+                        )
+                      : Image.network(image!),
+                )),
+
+            const SizedBox(height: 16),
+
+            //Attatchements (row here to align text to the left)
+            Row(
+              children: [
+                Text(
+                  "${attatchements.length} Attatchements",
+                  style: textTheme.displaySmall,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+            ListView.builder(
+                shrinkWrap: true,
+                itemCount: attatchements.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: ElevatedButton(
+                      onPressed: () => {},
+                      style: ElevatedButton.styleFrom(
+                        side: BorderSide(color: theme.secondary, width: 1),
+                        padding: const EdgeInsets.all(0),
+                        backgroundColor: theme.secondary,
+                        foregroundColor: theme.onSecondary,
+                        shadowColor: Colors.black,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            //Replace with actual name
+                            Text(attatchements[index],
+                                style: textTheme.displaySmall),
+                            Icon(
+                              Icons.download_sharp,
+                              color: theme.onSecondary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+            const SizedBox(height: 16),
+            //Back button
+            Container(
+              height: 40,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: getPrimaryGradient,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () => {Navigator.pop(context)},
+                child: Text(
+                  "Back",
+                  style: textTheme.displaySmall!.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

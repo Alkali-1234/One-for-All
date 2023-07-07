@@ -12,9 +12,12 @@ class MabData {
         date: DateTime(2010, 1, 14),
         authorUID: 0,
         image: "https://picsum.photos/200/300",
-        fileAttatchment: "https://picsum.photos/200/300",
+        fileAttatchments: [
+          "https://picsum.photos/200/300",
+          "https://picsum.photos/200/300"
+        ],
         dueDate: DateTime(2023, 1, 14),
-        type: "announcement"),
+        type: 1),
     MabPost(
         uid: 0,
         title: "Did you know this hit game called Among Us?",
@@ -23,9 +26,9 @@ class MabData {
         date: DateTime(2001, 9, 11),
         authorUID: 0,
         image: "https://picsum.photos/200/300",
-        fileAttatchment: "https://picsum.photos/200/300",
+        fileAttatchments: ["https://picsum.photos/200/300"],
         dueDate: DateTime(2023, 8, 14),
-        type: "announcement")
+        type: 2)
   ];
 }
 
@@ -40,7 +43,7 @@ class MabPost {
     required this.date,
     required this.authorUID,
     required this.image,
-    required this.fileAttatchment,
+    required this.fileAttatchments,
     required this.dueDate,
     required this.type,
   });
@@ -48,9 +51,9 @@ class MabPost {
   String title;
   String description;
   String image;
-  String fileAttatchment;
+  List<String> fileAttatchments;
   DateTime dueDate;
-  String type;
+  int type;
   final DateTime date;
   final int authorUID;
 }
