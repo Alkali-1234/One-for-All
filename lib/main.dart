@@ -155,7 +155,6 @@ class _HomePageState extends State<HomePage> {
               ), //END OF TOP APP BAR
             ),
             //Main Content
-            //TODO Main Content and pages
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -547,7 +546,175 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ],
-        )
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Icon(Icons.bolt, color: theme.onPrimary, size: 45),
+            const SizedBox(width: 10),
+            Text(
+              "Recent Activity",
+              style: textTheme.displayLarge!.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        Divider(color: theme.onPrimary, thickness: 1),
+        const SizedBox(height: 14),
+        //Recent Activity Card (TODO: Make this a carousel)
+        //Card has repeating background based on what type of activity it is
+        //Card format: Left: User profile, Rright: Top: {user} just posted a new {acitivity} Bottom: {X minutes ago} {subject} {any relevant e.g number of questions}
+        //In this example is a Quiz card
+
+        RecentActivityCard(theme: theme, textTheme: textTheme)
+      ],
+    );
+  }
+}
+
+//TODO make this a carousel, and change the hard coded data to be dynamic
+class RecentActivityCard extends StatelessWidget {
+  const RecentActivityCard({
+    super.key,
+    required this.theme,
+    required this.textTheme,
+  });
+
+  final ColorScheme theme;
+  final TextTheme textTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+            //this is the background of the card
+            width: double.infinity,
+            height: 80,
+            //Clip any overflowed items
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: theme.secondary,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            //Overflowbox to prevent error
+            child: OverflowBox(
+              maxWidth: double.infinity,
+              maxHeight: double.infinity,
+              //The actual card
+              //Column to hold the card
+              child: Column(
+                children: [
+                  const SizedBox(height: 8),
+                  //Each row has a repeating icon rotated 45 degrees
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (int i = 0; i < 15; i++)
+                        Row(
+                          children: [
+                            Transform.rotate(
+                                angle: 0.45,
+                                child: Icon(Icons.extension,
+                                    color: theme.secondary)),
+                            const SizedBox(width: 8)
+                          ],
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Transform.translate(
+                    //Offset to move the row to the right so it aligns diagonally with the icons above
+                    offset: const Offset(16, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (int i = 0; i < 15; i++)
+                          Row(
+                            children: [
+                              Transform.rotate(
+                                  angle: 0.45,
+                                  child: Icon(Icons.extension,
+                                      color: theme.secondary)),
+                              const SizedBox(width: 8)
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Transform.translate(
+                    offset: const Offset(32, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (int i = 0; i < 15; i++)
+                          Row(
+                            children: [
+                              Transform.rotate(
+                                  angle: 0.45,
+                                  child: Icon(Icons.extension,
+                                      color: theme.secondary)),
+                              const SizedBox(width: 8)
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            )),
+
+        //Card Content (foreground)
+        Align(
+          alignment: Alignment.center,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //Left (Profile Picture)
+              children: [
+                //Profile Pictre (will show gradient if unavailable)
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                      color: theme.onPrimary,
+                      gradient: getPrimaryGradient,
+                      shape: BoxShape.circle),
+                  child: ClipRRect(
+                      borderRadius: const BorderRadius.all(Radius.circular(25)),
+                      child: Image.network(
+                        'https://picsum.photos/400/200',
+                        fit: BoxFit.cover,
+                      )),
+                ),
+                const SizedBox(width: 10),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Alkaline just posted a new quiz!",
+                      style: textTheme.displayMedium!
+                          .copyWith(fontWeight: FontWeight.w600, fontSize: 20),
+                    ),
+                    Row(
+                      children: [
+                        Text("3 Minutes ago", style: textTheme.displaySmall),
+                        Text(" • ", style: textTheme.displaySmall),
+                        Text("IPS", style: textTheme.displaySmall),
+                        Text(" • ", style: textTheme.displaySmall),
+                        Text("10 Questions", style: textTheme.displaySmall)
+                      ],
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
