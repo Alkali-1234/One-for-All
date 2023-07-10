@@ -24,3 +24,11 @@ const primaryShadow = BoxShadow(
 );
 
 get getPrimaryShadow => primaryShadow;
+
+const types = {
+  0: 'Quiz',
+  1: 'Flashcards',
+  2: 'Notes',
+};
+
+get getTypes => types;

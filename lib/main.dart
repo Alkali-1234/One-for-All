@@ -1,6 +1,7 @@
 // import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:oneforall/data/user_data.dart';
 import 'package:provider/provider.dart';
 import 'constants.dart';
 import 'package:sidebarx/sidebarx.dart';
@@ -110,8 +111,8 @@ class _HomePageState extends State<HomePage> {
       //Main application
       body: SafeArea(
         child: Container(
-          width: double.infinity,
-          height: double.infinity,
+          height: double.maxFinite,
+          width: double.maxFinite,
           decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/images/purpwallpaper 2.png'),
@@ -160,11 +161,11 @@ class _HomePageState extends State<HomePage> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: selectedScreen == 0
-                    ? HomeScreen()
+                    ? const HomeScreen()
                     : selectedScreen == 1
-                        ? NavigationScreen()
+                        ? const NavigationScreen()
                         : selectedScreen == 2
-                            ? ProfileScreen()
+                            ? const ProfileScreen()
                             : Container(),
               ),
             ),
@@ -230,7 +231,6 @@ class SidebarXWidget extends StatelessWidget {
       ),
       items: const [
         SidebarXItem(icon: Icons.home, label: '  Home'),
-        //TODO nav items, and icons, and functionality
       ],
       extendedTheme: const SidebarXTheme(width: 140),
     );
@@ -594,8 +594,90 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               RecentActivityCarousel(theme: theme, textTheme: textTheme),
-              //TODO: Make statistics
-              const Row(children: [Text("")])
+              Expanded(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Column(mainAxisSize: MainAxisSize.min, children: [
+                        //Top
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              color: Colors.yellow,
+                              size: 36,
+                            ),
+                            Text(getUserData.exp.toString(),
+                                style: textTheme.displayMedium!
+                                    .copyWith(fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "EXP",
+                              style: textTheme.displaySmall,
+                              textAlign: TextAlign.end,
+                            ),
+                          ],
+                        ),
+                      ]),
+                      Column(mainAxisSize: MainAxisSize.min, children: [
+                        //Top
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.local_fire_department_rounded,
+                              color: Colors.orange,
+                              size: 36,
+                            ),
+                            Text(getUserData.streak.toString(),
+                                style: textTheme.displayMedium!
+                                    .copyWith(fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Streak",
+                              style: textTheme.displaySmall,
+                              textAlign: TextAlign.end,
+                            ),
+                          ],
+                        ),
+                      ]),
+                      Column(mainAxisSize: MainAxisSize.min, children: [
+                        //Top
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.send_rounded,
+                              color: Color.fromRGBO(201, 201, 201, 1),
+                              size: 36,
+                            ),
+                            Text(getUserData.posts.toString(),
+                                style: textTheme.displayMedium!
+                                    .copyWith(fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Posts",
+                              style: textTheme.displaySmall,
+                              textAlign: TextAlign.end,
+                            ),
+                          ],
+                        ),
+                      ]),
+                    ]),
+              )
             ],
           ),
         ),
@@ -790,7 +872,7 @@ class RecentActivityCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "${activity.authorName} just posted a new quiz!",
+                        "${activity.authorName} just posted a new ${getTypes[activity.type]}!",
                         style: textTheme.displayMedium!.copyWith(
                             fontWeight: FontWeight.w600, fontSize: 20),
                       ),
