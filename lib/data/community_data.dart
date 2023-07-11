@@ -80,6 +80,61 @@ class MabPost {
   final int authorUID;
 }
 
+class LACData {
+  LACData({
+    required this.uid,
+  });
+  final int uid;
+
+  List<LACPost> posts = [
+    LACPost(
+        uid: 0,
+        title: "Super long sentence like wow forreal guys??? Like a!",
+        description: "i really like ducks.",
+        date: DateTime(2001, 9, 11),
+        authorUID: 0,
+        image: "https://picsum.photos/200/300",
+        fileAttatchments: ["https://picsum.photos/200/300"],
+        dueDate: DateTime(2023, 8, 14),
+        type: 2),
+    LACPost(
+        uid: 0,
+        title: "Derevee?",
+        description:
+            "In my world, everyone is a pony, and they all eat rainbows, and poop butterflies.",
+        date: DateTime(2001, 9, 11),
+        authorUID: 0,
+        image: "https://picsum.photos/200/300",
+        fileAttatchments: ["https://picsum.photos/200/300"],
+        dueDate: DateTime(2023, 8, 14),
+        type: 2),
+  ];
+}
+
+class LACPost {
+  LACPost(
+      {required this.uid,
+      required this.title,
+      required this.description,
+      required this.image,
+      required this.fileAttatchments,
+      required this.dueDate,
+      required this.type,
+      required this.date,
+      required this.authorUID});
+  final int uid;
+  String title;
+  String description;
+  String image;
+  List<String> fileAttatchments;
+  DateTime dueDate;
+  int type;
+  final DateTime date;
+  final int authorUID;
+}
+
+get getLACData => LACData(uid: 0);
+
 class RecentActivities {
   RecentActivities({
     required this.uid,
