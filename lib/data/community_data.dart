@@ -17,7 +17,8 @@ class MabData {
           "https://picsum.photos/200/300"
         ],
         dueDate: DateTime(2023, 1, 14),
-        type: 1),
+        type: 1,
+        subject: 1),
     MabPost(
         uid: 0,
         title: "Did you know this hit game called Among Us?",
@@ -28,7 +29,8 @@ class MabData {
         image: "https://picsum.photos/200/300",
         fileAttatchments: ["https://picsum.photos/200/300"],
         dueDate: DateTime(2023, 8, 14),
-        type: 2),
+        type: 2,
+        subject: 2),
     MabPost(
         uid: 0,
         title: "Did you know this hit game called Among Us?",
@@ -39,7 +41,8 @@ class MabData {
         image: "https://picsum.photos/200/300",
         fileAttatchments: ["https://picsum.photos/200/300"],
         dueDate: DateTime(2023, 8, 14),
-        type: 2),
+        type: 2,
+        subject: 3),
     MabPost(
         uid: 0,
         title: "Did you know this hit game called Among Us?",
@@ -50,7 +53,8 @@ class MabData {
         image: "https://picsum.photos/200/300",
         fileAttatchments: ["https://picsum.photos/200/300"],
         dueDate: DateTime(2023, 8, 14),
-        type: 2),
+        type: 2,
+        subject: 4),
   ];
 }
 
@@ -68,6 +72,7 @@ class MabPost {
     required this.fileAttatchments,
     required this.dueDate,
     required this.type,
+    required this.subject,
   });
   final int uid;
   String title;
@@ -76,6 +81,7 @@ class MabPost {
   List<String> fileAttatchments;
   DateTime dueDate;
   int type;
+  int subject;
   final DateTime date;
   final int authorUID;
 }
@@ -95,8 +101,9 @@ class LACData {
         authorUID: 0,
         image: "https://picsum.photos/200/300",
         fileAttatchments: ["https://picsum.photos/200/300"],
-        dueDate: DateTime(2023, 8, 14),
-        type: 2),
+        dueDate: DateTime(2023, 7, 21),
+        type: 2,
+        subject: 1),
     LACPost(
         uid: 0,
         title: "Derevee?",
@@ -106,8 +113,9 @@ class LACData {
         authorUID: 0,
         image: "https://picsum.photos/200/300",
         fileAttatchments: ["https://picsum.photos/200/300"],
-        dueDate: DateTime(2023, 8, 14),
-        type: 2),
+        dueDate: DateTime(2023, 7, 15),
+        type: 1,
+        subject: 0),
   ];
 }
 
@@ -121,7 +129,8 @@ class LACPost {
       required this.dueDate,
       required this.type,
       required this.date,
-      required this.authorUID});
+      required this.authorUID,
+      required this.subject});
   final int uid;
   String title;
   String description;
@@ -129,6 +138,7 @@ class LACPost {
   List<String> fileAttatchments;
   DateTime dueDate;
   int type;
+  int subject;
   final DateTime date;
   final int authorUID;
 }

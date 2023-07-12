@@ -32,3 +32,26 @@ const types = {
 };
 
 get getTypes => types;
+
+const subjects = {
+  0: 'Math',
+  1: 'Science',
+  2: 'English',
+  3: 'History',
+  4: 'IT',
+  5: 'Art',
+  6: 'Music',
+  7: 'PE',
+  8: 'Other',
+};
+
+get getSubjects => subjects;
+
+const dueDates = {
+  0: -1,
+  1: 3,
+  2: 7,
+  3: 14,
+};
+
+get getDueDates => dueDates;
