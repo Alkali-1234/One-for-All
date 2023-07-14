@@ -55,3 +55,43 @@ const dueDates = {
 };
 
 get getDueDates => dueDates;
+
+const stdCalendarData = {
+  "week1": {
+    "dates": [0, 0, 0, 0, 0, 0, 0]
+  },
+  "week2": {
+    "dates": [0, 0, 0, 0, 0, 0, 0]
+  },
+  "week3": {
+    "dates": [0, 0, 0, 0, 0, 0, 0]
+  },
+  "week4": {
+    "dates": [0, 0, 0, 0, 0, 0, 0]
+  },
+  "week5": {
+    "dates": [0, 0, 0, 0, 0, 0, 0]
+  },
+  "week6": {
+    "dates": [0, 0, 0, 0, 0, 0, 0]
+  }
+};
+
+get getStdCalendarData => stdCalendarData;
+
+const monthsOfTheYear = {
+  1: 'January',
+  2: 'Febuary',
+  3: 'March',
+  4: 'April',
+  5: 'May',
+  6: 'June',
+  7: 'July',
+  8: 'August',
+  9: 'September',
+  10: 'October',
+  11: 'November',
+  12: 'December',
+};
+
+get getMonthsOfTheYear => monthsOfTheYear;
