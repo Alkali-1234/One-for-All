@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/community_data.dart';
-import 'package:intl/intl.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});

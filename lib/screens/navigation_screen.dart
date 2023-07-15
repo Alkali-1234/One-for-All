@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 //Screens
 import 'mab_lac_screen.dart';
 import 'calendar_screen.dart';
+import 'flashcards_screen.dart';
 
 class NavigationScreen extends StatefulWidget {
   const NavigationScreen({super.key});
@@ -41,24 +42,54 @@ class _NavigationScreenState extends State<NavigationScreen> {
                             constraints: constraints,
                             icon: Icons.article,
                             name: "Summaries",
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return const UnavailableItemDialog();
+                                  });
+                            },
                           ),
                           NavigationItem(
                             theme: theme,
                             constraints: constraints,
                             icon: Icons.calendar_month,
                             name: "Refresher",
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return const UnavailableItemDialog();
+                                  });
+                            },
                           ),
                           NavigationItem(
                             theme: theme,
                             constraints: constraints,
                             icon: Icons.note,
                             name: "Flashcards",
+                            onPressed: () {
+                              debugPrint("Flashcards");
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const FlashcardsScreen()),
+                              );
+                            },
                           ),
                           NavigationItem(
                             theme: theme,
                             constraints: constraints,
                             icon: Icons.extension,
                             name: "Quizzes",
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return const UnavailableItemDialog();
+                                  });
+                            },
                           ),
                         ],
                       )
@@ -82,6 +113,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
                             constraints: constraints,
                             icon: Icons.import_contacts,
                             name: "Notes",
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return const UnavailableItemDialog();
+                                  });
+                            },
                           ),
                           NavigationItem(
                             theme: theme,
@@ -134,24 +172,52 @@ class _NavigationScreenState extends State<NavigationScreen> {
                             constraints: constraints,
                             icon: Icons.forum,
                             name: "Forums",
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return const UnavailableItemDialog();
+                                  });
+                            },
                           ),
                           NavigationItem(
                             theme: theme,
                             constraints: constraints,
                             icon: Icons.share,
                             name: "Sharing",
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return const UnavailableItemDialog();
+                                  });
+                            },
                           ),
                           NavigationItem(
                             theme: theme,
                             constraints: constraints,
                             icon: Icons.diamond,
                             name: "Premium",
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return const UnavailableItemDialog();
+                                  });
+                            },
                           ),
                           NavigationItem(
                             theme: theme,
                             constraints: constraints,
                             icon: Icons.settings,
                             name: "Settings",
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return const UnavailableItemDialog();
+                                  });
+                            },
                           ),
                         ],
                       )
@@ -217,6 +283,39 @@ class NavigationItem extends StatelessWidget {
             children: [
               Icon(icon, size: 50),
               Text(name),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class UnavailableItemDialog extends StatelessWidget {
+  const UnavailableItemDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Theme.of(context).colorScheme.background,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("This item is not available yet",
+                  style: Theme.of(context).textTheme.displayMedium),
+              FloatingActionButton.small(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    "Ok",
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onBackground),
+                  )),
             ],
           ),
         ),
