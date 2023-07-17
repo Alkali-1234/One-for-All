@@ -1,5 +1,9 @@
 // import 'dart:math';
 
+//Firebase
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
 import 'package:flutter/material.dart';
 import 'package:oneforall/data/user_data.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +19,12 @@ import 'data/community_data.dart';
 import 'screens/navigation_screen.dart';
 import 'screens/profile_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  debugPrint(
+    "Initialized app! : ${Firebase.app().options.projectId}",
+  );
   runApp(const MyApp());
 }
 
