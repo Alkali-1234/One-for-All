@@ -95,3 +95,12 @@ const monthsOfTheYear = {
 };
 
 get getMonthsOfTheYear => monthsOfTheYear;
+
+const initialLoadData = {
+  "data" : {
+    "hasLoggedIn" : false,
+    "email" : "",
+    "password" : "",
+
+  }
+};

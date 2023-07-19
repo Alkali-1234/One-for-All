@@ -1,6 +1,7 @@
 // import 'dart:math';
 
 //Firebase
+
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -11,6 +12,9 @@ import 'constants.dart';
 import 'package:sidebarx/sidebarx.dart';
 import 'package:intl/intl.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:path_provider/path_provider.dart';
+// import 'package:introduction_screen/introduction_screen.dart';
 
 //Data
 import 'data/community_data.dart';
@@ -18,6 +22,7 @@ import 'data/community_data.dart';
 //Screens
 import 'screens/navigation_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/loading_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,19 +30,25 @@ void main() async {
   debugPrint(
     "Initialized app! : ${Firebase.app().options.projectId}",
   );
-  runApp(const MyApp());
+
+  runApp(const MyApp(
+    showReload: true,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.showReload});
+  final bool showReload;
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
     return ChangeNotifierProvider(
       create: (context) => AppState(),
       child: MaterialApp(
         title: 'One for All',
+        navigatorKey: navigatorKey,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSwatch().copyWith(
             primary: const Color.fromRGBO(0, 0, 0, 0.25),
@@ -70,7 +81,11 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-        home: const HomePage(),
+        home: showReload
+            ? LoadingScreen(
+                navigatorKey: navigatorKey,
+              )
+            : const HomePage(),
       ),
     );
   }
@@ -147,7 +162,7 @@ class _HomePageState extends State<HomePage> {
                         size: 30,
                       ),
                     ),
-                    Text("Alkaline", style: textTheme.displaySmall),
+                    Text(getUserData.username, style: textTheme.displaySmall),
                     Container(
                       width: 30,
                       height: 30,
