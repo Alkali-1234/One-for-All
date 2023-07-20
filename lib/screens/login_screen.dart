@@ -22,8 +22,8 @@ class _LoginScreenState extends State<LoginScreen> {
     var textTheme = Theme.of(context).textTheme;
     return Container(
         decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/images/purpwallpaper 2.png'))),
+            image:
+                DecorationImage(image: AssetImage('assets/images/logbg.png'))),
         child: SafeArea(
             child: Scaffold(
                 backgroundColor: Colors.transparent,
@@ -45,14 +45,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           onChanged: (value) => setState(() {
                             emailQuery = value;
                           }),
-                          style: textTheme.displayMedium,
+                          style: textTheme.displaySmall,
                           cursorColor: theme.onBackground,
                           decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.only(left: 10),
                             filled: true,
-                            fillColor: theme.primary,
+                            fillColor: theme.primary.withOpacity(0.125),
                             hintText: "Email",
-                            hintStyle: textTheme.displayMedium!.copyWith(
-                                color: theme.onBackground.withOpacity(0.5)),
+                            hintStyle: textTheme.displaySmall,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: const BorderSide(
@@ -81,13 +81,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             passwordQuery = value;
                           }),
                           cursorColor: theme.onBackground,
-                          style: textTheme.displayMedium,
+                          style: textTheme.displaySmall,
                           decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.only(left: 10),
                             filled: true,
-                            fillColor: theme.primary,
+                            fillColor: theme.primary.withOpacity(0.125),
                             hintText: "Password",
-                            hintStyle: textTheme.displayMedium!.copyWith(
-                                color: theme.onBackground.withOpacity(0.5)),
+                            hintStyle: textTheme.displaySmall,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: const BorderSide(
