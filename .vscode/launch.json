@@ -7,7 +7,9 @@
         {
             "name": "oneforall",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "vmAdditionalArgs": [
+                "--enable-software-rendering"]
         },
         {
             "name": "oneforall (profile mode)",
@@ -19,7 +21,9 @@
             "name": "oneforall (release mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "release",
+            "vmAdditionalArgs": [
+                "--enable-software-rendering"]
         }
     ]
 }

@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+//ignore: unused_import
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/user_data.dart';
+//ignore: unused_import
 import '../data/community_data.dart';
 import 'dart:math';
 
@@ -32,5 +34,30 @@ login(String email, String password, bool saveCredentials) {
       email: auth.currentUser!.email ?? "Invalid Email!",
       profilePicture: auth.currentUser!.photoURL ?? ""));
   //TODO get user data from database
+  return true;
+}
+
+createAccount(String email, String password, String username) {
+  FirebaseAuth.instance
+      .createUserWithEmailAndPassword(email: email, password: password)
+      .then((value) {
+    FirebaseAuth.instance.currentUser!.updateDisplayName(username);
+    FirebaseAuth.instance.currentUser!
+        .updatePhotoURL("https://api.dicebear.com/api/initials/$username.svg");
+  }).catchError((error) {
+    return error;
+  });
+  var auth = FirebaseAuth.instance;
+  //TODO user data from firestore
+  //Set user data
+  setUserData(UserData(
+      uid: int.tryParse(auth.currentUser!.uid) ?? 0,
+      exp: 0,
+      streak: 0,
+      posts: 0,
+      flashCardSets: [],
+      username: auth.currentUser!.displayName ?? "Invalid Username!",
+      email: auth.currentUser!.email ?? "Invalid Email!",
+      profilePicture: auth.currentUser!.photoURL ?? ""));
   return true;
 }

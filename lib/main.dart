@@ -58,6 +58,7 @@ class MyApp extends StatelessWidget {
             onPrimary: const Color.fromRGBO(255, 255, 255, 1),
             onSecondary: const Color.fromRGBO(255, 255, 255, 1),
             background: const Color.fromRGBO(24, 4, 44, 1.0),
+            error: Colors.red,
           ),
           textTheme: const TextTheme(
             displayLarge: TextStyle(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../main.dart';
 import 'login_screen.dart';
+import 'get_started.dart';
 
 //Shared preferences
 // ignore: unused_import
@@ -36,7 +37,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
         verbose = "First time opening app. Going to get started page...";
       });
       // await Future.delayed(const Duration(seconds: 3));
-      pushToPage(const LoginScreen());
+      pushToPage(const GetStartedScreen());
       return;
     }
     debugPrint("Has opened before");
