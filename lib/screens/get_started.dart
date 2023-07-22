@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oneforall/screens/login_screen.dart';
 import '../constants.dart';
 import '../service/auth_service.dart';
 import 'package:email_validator/email_validator.dart';
@@ -87,10 +88,10 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
     var textTheme = widget.textTheme;
     var changeStep = widget.changeStep;
 
-    Future<bool> createAccountValidation() async {
+    void createAccountValidation() async {
       //If loading, return
       if (isLoading) {
-        return false;
+        return;
       }
       setState(() {
         error = "";
@@ -106,7 +107,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
           isLoading = false;
           error = "Please fill in all fields.";
         });
-        return false;
+        return;
       }
       //Validate username
       if (userNameQuery.length < 3) {
@@ -114,21 +115,21 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
           isLoading = false;
           error = "Username must be at least 3 characters long.";
         });
-        return false;
+        return;
       }
       if (userNameQuery.length > 20) {
         setState(() {
           isLoading = false;
           error = "Username must be less than 20 characters long.";
         });
-        return false;
+        return;
       }
       if (userNameQuery.contains(" ")) {
         setState(() {
           isLoading = false;
           error = "Username cannot contain spaces.";
         });
-        return false;
+        return;
       }
       //Validate email
       if (!EmailValidator.validate(emailQuery)) {
@@ -136,7 +137,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
           isLoading = false;
           error = "Please enter a valid email.";
         });
-        return false;
+        return;
       }
       //Validate password
       if (passwordQuery != retypePasswordQuery) {
@@ -144,17 +145,17 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
           isLoading = false;
           error = "Passwords do not match.";
         });
-        return false;
+        return;
       }
       //Create account
-      var result =
-          await createAccount(emailQuery, passwordQuery, userNameQuery);
-      if (result != true) {
-        setState(() {
-          isLoading = false;
-          error = result;
-        });
-        return false;
+      await createAccount(emailQuery, passwordQuery, userNameQuery)
+          .then((value) => debugPrint("Account created"))
+          .onError((error, stackTrace) => setState(() {
+                isLoading = false;
+                this.error = error.toString();
+              }));
+      if (error != "") {
+        return;
       }
       setState(() {
         success = true;
@@ -163,7 +164,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
       await Future.delayed(const Duration(seconds: 3));
       //Go to step 2
       changeStep(2);
-      return true;
+      return;
     }
 
     return SafeArea(
@@ -262,7 +263,12 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()));
+              },
               style: ElevatedButton.styleFrom(
                   backgroundColor: theme.secondary,
                   shadowColor: Colors.transparent,

@@ -1,27 +1,25 @@
 import 'package:firebase_auth/firebase_auth.dart';
 //ignore: unused_import
 import 'package:flutter/material.dart';
+//ignore: unused_import
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/user_data.dart';
 //ignore: unused_import
 import '../data/community_data.dart';
-import 'dart:math';
 
 get getUserAuth => FirebaseAuth.instance;
 
-login(String email, String password, bool saveCredentials) {
-  FirebaseAuth.instance
-      .signInWithEmailAndPassword(email: email, password: password)
-      .then((value) async {
-    final prefs = await SharedPreferences.getInstance();
-    if (saveCredentials) {
-      prefs.setString("email", email);
-      prefs.setString("password", password);
-      prefs.setBool("hasOpenedBefore", true);
-    }
-  }).catchError((error) {
-    return error;
-  });
+Future login(String email, String password, bool saveCredentials) async {
+  try {
+    await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password)
+        .catchError((error, stacktrace) {
+      throw error;
+    });
+  } catch (e) {
+    rethrow;
+  }
+
   var auth = FirebaseAuth.instance;
   //Set user data
   setUserData(UserData(
@@ -37,16 +35,23 @@ login(String email, String password, bool saveCredentials) {
   return true;
 }
 
-createAccount(String email, String password, String username) {
-  FirebaseAuth.instance
-      .createUserWithEmailAndPassword(email: email, password: password)
-      .then((value) {
-    FirebaseAuth.instance.currentUser!.updateDisplayName(username);
-    FirebaseAuth.instance.currentUser!
-        .updatePhotoURL("https://api.dicebear.com/api/initials/$username.svg");
-  }).catchError((error) {
-    return error;
-  });
+Future createAccount(String email, String password, String username) async {
+  try {
+    await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .catchError((error, stacktrace) {
+      throw error.toString();
+    });
+  } catch (e) {
+    rethrow;
+  }
+
+  await FirebaseAuth.instance.currentUser!
+      .updateDisplayName(username)
+      .onError((error, stackTrace) => throw stackTrace);
+  await FirebaseAuth.instance.currentUser!
+      .updatePhotoURL("https://api.dicebear.com/api/initials/$username.svg")
+      .onError((error, stackTrace) => throw stackTrace);
   var auth = FirebaseAuth.instance;
   //TODO user data from firestore
   //Set user data

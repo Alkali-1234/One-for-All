@@ -88,7 +88,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
     getUserData.email = auth.currentUser!.email!;
     getUserData.username = auth.currentUser!.displayName!;
     getUserData.profilePicture = auth.currentUser!.photoURL!;
-    //TODO Get user data from database
     setState(() {
       verbose = "Retrieving user data...";
     });
@@ -116,8 +115,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.secondary,
             ),
             const SizedBox(height: 20),
             const Text(

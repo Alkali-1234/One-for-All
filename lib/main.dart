@@ -127,6 +127,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       //Global key for the scaffold
       key: _key,
       //Sidebar

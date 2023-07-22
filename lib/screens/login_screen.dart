@@ -1,7 +1,10 @@
+//
 import 'package:flutter/material.dart';
 import '../constants.dart';
 import '../service/auth_service.dart';
 import '../main.dart';
+import 'package:email_validator/email_validator.dart';
+import './get_started.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,6 +18,41 @@ class _LoginScreenState extends State<LoginScreen> {
   String passwordQuery = "";
   String error = "";
   bool isLoading = false;
+
+  void pushToPage(Widget page) {
+    Navigator.of(context)
+        .pushReplacement(MaterialPageRoute(builder: (context) => page));
+    return;
+  }
+
+  void attemptLogin() async {
+    setState(() {
+      isLoading = true;
+    });
+    //Check if email and password are filled
+    if (emailQuery == "" || passwordQuery == "") {
+      setState(() {
+        isLoading = false;
+        error = "Please fill in all fields";
+      });
+      return;
+    }
+    //Validate email
+    if (!EmailValidator.validate(emailQuery)) {
+      setState(() {
+        isLoading = false;
+        error = "Please enter a valid email";
+      });
+      return;
+    }
+    //Attempt to login
+    await login(emailQuery, passwordQuery, false)
+        .then((value) => pushToPage(const HomeScreen()))
+        .onError((error, stackTrace) => setState(() {
+              isLoading = false;
+              this.error = error.toString();
+            }));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,31 +164,30 @@ class _LoginScreenState extends State<LoginScreen> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              onPressed: () async {
-                                setState(() {
-                                  isLoading = true;
-                                });
-                                var loginResult = await login(
-                                    emailQuery, passwordQuery, false);
-                                if (loginResult) {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              MyApp(showReload: false)));
-                                } else {
-                                  setState(() {
-                                    isLoading = false;
-                                    error = "Failed to login";
-                                  });
+                              onPressed: () {
+                                if (isLoading == false) {
+                                  attemptLogin();
                                 }
                               },
-                              child: Text("Log In",
-                                  style: textTheme.displaySmall!
-                                      .copyWith(fontWeight: FontWeight.bold))),
+                              child: isLoading
+                                  ? SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                          color: theme.onBackground),
+                                    )
+                                  : Text("Log In",
+                                      style: textTheme.displaySmall!.copyWith(
+                                          fontWeight: FontWeight.bold))),
                         ),
+                        const SizedBox(height: 2.5),
+                        error != ""
+                            ? Text(error,
+                                style: textTheme.displaySmall!
+                                    .copyWith(color: theme.error))
+                            : Container(),
                         const SizedBox(
-                          height: 5,
+                          height: 2.5,
                         ),
                         SizedBox(
                           width: double.infinity,
@@ -164,16 +201,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                 side: BorderSide(color: theme.tertiary),
                               ),
                               onPressed: () {
-                                //TODO: Implement sign up page
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const GetStartedScreen()));
                               },
-                              child: isLoading
-                                  ? CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          theme.onSecondary),
-                                    )
-                                  : Text("Create a new account",
-                                      style: textTheme.displaySmall!.copyWith(
-                                          fontWeight: FontWeight.bold))),
+                              child: Text("Create a new account",
+                                  style: textTheme.displaySmall!
+                                      .copyWith(fontWeight: FontWeight.bold))),
                         ),
                       ],
                     ),
