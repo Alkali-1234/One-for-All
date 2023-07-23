@@ -9,7 +9,7 @@
             "request": "launch",
             "type": "dart",
             "vmAdditionalArgs": [
-                "--enable-software-rendering"]
+                "--enable-software-rendering", "--debug"]
         },
         {
             "name": "oneforall (profile mode)",

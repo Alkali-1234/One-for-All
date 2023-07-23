@@ -1,65 +1,23 @@
+var communityData;
+void setCommunityData(data) => communityData = data;
+get getCommunityData => communityData;
+
 class MabData {
   MabData({
     required this.uid,
+    required this.posts,
   });
   final int uid;
 
-  List<MabPost> posts = [
-    MabPost(
-        uid: 0,
-        title: "Hello World",
-        description: "description",
-        date: DateTime(2010, 1, 14),
-        authorUID: 0,
-        image: "https://picsum.photos/200/300",
-        fileAttatchments: [
-          "https://picsum.photos/200/300",
-          "https://picsum.photos/200/300"
-        ],
-        dueDate: DateTime(2023, 1, 14),
-        type: 1,
-        subject: 1),
-    MabPost(
-        uid: 0,
-        title: "Did you know this hit game called Among Us?",
-        description:
-            "In my world, everyone is a pony, and they all eat rainbows, and poop butterflies.",
-        date: DateTime(2001, 9, 11),
-        authorUID: 0,
-        image: "https://picsum.photos/200/300",
-        fileAttatchments: ["https://picsum.photos/200/300"],
-        dueDate: DateTime(2023, 8, 14),
-        type: 2,
-        subject: 2),
-    MabPost(
-        uid: 0,
-        title: "Did you know this hit game called Among Us?",
-        description:
-            "In my world, everyone is a pony, and they all eat rainbows, and poop butterflies.",
-        date: DateTime(2001, 9, 11),
-        authorUID: 0,
-        image: "https://picsum.photos/200/300",
-        fileAttatchments: ["https://picsum.photos/200/300"],
-        dueDate: DateTime(2023, 8, 14),
-        type: 2,
-        subject: 3),
-    MabPost(
-        uid: 0,
-        title: "Did you know this hit game called Among Us?",
-        description:
-            "In my world, everyone is a pony, and they all eat rainbows, and poop butterflies.",
-        date: DateTime(2001, 9, 11),
-        authorUID: 0,
-        image: "https://picsum.photos/200/300",
-        fileAttatchments: ["https://picsum.photos/200/300"],
-        dueDate: DateTime(2023, 8, 14),
-        type: 2,
-        subject: 4),
-  ];
+  List<MabPost> posts = [];
+
+  set addPost(MabPost post) => posts.add(post);
 }
 
-//get uid from user's community id
-get getMabData => MabData(uid: 0);
+MabData? mabData;
+
+void setMabData(MabData data) => mabData = data;
+get getMabData => mabData;
 
 class MabPost {
   MabPost({
