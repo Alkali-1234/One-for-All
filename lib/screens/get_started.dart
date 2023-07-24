@@ -16,8 +16,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
   String emailQuery = "";
   String passwordQuery = "";
   String error = "";
-  //! Current step is hardcoded to 2 for testing purposes
-  int currentStep = 2;
+  int currentStep = 0;
   //0 = welcome
   //1 = account creation
   //2 = join a school or a community
@@ -54,12 +53,83 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                           theme: theme,
                           textTheme: textTheme,
                           changeStep: changeCurrentStep)
-                      : JoinCommunityScreen(
-                          changeStep: changeCurrentStep,
-                        ),
+                      : currentStep == 2
+                          ? JoinCommunityScreen(
+                              changeStep: changeCurrentStep,
+                            )
+                          : const SettingsConfigurationScreen(),
             ),
           ),
         ));
+  }
+}
+
+class SettingsConfigurationScreen extends StatefulWidget {
+  const SettingsConfigurationScreen({super.key});
+
+  @override
+  State<SettingsConfigurationScreen> createState() =>
+      _SettingsConfigurationScreenState();
+}
+
+class _SettingsConfigurationScreenState
+    extends State<SettingsConfigurationScreen> {
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    return SafeArea(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          children: [
+            Row(children: [
+              Text("3. Configure your settings.",
+                  style: textTheme.displayMedium)
+            ]),
+            const SizedBox(height: 50),
+            Container(
+                width: double.infinity,
+                height: 200,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: theme.tertiary, width: 1),
+                    color: theme.primary),
+                child: Center(
+                  child: Text("Coming soon!", style: textTheme.displaySmall),
+                )),
+          ],
+        ),
+        //* Done button
+        Container(
+          height: 40,
+          width: double.infinity,
+          decoration: const BoxDecoration(
+              gradient: primaryGradient,
+              borderRadius: BorderRadius.all(Radius.circular(100))),
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()));
+            },
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                elevation: 0,
+                padding: const EdgeInsets.all(0),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100))),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 80),
+              child: Text("Done",
+                  style: textTheme.displaySmall!
+                      .copyWith(fontWeight: FontWeight.bold)),
+            ),
+          ),
+        )
+      ],
+    ));
   }
 }
 
