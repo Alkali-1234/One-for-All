@@ -22,16 +22,22 @@ Future login(String email, String password, bool saveCredentials) async {
 
   var auth = FirebaseAuth.instance;
   //Set user data
-  setUserData(UserData(
-      uid: int.tryParse(auth.currentUser!.uid) ?? 0,
-      exp: 0,
-      streak: 0,
-      posts: 0,
-      flashCardSets: [],
-      username: auth.currentUser!.displayName ?? "Invalid Username!",
-      email: auth.currentUser!.email ?? "Invalid Email!",
-      profilePicture: auth.currentUser!.photoURL ?? ""));
+    await getDocument("users", auth.currentUser!.uid).then((value) {
+        setUserData(UserData(
+            uid: int.tryParse(auth.currentUser!.uid) ?? 0,
+            exp: value["exp"] ?? -1,
+            streak: value["streak"] ?? -1,
+            posts: value["posts"] ?? -1,
+            flashCardSets: value["flashCardSets"] ?? [],
+            username: auth.currentUser!.displayName ?? "Invalid Username!",
+            email: auth.currentUser!.email ?? "Invalid Email!",
+            profilePicture: auth.currentUser!.photoURL ?? ""));
+    }).catchError((error, stackTrace) {
+        throw error;
+    });
 
+  
+    //Set community data
   await getValue("users", auth.currentUser!.uid, "assignedCommunity").then((value) async {
     if (value != null) {
      await getCommunityData(value); 
@@ -61,17 +67,25 @@ Future createAccount(String email, String password, String username) async {
   await FirebaseAuth.instance.currentUser!
       .updatePhotoURL("https://api.dicebear.com/api/initials/$username.svg")
       .onError((error, stackTrace) => throw stackTrace);
+  //Create user data
+  await createUserData(FirebaseAuth.instance.currentUser!.uid)
+      .catchError((error, stackTrace) {
+    throw error;
+  });
   var auth = FirebaseAuth.instance;
-  //TODO user data from firestore
   //Set user data
-  setUserData(UserData(
-      uid: int.tryParse(auth.currentUser!.uid) ?? 0,
-      exp: 0,
-      streak: 0,
-      posts: 0,
-      flashCardSets: [],
-      username: auth.currentUser!.displayName ?? "Invalid Username!",
-      email: auth.currentUser!.email ?? "Invalid Email!",
-      profilePicture: auth.currentUser!.photoURL ?? ""));
+  await getDocument("users", auth.currentUser!.uid).then((value) {
+    setUserData(UserData(
+        uid: int.tryParse(auth.currentUser!.uid) ?? 0,
+        exp: value["exp"] ?? -1,
+        streak: value["streak"] ?? -1,
+        posts: value["posts"] ?? -1,
+        flashCardSets: value["flashCardSets"] ?? [],
+        username: auth.currentUser!.displayName ?? "Invalid Username!",
+        email: auth.currentUser!.email ?? "Invalid Email!",
+        profilePicture: auth.currentUser!.photoURL ?? ""));
+  }).catchError((error, stackTrace) {
+    throw error;
+  });
   return true;
 }

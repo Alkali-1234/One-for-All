@@ -5,6 +5,26 @@ import 'package:flutter/material.dart';
 import '../data/community_data.dart';
 import 'auth_service.dart';
 
+
+Future createUserData(String uid) async {
+    //* Create user data
+    CollectionReference userCollection =
+        FirebaseFirestore.instance.collection("users");
+    try {
+        await userCollection.doc(uid).set({
+        "exp": 0,
+        "streak": 0,
+        "posts": 0,
+        "flashCardSets": [],
+        "assignedCommunity": null
+        }).catchError((error, stackTrace) {
+        throw error;
+        });
+    } catch (e) {
+        rethrow;
+    }
+}
+
 //! TODO FUNCTION NOT TESTED
 Future getValue(String collection, String document, String field) async {
     //* Get the collection
@@ -29,11 +49,31 @@ Future getValue(String collection, String document, String field) async {
   return val;
 }
 
+Future getDocument(String collection, String document) async {
+    //* Get the community document
+    CollectionReference communityCollection =
+        FirebaseFirestore.instance.collection(collection);
+    try {
+        await communityCollection.doc(document).get().then((value) {
+        if (value.data() == null) {
+            throw Exception("Document does not exist");
+        } else {
+            debugPrint(value.data().toString());
+            return value;
+        }
+        }).catchError((error, stackTrace) {
+        throw error;
+        });
+    } catch (e) {
+        rethrow;
+    }
+}
+
 Future getCommunity(String communityID) async {
   //* Get the community document
   CollectionReference communityCollection =
       FirebaseFirestore.instance.collection("communities");
-  Object? document;
+  DocumentSnapshot document;
   try {
     await communityCollection.doc(communityID).get().then((value) {
       // debugPrint(value.toString());
@@ -46,7 +86,8 @@ Future getCommunity(String communityID) async {
         throw Exception("Community does not exist");
       } else {
         debugPrint(value.data().toString());
-        document = value.data();
+        document = value;
+        return document;
       }
     }).catchError((error, stackTrace) {
       throw error;
@@ -54,7 +95,7 @@ Future getCommunity(String communityID) async {
   } catch (e) {
     rethrow;
   }
-  return document;
+ 
 }
 
 Future joinCommunity(String communityID, String password) async {
@@ -81,7 +122,6 @@ Future joinCommunity(String communityID, String password) async {
   FirebaseFirestore.instance
       .collection("communities")
       .doc(communityID)
-      //TODO UID should be proper
       .update({
     "members": FieldValue.arrayUnion([getUserAuth.uid])
   });
@@ -93,16 +133,16 @@ Future joinCommunity(String communityID, String password) async {
       MabData(uid: 0, posts: [
     for (var post in communityDocument["MAB"])
       MabPost(
-          uid: 0,
+          uid: communityDocument["MAB"].indexOf(post),
           title: post["title"],
           description: post["description"],
           date: DateTime.parse(post["date"].toDate().toString()),
-          authorUID: 0,
+          authorUID: post["authorUID"],
           image: post["image"],
           fileAttatchments: post["files"],
-          dueDate: DateTime.parse(post["date"].toDate().toString()),
-          type: 0,
-          subject: 1)
+          dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
+          type: post["type"],
+          subject: post["subject"]),
   ]));
   return communityDocument;
 }
@@ -132,7 +172,6 @@ Future getCommunityData(String communityID) async {
   //* Save data to community_data.dart
   setCommunityData(document);
   setMabData(
-      //! data is not complete in community document
       MabData(uid: 0, posts: [
     for (var post in document["MAB"])
       MabPost(
@@ -144,8 +183,8 @@ Future getCommunityData(String communityID) async {
           image: post["image"],
           fileAttatchments: post["files"],
           dueDate: DateTime.parse(post["date"].toDate().toString()),
-          type: 0,
-          subject: 1)
+          type: post["type"],
+          subject: post["subject"]),
   ]));
   //* If the user is in a section, get the section data
   //TODO
