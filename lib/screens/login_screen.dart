@@ -157,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(100),
                             gradient: getPrimaryGradient,
                           ),
                           width: double.infinity,
@@ -186,14 +186,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                       style: textTheme.displaySmall!.copyWith(
                                           fontWeight: FontWeight.bold))),
                         ),
-                        const SizedBox(height: 2.5),
+                        const SizedBox(height: 5),
                         error != ""
                             ? Text(error,
                                 style: textTheme.displaySmall!
                                     .copyWith(color: theme.error))
                             : Container(),
                         const SizedBox(
-                          height: 2.5,
+                          height: 5,
                         ),
                         SizedBox(
                           width: double.infinity,
@@ -203,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 backgroundColor: theme.secondary,
                                 shadowColor: Colors.transparent,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(100),
                                 ),
                                 side: BorderSide(color: theme.tertiary),
                               ),
@@ -215,9 +215,30 @@ class _LoginScreenState extends State<LoginScreen> {
                                             const GetStartedScreen()));
                               },
                               child: Text("Create a new account",
-                                  style: textTheme.displaySmall!
-                                      .copyWith(fontWeight: FontWeight.bold))),
+                                  style: textTheme.displaySmall)),
+
                         ),
+                        const SizedBox(height: 10),
+
+                        // Login as Guest
+                        SizedBox(
+                            width: double.infinity,
+                            height: 40,
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: theme.secondary,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(100),
+                                    ),
+                                    side: BorderSide(color: theme.tertiary),
+                                ),
+                                onPressed: () {},
+                                child: Text("Login as Guest",
+                                    style: textTheme.displaySmall)
+                            )
+
+                        )
                       ],
                     ),
                   ),

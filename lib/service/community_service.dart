@@ -5,6 +5,30 @@ import 'package:flutter/material.dart';
 import '../data/community_data.dart';
 import 'auth_service.dart';
 
+//! TODO FUNCTION NOT TESTED
+Future getValue(String collection, String document, String field) async {
+    //* Get the collection
+  CollectionReference communityCollection =
+
+      FirebaseFirestore.instance.collection(collection);
+  var val;
+  try {
+    await communityCollection.doc(document).get().then((value) {
+      if (value.data() == null) {
+        throw Exception("Community does not exist");
+      } else {
+        debugPrint(value.data().toString());
+        val = value[field];
+      }
+    }).catchError((error, stackTrace) {
+      throw error;
+    });
+  } catch (e) {
+    rethrow;
+  }
+  return val;
+}
+
 Future getCommunity(String communityID) async {
   //* Get the community document
   CollectionReference communityCollection =

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/user_data.dart';
 //ignore: unused_import
-import '../data/community_data.dart';
+import 'community_service.dart';
 
 get getUserAuth => FirebaseAuth.instance;
 
@@ -31,8 +31,17 @@ Future login(String email, String password, bool saveCredentials) async {
       username: auth.currentUser!.displayName ?? "Invalid Username!",
       email: auth.currentUser!.email ?? "Invalid Email!",
       profilePicture: auth.currentUser!.photoURL ?? ""));
-  //TODO get user data from database
+
+  await getValue("users", auth.currentUser!.uid, "assignedCommunity").then((value) async {
+    if (value != null) {
+     await getCommunityData(value); 
+    } else { throw Exception("User not assigned to community"); }
+    }).catchError((error, stackTrace) {
+      throw error;
+    });
+  
   return true;
+
 }
 
 Future createAccount(String email, String password, String username) async {
