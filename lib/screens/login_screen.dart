@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     //Attempt to login
     await login(emailQuery, passwordQuery, false)
-        .then((value) => pushToPage(const HomeScreen()))
+        .then((value) => pushToPage(const MyApp(showReload: false)))
         .onError((error, stackTrace) => setState(() {
               isLoading = false;
               this.error = error.toString();

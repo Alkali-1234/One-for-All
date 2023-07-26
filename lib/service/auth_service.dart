@@ -23,16 +23,30 @@ Future login(String email, String password, bool saveCredentials) async {
   var auth = FirebaseAuth.instance;
   //Set user data
     await getDocument("users", auth.currentUser!.uid).then((value) {
+        //set flashcard sets for setUserData
+        //* Initialize an empty list of flashcard sets
+        debugPrint(value.data()!["flashcardSets"].toString());
+        List<FlashcardSet> flashcardSets = [];
+        if (value.data()!["flashcardSets"] != null) {
+            //* Add flashcard sets to the list
+            for (var i = 0; i < value.data()!["flashcardSets"].length; i++) {
+                flashcardSets.add(FlashcardSet(id: i, flashcards: [
+                    for (var j = 0; j < value.data()!["flashcardSets"][i]["questions"].length; j++)
+                        Flashcard(id: j, question: value.data()!["flashcardSets"][i]["questions"][j]["question"], answer: value.data()!["flashcardSets"][i]["questions"][j]["answer"])
+                ], title: value.data()!["flashcardSets"][i]["title"], description: value.data()!["flashcardSets"][i]["description"]));
+            }
+        }
         setUserData(UserData(
             uid: int.tryParse(auth.currentUser!.uid) ?? 0,
-            exp: value["exp"] ?? -1,
-            streak: value["streak"] ?? -1,
-            posts: value["posts"] ?? -1,
-            flashCardSets: value["flashCardSets"] ?? [],
+            exp: value.data()["exp"],
+            streak: value.data()["streak"],
+            posts: value.data()["posts"],
+            flashCardSets: flashcardSets,
             username: auth.currentUser!.displayName ?? "Invalid Username!",
             email: auth.currentUser!.email ?? "Invalid Email!",
             profilePicture: auth.currentUser!.photoURL ?? ""));
     }).catchError((error, stackTrace) {
+        debugPrint("err on auth service: getDocument");
         throw error;
     });
 
@@ -40,9 +54,11 @@ Future login(String email, String password, bool saveCredentials) async {
     //Set community data
   await getValue("users", auth.currentUser!.uid, "assignedCommunity").then((value) async {
     if (value != null) {
+        debugPrint("Assigned community: " + value.toString());
      await getCommunityData(value); 
     } else { throw Exception("User not assigned to community"); }
     }).catchError((error, stackTrace) {
+     debugPrint("err on auth service: getValue");
       throw error;
     });
   

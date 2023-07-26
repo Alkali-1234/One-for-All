@@ -53,13 +53,14 @@ Future getDocument(String collection, String document) async {
     //* Get the community document
     CollectionReference communityCollection =
         FirebaseFirestore.instance.collection(collection);
+    var doc;
     try {
         await communityCollection.doc(document).get().then((value) {
         if (value.data() == null) {
             throw Exception("Document does not exist");
         } else {
             debugPrint(value.data().toString());
-            return value;
+            doc = value;
         }
         }).catchError((error, stackTrace) {
         throw error;
@@ -67,13 +68,14 @@ Future getDocument(String collection, String document) async {
     } catch (e) {
         rethrow;
     }
+    return doc;
 }
 
 Future getCommunity(String communityID) async {
   //* Get the community document
   CollectionReference communityCollection =
       FirebaseFirestore.instance.collection("communities");
-  DocumentSnapshot document;
+  var document;
   try {
     await communityCollection.doc(communityID).get().then((value) {
       // debugPrint(value.toString());
@@ -87,7 +89,6 @@ Future getCommunity(String communityID) async {
       } else {
         debugPrint(value.data().toString());
         document = value;
-        return document;
       }
     }).catchError((error, stackTrace) {
       throw error;
@@ -96,6 +97,7 @@ Future getCommunity(String communityID) async {
     rethrow;
   }
  
+  return document;
 }
 
 Future joinCommunity(String communityID, String password) async {
@@ -160,7 +162,7 @@ Future getCommunityData(String communityID) async {
       } else {
         debugPrint(value.data().toString());
 
-        document = value.data();
+        document = value;
       }
     }).catchError((error, stackTrace) {
       throw error;
@@ -173,7 +175,7 @@ Future getCommunityData(String communityID) async {
   setCommunityData(document);
   setMabData(
       MabData(uid: 0, posts: [
-    for (var post in document["MAB"])
+    for (var post in document.data()["MAB"])
       MabPost(
           uid: 0,
           title: post["title"],
@@ -181,7 +183,7 @@ Future getCommunityData(String communityID) async {
           date: DateTime.parse(post["date"].toDate().toString()),
           authorUID: 0,
           image: post["image"],
-          fileAttatchments: post["files"],
+          fileAttatchments: ["placeholder!", "!"],
           dueDate: DateTime.parse(post["date"].toDate().toString()),
           type: post["type"],
           subject: post["subject"]),
