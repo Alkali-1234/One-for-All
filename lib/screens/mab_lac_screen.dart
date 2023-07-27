@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:oneforall/constants.dart';
@@ -67,6 +68,15 @@ class _MABLACScreenState extends State<MABLACScreen> {
                 fit: BoxFit.cover)),
         child: SafeArea(
             child: Scaffold(
+                floatingActionButton: FloatingActionButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) => const NewEventModal());
+                  },
+                  backgroundColor: theme.primary,
+                  child: const Icon(Icons.add),
+                ),
                 resizeToAvoidBottomInset: false,
                 backgroundColor: Colors.transparent,
                 body: Column(
@@ -466,59 +476,59 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                               ),
                                             ),
                                             const SizedBox(height: 5),
-                                            Flexible(
+                                            const Flexible(
                                               flex: 1,
                                               child: Row(
                                                 children: [
-                                                  Container(
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.3,
-                                                    decoration: BoxDecoration(
-                                                      color: theme.secondary,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                    ),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: DropdownButton(
-                                                        value: sortFilter,
-                                                        icon: const Icon(null),
-                                                        underline: Container(),
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            sortFilter =
-                                                                value as int;
-                                                          });
-                                                        },
-                                                        items: const [
-                                                          DropdownMenuItem(
-                                                            value: 0,
-                                                            child: Text(
-                                                                "Newest",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white)),
-                                                          ),
-                                                          DropdownMenuItem(
-                                                            value: 1,
-                                                            child: FittedBox(
-                                                              child: Text(
-                                                                  "Due Date",
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white)),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
+                                                  // Container(
+                                                  //   width:
+                                                  //       MediaQuery.of(context)
+                                                  //               .size
+                                                  //               .width *
+                                                  //           0.3,
+                                                  //   decoration: BoxDecoration(
+                                                  //     color: theme.secondary,
+                                                  //     borderRadius:
+                                                  //         BorderRadius.circular(
+                                                  //             10),
+                                                  //   ),
+                                                  //   child: Padding(
+                                                  //     padding:
+                                                  //         const EdgeInsets.all(
+                                                  //             8.0),
+                                                  //     child: DropdownButton(
+                                                  //       value: sortFilter,
+                                                  //       icon: const Icon(null),
+                                                  //       underline: Container(),
+                                                  //       onChanged: (value) {
+                                                  //         setState(() {
+                                                  //           sortFilter =
+                                                  //               value as int;
+                                                  //         });
+                                                  //       },
+                                                  //       items: const [
+                                                  //         DropdownMenuItem(
+                                                  //           value: 0,
+                                                  //           child: Text(
+                                                  //               "Newest",
+                                                  //               style: TextStyle(
+                                                  //                   color: Colors
+                                                  //                       .white)),
+                                                  //         ),
+                                                  //         DropdownMenuItem(
+                                                  //           value: 1,
+                                                  //           child: FittedBox(
+                                                  //             child: Text(
+                                                  //                 "Due Date",
+                                                  //                 style: TextStyle(
+                                                  //                     color: Colors
+                                                  //                         .white)),
+                                                  //           ),
+                                                  //         ),
+                                                  //       ],
+                                                  //     ),
+                                                  //   ),
+                                                  // ),
                                                 ],
                                               ),
                                             )
@@ -644,6 +654,197 @@ class _MABLACScreenState extends State<MABLACScreen> {
                     ),
                   ],
                 ))));
+  }
+}
+
+class NewEventModal extends StatefulWidget {
+  const NewEventModal({super.key});
+
+  @override
+  State<NewEventModal> createState() => _NewEventModalState();
+}
+
+class _NewEventModalState extends State<NewEventModal> {
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    String title = "";
+    String description = "";
+    int subject = 0;
+    int type = 1;
+    Timestamp dueDate;
+    //1 = Announces
+    //2 = Tasks
+
+    return Dialog(
+      elevation: 2,
+      backgroundColor: Theme.of(context).colorScheme.background,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("New Event", style: textTheme.displayLarge),
+            const SizedBox(height: 8),
+            //* Title textfield
+            SizedBox(
+              height: 40,
+              child: TextField(
+                onChanged: (value) => setState(() {
+                  title = value;
+                }),
+                style: textTheme.displaySmall,
+                cursorColor: theme.onBackground,
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.only(left: 10),
+                  filled: true,
+                  fillColor: theme.primary.withOpacity(0.125),
+                  hintText: "Title",
+                  hintStyle: textTheme.displaySmall,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide:
+                        const BorderSide(color: Colors.transparent, width: 0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: theme.onBackground, width: 1),
+                  ),
+                  disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide:
+                        const BorderSide(color: Colors.transparent, width: 0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide:
+                        const BorderSide(color: Colors.transparent, width: 0),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            //* Description textfield
+            SizedBox(
+              height: 40,
+              child: TextField(
+                onChanged: (value) => setState(() {
+                  description = value;
+                }),
+                style: textTheme.displaySmall,
+                cursorColor: theme.onBackground,
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.only(left: 10),
+                  filled: true,
+                  fillColor: theme.primary.withOpacity(0.125),
+                  hintText: "Description",
+                  hintStyle: textTheme.displaySmall,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide:
+                        const BorderSide(color: Colors.transparent, width: 0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: theme.onBackground, width: 1),
+                  ),
+                  disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide:
+                        const BorderSide(color: Colors.transparent, width: 0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide:
+                        const BorderSide(color: Colors.transparent, width: 0),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            //* Due date field
+            Row(
+              children: [
+                Text("Due date:", style: textTheme.displaySmall),
+              ],
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: theme.secondary,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CalendarDatePicker(
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+                  lastDate: DateTime(DateTime.now().year + 10, 1, 1),
+                  onDateChanged: (value) => setState(() {
+                    dueDate = Timestamp.fromDate(value);
+                  }),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            //* Subject field
+            Row(
+              children: [
+                Text("Subject:", style: textTheme.displaySmall),
+                const SizedBox(width: 8),
+                SizedBox(
+                  height: 40,
+                  child: DropdownButton(
+                    padding: const EdgeInsets.all(8),
+                    borderRadius: BorderRadius.circular(30),
+                    hint: const Text("Subject"),
+                    value: subject,
+                    icon: const Icon(null),
+                    underline: Container(),
+                    onChanged: (value) {
+                      setState(() {
+                        subject = value as int;
+                      });
+                    },
+                    items: List.generate(
+                        getSubjects.length,
+                        (index) => DropdownMenuItem(
+                            value: index,
+                            child: Text(getSubjects[index],
+                                style: textTheme.displaySmall))),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+            //* Type field
+            Text("Pick type", style: textTheme.displaySmall),
+            DropdownButton(
+              hint: const Text("Type"),
+              value: type,
+              icon: const Icon(null),
+              underline: Container(),
+              onChanged: (value) {
+                setState(() {
+                  type = value as int;
+                });
+              },
+              items: const [
+                DropdownMenuItem(
+                  value: 1,
+                  child: Text("Announcement"),
+                ),
+                DropdownMenuItem(
+                  value: 2,
+                  child: Text("Task"),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

@@ -7,8 +7,6 @@ import 'get_started.dart';
 //Shared preferences
 // ignore: unused_import
 import 'package:shared_preferences/shared_preferences.dart';
-import '../data/user_data.dart';
-
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key, required this.navigatorKey});
@@ -63,11 +61,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
     try {
       login(email, password, true);
     } catch (e) {
-        setState(() {
-          verbose = "Error logging in. Going to login page...";
-        });
-        await Future.delayed(const Duration(seconds: 3));
-        pushToPage(const LoginScreen());
+      setState(() {
+        verbose = "Error logging in. Going to login page...";
+      });
+      await Future.delayed(const Duration(seconds: 3));
+      pushToPage(const LoginScreen());
     }
     setState(() {
       verbose = "Finished!";
