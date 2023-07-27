@@ -17,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String emailQuery = "";
   String passwordQuery = "";
   String error = "";
+  bool saveCredentials = false;
   bool isLoading = false;
 
   void pushToPage(Widget page) {
@@ -46,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
     //Attempt to login
-    await login(emailQuery, passwordQuery, false)
+    await login(emailQuery, passwordQuery, saveCredentials)
         .then((value) => pushToPage(const MyApp(showReload: false)))
         .onError((error, stackTrace) => setState(() {
               isLoading = false;
@@ -153,6 +154,29 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Checkbox(
+                                    side: BorderSide(
+                                        color: Theme.of(context).colorScheme.onBackground),
+                                    value: saveCredentials,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        saveCredentials = value!;
+                                      });
+                                    }),
+                                Text("Remember me",
+                                    style: textTheme.displaySmall)
+                              ],
+                            ),
+                            Text("",
+                                style: textTheme.displaySmall)
+                          ],
                         ),
                         const SizedBox(height: 20),
                         Container(

@@ -19,6 +19,12 @@ Future login(String email, String password, bool saveCredentials) async {
   } catch (e) {
     rethrow;
   }
+  //* Save credentials
+  if(saveCredentials) {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("email", email);
+    prefs.setString("password", password);
+  }
 
   var auth = FirebaseAuth.instance;
   //Set user data
@@ -54,14 +60,16 @@ Future login(String email, String password, bool saveCredentials) async {
     //Set community data
   await getValue("users", auth.currentUser!.uid, "assignedCommunity").then((value) async {
     if (value != null) {
-        debugPrint("Assigned community: " + value.toString());
+        debugPrint("Assigned community: $value");
      await getCommunityData(value); 
     } else { throw Exception("User not assigned to community"); }
     }).catchError((error, stackTrace) {
      debugPrint("err on auth service: getValue");
       throw error;
     });
-  
+    //* hasOpenedBefore = true
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setBool("hasOpenedBefore", true);
   return true;
 
 }
@@ -96,12 +104,15 @@ Future createAccount(String email, String password, String username) async {
         exp: value["exp"] ?? -1,
         streak: value["streak"] ?? -1,
         posts: value["posts"] ?? -1,
-        flashCardSets: value["flashCardSets"] ?? [],
+        flashCardSets: value["flashCardSets"] == [] ? [] : value["flashCardSets"],
         username: auth.currentUser!.displayName ?? "Invalid Username!",
         email: auth.currentUser!.email ?? "Invalid Email!",
         profilePicture: auth.currentUser!.photoURL ?? ""));
   }).catchError((error, stackTrace) {
     throw error;
   });
+  //* First time load = false
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setBool("hasOpenedBefore", true);
   return true;
 }

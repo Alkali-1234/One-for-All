@@ -25,7 +25,6 @@ Future createUserData(String uid) async {
     }
 }
 
-//! TODO FUNCTION NOT TESTED
 Future getValue(String collection, String document, String field) async {
     //* Get the collection
   CollectionReference communityCollection =

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oneforall/service/auth_service.dart';
 import '../main.dart';
 import 'login_screen.dart';
 import 'get_started.dart';
@@ -6,8 +7,8 @@ import 'get_started.dart';
 //Shared preferences
 // ignore: unused_import
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../data/user_data.dart';
+
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key, required this.navigatorKey});
@@ -60,38 +61,14 @@ class _LoadingScreenState extends State<LoadingScreen> {
       verbose = "Logging in...";
     });
     try {
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
+      login(email, password, true);
+    } catch (e) {
         setState(() {
-          verbose = "User not found. Going to login page...";
+          verbose = "Error logging in. Going to login page...";
         });
         await Future.delayed(const Duration(seconds: 3));
         pushToPage(const LoginScreen());
-        return;
-      } else {
-        setState(() {
-          verbose = "Failed to login: ${e.code}. Going to login page...";
-        });
-        await Future.delayed(const Duration(seconds: 3));
-        pushToPage(const LoginScreen());
-        return;
-      }
     }
-    setState(() {
-      verbose = "Setting things up...";
-    });
-    final auth = FirebaseAuth.instance;
-    //Set user data
-    getUserData.uid = auth.currentUser!.uid;
-    getUserData.email = auth.currentUser!.email!;
-    getUserData.username = auth.currentUser!.displayName!;
-    getUserData.profilePicture = auth.currentUser!.photoURL!;
-    setState(() {
-      verbose = "Retrieving user data...";
-    });
-
     setState(() {
       verbose = "Finished!";
     });
