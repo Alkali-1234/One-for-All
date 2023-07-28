@@ -59,7 +59,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       verbose = "Logging in...";
     });
     try {
-      login(email, password, true);
+      await login(email, password, true);
     } catch (e) {
       setState(() {
         verbose = "Error logging in. Going to login page...";

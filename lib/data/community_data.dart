@@ -1,6 +1,6 @@
 var communityData;
 void setCommunityData(data) => communityData = data;
-get getCommunityData => communityData;
+get getSavedCommunityData => communityData;
 
 class MabData {
   MabData({

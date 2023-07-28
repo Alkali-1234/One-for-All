@@ -4,31 +4,73 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import '../data/community_data.dart';
 import 'auth_service.dart';
+import 'dart:io';
+import 'files_service.dart';
 
+Future addNewMABEvent(String title, String description, int type, int subject,
+    Timestamp dueDate, List<File> attatchements, File? image) async {
+  //* Upload the image
+  String? imageURL;
+  try {
+    if (image != null)
+      imageURL = await uploadCommunityMabImage(image, image.path);
+  } catch (e) {
+    rethrow;
+  }
+  //* Upload the files
+  List<String> fileURLs = [];
+  try {
+    await uploadCommunityMabFiles(attatchements);
+  } catch (e) {
+    rethrow;
+  }
+  //* Add the event to the community document
+  try {
+    await FirebaseFirestore.instance
+        .collection("communities")
+        .doc(getSavedCommunityData["id"])
+        .update({
+      "MAB": FieldValue.arrayUnion([
+        {
+          "title": title,
+          "description": description,
+          "date": Timestamp.now(),
+          "authorUID": getUserAuth.uid,
+          "image": imageURL,
+          "files": fileURLs,
+          "dueDate": dueDate,
+          "type": type,
+          "subject": subject
+        }
+      ])
+    });
+  } catch (e) {
+    rethrow;
+  }
+}
 
 Future createUserData(String uid) async {
-    //* Create user data
-    CollectionReference userCollection =
-        FirebaseFirestore.instance.collection("users");
-    try {
-        await userCollection.doc(uid).set({
-        "exp": 0,
-        "streak": 0,
-        "posts": 0,
-        "flashCardSets": [],
-        "assignedCommunity": null
-        }).catchError((error, stackTrace) {
-        throw error;
-        });
-    } catch (e) {
-        rethrow;
-    }
+  //* Create user data
+  CollectionReference userCollection =
+      FirebaseFirestore.instance.collection("users");
+  try {
+    await userCollection.doc(uid).set({
+      "exp": 0,
+      "streak": 0,
+      "posts": 0,
+      "flashCardSets": [],
+      "assignedCommunity": null
+    }).catchError((error, stackTrace) {
+      throw error;
+    });
+  } catch (e) {
+    rethrow;
+  }
 }
 
 Future getValue(String collection, String document, String field) async {
-    //* Get the collection
+  //* Get the collection
   CollectionReference communityCollection =
-
       FirebaseFirestore.instance.collection(collection);
   var val;
   try {
@@ -49,25 +91,25 @@ Future getValue(String collection, String document, String field) async {
 }
 
 Future getDocument(String collection, String document) async {
-    //* Get the community document
-    CollectionReference communityCollection =
-        FirebaseFirestore.instance.collection(collection);
-    var doc;
-    try {
-        await communityCollection.doc(document).get().then((value) {
-        if (value.data() == null) {
-            throw Exception("Document does not exist");
-        } else {
-            debugPrint(value.data().toString());
-            doc = value;
-        }
-        }).catchError((error, stackTrace) {
-        throw error;
-        });
-    } catch (e) {
-        rethrow;
-    }
-    return doc;
+  //* Get the community document
+  CollectionReference communityCollection =
+      FirebaseFirestore.instance.collection(collection);
+  var doc;
+  try {
+    await communityCollection.doc(document).get().then((value) {
+      if (value.data() == null) {
+        throw Exception("Document does not exist");
+      } else {
+        debugPrint(value.data().toString());
+        doc = value;
+      }
+    }).catchError((error, stackTrace) {
+      throw error;
+    });
+  } catch (e) {
+    rethrow;
+  }
+  return doc;
 }
 
 Future getCommunity(String communityID) async {
@@ -95,7 +137,7 @@ Future getCommunity(String communityID) async {
   } catch (e) {
     rethrow;
   }
- 
+
   return document;
 }
 
@@ -120,10 +162,7 @@ Future joinCommunity(String communityID, String password) async {
   if (getUserAuth == null) {
     throw Exception("User is not authenticated");
   }
-  FirebaseFirestore.instance
-      .collection("communities")
-      .doc(communityID)
-      .update({
+  FirebaseFirestore.instance.collection("communities").doc(communityID).update({
     "members": FieldValue.arrayUnion([getUserAuth.uid])
   });
 
@@ -172,8 +211,7 @@ Future getCommunityData(String communityID) async {
 
   //* Save data to community_data.dart
   setCommunityData(document);
-  setMabData(
-      MabData(uid: 0, posts: [
+  setMabData(MabData(uid: 0, posts: [
     for (var post in document.data()["MAB"])
       MabPost(
           uid: 0,

@@ -1,8 +1,11 @@
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:oneforall/constants.dart';
 import '../data/community_data.dart';
+import '../service/community_service.dart';
 
 class MABLACScreen extends StatefulWidget {
   const MABLACScreen({super.key});
@@ -665,17 +668,46 @@ class NewEventModal extends StatefulWidget {
 }
 
 class _NewEventModalState extends State<NewEventModal> {
+  String title = "";
+  String description = "";
+  int subject = 0;
+  int type = 1;
+  Timestamp? dueDate;
+  //1 = Announces
+  //2 = Tasks
+  File? image;
+  List<File> attatchements = [];
+
+  //* Backend variables
+  bool isLoading = false;
+  bool success = false;
+  String error = "";
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    String title = "";
-    String description = "";
-    int subject = 0;
-    int type = 1;
-    Timestamp dueDate;
-    //1 = Announces
-    //2 = Tasks
+
+    //* Adds new file to the community document
+    void addNewEvent() async {
+      //* Spam prevention
+      if (isLoading) {
+        return;
+      }
+      //* Check if all fields are filled
+      if (title == "" || description == "" || dueDate == null) {
+        setState(() {
+          error = "Please fill in all fields";
+        });
+        return;
+      }
+      //* Set loading to true
+      setState(() {
+        isLoading = true;
+      });
+      //* Add the event to the community document
+      //TODO implement
+    }
 
     return Dialog(
       elevation: 2,
@@ -767,30 +799,55 @@ class _NewEventModalState extends State<NewEventModal> {
             Row(
               children: [
                 Text("Due date:", style: textTheme.displaySmall),
+                TextButton(
+                  onPressed: () async {
+                    DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                        fieldLabelText: Text("Due date:",
+                                style: TextStyle(color: theme.onBackground))
+                            .data,
+                        builder: (context, child) => Theme(
+                              data: ThemeData.dark().copyWith(
+                                colorScheme: ColorScheme.dark(
+                                  primary: theme.secondary,
+                                  onPrimary: theme.onPrimary,
+                                  surface: theme.secondary,
+                                  onSurface: theme.onPrimary,
+                                  background: theme.background,
+                                  onBackground: theme.onBackground,
+                                ),
+                                dialogBackgroundColor: theme.background,
+                                textButtonTheme: TextButtonThemeData(
+                                    style: TextButton.styleFrom(
+                                  foregroundColor: theme.onBackground,
+                                )),
+                              ),
+                              child: child!,
+                            ));
+                    if (picked != null) {
+                      setState(() {
+                        dueDate = Timestamp.fromDate(picked);
+                      });
+                    }
+                  },
+                  child: Text(
+                      dueDate == null
+                          ? "Select a date"
+                          : DateFormat("dd/MM/yyyy").format(dueDate!.toDate()),
+                      style: textTheme.displaySmall!
+                          .copyWith(fontWeight: FontWeight.bold)),
+                ),
               ],
             ),
-            Container(
-              decoration: BoxDecoration(
-                color: theme.secondary,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CalendarDatePicker(
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime.fromMillisecondsSinceEpoch(0),
-                  lastDate: DateTime(DateTime.now().year + 10, 1, 1),
-                  onDateChanged: (value) => setState(() {
-                    dueDate = Timestamp.fromDate(value);
-                  }),
-                ),
-              ),
-            ),
+
             const SizedBox(height: 8),
             //* Subject field
             Row(
               children: [
-                Text("Subject:", style: textTheme.displaySmall),
+                Text("Subject: ", style: textTheme.displaySmall),
                 const SizedBox(width: 8),
                 SizedBox(
                   height: 40,
@@ -805,13 +862,16 @@ class _NewEventModalState extends State<NewEventModal> {
                       setState(() {
                         subject = value as int;
                       });
+                      debugPrint("Changed subject to $subject");
                     },
                     items: List.generate(
                         getSubjects.length,
                         (index) => DropdownMenuItem(
                             value: index,
                             child: Text(getSubjects[index],
-                                style: textTheme.displaySmall))),
+                                textAlign: TextAlign.center,
+                                style: textTheme.displaySmall!
+                                    .copyWith(fontWeight: FontWeight.bold)))),
                   ),
                 ),
               ],
@@ -819,28 +879,161 @@ class _NewEventModalState extends State<NewEventModal> {
 
             const SizedBox(height: 8),
             //* Type field
-            Text("Pick type", style: textTheme.displaySmall),
-            DropdownButton(
-              hint: const Text("Type"),
-              value: type,
-              icon: const Icon(null),
-              underline: Container(),
-              onChanged: (value) {
-                setState(() {
-                  type = value as int;
-                });
-              },
-              items: const [
-                DropdownMenuItem(
-                  value: 1,
-                  child: Text("Announcement"),
-                ),
-                DropdownMenuItem(
-                  value: 2,
-                  child: Text("Task"),
+            Row(
+              children: [
+                Text("Type: ", style: textTheme.displaySmall),
+                const SizedBox(width: 8),
+                SizedBox(
+                  height: 40,
+                  child: DropdownButton(
+                    padding: const EdgeInsets.all(8),
+                    borderRadius: BorderRadius.circular(30),
+                    hint: const Text("Type"),
+                    value: type,
+                    icon: const Icon(null),
+                    underline: Container(),
+                    onChanged: (value) {
+                      setState(() {
+                        type = value as int;
+                      });
+                    },
+                    items: [
+                      DropdownMenuItem(
+                        value: 1,
+                        child: Text("Announcement",
+                            textAlign: TextAlign.center,
+                            style: textTheme.displaySmall!
+                                .copyWith(fontWeight: FontWeight.bold)),
+                      ),
+                      DropdownMenuItem(
+                        value: 2,
+                        child: Text("Task",
+                            textAlign: TextAlign.center,
+                            style: textTheme.displaySmall!
+                                .copyWith(fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
+            const SizedBox(height: 8),
+            //* Image field
+            Row(
+              children: [
+                Text("Image: ", style: textTheme.displaySmall),
+                const SizedBox(width: 8),
+                SizedBox(
+                  height: 40,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      //* Show image picker
+                      final pickedFile = await ImagePicker().pickImage(
+                          source: ImageSource.gallery,
+                          imageQuality: 50,
+                          maxWidth: 500,
+                          maxHeight: 500);
+                      if (pickedFile == null) return;
+                      setState(() {
+                        image = File(pickedFile.path);
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      elevation: 2,
+                      padding: const EdgeInsets.all(8),
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      "Select an image",
+                      style: textTheme.displaySmall!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            //* Show image if there is one
+            if (image != null)
+              Container(
+                width: double.infinity,
+                height: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  image: DecorationImage(
+                      image: FileImage(image!), fit: BoxFit.cover),
+                ),
+              ),
+            const SizedBox(height: 8),
+            //* Attatchements field
+            Row(
+              children: [
+                Text("Attatchements: ", style: textTheme.displaySmall),
+                const SizedBox(width: 8),
+                SizedBox(
+                  height: 40,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      //* Show image picker
+                      final pickedFiles = await ImagePicker().pickMultipleMedia(
+                          imageQuality: 50, maxWidth: 500, maxHeight: 500);
+                      setState(() {
+                        for (var file in pickedFiles) {
+                          attatchements.add(File(file.path));
+                        }
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      elevation: 2,
+                      padding: const EdgeInsets.all(8),
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      "Pick attatchements",
+                      style: textTheme.displaySmall!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            //* Confirm button
+            Container(
+                width: double.infinity,
+                height: 40,
+                decoration: BoxDecoration(
+                  gradient: primaryGradient,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: ElevatedButton(
+                  onPressed: () => addNewEvent(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  //* Confirm button text : if loading, show loading indicator, if not loading and there is error, show error text, else show confirm text
+                  child: isLoading
+                      ? CircularProgressIndicator(color: theme.onBackground)
+                      : !isLoading && error != ""
+                          ? Text(error,
+                              style: textTheme.displaySmall!
+                                  .copyWith(color: theme.error))
+                          : Text("Confirm",
+                              style: textTheme.displaySmall!
+                                  .copyWith(fontWeight: FontWeight.bold)),
+                ))
           ],
         ),
       ),
