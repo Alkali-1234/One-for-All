@@ -12,30 +12,34 @@ Future addNewMABEvent(String title, String description, int type, int subject,
   //* Upload the image
   String? imageURL;
   try {
-    if (image != null)
+    if (image != null) {
       imageURL = await uploadCommunityMabImage(image, image.path);
+    }
   } catch (e) {
     rethrow;
   }
   //* Upload the files
   List<String> fileURLs = [];
   try {
-    await uploadCommunityMabFiles(attatchements);
+    fileURLs = await uploadCommunityMabFiles(attatchements);
   } catch (e) {
     rethrow;
   }
   //* Add the event to the community document
+  debugPrint(getSavedCommunityData.toString());
+  debugPrint(getSavedCommunityData.id);
+
   try {
     await FirebaseFirestore.instance
         .collection("communities")
-        .doc(getSavedCommunityData["id"])
+        .doc(getSavedCommunityData.id)
         .update({
       "MAB": FieldValue.arrayUnion([
         {
           "title": title,
           "description": description,
           "date": Timestamp.now(),
-          "authorUID": getUserAuth.uid,
+          "authorUID": getUserAuth.currentUser!.uid,
           "image": imageURL,
           "files": fileURLs,
           "dueDate": dueDate,
@@ -45,6 +49,7 @@ Future addNewMABEvent(String title, String description, int type, int subject,
       ])
     });
   } catch (e) {
+    debugPrint(e.toString());
     rethrow;
   }
 }
@@ -219,8 +224,8 @@ Future getCommunityData(String communityID) async {
           description: post["description"],
           date: DateTime.parse(post["date"].toDate().toString()),
           authorUID: 0,
-          image: post["image"],
-          fileAttatchments: ["placeholder!", "!"],
+          image: post["image"] ?? "",
+          fileAttatchments: [for (String file in post["files"]) file],
           dueDate: DateTime.parse(post["date"].toDate().toString()),
           type: post["type"],
           subject: post["subject"]),

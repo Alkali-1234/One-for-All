@@ -35,14 +35,16 @@ Future uploadCommunityMabImage(File image, String fileName) async {
 }
 
 Future uploadCommunityMabFiles(List<File> files) async {
+  List<String> downloadURLs = [];
   await Future.wait(files.map((file) async {
     Reference firebaseStorageRef = FirebaseStorage.instance
         .ref()
         .child('community_files/community_mab_files/${file.path}');
     UploadTask uploadTask = firebaseStorageRef.putFile(file);
     TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
-    return await taskSnapshot.ref.getDownloadURL().then(
-          (value) => value,
+    await taskSnapshot.ref.getDownloadURL().then(
+          (value) => downloadURLs.add(value),
         );
   }));
+  return downloadURLs;
 }

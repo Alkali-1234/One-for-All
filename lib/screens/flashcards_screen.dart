@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
 import '../data/user_data.dart';
 import 'flashcardsPlay_screen.dart';
 import 'flashcards_edit_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FlashcardsScreen extends StatefulWidget {
   const FlashcardsScreen({super.key});
@@ -137,60 +139,66 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                       itemBuilder: (context, index) {
                                         return isItemValid(getUserData
                                                 .flashCardSets[index].title)
-                                            ? Container(
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.1,
-                                                width: double.infinity,
-                                                decoration: BoxDecoration(
-                                                  color: theme.secondary,
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  border: Border.all(
-                                                    color: theme.tertiary,
-                                                  ),
-                                                ),
-                                                child: ElevatedButton(
-                                                    onPressed: () {
-                                                      showDialog(
-                                                          context: context,
-                                                          builder: (context) =>
-                                                              SelectedSetModal(
-                                                                flashcardSet:
-                                                                    getUserData
-                                                                            .flashCardSets[
-                                                                        index],
-                                                                index: index,
-                                                              ));
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
-                                                          Colors.transparent,
-                                                      shadowColor:
-                                                          Colors.transparent,
-                                                      foregroundColor:
-                                                          theme.onPrimary,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
+                                            ? Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 8),
+                                                child: Container(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.1,
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                    color: theme.secondary,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    border: Border.all(
+                                                      color: theme.tertiary,
                                                     ),
-                                                    child: Center(
-                                                        child: Text(
-                                                      getUserData
-                                                          .flashCardSets[index]
-                                                          .title,
-                                                      style: textTheme
-                                                          .displayMedium!
-                                                          .copyWith(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                    ))),
+                                                  ),
+                                                  child: ElevatedButton(
+                                                      onPressed: () {
+                                                        showDialog(
+                                                            context: context,
+                                                            builder: (context) =>
+                                                                SelectedSetModal(
+                                                                  flashcardSet:
+                                                                      getUserData
+                                                                              .flashCardSets[
+                                                                          index],
+                                                                  index: index,
+                                                                ));
+                                                      },
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        shadowColor:
+                                                            Colors.transparent,
+                                                        foregroundColor:
+                                                            theme.onPrimary,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                        ),
+                                                      ),
+                                                      child: Center(
+                                                          child: Text(
+                                                        getUserData
+                                                            .flashCardSets[
+                                                                index]
+                                                            .title,
+                                                        style: textTheme
+                                                            .displayMedium!
+                                                            .copyWith(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                      ))),
+                                                ),
                                               )
                                             : Container();
                                       }),
@@ -215,6 +223,79 @@ class NewSetModal extends StatefulWidget {
 
 class _NewSetModalState extends State<NewSetModal> {
   String titleQuery = "";
+  bool isLoading = false;
+  bool success = false;
+
+  Future createSet() async {
+    //* Spam prevention
+    if (isLoading || success) {
+      return;
+    }
+    //* Check if the title is empty
+    if (titleQuery == "") {
+      return;
+    }
+    //* Set loading to true
+    setState(() {
+      isLoading = true;
+    });
+    //* Create the set and add it to shared preferences
+    List<FlashcardSet> flashcardSets = [];
+    //* Get the flashcard sets from shared prefs
+    await SharedPreferences.getInstance().then((value) {
+      if (value.containsKey("flashcardSets")) {
+        dynamic decodedObject = jsonDecode(value.getString("flashcardSets")!);
+
+        //* Convert the decoded `dynamic` object back to your desired Dart object structure
+        for (var set in decodedObject['sets']) {
+          flashcardSets.add(FlashcardSet(
+              id: decodedObject['sets'].indexOf(set),
+              title: set["title"],
+              description: "description_unavailable",
+              flashcards: [
+                for (var flashcard in set['questions'])
+                  Flashcard(
+                      id: set['questions'].indexOf(flashcard),
+                      question: flashcard['question'],
+                      answer: flashcard['answer'])
+              ]));
+        }
+      }
+    });
+    flashcardSets.add(FlashcardSet(
+        id: flashcardSets.length,
+        flashcards: [],
+        title: titleQuery,
+        description: ""));
+    //* Convert flashcard sets to json
+    Object flashcardSetsObject = {
+      "sets": [
+        for (FlashcardSet set in flashcardSets)
+          {
+            "title": set.title,
+            "description": set.description,
+            "questions": [
+              for (Flashcard flashcard in set.flashcards)
+                {"question": flashcard.question, "answer": flashcard.answer}
+            ]
+          }
+      ],
+    };
+
+    //* Save the data to shared prefs by converting it to json
+    await SharedPreferences.getInstance().then((value) async {
+      await value.setString("flashcardSets", jsonEncode(flashcardSetsObject));
+    });
+
+    //* Set loading to false
+    setState(() {
+      isLoading = false;
+      success = true;
+    });
+    //ignore: user_build_context_synchronously, use_build_context_synchronously
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -287,9 +368,13 @@ class _NewSetModalState extends State<NewSetModal> {
                           ),
                         ),
                         onPressed: () {
-                          //Add new set to user data
+                          createSet();
                         },
-                        child: const Text("Create")),
+                        child: isLoading
+                            ? const CircularProgressIndicator()
+                            : success
+                                ? const Icon(Icons.check)
+                                : const Text("Create")),
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.secondary,

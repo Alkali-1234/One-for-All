@@ -62,10 +62,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
       await login(email, password, true);
     } catch (e) {
       setState(() {
-        verbose = "Error logging in. Going to login page...";
+        verbose = "Error logging in. Going to login page... \n $e";
       });
       await Future.delayed(const Duration(seconds: 3));
       pushToPage(const LoginScreen());
+      return;
     }
     setState(() {
       verbose = "Finished!";

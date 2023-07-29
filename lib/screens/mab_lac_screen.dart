@@ -1,11 +1,15 @@
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:oneforall/constants.dart';
+import 'package:path_provider/path_provider.dart';
 import '../data/community_data.dart';
 import '../service/community_service.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 
 class MABLACScreen extends StatefulWidget {
   const MABLACScreen({super.key});
@@ -77,7 +81,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                         context: context,
                         builder: (context) => const NewEventModal());
                   },
-                  backgroundColor: theme.primary,
+                  backgroundColor: theme.secondary,
                   child: const Icon(Icons.add),
                 ),
                 resizeToAvoidBottomInset: false,
@@ -597,7 +601,17 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                                                 due: getLACData
                                                                     .posts[
                                                                         index]
-                                                                    .dueDate)
+                                                                    .dueDate,
+                                                                attatchements:
+                                                                    getMabData
+                                                                        .posts[
+                                                                            index]
+                                                                        .fileAttatchments,
+                                                                image: getMabData
+                                                                    .posts[
+                                                                        index]
+                                                                    .image,
+                                                              )
                                                             : Container()
                                                         : isItemValid(
                                                                 getMabData
@@ -645,7 +659,17 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                                                 due: getMabData
                                                                     .posts[
                                                                         index]
-                                                                    .dueDate)
+                                                                    .dueDate,
+                                                                attatchements:
+                                                                    getMabData
+                                                                        .posts[
+                                                                            index]
+                                                                        .fileAttatchments,
+                                                                image: getMabData
+                                                                    .posts[
+                                                                        index]
+                                                                    .image,
+                                                              )
                                                             : Container();
                                                   });
                                             }),
@@ -691,7 +715,7 @@ class _NewEventModalState extends State<NewEventModal> {
     //* Adds new file to the community document
     void addNewEvent() async {
       //* Spam prevention
-      if (isLoading) {
+      if (isLoading || success) {
         return;
       }
       //* Check if all fields are filled
@@ -706,7 +730,24 @@ class _NewEventModalState extends State<NewEventModal> {
         isLoading = true;
       });
       //* Add the event to the community document
-      //TODO implement
+      try {
+        await addNewMABEvent(
+            title, description, type, subject, dueDate!, attatchements, image);
+      } catch (e) {
+        setState(() {
+          error = "Error adding event $e";
+          isLoading = false;
+        });
+        return;
+      }
+//* Set loading to false
+      setState(() {
+        isLoading = false;
+        success = true;
+      });
+
+      await Future.delayed(const Duration(seconds: 1));
+      Navigator.pop(context);
     }
 
     return Dialog(
@@ -984,6 +1025,7 @@ class _NewEventModalState extends State<NewEventModal> {
                       setState(() {
                         for (var file in pickedFiles) {
                           attatchements.add(File(file.path));
+                          debugPrint("Added file ${file.path}");
                         }
                       });
                     },
@@ -1025,14 +1067,20 @@ class _NewEventModalState extends State<NewEventModal> {
                   ),
                   //* Confirm button text : if loading, show loading indicator, if not loading and there is error, show error text, else show confirm text
                   child: isLoading
-                      ? CircularProgressIndicator(color: theme.onBackground)
+                      ? SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: CircularProgressIndicator(
+                              color: theme.onBackground))
                       : !isLoading && error != ""
                           ? Text(error,
                               style: textTheme.displaySmall!
                                   .copyWith(color: theme.error))
-                          : Text("Confirm",
-                              style: textTheme.displaySmall!
-                                  .copyWith(fontWeight: FontWeight.bold)),
+                          : success
+                              ? Icon(Icons.check, color: theme.onBackground)
+                              : Text("Confirm",
+                                  style: textTheme.displaySmall!
+                                      .copyWith(fontWeight: FontWeight.bold)),
                 ))
           ],
         ),
@@ -1052,6 +1100,8 @@ class ListItem extends StatelessWidget {
     required this.subject,
     required this.type,
     required this.due,
+    required this.attatchements,
+    this.image,
   });
 
   final ColorScheme theme;
@@ -1062,6 +1112,8 @@ class ListItem extends StatelessWidget {
   final int subject;
   final int type;
   final DateTime due;
+  final List<String> attatchements;
+  final String? image;
 
   @override
   Widget build(BuildContext context) {
@@ -1081,8 +1133,8 @@ class ListItem extends StatelessWidget {
                     return MABModal(
                         title: title,
                         description: description,
-                        image: null,
-                        attatchements: const ["https://picsum.photos/200/300"]);
+                        image: image,
+                        attatchements: attatchements);
                   });
             },
             style: ElevatedButton.styleFrom(
@@ -1183,11 +1235,31 @@ class MABModal extends StatelessWidget {
   final String title, description;
   final List<String> attatchements;
   final String? image;
+  String extractFilenameFromUrl(String url) {
+    RegExp regExp = RegExp(r'(?<=cache%2F)[^?]+');
+    Match? match = regExp.firstMatch(url);
+
+    if (match != null) {
+      return match.group(0)!;
+    } else {
+      return ""; // Return an empty string or handle the absence of a match as needed.
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+
+    void downloadFile(String downloadURL) async {
+      //* Put download url link to cliboard and show snackbar
+      await Clipboard.setData(ClipboardData(text: downloadURL));
+
+      // //* Open download link in browser
+      //ignore: deprecated_member_use
+      await launch(downloadURL);
+    }
+
     return Dialog(
       elevation: 2,
       backgroundColor: theme.background,
@@ -1217,7 +1289,7 @@ class MABModal extends StatelessWidget {
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
                     border: Border.all(color: theme.secondary, width: 1)),
                 child: Center(
-                  child: image == null
+                  child: image == null || image == ""
                       ? Text(
                           "No Image",
                           style: textTheme.displaySmall,
@@ -1244,7 +1316,9 @@ class MABModal extends StatelessWidget {
                   return Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: ElevatedButton(
-                      onPressed: () => {},
+                      onPressed: () => {
+                        downloadFile(attatchements[index]),
+                      },
                       style: ElevatedButton.styleFrom(
                         side: BorderSide(color: theme.secondary, width: 1),
                         padding: const EdgeInsets.all(0),
@@ -1262,7 +1336,7 @@ class MABModal extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             //Replace with actual name
-                            Text(attatchements[index],
+                            Text(extractFilenameFromUrl(attatchements[index]),
                                 style: textTheme.displaySmall),
                             Icon(
                               Icons.download_sharp,
