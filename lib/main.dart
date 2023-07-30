@@ -192,7 +192,7 @@ class _HomePageState extends State<HomePage> {
                     : selectedScreen == 1
                         ? const NavigationScreen()
                         : selectedScreen == 2
-                            ? const ProfileScreen()
+                            ? ProfileScreen()
                             : Container(),
               ),
             ),

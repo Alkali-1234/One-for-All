@@ -4,6 +4,7 @@ import '../constants.dart';
 import '../service/auth_service.dart';
 import 'package:email_validator/email_validator.dart';
 import '../service/community_service.dart';
+import 'package:animations/animations.dart';
 
 class GetStartedScreen extends StatefulWidget {
   const GetStartedScreen({super.key});
@@ -44,20 +45,31 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
             height: double.infinity,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: currentStep == 0
-                  ? WelcomeScreen(
-                      textTheme: textTheme,
-                      changeCurrentStep: changeCurrentStep)
-                  : currentStep == 1
-                      ? AccountCreationScreen(
-                          theme: theme,
-                          textTheme: textTheme,
-                          changeStep: changeCurrentStep)
-                      : currentStep == 2
-                          ? JoinCommunityScreen(
-                              changeStep: changeCurrentStep,
-                            )
-                          : const SettingsConfigurationScreen(),
+              child: PageTransitionSwitcher(
+                transitionBuilder: (child, animation, secondaryAnimation) {
+                  return FadeThroughTransition(
+                    animation: animation,
+                    secondaryAnimation: secondaryAnimation,
+                    child: child,
+                  );
+                },
+                child: currentStep == 0
+                    ? WelcomeScreen(
+                        textTheme: textTheme,
+                        changeCurrentStep: changeCurrentStep,
+                      )
+                    : currentStep == 1
+                        ? AccountCreationScreen(
+                            theme: theme,
+                            textTheme: textTheme,
+                            changeStep: changeCurrentStep,
+                          )
+                        : currentStep == 2
+                            ? JoinCommunityScreen(
+                                changeStep: changeCurrentStep,
+                              )
+                            : const SettingsConfigurationScreen(),
+              ),
             ),
           ),
         ));
