@@ -35,11 +35,12 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
     var textTheme = Theme.of(context).textTheme;
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: theme.background,
+        backgroundColor: Colors.transparent,
         body: Container(
           decoration: const BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage('assets/images/logbg.png'))),
+                  image: AssetImage('assets/images/logbg.png'),
+                  fit: BoxFit.cover)),
           child: SizedBox(
             width: double.infinity,
             height: double.infinity,
@@ -47,7 +48,9 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
               padding: const EdgeInsets.all(16.0),
               child: PageTransitionSwitcher(
                 transitionBuilder: (child, animation, secondaryAnimation) {
-                  return FadeThroughTransition(
+                  return SharedAxisTransition(
+                    transitionType: SharedAxisTransitionType.horizontal,
+                    fillColor: Colors.transparent,
                     animation: animation,
                     secondaryAnimation: secondaryAnimation,
                     child: child,

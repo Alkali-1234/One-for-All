@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'mab_lac_screen.dart';
 import 'calendar_screen.dart';
 import 'flashcards_screen.dart';
+import 'settings_screen.dart';
 
 class NavigationScreen extends StatefulWidget {
   const NavigationScreen({super.key});
@@ -212,11 +213,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
                             icon: Icons.settings,
                             name: "Settings",
                             onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return const UnavailableItemDialog();
-                                  });
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const SettingsScreen()));
                             },
                           ),
                         ],

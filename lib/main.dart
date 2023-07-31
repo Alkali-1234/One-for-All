@@ -15,6 +15,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:path_provider/path_provider.dart';
 // import 'package:introduction_screen/introduction_screen.dart';
+import 'package:animations/animations.dart';
 
 //Data
 import 'data/community_data.dart';
@@ -112,6 +113,7 @@ class _HomePageState extends State<HomePage> {
   //Global key for the scaffold
   final _key = GlobalKey<ScaffoldState>();
   int selectedScreen = 0;
+  bool reverseTransition = false;
   //HomePage State
 
   @override
@@ -122,6 +124,11 @@ class _HomePageState extends State<HomePage> {
 
     void setSelectedScreen(int index) {
       setState(() {
+        if (index > selectedScreen) {
+          reverseTransition = false;
+        } else {
+          reverseTransition = true;
+        }
         selectedScreen = index;
       });
       debugPrint("Selected Screen: $selectedScreen");
@@ -187,13 +194,25 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: selectedScreen == 0
-                    ? const HomeScreen()
-                    : selectedScreen == 1
-                        ? const NavigationScreen()
-                        : selectedScreen == 2
-                            ? ProfileScreen()
-                            : Container(),
+                child: PageTransitionSwitcher(
+                  reverse: reverseTransition,
+                  transitionBuilder:
+                      (child, primaryAnimation, secondaryAnimation) =>
+                          SharedAxisTransition(
+                    transitionType: SharedAxisTransitionType.horizontal,
+                    fillColor: Colors.transparent,
+                    animation: primaryAnimation,
+                    secondaryAnimation: secondaryAnimation,
+                    child: child,
+                  ),
+                  child: selectedScreen == 0
+                      ? const HomeScreen()
+                      : selectedScreen == 1
+                          ? const NavigationScreen()
+                          : selectedScreen == 2
+                              ? ProfileScreen()
+                              : Container(),
+                ),
               ),
             ),
             //END OF MAIN CONTENT

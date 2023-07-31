@@ -59,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   .profilePicture !=
                               ''
                           ? getUserData.profilePicture
-                          : 'https://api.dicebear.com/api/initials/invalid_username.svg'),
+                          : 'https://api.dicebear.com/6.x/initials/svg?seed=invalid_username'),
                     ),
                     Container(
                       decoration: const BoxDecoration(
