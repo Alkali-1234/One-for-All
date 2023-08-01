@@ -207,18 +207,21 @@ class _NavigationScreenState extends State<NavigationScreen> {
                                   });
                             },
                           ),
-                          NavigationItem(
-                            theme: theme,
-                            constraints: constraints,
-                            icon: Icons.settings,
-                            name: "Settings",
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SettingsScreen()));
-                            },
+                          Hero(
+                            tag: "settings",
+                            child: NavigationItem(
+                              theme: theme,
+                              constraints: constraints,
+                              icon: Icons.settings,
+                              name: "Settings",
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SettingsScreen()));
+                              },
+                            ),
                           ),
                         ],
                       )
