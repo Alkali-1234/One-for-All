@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:oneforall/service/auth_service.dart';
 import '../data/user_data.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,17 +14,51 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  //* Previous data
+  String previousProfilePicture = getUserData.profilePicture;
+  String previousUsername = getUserData.username;
+  String previousEmail = getUserData.email;
+
+  //* Current
+  var profilePicture = getUserData.profilePicture;
   String username = getUserData.username;
   String email = getUserData.email;
-  String password = '';
+
+  ImageProvider pfpImage = NetworkImage(getUserData.profilePicture);
 
   final _formKey = GlobalKey<FormState>();
 
   void _saveChanges() {
     if (_formKey.currentState!.validate()) {
       // Save changes to the user profile
+      if (profilePicture != previousProfilePicture) {
+        //* Change profile picture
+        changeUserProfilePicture(profilePicture, previousProfilePicture);
+      }
+      if (username != previousUsername) {
+        //* Change username
+        changeUserName(username);
+      }
+      if (email != previousEmail) {
+        //* Change email
+        //TODO Implement
+      }
       debugPrint('Changes saved!');
     }
+  }
+
+  void changeProfilePicture() async {
+    //* Handle change profile picture
+    debugPrint('Change profile picture clicked!');
+    //* Pick image from gallery
+    await ImagePicker().pickImage(source: ImageSource.gallery).then((value) {
+      if (value != null) {
+        setState(() {
+          profilePicture = value;
+          pfpImage = FileImage(value as File);
+        });
+      }
+    });
   }
 
   @override
@@ -55,11 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     CircleAvatar(
                       radius: 60,
-                      backgroundImage: NetworkImage(getUserData
-                                  .profilePicture !=
-                              ''
-                          ? getUserData.profilePicture
-                          : 'https://api.dicebear.com/6.x/initials/svg?seed=invalid_username'),
+                      backgroundImage: pfpImage,
                     ),
                     Container(
                       decoration: const BoxDecoration(
@@ -118,21 +150,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                       ),
                       const SizedBox(height: 10),
-                      TextFormField(
-                        initialValue: password,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                            labelText: 'Password',
-                            labelStyle: TextStyle(color: theme.onBackground)),
-                        style: textTheme.displaySmall!,
-                        onChanged: (value) => setState(() => password = value),
-                        validator: (value) {
-                          if (value == "" || value == null) {
-                            return 'Please enter a password';
-                          }
-                          return null;
-                        },
-                      ),
+                      TextButton(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.transparent),
+                            padding: MaterialStateProperty.all(
+                                const EdgeInsets.all(8)),
+                          ),
+                          onPressed: () {},
+                          child: Text('Change Password',
+                              style: textTheme.displaySmall!
+                                  .copyWith(fontWeight: FontWeight.w500))),
                     ],
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 //ignore: unused_import
@@ -158,5 +159,51 @@ Future createAccount(String email, String password, String username) async {
   //* First time load = false
   final prefs = await SharedPreferences.getInstance();
   prefs.setBool("hasOpenedBefore", true);
+  return true;
+}
+
+Future changeUserName(String username) async {
+  try {
+    await FirebaseAuth.instance.currentUser!
+        .updateDisplayName(username)
+        .catchError((error, stacktrace) {
+      throw error;
+    });
+  } catch (e) {
+    rethrow;
+  }
+  return true;
+}
+
+Future changeUserProfilePicture(
+    File file, String? previousProfilePicture) async {
+  //* Upload new profile picture to firebase storage
+  //TODO implement
+  String url = "";
+
+  try {
+    await FirebaseAuth.instance.currentUser!
+        .updatePhotoURL(url)
+        .catchError((error, stacktrace) {
+      throw error;
+    });
+  } catch (e) {
+    rethrow;
+  }
+  if (previousProfilePicture != null) {
+    //* Delete previous profile picture from firebase storage
+    //TODO implement
+  }
+  return true;
+}
+
+Future logout() async {
+  try {
+    await FirebaseAuth.instance.signOut().catchError((error, stacktrace) {
+      throw error;
+    });
+  } catch (e) {
+    rethrow;
+  }
   return true;
 }

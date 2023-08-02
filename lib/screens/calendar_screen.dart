@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/community_data.dart';
+import '../data/user_data.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -10,8 +11,8 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  int selectedYear = 2023;
-  int selectedMonth = 7;
+  int selectedYear = DateTime.now().year.toInt();
+  int selectedMonth = DateTime.now().month.toInt();
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -28,36 +29,40 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 body: Column(
                   children: [
                     //App Bar
-                    Container(
-                      color: theme.secondary,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: Icon(
-                                Icons.arrow_back,
-                                color: theme.onPrimary,
+                    Hero(
+                      tag: "topAppBar",
+                      child: Container(
+                        color: theme.secondary,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              GestureDetector(
+                                onTap: () => Navigator.pop(context),
+                                child: Icon(
+                                  Icons.arrow_back,
+                                  color: theme.onPrimary,
+                                ),
                               ),
-                            ),
-                            Text("Alkaline", style: textTheme.displaySmall),
-                            Container(
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                color: theme.onPrimary,
-                                borderRadius: BorderRadius.circular(20),
-                                gradient: getPrimaryGradient,
-                              ),
-                              child: ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(15)),
-                                  child: Image.network(
-                                      'https://picsum.photos/200')),
-                            )
-                          ],
+                              Text(getUserData.username,
+                                  style: textTheme.displaySmall),
+                              Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  color: theme.onPrimary,
+                                  borderRadius: BorderRadius.circular(20),
+                                  gradient: getPrimaryGradient,
+                                ),
+                                child: ClipRRect(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(15)),
+                                    child: Image.network(
+                                        'https://picsum.photos/200')),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ),

@@ -154,41 +154,44 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           child: Column(children: [
-            Container(
-              width: double.infinity,
-              color: theme.secondary,
-              //Top App Bar
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () =>
-                          {_key.currentState?.openDrawer(), debugPrint("e")},
-                      child: Icon(
-                        Icons.menu,
-                        color: theme.onPrimary,
-                        size: 30,
+            Hero(
+              tag: "topAppBar",
+              child: Container(
+                width: double.infinity,
+                color: theme.secondary,
+                //Top App Bar
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () =>
+                            {_key.currentState?.openDrawer(), debugPrint("e")},
+                        child: Icon(
+                          Icons.menu,
+                          color: theme.onPrimary,
+                          size: 30,
+                        ),
                       ),
-                    ),
-                    Text(getUserData.username, style: textTheme.displaySmall),
-                    Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: theme.onPrimary,
-                        borderRadius: BorderRadius.circular(20),
-                        gradient: getPrimaryGradient,
-                      ),
-                      child: ClipRRect(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(15)),
-                          child: Image.network('https://picsum.photos/200')),
-                    )
-                  ],
-                ),
-              ), //END OF TOP APP BAR
+                      Text(getUserData.username, style: textTheme.displaySmall),
+                      Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: theme.onPrimary,
+                          borderRadius: BorderRadius.circular(20),
+                          gradient: getPrimaryGradient,
+                        ),
+                        child: ClipRRect(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(15)),
+                            child: Image.network('https://picsum.photos/200')),
+                      )
+                    ],
+                  ),
+                ), //END OF TOP APP BAR
+              ),
             ),
             //Main Content
             Expanded(
