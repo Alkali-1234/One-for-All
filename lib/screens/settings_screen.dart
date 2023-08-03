@@ -321,15 +321,10 @@ class _SettingsScreenState extends State<SettingsScreen>
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () {
-                                // just show snakbar for now (im scared it will break the app lol)
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    backgroundColor: Colors.black,
-                                    content: Text("Cache cleared!",
-                                        style: TextStyle(color: Colors.white)),
-                                    duration: Duration(seconds: 1),
-                                  ),
-                                );
+                                showDialog(
+                                    context: context,
+                                    builder: (_) => ConfirmationModal(
+                                        clearCacheFunction: clearCache));
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: theme.secondary,
@@ -375,5 +370,59 @@ class _SettingsScreenState extends State<SettingsScreen>
         ),
       ),
     );
+  }
+}
+
+//* Are you sure modal
+class ConfirmationModal extends StatelessWidget {
+  const ConfirmationModal({super.key, required this.clearCacheFunction});
+  final Function clearCacheFunction;
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    return Dialog(
+        child: Stack(
+      children: [
+        //* Blur
+        Positioned.fill(
+            child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: theme.primaryContainer,
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(20))),
+                ))),
+        Card(
+          color: theme.secondary,
+          shape: RoundedRectangleBorder(
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+            side: BorderSide(color: theme.tertiary, width: 0.5),
+          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Text("Are you sure?", style: textTheme.displayMedium),
+            const SizedBox(height: 5),
+            Text(
+                "This will delete saved email/password and information that you have opened this app before.",
+                style: textTheme.displaySmall),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextButton(
+                    onPressed: () => clearCacheFunction,
+                    child: Text("Yes", style: textTheme.displaySmall)),
+                const SizedBox(width: 10),
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text("Cancel", style: textTheme.displaySmall))
+              ],
+            )
+          ]),
+        ),
+      ],
+    ));
   }
 }

@@ -297,6 +297,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   //HomeScreen State
   int MABSelectedFilter = 0;
+  bool reverseTransition = false;
 
   @override
   Widget build(BuildContext context) {
@@ -304,6 +305,11 @@ class _HomeScreenState extends State<HomeScreen> {
     var textTheme = Theme.of(context).textTheme;
     void setMABSelectedFilter(int filter) {
       setState(() {
+        if (filter > MABSelectedFilter) {
+          reverseTransition = false;
+        } else {
+          reverseTransition = true;
+        }
         MABSelectedFilter = filter;
       });
       debugPrint("Selected Filter: $MABSelectedFilter");
@@ -530,83 +536,94 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: ListView.builder(
                           itemCount: getMabData.posts.length,
                           itemBuilder: (context, index) {
-                            return MABSelectedFilter == 0 ||
-                                    getMabData.posts[index].type ==
-                                        MABSelectedFilter
-                                ? Padding(
-                                    padding: const EdgeInsets.only(bottom: 5.0),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        side: BorderSide(
-                                            color: theme.secondary, width: 1),
-                                        padding: const EdgeInsets.all(8),
-                                        backgroundColor: theme.secondary,
-                                        foregroundColor: theme.onSecondary,
-                                        shadowColor: Colors.black,
-                                        elevation: 2,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                            return AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 100),
+                              transitionBuilder: (child, animation) =>
+                                  FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              ),
+                              child: MABSelectedFilter == 0 ||
+                                      getMabData.posts[index].type ==
+                                          MABSelectedFilter
+                                  ? Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 5.0),
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          side: BorderSide(
+                                              color: theme.secondary, width: 1),
+                                          padding: const EdgeInsets.all(8),
+                                          backgroundColor: theme.secondary,
+                                          foregroundColor: theme.onSecondary,
+                                          shadowColor: Colors.black,
+                                          elevation: 2,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        onPressed: () => {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) => MABModal(
+                                                    title: getMabData
+                                                        .posts[index].title,
+                                                    description: getMabData
+                                                        .posts[index]
+                                                        .description,
+                                                    image: getMabData
+                                                        .posts[index].image,
+                                                    attatchements: getMabData
+                                                        .posts[index]
+                                                        .fileAttatchments,
+                                                  ))
+                                        },
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            SizedBox(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.5,
+                                              height: 30,
+                                              child: FittedBox(
+                                                child: Text(
+                                                  getMabData.posts[index].title,
+                                                  style: textTheme.displaySmall!
+                                                      .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  textAlign: TextAlign.left,
+                                                ),
+                                              ),
+                                            ),
+                                            ClipRRect(
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(8.0)),
+                                              child: Container(
+                                                color: theme.secondary,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(6.0),
+                                                  child: Text(
+                                                    //days left due, and the day it is due
+                                                    "${getMabData.posts[index].dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(getMabData.posts[index].dueDate)})",
+                                                    style:
+                                                        textTheme.displaySmall,
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          ],
                                         ),
                                       ),
-                                      onPressed: () => {
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) => MABModal(
-                                                  title: getMabData
-                                                      .posts[index].title,
-                                                  description: getMabData
-                                                      .posts[index].description,
-                                                  image: getMabData
-                                                      .posts[index].image,
-                                                  attatchements: getMabData
-                                                      .posts[index]
-                                                      .fileAttatchments,
-                                                ))
-                                      },
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.5,
-                                            height: 30,
-                                            child: FittedBox(
-                                              child: Text(
-                                                getMabData.posts[index].title,
-                                                style: textTheme.displaySmall!
-                                                    .copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                                textAlign: TextAlign.left,
-                                              ),
-                                            ),
-                                          ),
-                                          ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(8.0)),
-                                            child: Container(
-                                              color: theme.secondary,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(6.0),
-                                                child: Text(
-                                                  //days left due, and the day it is due
-                                                  "${getMabData.posts[index].dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(getMabData.posts[index].dueDate)})",
-                                                  style: textTheme.displaySmall,
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                : const SizedBox.shrink();
+                                    )
+                                  : const SizedBox.shrink(),
+                            );
                           },
                         ),
                       ),

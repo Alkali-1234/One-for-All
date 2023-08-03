@@ -28,22 +28,78 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
-  void _saveChanges() {
+  void _saveChanges() async {
     if (_formKey.currentState!.validate()) {
+      await showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) => WillPopScope(
+              onWillPop: () => Future.value(false),
+              child: const SavingSettingsModal()));
       // Save changes to the user profile
-      if (profilePicture != previousProfilePicture) {
+      if (profilePicture is File) {
         //* Change profile picture
-        changeUserProfilePicture(profilePicture, previousProfilePicture);
+        try {
+          await changeUserProfilePicture(
+              profilePicture, previousProfilePicture);
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Changes not saved! Please be sure that all fields are filled and changed',
+                  style: TextStyle(color: Colors.white)),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
       if (username != previousUsername) {
         //* Change username
-        changeUserName(username);
+        try {
+          await changeUserName(username);
+        } on Exception catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Changes not saved! Please be sure that all fields are filled and changed',
+                  style: TextStyle(color: Colors.white)),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
       if (email != previousEmail) {
         //* Change email
-        //TODO Implement
+        try {
+          await changeUserEmail(email);
+        } on Exception catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Changes not saved! Please be sure that all fields are filled and changed',
+                  style: TextStyle(color: Colors.white)),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
       debugPrint('Changes saved!');
+      //! FIXME IT WONT CLOSE PLEASE HELP HELP HELP HELP HELP HELP HELP HELP HELP HELP HELP HELP HELP HELP HELP
+      //! GOD PLEASE HELP ME
+      Navigator.pop(context);
+      return;
+    } else {
+      //* Show snack bar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Changes not saved! Please be sure that all fields are filled and changed',
+              style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.red,
+        ),
+      );
+      debugPrint('Changes not saved!');
+      return;
     }
   }
 
@@ -54,11 +110,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await ImagePicker().pickImage(source: ImageSource.gallery).then((value) {
       if (value != null) {
         setState(() {
-          profilePicture = value;
-          pfpImage = FileImage(value as File);
+          profilePicture = File(value.path);
+          pfpImage = FileImage(File(value.path));
         });
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (profilePicture == "") {
+      profilePicture = NetworkImage("https://picsum.photos/200");
+    }
   }
 
   @override
@@ -102,7 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         icon: const Icon(Icons.edit),
                         onPressed: () {
                           // Handle edit profile picture
-                          debugPrint('Edit profile picture clicked!');
+                          changeProfilePicture();
                         },
                       ),
                     ),
@@ -185,5 +249,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
+  }
+}
+
+//* Saving settings modal
+class SavingSettingsModal extends StatelessWidget {
+  const SavingSettingsModal({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    return Dialog(
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.transparent,
+        child: Stack(
+          children: [
+            //* Blur background
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: theme.primaryContainer,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ),
+            Card(
+              color: theme.primaryContainer,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(color: theme.tertiary, width: 0.5)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Saving changes...',
+                        style: textTheme.displaySmall!
+                            .copyWith(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 20),
+                    LinearProgressIndicator(
+                      backgroundColor: theme.onBackground,
+                      color: Colors.blue,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ));
   }
 }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 //ignore: unused_import
 import 'package:flutter/material.dart';
+import 'package:oneforall/service/files_service.dart';
 //ignore: unused_import
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/user_data.dart';
@@ -177,9 +178,14 @@ Future changeUserName(String username) async {
 
 Future changeUserProfilePicture(
     File file, String? previousProfilePicture) async {
-  //* Upload new profile picture to firebase storage
-  //TODO implement
   String url = "";
+  //* Upload new profile picture to firebase storage
+  try {
+    url = await uploadUserPP(
+        file, "profile_picture_${FirebaseAuth.instance.currentUser!.uid}");
+  } catch (e) {
+    rethrow;
+  }
 
   try {
     await FirebaseAuth.instance.currentUser!
@@ -193,6 +199,19 @@ Future changeUserProfilePicture(
   if (previousProfilePicture != null) {
     //* Delete previous profile picture from firebase storage
     //TODO implement
+  }
+  return true;
+}
+
+Future changeUserEmail(String email) async {
+  try {
+    await FirebaseAuth.instance.currentUser!
+        .updateEmail(email)
+        .catchError((error, stacktrace) {
+      throw error;
+    });
+  } catch (e) {
+    rethrow;
   }
   return true;
 }

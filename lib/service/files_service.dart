@@ -2,7 +2,7 @@ import 'package:firebase_storage/firebase_storage.dart'; // For File Upload To F
 import 'package:flutter/material.dart';
 import 'dart:io';
 
-Future uploadUserPP(BuildContext context, File image, String fileName) async {
+Future uploadUserPP(File image, String fileName) async {
   Reference firebaseStorageRef =
       FirebaseStorage.instance.ref().child('user_profile_pictures/$fileName');
   UploadTask uploadTask = firebaseStorageRef.putFile(image);
