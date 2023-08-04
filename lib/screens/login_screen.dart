@@ -163,7 +163,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               children: [
                                 Checkbox(
                                     side: BorderSide(
-                                        color: Theme.of(context).colorScheme.onBackground),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onBackground),
                                     value: saveCredentials,
                                     onChanged: (value) {
                                       setState(() {
@@ -174,8 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     style: textTheme.displaySmall)
                               ],
                             ),
-                            Text("",
-                                style: textTheme.displaySmall)
+                            Text("", style: textTheme.displaySmall)
                           ],
                         ),
                         const SizedBox(height: 20),
@@ -240,7 +241,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                               child: Text("Create a new account",
                                   style: textTheme.displaySmall)),
-
                         ),
                         const SizedBox(height: 10),
 
@@ -250,19 +250,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             height: 40,
                             child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    backgroundColor: theme.secondary,
-                                    shadowColor: Colors.transparent,
-                                    shape: RoundedRectangleBorder(
+                                  backgroundColor: theme.secondary,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    side: BorderSide(color: theme.tertiary),
+                                  ),
+                                  side: BorderSide(color: theme.tertiary),
                                 ),
                                 onPressed: () {},
                                 child: Text("Login as Guest",
-                                    style: textTheme.displaySmall)
-                            )
-
-                        )
+                                    style: textTheme.displaySmall)))
                       ],
                     ),
                   ),

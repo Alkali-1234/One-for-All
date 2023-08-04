@@ -1,3 +1,6 @@
+import '/constants.dart';
+import 'package:flutter/material.dart';
+
 class UserData {
   UserData(
       {required this.uid,

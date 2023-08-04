@@ -1,8 +1,11 @@
 import 'dart:ui';
-
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../constants.dart';
 import '../data/user_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../main.dart';
 import '../service/auth_service.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -95,11 +98,15 @@ class _SettingsScreenState extends State<SettingsScreen>
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var appState = Provider.of<AppState>(context);
     return Container(
-      decoration: const BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage('assets/images/purpwallpaper 2.png'),
-              fit: BoxFit.cover)),
+      decoration: appState.currentUserSelectedTheme == defaultBlueTheme
+          ? const BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage('assets/images/purpwallpaper 2.png'),
+                  fit: BoxFit.cover))
+          : BoxDecoration(
+              color: appState.currentUserSelectedTheme.colorScheme.background),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
@@ -214,6 +221,29 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     setState(() {
                                       selectedTheme = _tabController.index;
                                     });
+                                    //* change theme
+                                    switch (_tabController.index) {
+                                      case 0:
+                                        setState(() {
+                                          appState.currentUserSelectedTheme =
+                                              defaultBlueTheme;
+                                        });
+                                        break;
+                                      case 1:
+                                        setState(() {
+                                          appState.currentUserSelectedTheme =
+                                              darkTheme;
+                                        });
+                                        break;
+                                      case 2:
+                                        setState(() {
+                                          appState.currentUserSelectedTheme =
+                                              lightTheme;
+                                        });
+                                        break;
+                                      default:
+                                        debugPrint("Invalid theme index");
+                                    }
                                   }
                                 });
                                 return TabBarView(
@@ -392,35 +422,38 @@ class ConfirmationModal extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                       color: theme.primaryContainer,
+                      border: Border.all(color: theme.tertiary, width: 0.5),
                       borderRadius:
                           const BorderRadius.all(Radius.circular(20))),
                 ))),
-        Card(
-          color: theme.secondary,
-          shape: RoundedRectangleBorder(
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-            side: BorderSide(color: theme.tertiary, width: 0.5),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Card(
+            color: theme.secondary,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Text("Are you sure?", style: textTheme.displayMedium),
+              const SizedBox(height: 5),
+              Text(
+                  "This will delete saved email/password and information that you have opened this app before.",
+                  style: textTheme.displaySmall),
+              const SizedBox(height: 5),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextButton(
+                      onPressed: () => clearCacheFunction,
+                      child: Text("Yes", style: textTheme.displaySmall)),
+                  const SizedBox(width: 10),
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text("Cancel", style: textTheme.displaySmall))
+                ],
+              )
+            ]),
           ),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Text("Are you sure?", style: textTheme.displayMedium),
-            const SizedBox(height: 5),
-            Text(
-                "This will delete saved email/password and information that you have opened this app before.",
-                style: textTheme.displaySmall),
-            const SizedBox(height: 5),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextButton(
-                    onPressed: () => clearCacheFunction,
-                    child: Text("Yes", style: textTheme.displaySmall)),
-                const SizedBox(width: 10),
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text("Cancel", style: textTheme.displaySmall))
-              ],
-            )
-          ]),
         ),
       ],
     ));

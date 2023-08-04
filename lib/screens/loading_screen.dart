@@ -6,8 +6,7 @@ import 'get_started.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoadingScreen extends StatefulWidget {
-  const LoadingScreen({super.key, required this.navigatorKey});
-  final GlobalKey<NavigatorState> navigatorKey;
+  const LoadingScreen({super.key});
 
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
@@ -26,9 +25,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   void loadingScreenAnimation() async {
     for (var i = 0; i < 4; i++) {
-      setState(() {
-        loadingDots = "." * (i + 1);
-      });
+      if (this.mounted) {
+        setState(() {
+          loadingDots = "." * (i + 1);
+        });
+      }
       await Future.delayed(const Duration(milliseconds: 500));
     }
     loadingScreenAnimation();

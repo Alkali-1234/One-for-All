@@ -30,42 +30,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _saveChanges() async {
     if (_formKey.currentState!.validate()) {
-      await showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (context) => WillPopScope(
-              onWillPop: () => Future.value(false),
-              child: const SavingSettingsModal()));
+      debugPrint("e");
       // Save changes to the user profile
       if (profilePicture is File) {
         //* Change profile picture
         try {
-          await changeUserProfilePicture(
+          String newLink = await changeUserProfilePicture(
               profilePicture, previousProfilePicture);
+          getUserData.profilePicture = newLink;
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                  'Changes not saved! Please be sure that all fields are filled and changed',
-                  style: TextStyle(color: Colors.white)),
+            SnackBar(
+              content: Text('Error changing profile picture! $e',
+                  style: const TextStyle(color: Colors.white)),
               backgroundColor: Colors.red,
             ),
           );
+          return;
         }
       }
       if (username != previousUsername) {
         //* Change username
         try {
           await changeUserName(username);
+          getUserData.username = username;
         } on Exception catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                  'Changes not saved! Please be sure that all fields are filled and changed',
+            SnackBar(
+              content: Text('Error changing username! $e',
                   style: TextStyle(color: Colors.white)),
               backgroundColor: Colors.red,
             ),
           );
+          return;
         }
       }
       if (email != previousEmail) {
@@ -74,21 +71,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
           await changeUserEmail(email);
         } on Exception catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                  'Changes not saved! Please be sure that all fields are filled and changed',
+            SnackBar(
+              content: Text('Error changing email! $e',
                   style: TextStyle(color: Colors.white)),
               backgroundColor: Colors.red,
             ),
           );
+          return;
         }
       }
       debugPrint('Changes saved!');
-      //! FIXME IT WONT CLOSE PLEASE HELP HELP HELP HELP HELP HELP HELP HELP HELP HELP HELP HELP HELP HELP HELP
-      //! GOD PLEASE HELP ME
-      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content:
+              Text('Changes saved!', style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.green,
+        ),
+      );
       return;
     } else {
+      debugPrint("called");
+      Navigator.pop(context);
       //* Show snack bar
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -230,7 +233,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: _saveChanges,
+                  onPressed: () => _saveChanges(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.secondary,
                     padding: const EdgeInsets.symmetric(

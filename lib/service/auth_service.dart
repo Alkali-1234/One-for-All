@@ -200,7 +200,7 @@ Future changeUserProfilePicture(
     //* Delete previous profile picture from firebase storage
     //TODO implement
   }
-  return true;
+  return url;
 }
 
 Future changeUserEmail(String email) async {
