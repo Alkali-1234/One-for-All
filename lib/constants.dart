@@ -141,12 +141,12 @@ ThemeData defaultBlueTheme = ThemeData(
 ThemeData darkTheme = ThemeData(
   colorScheme: ColorScheme.fromSwatch().copyWith(
     primary: const Color.fromRGBO(0, 0, 0, 0.25),
-    secondary: const Color.fromRGBO(255, 255, 255, 0.25),
-    tertiary: const Color.fromRGBO(255, 255, 255, 0.50),
+    secondary: const Color.fromRGBO(255, 255, 255, 0.125),
+    tertiary: const Color.fromRGBO(255, 255, 255, 0.2),
     primaryContainer: const Color.fromRGBO(255, 255, 255, 0.07),
     onPrimary: const Color.fromRGBO(255, 255, 255, 1),
     onSecondary: const Color.fromRGBO(255, 255, 255, 1),
-    background: const Color.fromRGBO(0, 0, 0, 1.0),
+    background: const Color.fromRGBO(30, 30, 30, 1.0),
     error: Colors.red,
   ),
   textTheme: const TextTheme(
@@ -175,11 +175,12 @@ ThemeData darkTheme = ThemeData(
 ThemeData lightTheme = ThemeData(
   colorScheme: ColorScheme.fromSwatch().copyWith(
     primary: const Color.fromRGBO(0, 0, 0, 0.25),
-    secondary: const Color.fromRGBO(255, 255, 255, 0.25),
-    tertiary: const Color.fromRGBO(255, 255, 255, 0.50),
-    primaryContainer: const Color.fromRGBO(255, 255, 255, 0.07),
+    secondary: const Color.fromRGBO(0, 0, 0, 0.25),
+    tertiary: const Color.fromRGBO(0, 0, 0, 0.50),
+    primaryContainer: const Color.fromRGBO(0, 0, 0, 0.07),
     onPrimary: const Color.fromRGBO(0, 0, 0, 1),
     onSecondary: const Color.fromRGBO(0, 0, 0, 1),
+    onBackground: const Color.fromRGBO(0, 0, 0, 1),
     background: const Color.fromRGBO(255, 255, 255, 1.0),
     error: Colors.red,
   ),

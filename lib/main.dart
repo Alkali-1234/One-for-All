@@ -3,6 +3,7 @@
 //Firebase
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter/material.dart';
@@ -96,7 +97,26 @@ class MyApp extends StatelessWidget {
 
 //AppState
 class AppState extends ChangeNotifier {
-  ThemeData _currentUserSelectedTheme = defaultBlueTheme;
+  // //* get theme func
+  // Future<ThemeData> getSavedTheme() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   if (prefs.containsKey("theme")) {
+  //     final theme = prefs.getInt("theme");
+  //     if (theme == 0) {
+  //       return defaultBlueTheme;
+  //     } else if (theme == 1) {
+  //       return darkTheme;
+  //     } else if (theme == 2) {
+  //       return lightTheme;
+  //     } else {
+  //       return defaultBlueTheme;
+  //     }
+  //   } else {
+  //     return defaultBlueTheme;
+  //   }
+  // }
+
+  ThemeData _currentUserSelectedTheme = passedUserTheme;
   ThemeData get currentUserSelectedTheme => _currentUserSelectedTheme;
   set currentUserSelectedTheme(ThemeData theme) {
     _currentUserSelectedTheme = theme;
@@ -125,7 +145,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    //var appState = Provider.of<AppState>(context);
+    var appState = Provider.of<AppState>(context);
 
     void setSelectedScreen(int index) {
       setState(() {
@@ -152,12 +172,14 @@ class _HomePageState extends State<HomePage> {
         child: Container(
           height: double.maxFinite,
           width: double.maxFinite,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/purpwallpaper 2.png'),
-              fit: BoxFit.cover,
-            ),
-          ),
+          decoration: appState.currentUserSelectedTheme == defaultBlueTheme
+              ? const BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage('assets/images/purpwallpaper 2.png'),
+                      fit: BoxFit.cover))
+              : BoxDecoration(
+                  color:
+                      appState.currentUserSelectedTheme.colorScheme.background),
           child: Column(children: [
             Hero(
               tag: "topAppBar",
@@ -308,6 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var appState = Provider.of<AppState>(context);
     void setMABSelectedFilter(int filter) {
       setState(() {
         if (filter > MABSelectedFilter) {

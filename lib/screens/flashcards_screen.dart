@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
+import 'package:oneforall/main.dart';
+import 'package:provider/provider.dart';
 import '../data/user_data.dart';
 import 'flashcardsPlay_screen.dart';
 import 'flashcards_edit_screen.dart';
@@ -27,11 +29,16 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var appState = Provider.of<AppState>(context);
     return Container(
-        decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/images/purpwallpaper 2.png'),
-                fit: BoxFit.cover)),
+        decoration: appState.currentUserSelectedTheme == defaultBlueTheme
+            ? const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/images/purpwallpaper 2.png'),
+                    fit: BoxFit.cover))
+            : BoxDecoration(
+                color:
+                    appState.currentUserSelectedTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 floatingActionButton: FloatingActionButton(
@@ -286,6 +293,12 @@ class _NewSetModalState extends State<NewSetModal> {
     await SharedPreferences.getInstance().then((value) async {
       await value.setString("flashcardSets", jsonEncode(flashcardSetsObject));
     });
+
+    //* Reload when done
+    await reloadFlashcards();
+
+    //* Rebuild
+    setState(() {});
 
     //* Set loading to false
     setState(() {

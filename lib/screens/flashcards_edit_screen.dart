@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../data/user_data.dart';
+import '../main.dart';
 
 class FlashcardsEditScreen extends StatefulWidget {
   const FlashcardsEditScreen({super.key, required this.setIndex});
@@ -25,6 +30,50 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
     }
   }
 
+  Future saveFlashcards() async {
+    //* Determine wether flashcard is stored on cloud or locally
+    //TODO implement
+
+    //* In case of local storage
+    //! Will always use the local storage method for now
+    //* Set the flashcard set to the new flashcard set
+    setState(() {
+      getUserData.flashCardSets[widget.setIndex].flashcards =
+          List<Flashcard>.empty(growable: true);
+      for (var i in getQuestionQuery["queries"]) {
+        getUserData.flashCardSets[widget.setIndex].flashcards.add(Flashcard(
+            id: i["id"], question: i["question"], answer: i["answer"]));
+      }
+    });
+    Object objectifiedFlashcardSets = {
+      "sets": [
+        for (var set in getUserData.flashCardSets)
+          {
+            "title": set.title,
+            "description": set.description,
+            "questions": [
+              for (var flashcard in set.flashcards)
+                {"question": flashcard.question, "answer": flashcard.answer}
+            ]
+          }
+      ]
+    };
+    //* Save the flashcard set to the local storage
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString("flashcardSets", jsonEncode(objectifiedFlashcardSets));
+    Navigator.pop(context);
+  }
+
+  void addCard() {
+    setState(() {
+      getQuestionQuery["queries"].add({
+        "id": getQuestionQuery["queries"].length,
+        "question": "",
+        "answer": ""
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -35,12 +84,16 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    int index = widget.setIndex;
+    var appState = Provider.of<AppState>(context);
     return Container(
-        decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/images/purpwallpaper 2.png'),
-                fit: BoxFit.cover)),
+        decoration: appState.currentUserSelectedTheme == defaultBlueTheme
+            ? const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/images/purpwallpaper 2.png'),
+                    fit: BoxFit.cover))
+            : BoxDecoration(
+                color:
+                    appState.currentUserSelectedTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -95,15 +148,14 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                               children: [
                                 Text("Edit Set",
                                     style: textTheme.displayMedium),
-                                Text(
-                                    "${getUserData.flashCardSets[index].flashcards.length} Questions",
+                                Text("${getQuestionQuery.length} Questions",
                                     style: textTheme.displayMedium)
                               ],
                             ),
                             const SizedBox(height: 10),
                             //New Question button
                             ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () => addCard(),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: theme.secondary,
                                   shadowColor: Colors.transparent,
@@ -128,8 +180,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                               height: MediaQuery.of(context).size.height * 0.65,
                               child: ListView.builder(
                                   shrinkWrap: true,
-                                  itemCount: getUserData
-                                      .flashCardSets[index].flashcards.length,
+                                  itemCount: getQuestionQuery["queries"].length,
                                   itemBuilder: (context, index) {
                                     return Padding(
                                       padding: const EdgeInsets.only(top: 8.0),
@@ -172,6 +223,17 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                                                 ["question"],
                                                         decoration:
                                                             InputDecoration(
+                                                          focusedBorder:
+                                                              OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            borderSide: BorderSide(
+                                                                color: theme
+                                                                    .onBackground,
+                                                                width: 1),
+                                                          ),
                                                           border:
                                                               OutlineInputBorder(
                                                             borderRadius:
@@ -276,7 +338,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                               children: [
                                 ElevatedButton(
                                     onPressed: () {
-                                      //Sync with database and local data
+                                      saveFlashcards();
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: theme.secondary,

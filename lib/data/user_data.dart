@@ -1,5 +1,9 @@
-import '/constants.dart';
+import 'dart:convert';
+
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
+
+late ThemeData passedUserTheme;
 
 class UserData {
   UserData(
@@ -62,4 +66,38 @@ class Flashcard {
   final int id;
   String question;
   String answer;
+}
+
+//! check if this still throws an error
+Future reloadFlashcards() async {
+  //* Get flashcard sets from shared preferences
+  await SharedPreferences.getInstance().then((value) {
+    if (value.containsKey("flashcardSets")) {
+      dynamic decodedObject = jsonDecode(value.getString("flashcardSets")!);
+
+      //* Convert the decoded `dynamic` object back to your desired Dart object structure
+      List<FlashcardSet> flashcardSets = [];
+      for (var set in decodedObject['sets']) {
+        flashcardSets.add(FlashcardSet(
+            id: decodedObject['sets'].indexOf(set),
+            title: set["title"],
+            description: "description_unavailable",
+            flashcards: [
+              for (var flashcard in set['questions'])
+                Flashcard(
+                    id: set['questions'].indexOf(flashcard),
+                    question: flashcard['question'],
+                    answer: flashcard['answer'])
+            ]));
+      }
+
+      //* Empty the flashcard sets
+      getUserData.flashCardSets = List<FlashcardSet>.empty(growable: true);
+
+      //* Add the flashcard sets to the user data
+      for (FlashcardSet set in flashcardSets) {
+        getUserData.flashCardSets.add(set);
+      }
+    }
+  });
 }

@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../constants.dart';
 import '../data/user_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,7 +8,8 @@ import '../main.dart';
 import '../service/auth_service.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  const SettingsScreen({super.key, required this.currentTheme});
+  final ThemeData currentTheme;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -24,8 +24,12 @@ class _SettingsScreenState extends State<SettingsScreen>
     Tab(text: "Bright Light"),
   ];
 
+  ThemeData? savedTheme;
+
   int selectedTheme = 0;
+  //0 = default blue 1 = dark 2 = light
   int currentLoading = 0;
+  late TabController _tabController;
   //0 = not loading, 1 = save in progress, 2 = clear cache in progress, 3 = logout in progress
 
   void saveSettings() async {
@@ -37,9 +41,16 @@ class _SettingsScreenState extends State<SettingsScreen>
     await SharedPreferences.getInstance().then((prefs) {
       prefs.setInt("theme", selectedTheme);
     });
+    setState(() {
+      savedTheme = selectedTheme == 0
+          ? defaultBlueTheme
+          : selectedTheme == 1
+              ? darkTheme
+              : lightTheme;
+    });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.green,
         content: Text("Saved Settings!", style: TextStyle(color: Colors.white)),
         duration: Duration(seconds: 1),
       ),
@@ -78,7 +89,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       debugPrint(stacktrace.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.red,
           content: Text("Error logging out! ${error.toString()}",
               style: const TextStyle(color: Colors.white)),
         ),
@@ -91,6 +102,19 @@ class _SettingsScreenState extends State<SettingsScreen>
     debugPrint("Logged out");
     setState(() {
       currentLoading = 0;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    //* Set the theme setting to the current theme
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      widget.currentTheme == defaultBlueTheme
+          ? _tabController.animateTo(0)
+          : widget.currentTheme == darkTheme
+              ? _tabController.animateTo(1)
+              : _tabController.animateTo(2);
     });
   }
 
@@ -165,7 +189,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                           //* User info card
                           Card(
                             color: theme.secondary,
-                            elevation: 4.0,
+                            elevation: 0,
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Row(
@@ -212,7 +236,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                             child: DefaultTabController(
                               length: _themes.length,
                               child: Builder(builder: (context) {
-                                final TabController _tabController =
+                                _tabController =
                                     DefaultTabController.of(context);
                                 _tabController.addListener(() {
                                   debugPrint(
@@ -321,15 +345,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                             child: ElevatedButton(
                               onPressed: () {
                                 debugPrint("Save pressed");
-                                // just show snakbar for now (im lazy)
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    backgroundColor: Colors.black,
-                                    content: Text("Saved Settings!",
-                                        style: TextStyle(color: Colors.white)),
-                                    duration: Duration(seconds: 1),
-                                  ),
-                                );
+                                saveSettings();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: theme.secondary,

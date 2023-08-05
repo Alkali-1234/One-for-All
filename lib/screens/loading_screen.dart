@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:oneforall/constants.dart';
+import 'package:oneforall/data/user_data.dart';
 import 'package:oneforall/service/auth_service.dart';
+import 'package:provider/provider.dart';
 import '../main.dart';
 import 'login_screen.dart';
 import 'get_started.dart';
@@ -16,6 +19,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   String verbose = "";
   String loadingDots = ".";
   Icon? loadingStatus;
+  late var _appState;
 
   void pushToPage(Widget page) {
     Navigator.of(context)
@@ -25,7 +29,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   void loadingScreenAnimation() async {
     for (var i = 0; i < 4; i++) {
-      if (this.mounted) {
+      if (mounted) {
         setState(() {
           loadingDots = "." * (i + 1);
         });
@@ -54,14 +58,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
       setState(() {
         verbose = "Setting theme...";
       });
-      String theme = prefs.getString("theme") ?? "blue";
+      int theme = prefs.getInt("theme") ?? 0;
       // pass the theme in myapp
-      if (theme == "blue") {
-        //TODO implement
-      } else if (theme == "dark") {
-        //TODO implement
-      } else if (theme == "light") {
-        //TODO implement
+      // bismillahirrahmanirrahim this works
+      if (theme == 0) {
+        passedUserTheme = defaultBlueTheme;
+      } else if (theme == 1) {
+        passedUserTheme = darkTheme;
+      } else if (theme == 2) {
+        passedUserTheme = lightTheme;
       }
     }
     if (prefs.containsKey("language")) {
@@ -117,12 +122,17 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
-    initializeApp();
     loadingScreenAnimation();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      initializeApp();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    var appState = Provider.of<AppState>(context);
+    _appState = appState;
+
     return Scaffold(
       body: Container(
         color: Colors.black,
@@ -130,12 +140,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              loadingStatus == null
-                  ? CircularProgressIndicator(
-                      color: Theme.of(context).colorScheme.secondary,
-                    )
-                  : loadingStatus ?? Container(),
-              const SizedBox(height: 20),
               Text(
                 'Loading $loadingDots',
                 style: const TextStyle(

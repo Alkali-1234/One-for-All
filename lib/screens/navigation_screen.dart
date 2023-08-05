@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:oneforall/main.dart';
+import 'package:provider/provider.dart';
 
 //Screens
 import 'mab_lac_screen.dart';
@@ -18,6 +20,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var appState = Provider.of<AppState>(context);
 
     return Column(
       //Title
@@ -218,8 +221,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SettingsScreen()));
+                                        builder: (context) => SettingsScreen(
+                                              currentTheme: appState
+                                                  .currentUserSelectedTheme,
+                                            )));
                               },
                             ),
                           ),
