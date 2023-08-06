@@ -179,6 +179,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                                       },
                                                       style: ElevatedButton
                                                           .styleFrom(
+                                                        elevation: 0,
                                                         backgroundColor:
                                                             Colors.transparent,
                                                         shadowColor:
@@ -326,28 +327,38 @@ class _NewSetModalState extends State<NewSetModal> {
                 const Divider(),
                 const SizedBox(height: 10),
                 //Title Text Field
-                TextField(
-                  onChanged: (value) => setState(() {
-                    titleQuery = value;
-                  }),
-                  keyboardAppearance: Brightness.dark,
-                  cursorColor: theme.onPrimary,
-                  style: textTheme.displaySmall!.copyWith(
-                      color: theme.onPrimary, fontWeight: FontWeight.bold),
-                  decoration: InputDecoration(
-                      filled: true,
-                      fillColor: theme.primary,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(
-                          width: 0,
-                          style: BorderStyle.none,
+                SizedBox(
+                  height: 40,
+                  child: TextField(
+                    onChanged: (value) => setState(() {
+                      titleQuery = value;
+                    }),
+                    keyboardAppearance: Brightness.dark,
+                    cursorColor: theme.onPrimary,
+                    style: textTheme.displaySmall!.copyWith(
+                        color: theme.onPrimary, fontWeight: FontWeight.bold),
+                    decoration: InputDecoration(
+                        filled: true,
+                        fillColor: theme.primary,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(
+                            width: 0,
+                            style: BorderStyle.none,
+                          ),
                         ),
-                      ),
-                      hintText: 'Title',
-                      hintStyle: textTheme.displaySmall!.copyWith(
-                          color: theme.onPrimary.withOpacity(0.25),
-                          fontWeight: FontWeight.bold)),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            width: 2,
+                            color: theme.onBackground,
+                          ),
+                        ),
+                        hintText: 'Title',
+                        hintStyle: textTheme.displaySmall!.copyWith(
+                            color: theme.onPrimary.withOpacity(0.25),
+                            fontWeight: FontWeight.bold)),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 //How to use

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
+import 'package:provider/provider.dart';
 import '../data/user_data.dart';
 import 'dart:math';
+import 'package:animations/animations.dart';
+import '../main.dart';
 
 class FlashcardsPlayScreen extends StatefulWidget {
   const FlashcardsPlayScreen({super.key, required this.flashcardsSet});
@@ -13,11 +16,13 @@ class FlashcardsPlayScreen extends StatefulWidget {
 
 class _FlashcardsPlayScreen extends State<FlashcardsPlayScreen> {
   int selectedScreen = 0;
+  bool reversed = false;
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var appState = Provider.of<AppState>(context);
     FlashcardSet set = widget.flashcardsSet;
 
     // 0 = Select Mode
@@ -26,15 +31,24 @@ class _FlashcardsPlayScreen extends State<FlashcardsPlayScreen> {
     // 3 Play
     void changeScreen(int screen) {
       setState(() {
+        if (selectedScreen < screen) {
+          reversed = false;
+        } else {
+          reversed = true;
+        }
         selectedScreen = screen;
       });
     }
 
     return Container(
-        decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/images/purpwallpaper 2.png'),
-                fit: BoxFit.cover)),
+        decoration: appState.currentUserSelectedTheme == defaultBlueTheme
+            ? const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/images/purpwallpaper 2.png'),
+                    fit: BoxFit.cover))
+            : BoxDecoration(
+                color:
+                    appState.currentUserSelectedTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -70,23 +84,36 @@ class _FlashcardsPlayScreen extends State<FlashcardsPlayScreen> {
                         : Container(),
                     //End of App Bar
                     //Body
-                    selectedScreen == 0
-                        ? SelectModeScreen(
-                            textTheme: textTheme,
-                            theme: theme,
-                            set: set,
-                            changeScreenFunction: changeScreen)
-                        : selectedScreen == 1
-                            ? StartScreen(
-                                textTheme: textTheme,
-                                theme: theme,
-                                set: set,
-                                changeScreenFunction: changeScreen)
-                            : selectedScreen == 2
-                                ? const Placeholder()
-                                : selectedScreen == 3
-                                    ? PlayScreen(set: set)
-                                    : const Placeholder(),
+                    PageTransitionSwitcher(
+                      reverse: reversed,
+                      transitionBuilder:
+                          (child, primaryAnimation, secondaryAnimation) {
+                        return SharedAxisTransition(
+                          fillColor: Colors.transparent,
+                          transitionType: SharedAxisTransitionType.horizontal,
+                          animation: primaryAnimation,
+                          secondaryAnimation: secondaryAnimation,
+                          child: child,
+                        );
+                      },
+                      child: selectedScreen == 0
+                          ? SelectModeScreen(
+                              textTheme: textTheme,
+                              theme: theme,
+                              set: set,
+                              changeScreenFunction: changeScreen)
+                          : selectedScreen == 1
+                              ? StartScreen(
+                                  textTheme: textTheme,
+                                  theme: theme,
+                                  set: set,
+                                  changeScreenFunction: changeScreen)
+                              : selectedScreen == 2
+                                  ? const Placeholder()
+                                  : selectedScreen == 3
+                                      ? PlayScreen(set: set)
+                                      : const Placeholder(),
+                    ),
                   ],
                 ))));
   }
@@ -291,7 +318,10 @@ class PlayScreen extends StatefulWidget {
   State<PlayScreen> createState() => _PlayScreenState();
 }
 
-class _PlayScreenState extends State<PlayScreen> {
+class _PlayScreenState extends State<PlayScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _cardAnimationController;
+  late Animation<double> _cardAnimation;
   DateTime startingTime = DateTime.now();
   Flashcard currentCard = Flashcard(
       id: 0,
@@ -402,13 +432,24 @@ class _PlayScreenState extends State<PlayScreen> {
   void initState() {
     super.initState();
     initializeWeights();
+    _cardAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+    _cardAnimation =
+        Tween<double>(begin: 1, end: 0).animate(_cardAnimationController);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(context: context, builder: (_) => const ThreeTwoOneGoRibbon());
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    return Expanded(
+    return SizedBox(
+      //! Temporary solution, Expanded was here, it worked last time, idk why it doesn't work now (please help)
+      height: MediaQuery.of(context).size.height * 0.95,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -424,50 +465,68 @@ class _PlayScreenState extends State<PlayScreen> {
                 Text("Question $questionNumber",
                     style: textTheme.displayMedium),
                 const SizedBox(height: 10),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.25,
-                  width: double.infinity,
-                  child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          flipped = !flipped;
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.secondary.withOpacity(0.115),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                AnimatedBuilder(
+                    animation: _cardAnimation,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        //Y stays the same, X changes
+                        scaleY: 1,
+                        scaleX: _cardAnimation.value,
+                        child: Center(
+                          child: SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.25,
+                            width: double.infinity,
+                            child: ElevatedButton(
+                                onPressed: () async {
+                                  //* Forward then back
+                                  await _cardAnimationController.forward();
+                                  setState(() {
+                                    flipped = !flipped;
+                                  });
+                                  await _cardAnimationController.reverse();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      theme.secondary.withOpacity(0.115),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  shadowColor: Colors.transparent,
+                                  // height: MediaQuery.of(context).size.height * 0.25,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const SizedBox.shrink(),
+                                      Text(
+                                        !flipped
+                                            ? currentCard.question
+                                            : currentCard.answer,
+                                        style: textTheme.displayMedium,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      Icon(Icons.rotate_left,
+                                          color: theme.onBackground),
+                                    ],
+                                  ),
+                                )),
+                          ),
                         ),
-                        shadowColor: Colors.transparent,
-                        // height: MediaQuery.of(context).size.height * 0.25,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const SizedBox.shrink(),
-                            Text(
-                              !flipped
-                                  ? currentCard.question
-                                  : currentCard.answer,
-                              style: textTheme.displayMedium,
-                              textAlign: TextAlign.center,
-                            ),
-                            Icon(Icons.rotate_left, color: theme.onBackground),
-                          ],
-                        ),
-                      )),
-                ),
+                      );
+                    }),
                 const SizedBox(height: 10),
                 Text("How well did you know this?",
                     style: textTheme.displaySmall),
                 const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
                       height: 40,
+                      width: double.infinity,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(100),
                           gradient: primaryGradient),
@@ -481,24 +540,34 @@ class _PlayScreenState extends State<PlayScreen> {
                               foregroundColor: theme.onPrimary),
                           child: const Text("100% Knew it!")),
                     ),
-                    ElevatedButton(
-                        onPressed: () {
-                          nextQuestion(25);
-                        },
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.secondary,
-                            shadowColor: Colors.transparent,
-                            foregroundColor: theme.onPrimary),
-                        child: const Text("50% Some")),
-                    ElevatedButton(
-                        onPressed: () {
-                          nextQuestion(75);
-                        },
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.secondary,
-                            shadowColor: Colors.transparent,
-                            foregroundColor: theme.onPrimary),
-                        child: const Text("0% None")),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 40,
+                      width: double.infinity,
+                      child: ElevatedButton(
+                          onPressed: () {
+                            nextQuestion(25);
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.secondary,
+                              shadowColor: Colors.transparent,
+                              foregroundColor: theme.onPrimary),
+                          child: const Text("50% Some")),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 40,
+                      width: double.infinity,
+                      child: ElevatedButton(
+                          onPressed: () {
+                            nextQuestion(75);
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.secondary,
+                              shadowColor: Colors.transparent,
+                              foregroundColor: theme.onPrimary),
+                          child: const Text("0% None")),
+                    ),
                   ],
                 )
               ],
@@ -526,7 +595,7 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 }
 
-class FinishedScreen extends StatelessWidget {
+class FinishedScreen extends StatefulWidget {
   const FinishedScreen(
       {super.key,
       required this.set,
@@ -542,18 +611,70 @@ class FinishedScreen extends StatelessWidget {
   final int questionsDone;
   final Object weights;
 
-  get getFlashcardSet => set;
-  get getWeights => weights;
+  @override
+  State<FinishedScreen> createState() => _FinishedScreenState();
+}
+
+class _FinishedScreenState extends State<FinishedScreen>
+    with SingleTickerProviderStateMixin {
+//* Animation variables for fading in animation on loading the screen
+  late AnimationController _controller;
+
+  late Animation<double> _animation;
+
+  get getFlashcardSet => widget.set;
+
+  get getWeights => widget.weights;
+
+  String removeMilliseconds(String input) {
+    // Define the regular expression pattern to match the milliseconds part
+    RegExp regex = RegExp(r"\.\d+");
+
+    // Replace the matched part with an empty string to remove it
+    String output = input.replaceAll(regex, "");
+
+    return output;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration:
+          const Duration(milliseconds: 1000), // Adjust the duration as needed
+    );
+
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_controller);
+
+    _controller.forward(); // Start the animation on page load
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var appState = Provider.of<AppState>(context);
+
     return Container(
-        decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/images/purpwallpaper 2.png'),
-                fit: BoxFit.cover)),
+        decoration: appState.currentUserSelectedTheme == defaultBlueTheme
+            ? const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/images/purpwallpaper 2.png'),
+                    fit: BoxFit.cover))
+            : BoxDecoration(
+                color:
+                    appState.currentUserSelectedTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -585,210 +706,239 @@ class FinishedScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                          Text("Finished",
-                              style: textTheme.displayLarge!
-                                  .copyWith(fontStyle: FontStyle.italic)),
+                          _buildAnimatedWidget(
+                              1,
+                              Text("Finished",
+                                  style: textTheme.displayLarge!
+                                      .copyWith(fontStyle: FontStyle.italic))),
                           const SizedBox(height: 24),
                           //Card
-                          Container(
-                            decoration: BoxDecoration(
-                              color: theme.primary,
-                              border: Border.all(color: theme.secondary),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0, vertical: 16.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(100)),
-                                            child: Image.network(
-                                              "https://picsum.photos/50",
-                                              height: 35,
-                                              width: 35,
+                          _buildAnimatedWidget(
+                            2,
+                            Container(
+                              decoration: BoxDecoration(
+                                color: theme.primary,
+                                border: Border.all(color: theme.secondary),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0, vertical: 16.0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(100)),
+                                              child: Image.network(
+                                                "https://picsum.photos/50",
+                                                height: 35,
+                                                width: 35,
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Text("Alkaline",
-                                              style: textTheme.displayMedium!
-                                                  .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold)),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Text(
-                                          "Finished flashcards with an accuracy of:",
-                                          style: textTheme.displaySmall),
-                                    ],
-                                  ),
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "${(accuracy * 100).round()}%",
-                                        style: textTheme.displayLarge,
-                                      ),
-                                    ],
-                                  )
-                                ],
+                                            const SizedBox(width: 10),
+                                            Text("Alkaline",
+                                                style: textTheme.displayMedium!
+                                                    .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Text(
+                                            "Finished flashcards with an accuracy of:",
+                                            style: textTheme.displaySmall),
+                                      ],
+                                    ),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "${(widget.accuracy * 100).round()}%",
+                                          style: textTheme.displayLarge,
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                           //End of Card
                           const SizedBox(height: 24),
-                          Container(
-                              decoration: BoxDecoration(
-                                color: theme.primaryContainer,
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10),
+                          _buildAnimatedWidget(
+                            3,
+                            Container(
+                                decoration: BoxDecoration(
+                                  color: theme.primaryContainer,
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
                                 ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Score",
-                                      style: textTheme.displayMedium,
-                                    ),
-                                    Text(score.toString(),
-                                        style: textTheme.displayMedium)
-                                  ],
-                                ),
-                              )),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Score",
+                                        style: textTheme.displayMedium,
+                                      ),
+                                      Text(widget.score.toString(),
+                                          style: textTheme.displayMedium)
+                                    ],
+                                  ),
+                                )),
+                          ),
                           const SizedBox(height: 10),
                           //Questions done
-                          Container(
-                              decoration: BoxDecoration(
-                                color: theme.primaryContainer,
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10),
+                          _buildAnimatedWidget(
+                            4,
+                            Container(
+                                decoration: BoxDecoration(
+                                  color: theme.primaryContainer,
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
                                 ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Questions done",
-                                      style: textTheme.displayMedium,
-                                    ),
-                                    Text(questionsDone.toString(),
-                                        style: textTheme.displayMedium)
-                                  ],
-                                ),
-                              )),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Questions done",
+                                        style: textTheme.displayMedium,
+                                      ),
+                                      Text(widget.questionsDone.toString(),
+                                          style: textTheme.displayMedium)
+                                    ],
+                                  ),
+                                )),
+                          ),
                           const SizedBox(height: 10),
-                          Container(
-                              decoration: BoxDecoration(
-                                color: theme.primaryContainer,
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10),
+                          _buildAnimatedWidget(
+                            5,
+                            Container(
+                                decoration: BoxDecoration(
+                                  color: theme.primaryContainer,
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
                                 ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Time spent",
-                                      style: textTheme.displayMedium,
-                                    ),
-                                    Text("${timeSpent.abs()} H",
-                                        style: textTheme.displayMedium)
-                                  ],
-                                ),
-                              )),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Time spent",
+                                        style: textTheme.displayMedium,
+                                      ),
+                                      Text(
+                                          "${removeMilliseconds(widget.timeSpent.abs().toString())} H",
+                                          style: textTheme.displayMedium)
+                                    ],
+                                  ),
+                                )),
+                          ),
 
                           const SizedBox(height: 24),
-                          Row(
-                            children: [
-                              Text("Questions - ${set.flashcards.length}",
-                                  style: textTheme.displayMedium),
-                            ],
+                          _buildAnimatedWidget(
+                            6,
+                            Row(
+                              children: [
+                                Text(
+                                    "Questions - ${widget.set.flashcards.length}",
+                                    style: textTheme.displayMedium),
+                              ],
+                            ),
                           ),
                           const Divider(),
-                          SizedBox(
-                            height: 200,
-                            child: ListView.builder(
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4.0),
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      showDialog(
-                                          context: context,
-                                          builder: ((context) => QuestionModal(
-                                              card: set.flashcards[index],
-                                              weightOfCard:
-                                                  getWeights["weights"][index]
-                                                      ["weight"])));
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: theme.secondary,
-                                      shadowColor: Colors.transparent,
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 8),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                          _buildAnimatedWidget(
+                            7,
+                            SizedBox(
+                              height: 200,
+                              child: ListView.builder(
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4.0),
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: ((context) =>
+                                                QuestionModal(
+                                                    card:
+                                                        widget.set
+                                                            .flashcards[index],
+                                                    weightOfCard:
+                                                        getWeights["weights"]
+                                                                [index]
+                                                            ["weight"])));
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: theme.secondary,
+                                        shadowColor: Colors.transparent,
+                                        elevation: 0,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16, vertical: 8),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        side: BorderSide(color: theme.tertiary),
                                       ),
-                                      side: BorderSide(color: theme.tertiary),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                widget.set.flashcards[index]
+                                                    .question,
+                                                style: textTheme.displaySmall!
+                                                    .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                widget.set.flashcards[index]
+                                                    .answer,
+                                                style: textTheme.displaySmall,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              set.flashcards[index].question,
-                                              style: textTheme.displaySmall!
-                                                  .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              set.flashcards[index].answer,
-                                              style: textTheme.displaySmall,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                              itemCount: set.flashcards.length,
+                                  );
+                                },
+                                itemCount: widget.set.flashcards.length,
+                              ),
                             ),
                           ),
                           const Divider(),
@@ -797,6 +947,40 @@ class FinishedScreen extends StatelessWidget {
                     )
                   ],
                 ))));
+  }
+
+  //hopefully this thing from chatgpt works
+  //TODO make this work, temp solution
+  Widget _buildAnimatedWidget(int index, Widget child) {
+    final delayInterval =
+        0.15; // Adjust the delay between each widget animation
+    final startDelay = index * delayInterval;
+    final endDelay =
+        startDelay + delayInterval; // Ensure endDelay doesn't exceed 1.0
+
+    final fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Interval(0, 1, curve: Curves.easeInOut),
+    ));
+
+    final slideAnimation = Tween<Offset>(
+      begin: Offset(0, -1), // Slide in from above
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Interval(0, 1, curve: Curves.easeInOut),
+    ));
+
+    return FadeTransition(
+      opacity: fadeAnimation,
+      child: SlideTransition(
+        position: slideAnimation,
+        child: child,
+      ),
+    );
   }
 }
 
@@ -926,6 +1110,74 @@ class UnavailableItemDialog extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class ThreeTwoOneGoRibbon extends StatefulWidget {
+  const ThreeTwoOneGoRibbon({super.key});
+
+  @override
+  State<ThreeTwoOneGoRibbon> createState() => _ThreeTwoOneGoRibbonState();
+}
+
+class _ThreeTwoOneGoRibbonState extends State<ThreeTwoOneGoRibbon> {
+  String text = "3";
+  void startAnimation() async {
+    //TODO add sounds
+    if (mounted) {
+      await Future.delayed(const Duration(seconds: 1));
+      setState(() {
+        text = "2";
+      });
+      await Future.delayed(const Duration(seconds: 1));
+      setState(() {
+        text = "1";
+      });
+      await Future.delayed(const Duration(seconds: 1));
+      setState(() {
+        text = "Go!";
+      });
+      await Future.delayed(const Duration(seconds: 1));
+      Navigator.pop(context);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    startAnimation();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: Dialog(
+          child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.black,
+              ),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                transitionBuilder: (child, animation) {
+                  return ScaleTransition(
+                    scale: animation,
+                    child: child,
+                  );
+                },
+                child: Text(
+                  text,
+                  key: ValueKey(text),
+                  style: Theme.of(context).textTheme.displayLarge!.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 48,
+                      fontStyle: FontStyle.italic),
+                ),
+              ))),
     );
   }
 }

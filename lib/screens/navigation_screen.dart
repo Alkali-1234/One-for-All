@@ -278,7 +278,7 @@ class NavigationItem extends StatelessWidget {
           onPressed!();
         },
         style: ElevatedButton.styleFrom(
-          elevation: 2,
+          elevation: 0,
           padding: const EdgeInsets.all(8),
           backgroundColor: theme.secondary,
           foregroundColor: theme.onPrimary,

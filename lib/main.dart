@@ -17,6 +17,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 // import 'package:path_provider/path_provider.dart';
 // import 'package:introduction_screen/introduction_screen.dart';
 import 'package:animations/animations.dart';
+import 'my_flutter_app_icons.dart';
 
 //Data
 import 'data/community_data.dart';
@@ -252,24 +253,31 @@ class _HomePageState extends State<HomePage> {
               showSelectedLabels: false,
               showUnselectedLabels: false,
               backgroundColor: theme.secondary,
+              elevation: 0,
               items: [
                 BottomNavigationBarItem(
                   icon: Icon(
-                    selectedScreen == 0 ? Icons.home : Icons.home_outlined,
+                    selectedScreen == 0
+                        ? Icons.home_rounded
+                        : Icons.home_outlined,
                     color: theme.onPrimary,
                   ),
                   label: "Home",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(
-                    Icons.grid_view,
+                    selectedScreen == 1
+                        ? Icons.grid_view_rounded
+                        : Icons.grid_view_outlined,
                     color: theme.onPrimary,
                   ),
                   label: "Navigation",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(
-                    selectedScreen == 2 ? Icons.person : Icons.person_outline,
+                    selectedScreen == 2
+                        ? Icons.person_rounded
+                        : Icons.person_outline,
                     color: theme.onPrimary,
                   ),
                   label: "Profile",
@@ -585,7 +593,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           backgroundColor: theme.secondary,
                                           foregroundColor: theme.onSecondary,
                                           shadowColor: Colors.black,
-                                          elevation: 2,
+                                          elevation: 0,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(10),

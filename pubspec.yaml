@@ -37,3 +37,7 @@ flutter:
   assets:
     - assets/images/purpwallpaper 2.png
     - assets/images/logbg.png
+  fonts:
+    - family: MyFlutterApp
+      fonts: 
+        - asset: icons/MyFlutterApp.ttf

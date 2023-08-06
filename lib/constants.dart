@@ -142,7 +142,7 @@ ThemeData darkTheme = ThemeData(
   colorScheme: ColorScheme.fromSwatch().copyWith(
     primary: const Color.fromRGBO(0, 0, 0, 0.25),
     secondary: const Color.fromRGBO(255, 255, 255, 0.125),
-    tertiary: const Color.fromRGBO(255, 255, 255, 0.2),
+    tertiary: const Color.fromRGBO(255, 255, 255, 0.25),
     primaryContainer: const Color.fromRGBO(255, 255, 255, 0.07),
     onPrimary: const Color.fromRGBO(255, 255, 255, 1),
     onSecondary: const Color.fromRGBO(255, 255, 255, 1),
@@ -175,8 +175,8 @@ ThemeData darkTheme = ThemeData(
 ThemeData lightTheme = ThemeData(
   colorScheme: ColorScheme.fromSwatch().copyWith(
     primary: const Color.fromRGBO(0, 0, 0, 0.25),
-    secondary: const Color.fromRGBO(0, 0, 0, 0.25),
-    tertiary: const Color.fromRGBO(0, 0, 0, 0.50),
+    secondary: const Color.fromRGBO(0, 0, 0, 0.125),
+    tertiary: const Color.fromRGBO(0, 0, 0, 0.2),
     primaryContainer: const Color.fromRGBO(0, 0, 0, 0.07),
     onPrimary: const Color.fromRGBO(0, 0, 0, 1),
     onSecondary: const Color.fromRGBO(0, 0, 0, 1),
