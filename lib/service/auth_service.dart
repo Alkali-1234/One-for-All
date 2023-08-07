@@ -53,7 +53,7 @@ Future login(String email, String password, bool saveCredentials) async {
                     answer: value.data()!["flashcardSets"][i]["questions"][j]
                         ["answer"])
             ],
-            title: value.data()!["flashcardSets"][i]["title"],
+            title: "${value.data()!["flashcardSets"][i]["title"]} (Cloud)",
             description: value.data()!["flashcardSets"][i]["description"]));
       }
     }
@@ -82,7 +82,7 @@ Future login(String email, String password, bool saveCredentials) async {
       for (var set in decodedObject['sets']) {
         flashcardSets.add(FlashcardSet(
             id: decodedObject['sets'].indexOf(set),
-            title: set["title"],
+            title: "${set["title"]} (Local)",
             description: "description_unavailable",
             flashcards: [
               for (var flashcard in set['questions'])

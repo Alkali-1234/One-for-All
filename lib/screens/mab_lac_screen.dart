@@ -5,8 +5,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:oneforall/constants.dart';
+import 'package:oneforall/data/user_data.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import '../data/community_data.dart';
+import '../main.dart';
 import '../service/community_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -68,11 +71,16 @@ class _MABLACScreenState extends State<MABLACScreen> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var appState = Provider.of<AppState>(context);
     return Container(
-        decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/images/purpwallpaper 2.png'),
-                fit: BoxFit.cover)),
+        decoration: appState.currentUserSelectedTheme == defaultBlueTheme
+            ? const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/images/purpwallpaper 2.png'),
+                    fit: BoxFit.cover))
+            : BoxDecoration(
+                color:
+                    appState.currentUserSelectedTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 floatingActionButton: FloatingActionButton(
@@ -103,7 +111,8 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                 color: theme.onPrimary,
                               ),
                             ),
-                            Text("Alkaline", style: textTheme.displaySmall),
+                            Text(getUserData.username,
+                                style: textTheme.displaySmall),
                             Container(
                               width: 30,
                               height: 30,
@@ -116,7 +125,9 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(15)),
                                   child: Image.network(
-                                      'https://picsum.photos/200')),
+                                    getUserData.profilePicture,
+                                    fit: BoxFit.cover,
+                                  )),
                             )
                           ],
                         ),
@@ -151,6 +162,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                             });
                                           },
                                           style: ElevatedButton.styleFrom(
+                                            elevation: 0,
                                             shadowColor: Colors.transparent,
                                             padding: const EdgeInsets.all(8),
                                             backgroundColor:
@@ -194,6 +206,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                             });
                                           },
                                           style: ElevatedButton.styleFrom(
+                                            elevation: 0,
                                             shadowColor: Colors.transparent,
                                             padding: const EdgeInsets.all(8),
                                             backgroundColor:
@@ -1120,7 +1133,6 @@ class ListItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: Container(
-          height: c.maxHeight * 0.165,
           decoration: BoxDecoration(
             color: theme.secondary,
             borderRadius: BorderRadius.circular(10),
@@ -1138,7 +1150,7 @@ class ListItem extends StatelessWidget {
                   });
             },
             style: ElevatedButton.styleFrom(
-              elevation: 2,
+              elevation: 0,
               padding: const EdgeInsets.all(12),
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
@@ -1174,6 +1186,7 @@ class ListItem extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 5),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

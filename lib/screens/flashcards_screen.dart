@@ -478,11 +478,11 @@ class SelectedSetModal extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => FlashcardsPlayScreen(
-                                    flashcardsSet: flashcardSet)));
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return FlashcardsPlayScreen(
+                              flashcardsSet: flashcardSet);
+                        }));
                       },
                       child: const Text("Open")),
                   ElevatedButton(

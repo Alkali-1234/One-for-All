@@ -1,7 +1,10 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/community_data.dart';
+import 'package:provider/provider.dart';
 import '../data/user_data.dart';
+import '../main.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -13,15 +16,21 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen> {
   int selectedYear = DateTime.now().year.toInt();
   int selectedMonth = DateTime.now().month.toInt();
+  bool reversed = false;
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var appState = context.watch<AppState>();
     return Container(
-        decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/images/purpwallpaper 2.png'),
-                fit: BoxFit.cover)),
+        decoration: appState.currentUserSelectedTheme == defaultBlueTheme
+            ? const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/images/purpwallpaper 2.png'),
+                    fit: BoxFit.cover))
+            : BoxDecoration(
+                color:
+                    appState.currentUserSelectedTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -59,7 +68,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(15)),
                                     child: Image.network(
-                                        'https://picsum.photos/200')),
+                                        getUserData.profilePicture,
+                                        fit: BoxFit.cover)),
                               )
                             ],
                           ),
@@ -81,8 +91,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  Text(selectedYear.toString(),
-                                      style: textTheme.displaySmall),
+                                  AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 150),
+                                    transitionBuilder: (child, animation) =>
+                                        FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    ),
+                                    child: Text(selectedYear.toString(),
+                                        style: textTheme.displaySmall),
+                                  ),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -90,6 +108,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                       GestureDetector(
                                         onTap: () {
                                           setState(() {
+                                            reversed = true;
                                             if (selectedMonth - 1 == 0) {
                                               selectedMonth = 13;
                                               selectedYear--;
@@ -108,6 +127,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                       GestureDetector(
                                         onTap: () {
                                           setState(() {
+                                            reversed = false;
                                             if (selectedMonth + 1 == 13) {
                                               selectedMonth = 0;
                                               selectedYear++;
@@ -128,9 +148,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           const SizedBox(height: 15),
                           Flexible(
                               flex: 5,
-                              child: Calendar(
-                                selectedMonth: selectedMonth,
-                                selectedYear: selectedYear,
+                              //not working
+                              child: PageTransitionSwitcher(
+                                transitionBuilder:
+                                    (child, animation, secondaryAnimation) =>
+                                        SharedAxisTransition(
+                                  fillColor: Colors.transparent,
+                                  transitionType:
+                                      SharedAxisTransitionType.horizontal,
+                                  animation: animation,
+                                  secondaryAnimation: secondaryAnimation,
+                                  child: child,
+                                ),
+                                duration: const Duration(milliseconds: 150),
+                                child: Calendar(
+                                  selectedMonth: selectedMonth,
+                                  selectedYear: selectedYear,
+                                ),
                               )),
                           const SizedBox(height: 10),
                           Flexible(flex: 2, child: Placeholder()),

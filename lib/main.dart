@@ -214,7 +214,8 @@ class _HomePageState extends State<HomePage> {
                         child: ClipRRect(
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(15)),
-                            child: Image.network('https://picsum.photos/200')),
+                            child: Image.network(getUserData.profilePicture,
+                                fit: BoxFit.cover)),
                       )
                     ],
                   ),

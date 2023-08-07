@@ -20,9 +20,8 @@ class _FlashcardsPlayScreen extends State<FlashcardsPlayScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context).colorScheme;
-    var textTheme = Theme.of(context).textTheme;
-    var appState = Provider.of<AppState>(context);
+    var theme = passedUserTheme.colorScheme;
+    var textTheme = passedUserTheme.textTheme;
     FlashcardSet set = widget.flashcardsSet;
 
     // 0 = Select Mode
@@ -41,14 +40,13 @@ class _FlashcardsPlayScreen extends State<FlashcardsPlayScreen> {
     }
 
     return Container(
-        decoration: appState.currentUserSelectedTheme == defaultBlueTheme
+        //! Appstate for some reason changes the theme to default blue theme when going to this page for some reason, maybe because after the first frame, it defaults to blue?
+        decoration: passedUserTheme == defaultBlueTheme
             ? const BoxDecoration(
                 image: DecorationImage(
                     image: AssetImage('assets/images/purpwallpaper 2.png'),
                     fit: BoxFit.cover))
-            : BoxDecoration(
-                color:
-                    appState.currentUserSelectedTheme.colorScheme.background),
+            : BoxDecoration(color: passedUserTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -439,7 +437,10 @@ class _PlayScreenState extends State<PlayScreen>
     _cardAnimation =
         Tween<double>(begin: 1, end: 0).animate(_cardAnimationController);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDialog(context: context, builder: (_) => const ThreeTwoOneGoRibbon());
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (_) => const ThreeTwoOneGoRibbon());
     });
   }
 
@@ -462,8 +463,11 @@ class _PlayScreenState extends State<PlayScreen>
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text("Question $questionNumber",
-                    style: textTheme.displayMedium),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 150),
+                  child: Text("Question $questionNumber",
+                      style: textTheme.displayMedium),
+                ),
                 const SizedBox(height: 10),
                 AnimatedBuilder(
                     animation: _cardAnimation,
@@ -521,54 +525,63 @@ class _PlayScreenState extends State<PlayScreen>
                 Text("How well did you know this?",
                     style: textTheme.displaySmall),
                 const SizedBox(height: 10),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      height: 40,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          gradient: primaryGradient),
-                      child: ElevatedButton(
-                          onPressed: () {
-                            nextQuestion(-100);
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              foregroundColor: theme.onPrimary),
-                          child: const Text("100% Knew it!")),
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      height: 40,
-                      width: double.infinity,
-                      child: ElevatedButton(
-                          onPressed: () {
-                            nextQuestion(25);
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.secondary,
-                              shadowColor: Colors.transparent,
-                              foregroundColor: theme.onPrimary),
-                          child: const Text("50% Some")),
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      height: 40,
-                      width: double.infinity,
-                      child: ElevatedButton(
-                          onPressed: () {
-                            nextQuestion(75);
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.secondary,
-                              shadowColor: Colors.transparent,
-                              foregroundColor: theme.onPrimary),
-                          child: const Text("0% None")),
-                    ),
-                  ],
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 150),
+                  transitionBuilder: (child, animation) => FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  ),
+                  child: flipped
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              height: 40,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(100),
+                                  gradient: primaryGradient),
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    nextQuestion(-100);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      shadowColor: Colors.transparent,
+                                      foregroundColor: theme.onPrimary),
+                                  child: const Text("100% Knew it!")),
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              height: 40,
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    nextQuestion(25);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: theme.secondary,
+                                      shadowColor: Colors.transparent,
+                                      foregroundColor: theme.onPrimary),
+                                  child: const Text("50% Some")),
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              height: 40,
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    nextQuestion(75);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: theme.secondary,
+                                      shadowColor: Colors.transparent,
+                                      foregroundColor: theme.onPrimary),
+                                  child: const Text("0% None")),
+                            ),
+                          ],
+                        )
+                      : Container(),
                 )
               ],
             ),
@@ -616,7 +629,7 @@ class FinishedScreen extends StatefulWidget {
 }
 
 class _FinishedScreenState extends State<FinishedScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
 //* Animation variables for fading in animation on loading the screen
   late AnimationController _controller;
 
@@ -662,19 +675,18 @@ class _FinishedScreenState extends State<FinishedScreen>
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context).colorScheme;
-    var textTheme = Theme.of(context).textTheme;
+    var theme = passedUserTheme.colorScheme;
+    var textTheme = passedUserTheme.textTheme;
     var appState = Provider.of<AppState>(context);
 
     return Container(
-        decoration: appState.currentUserSelectedTheme == defaultBlueTheme
+        //! Appstate for some reason changes the theme to default blue theme when going to this page for some reason, maybe because after the first frame, it defaults to blue?
+        decoration: passedUserTheme == defaultBlueTheme
             ? const BoxDecoration(
                 image: DecorationImage(
                     image: AssetImage('assets/images/purpwallpaper 2.png'),
                     fit: BoxFit.cover))
-            : BoxDecoration(
-                color:
-                    appState.currentUserSelectedTheme.colorScheme.background),
+            : BoxDecoration(color: passedUserTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -952,26 +964,36 @@ class _FinishedScreenState extends State<FinishedScreen>
   //hopefully this thing from chatgpt works
   //TODO make this work, temp solution
   Widget _buildAnimatedWidget(int index, Widget child) {
-    final delayInterval =
-        0.15; // Adjust the delay between each widget animation
+    const delayInterval = 20; // Adjust the delay between each widget animation
     final startDelay = index * delayInterval;
-    final endDelay =
-        startDelay + delayInterval; // Ensure endDelay doesn't exceed 1.0
+    final animationStartDelay =
+        Duration(milliseconds: startDelay) + Duration(milliseconds: 500);
+
+    // Create a separate AnimationController for each widget
+    final widgetController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+
+    //Begin the animation after the delay
+    Future.delayed(animationStartDelay, () {
+      widgetController.forward();
+    });
 
     final fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Interval(0, 1, curve: Curves.easeInOut),
+      parent: widgetController,
+      curve: const Interval(0, 1, curve: Curves.easeInOut),
     ));
 
     final slideAnimation = Tween<Offset>(
-      begin: Offset(0, -1), // Slide in from above
+      begin: const Offset(0, -1), // Slide in from above
       end: Offset.zero,
     ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Interval(0, 1, curve: Curves.easeInOut),
+      parent: widgetController,
+      curve: const Interval(0, 1, curve: Curves.easeInOut),
     ));
 
     return FadeTransition(
@@ -992,8 +1014,8 @@ class QuestionModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context).colorScheme;
-    var textTheme = Theme.of(context).textTheme;
+    var theme = passedUserTheme.colorScheme;
+    var textTheme = passedUserTheme.textTheme;
     return Dialog(
       child: Container(
         decoration: BoxDecoration(
@@ -1151,33 +1173,31 @@ class _ThreeTwoOneGoRibbonState extends State<ThreeTwoOneGoRibbon> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Dialog(
-          child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.black,
-              ),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                transitionBuilder: (child, animation) {
-                  return ScaleTransition(
-                    scale: animation,
-                    child: child,
-                  );
-                },
-                child: Text(
-                  text,
-                  key: ValueKey(text),
-                  style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 48,
-                      fontStyle: FontStyle.italic),
-                ),
-              ))),
-    );
+    return Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          color: Colors.black,
+        ),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          transitionBuilder: (child, animation) {
+            return ScaleTransition(
+              scale: animation,
+              child: child,
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              text,
+              key: ValueKey(text),
+              style: Theme.of(context).textTheme.displayLarge!.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 48,
+                  fontStyle: FontStyle.italic),
+            ),
+          ),
+        ));
   }
 }

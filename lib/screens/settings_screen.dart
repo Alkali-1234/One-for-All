@@ -47,6 +47,11 @@ class _SettingsScreenState extends State<SettingsScreen>
           : selectedTheme == 1
               ? darkTheme
               : lightTheme;
+      passedUserTheme = selectedTheme == 0
+          ? defaultBlueTheme
+          : selectedTheme == 1
+              ? darkTheme
+              : lightTheme;
     });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -68,7 +73,8 @@ class _SettingsScreenState extends State<SettingsScreen>
       prefs
         ..remove("email")
         ..remove("password")
-        ..remove("hasOpenedBefore");
+        ..remove("hasOpenedBefore")
+        ..remove("theme");
     });
     debugPrint("Cleared cache");
     const SnackBar(
@@ -162,6 +168,10 @@ class _SettingsScreenState extends State<SettingsScreen>
                             alignment: Alignment.topLeft,
                             child: IconButton(
                               onPressed: () {
+                                if (Theme.of(context) != passedUserTheme) {
+                                  appState.currentUserSelectedTheme =
+                                      passedUserTheme;
+                                }
                                 Navigator.pop(context);
                               },
                               icon: Icon(
@@ -445,7 +455,7 @@ class ConfirmationModal extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Card(
-            color: theme.secondary,
+            color: Colors.transparent,
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(20)),
             ),
@@ -453,7 +463,7 @@ class ConfirmationModal extends StatelessWidget {
               Text("Are you sure?", style: textTheme.displayMedium),
               const SizedBox(height: 5),
               Text(
-                  "This will delete saved email/password and information that you have opened this app before.",
+                  "This will delete saved email/password, theme informatino, and information that you have opened this app before.",
                   style: textTheme.displaySmall),
               const SizedBox(height: 5),
               Row(
