@@ -120,7 +120,7 @@ class _SettingsConfigurationScreenState
         Container(
           height: 40,
           width: double.infinity,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
               gradient: primaryGradient,
               borderRadius: BorderRadius.all(Radius.circular(100))),
           child: ElevatedButton(
@@ -465,7 +465,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
         Container(
           height: 40,
           width: double.infinity,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
               gradient: primaryGradient,
               borderRadius: BorderRadius.all(Radius.circular(100))),
           child: ElevatedButton(
@@ -692,7 +692,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
           Container(
             height: 40,
             width: double.infinity,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
                 gradient: primaryGradient,
                 borderRadius: BorderRadius.all(Radius.circular(100))),
             child: ElevatedButton(
@@ -844,7 +844,7 @@ class WelcomeScreen extends StatelessWidget {
       const SizedBox(height: 50),
       Container(
         height: 40,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
             gradient: primaryGradient,
             borderRadius: BorderRadius.all(Radius.circular(100))),
         child: ElevatedButton(

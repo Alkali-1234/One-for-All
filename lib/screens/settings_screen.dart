@@ -41,17 +41,19 @@ class _SettingsScreenState extends State<SettingsScreen>
     await SharedPreferences.getInstance().then((prefs) {
       prefs.setInt("theme", selectedTheme);
     });
+    ThemeData themeUsed = selectedTheme == 0
+        ? defaultBlueTheme
+        : selectedTheme == 1
+            ? darkTheme
+            : lightTheme;
     setState(() {
-      savedTheme = selectedTheme == 0
-          ? defaultBlueTheme
+      savedTheme = themeUsed;
+      passedUserTheme = themeUsed;
+      primaryGradient = selectedTheme == 0
+          ? defaultBluePrimaryGradient
           : selectedTheme == 1
-              ? darkTheme
-              : lightTheme;
-      passedUserTheme = selectedTheme == 0
-          ? defaultBlueTheme
-          : selectedTheme == 1
-              ? darkTheme
-              : lightTheme;
+              ? darkPrimaryGradient
+              : lightPrimaryGradient;
     });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(

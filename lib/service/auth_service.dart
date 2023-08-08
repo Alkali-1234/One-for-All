@@ -142,19 +142,7 @@ Future createAccount(String email, String password, String username) async {
     throw error;
   });
   var auth = FirebaseAuth.instance;
-  //Set user data
-  await getDocument("users", auth.currentUser!.uid).then((value) {
-    setUserData(UserData(
-        uid: int.tryParse(auth.currentUser!.uid) ?? 0,
-        exp: value["exp"] ?? -1,
-        streak: value["streak"] ?? -1,
-        posts: value["posts"] ?? -1,
-        flashCardSets:
-            value["flashCardSets"] == [] ? [] : value["flashCardSets"],
-        username: auth.currentUser!.displayName ?? "Invalid Username!",
-        email: auth.currentUser!.email ?? "Invalid Email!",
-        profilePicture: auth.currentUser!.photoURL ?? ""));
-  }).catchError((error, stackTrace) {
+  await login(email, password, false).catchError((error, stackTrace) {
     throw error;
   });
   //* First time load = false

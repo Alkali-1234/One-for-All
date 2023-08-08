@@ -82,18 +82,15 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context).colorScheme;
-    var textTheme = Theme.of(context).textTheme;
-    var appState = Provider.of<AppState>(context);
+    var theme = passedUserTheme.colorScheme;
+    var textTheme = passedUserTheme.textTheme;
     return Container(
-        decoration: appState.currentUserSelectedTheme == defaultBlueTheme
+        decoration: passedUserTheme == defaultBlueTheme
             ? const BoxDecoration(
                 image: DecorationImage(
                     image: AssetImage('assets/images/purpwallpaper 2.png'),
                     fit: BoxFit.cover))
-            : BoxDecoration(
-                color:
-                    appState.currentUserSelectedTheme.colorScheme.background),
+            : BoxDecoration(color: passedUserTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -115,7 +112,8 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                 color: theme.onPrimary,
                               ),
                             ),
-                            Text("Alkaline", style: textTheme.displaySmall),
+                            Text(getUserData.username,
+                                style: textTheme.displaySmall),
                             Container(
                               width: 30,
                               height: 30,
@@ -128,7 +126,8 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(15)),
                                   child: Image.network(
-                                      'https://picsum.photos/200')),
+                                      getUserData.profilePicture,
+                                      fit: BoxFit.cover)),
                             ),
                           ],
                         ),
@@ -148,7 +147,8 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                               children: [
                                 Text("Edit Set",
                                     style: textTheme.displayMedium),
-                                Text("${getQuestionQuery.length} Questions",
+                                Text(
+                                    "${getQuestionQuery["queries"].length} Questions",
                                     style: textTheme.displayMedium)
                               ],
                             ),
@@ -242,9 +242,9 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                                                         10),
                                                             borderSide:
                                                                 const BorderSide(
-                                                                    color: Colors
-                                                                        .transparent,
-                                                                    width: 0),
+                                                                    width: 0,
+                                                                    style: BorderStyle
+                                                                        .none),
                                                           ),
                                                           contentPadding:
                                                               const EdgeInsets
@@ -298,9 +298,20 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                                                         10),
                                                             borderSide:
                                                                 const BorderSide(
-                                                                    color: Colors
-                                                                        .transparent,
-                                                                    width: 0),
+                                                                    width: 0,
+                                                                    style: BorderStyle
+                                                                        .none),
+                                                          ),
+                                                          focusedBorder:
+                                                              OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            borderSide: BorderSide(
+                                                                color: theme
+                                                                    .onBackground,
+                                                                width: 1),
                                                           ),
                                                           contentPadding:
                                                               const EdgeInsets

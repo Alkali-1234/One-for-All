@@ -5,7 +5,8 @@ const pi = 3.14;
 const rareMainTheme = Color.fromRGBO(0, 163, 255, 1);
 get getRareMainTheme => rareMainTheme;
 
-const primaryGradient = LinearGradient(
+//May change
+LinearGradient primaryGradient = const LinearGradient(
   colors: [
     Color.fromRGBO(0, 163, 255, 1),
     Color.fromRGBO(0, 56, 164, 1),
@@ -16,6 +17,7 @@ const primaryGradient = LinearGradient(
 );
 
 get getPrimaryGradient => primaryGradient;
+set setPrimaryGradient(LinearGradient gradient) => primaryGradient = gradient;
 
 const primaryShadow = BoxShadow(
   color: Color.fromRGBO(0, 0, 0, 0.5),
@@ -206,3 +208,34 @@ ThemeData lightTheme = ThemeData(
   ),
   useMaterial3: true,
 );
+
+const defaultBluePrimaryGradient = LinearGradient(
+  colors: [
+    Color.fromRGBO(108, 115, 255, 1),
+    Color.fromRGBO(0, 9, 214, 1),
+  ],
+  stops: [0.0, 1.0],
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+);
+
+get getDefaultBluePrimaryGradient => defaultBluePrimaryGradient;
+
+const darkPrimaryGradient = LinearGradient(
+  colors: [
+    Color.fromRGBO(72, 72, 72, 1),
+    Color.fromRGBO(49, 49, 49, 1),
+  ],
+  stops: [0.0, 1.0],
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+);
+
+get getDarkPrimaryGradient => darkPrimaryGradient;
+
+const lightPrimaryGradient = LinearGradient(colors: [
+  Color.fromRGBO(255, 255, 255, 1),
+  Color.fromRGBO(130, 130, 130, 1)
+]);
+
+get getLightPrimaryGradient => lightPrimaryGradient;

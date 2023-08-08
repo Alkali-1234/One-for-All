@@ -63,10 +63,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
       // bismillahirrahmanirrahim this works
       if (theme == 0) {
         passedUserTheme = defaultBlueTheme;
+        primaryGradient = defaultBluePrimaryGradient;
       } else if (theme == 1) {
         passedUserTheme = darkTheme;
+        primaryGradient = darkPrimaryGradient;
       } else if (theme == 2) {
         passedUserTheme = lightTheme;
+        primaryGradient = lightPrimaryGradient;
       }
     }
     if (prefs.containsKey("language")) {

@@ -69,7 +69,8 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                 color: theme.onPrimary,
                               ),
                             ),
-                            Text("Alkaline", style: textTheme.displaySmall),
+                            Text(getUserData.username,
+                                style: textTheme.displaySmall),
                             Container(
                               width: 30,
                               height: 30,
@@ -82,7 +83,8 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(15)),
                                   child: Image.network(
-                                      'https://picsum.photos/200')),
+                                      getUserData.profilePicture,
+                                      fit: BoxFit.cover)),
                             )
                           ],
                         ),
@@ -376,7 +378,7 @@ class _NewSetModalState extends State<NewSetModal> {
                 const SizedBox(height: 10),
                 //How to use text
                 Text(
-                    "You may put as much question as you will (I might add a restriction later, use this to your advantage!). Each set represents one collection of cards. For each card you encounter you must think of the answer in your head, and then flip the card by tapping it, revealing the answer. You then must choose the following buttons depending on your performance on the question (The buttons mentioned are the 100% knew it, 50% some, 0% didn’t know). Each question has a weight, depending on your performance on the question, the weight can go down and up. In which if it goes up it will show more frequently per as if it goes down it will show less frequently. For more information, look at the *docs*",
+                    "You may put as much question as you will, each flashcard set are stored locally (CACHED!). Each set represents one collection of cards. For each card you encounter you must think of the answer in your head, and then flip the card by tapping it, revealing the answer. You then must choose the following buttons depending on your performance on the question (The buttons mentioned are the 100% knew it, 50% some, 0% didn’t know). Each question has a weight, depending on your performance on the question, the weight can go down and up. In which if it goes up it will show more frequently per as if it goes down it will show less frequently. For more information, look at the *docs*",
                     style: textTheme.displaySmall),
                 const SizedBox(height: 10),
                 //Buttons: Create and Cancel
