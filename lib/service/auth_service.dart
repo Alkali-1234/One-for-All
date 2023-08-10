@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 //ignore: unused_import
 import 'package:flutter/material.dart';
 import 'package:oneforall/service/files_service.dart';
+import 'package:oneforall/service/firebase_api.dart';
 //ignore: unused_import
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/user_data.dart';
@@ -113,6 +115,8 @@ Future login(String email, String password, bool saveCredentials) async {
     debugPrint("err on auth service: getValue");
     throw error;
   });
+  //* initialize FCM
+  await initializeFCM();
   //* hasOpenedBefore = true
   final prefs = await SharedPreferences.getInstance();
   prefs.setBool("hasOpenedBefore", true);
@@ -148,6 +152,30 @@ Future createAccount(String email, String password, String username) async {
   //* First time load = false
   final prefs = await SharedPreferences.getInstance();
   prefs.setBool("hasOpenedBefore", true);
+  return true;
+}
+
+Future saveFCMToken(String token) async {
+  //* Check if user is logged in
+  if (FirebaseAuth.instance.currentUser == null) {
+    throw Exception("user_not_logged_in");
+  }
+  //* Check if user has already saved the token with shared prefs
+  final prefs = await SharedPreferences.getInstance();
+  if (prefs.containsKey("fcmToken")) {
+    if (prefs.getString("fcmToken") == token) {
+      return true;
+    }
+  }
+  try {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .update({"fcmToken": token});
+  } catch (e) {
+    rethrow;
+  }
+  prefs.setString("fcmToken", token);
   return true;
 }
 

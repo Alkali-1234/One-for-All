@@ -25,6 +25,7 @@ dependencies:
   flutter_downloader: ^1.10.5
   url_launcher: ^6.1.12
   animations: ^2.0.7
+  firebase_messaging: ^14.6.5
 
 dev_dependencies:
   flutter_test:
