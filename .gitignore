@@ -46,3 +46,9 @@ app.*.map.json
 # Google services (e.g. APIs or Firebase)
 /android/app/src
 
+# Prevent accidentally committing secrets
+/android/key.properties
+
+# assets/private
+/assets/private
+

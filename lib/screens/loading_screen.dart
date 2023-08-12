@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/user_data.dart';
 import 'package:oneforall/service/auth_service.dart';
-import 'package:provider/provider.dart';
 import '../main.dart';
 import 'login_screen.dart';
 import 'get_started.dart';
@@ -19,7 +18,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
   String verbose = "";
   String loadingDots = ".";
   Icon? loadingStatus;
-  late var _appState;
 
   void pushToPage(Widget page) {
     Navigator.of(context)
@@ -133,9 +131,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var appState = Provider.of<AppState>(context);
-    _appState = appState;
-
     return Scaffold(
       body: Container(
         color: Colors.black,

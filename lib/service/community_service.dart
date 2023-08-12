@@ -6,6 +6,7 @@ import '../data/community_data.dart';
 import 'auth_service.dart';
 import 'dart:io';
 import 'files_service.dart';
+import 'firebase_api.dart';
 
 Future addNewMABEvent(String title, String description, int type, int subject,
     Timestamp dueDate, List<File> attatchements, File? image) async {
@@ -52,6 +53,22 @@ Future addNewMABEvent(String title, String description, int type, int subject,
     debugPrint(e.toString());
     rethrow;
   }
+  //* Send notification
+  Map<String, String> data = {
+    "MAB": "true",
+    "title": title,
+    "description": description,
+    "date": Timestamp.now().toString(),
+    "authorUID": getUserAuth.currentUser!.uid,
+    "image": imageURL ?? "",
+    //Seperate with commas
+    "files": fileURLs.join(","),
+    "dueDate": dueDate.toString(),
+    "type": type.toString(),
+    "subject": subject.toString(),
+  };
+  sendNotification(type == 1 ? "New Announcement" : "New Task", title, data,
+      "MAB_${getSavedCommunityData.id}");
 }
 
 Future createUserData(String uid) async {

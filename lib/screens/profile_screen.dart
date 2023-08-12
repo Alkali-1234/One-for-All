@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:oneforall/screens/dev_screen.dart';
 import 'package:oneforall/service/auth_service.dart';
 import '../data/user_data.dart';
 import 'package:image_picker/image_picker.dart';
@@ -224,8 +225,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             padding: MaterialStateProperty.all(
                                 const EdgeInsets.all(8)),
                           ),
-                          onPressed: () {},
-                          child: Text('Change Password',
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => const DevScreen()));
+                          },
+                          child: Text('Change Password (Dev)',
                               style: textTheme.displaySmall!
                                   .copyWith(fontWeight: FontWeight.w500))),
                     ],

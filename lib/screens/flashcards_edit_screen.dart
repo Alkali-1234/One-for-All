@@ -2,10 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/user_data.dart';
-import '../main.dart';
 
 class FlashcardsEditScreen extends StatefulWidget {
   const FlashcardsEditScreen({super.key, required this.setIndex});

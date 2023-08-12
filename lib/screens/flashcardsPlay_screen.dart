@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
-import 'package:provider/provider.dart';
 import '../data/user_data.dart';
 import 'dart:math';
 import 'package:animations/animations.dart';
-import '../main.dart';
 
 class FlashcardsPlayScreen extends StatefulWidget {
   const FlashcardsPlayScreen({super.key, required this.flashcardsSet});
@@ -632,7 +630,7 @@ class _FinishedScreenState extends State<FinishedScreen>
     with TickerProviderStateMixin {
 //* Animation variables for fading in animation on loading the screen
   late AnimationController _controller;
-
+  //ignore: unused_field
   late Animation<double> _animation;
 
   get getFlashcardSet => widget.set;
@@ -677,7 +675,6 @@ class _FinishedScreenState extends State<FinishedScreen>
   Widget build(BuildContext context) {
     var theme = passedUserTheme.colorScheme;
     var textTheme = passedUserTheme.textTheme;
-    var appState = Provider.of<AppState>(context);
 
     return Container(
         //! Appstate for some reason changes the theme to default blue theme when going to this page for some reason, maybe because after the first frame, it defaults to blue?

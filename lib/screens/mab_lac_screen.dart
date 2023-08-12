@@ -6,13 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/user_data.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../data/community_data.dart';
 import '../main.dart';
 import '../service/community_service.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 
 class MABLACScreen extends StatefulWidget {
   const MABLACScreen({super.key});

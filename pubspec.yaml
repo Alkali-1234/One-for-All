@@ -26,6 +26,12 @@ dependencies:
   url_launcher: ^6.1.12
   animations: ^2.0.7
   firebase_messaging: ^14.6.5
+  http: ^1.1.0
+  dart_jsonwebtoken: ^2.8.2
+  pointycastle: ^3.7.3
+  jwt_io: ^1.1.6
+  google_sign_in: ^6.1.4
+  googleapis_auth: ^1.4.1
 
 dev_dependencies:
   flutter_test:
@@ -38,6 +44,7 @@ flutter:
   assets:
     - assets/images/purpwallpaper 2.png
     - assets/images/logbg.png
+    - assets/private/one-for-all-vcr-notificationacc.json
   fonts:
     - family: MyFlutterApp
       fonts: 

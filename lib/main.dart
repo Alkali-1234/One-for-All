@@ -3,8 +3,6 @@
 //Firebase
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:oneforall/service/firebase_api.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +16,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 // import 'package:path_provider/path_provider.dart';
 // import 'package:introduction_screen/introduction_screen.dart';
 import 'package:animations/animations.dart';
-import 'my_flutter_app_icons.dart';
 
 //Data
 import 'data/community_data.dart';
@@ -340,7 +337,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    var appState = Provider.of<AppState>(context);
     void setMABSelectedFilter(int filter) {
       setState(() {
         if (filter > MABSelectedFilter) {

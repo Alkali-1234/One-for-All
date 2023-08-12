@@ -103,20 +103,24 @@ Future login(String email, String password, bool saveCredentials) async {
   });
 
   //* Set community data
-  await getValue("users", auth.currentUser!.uid, "assignedCommunity")
-      .then((value) async {
-    if (value != null) {
-      debugPrint("Assigned community: $value");
-      await getCommunityData(value);
-    } else {
-      throw Exception("User not assigned to community");
-    }
-  }).catchError((error, stackTrace) {
-    debugPrint("err on auth service: getValue");
-    throw error;
-  });
+  final assignedCommunity =
+      await getValue("users", auth.currentUser!.uid, "assignedCommunity");
+  if (assignedCommunity != null) {
+    await getCommunityData(assignedCommunity).then((value) {
+      return;
+    }).catchError((error, stackTrace) {
+      throw error;
+    });
+  } else {
+    throw Exception("user_not_assigned_to_community");
+  }
+
+  if (assignedCommunity is! String) {
+    throw Exception("assigned_community_not_string");
+  }
+
   //* initialize FCM
-  await initializeFCM();
+  await initializeFCM(assignedCommunity);
   //* hasOpenedBefore = true
   final prefs = await SharedPreferences.getInstance();
   prefs.setBool("hasOpenedBefore", true);
@@ -145,7 +149,6 @@ Future createAccount(String email, String password, String username) async {
       .catchError((error, stackTrace) {
     throw error;
   });
-  var auth = FirebaseAuth.instance;
   await login(email, password, false).catchError((error, stackTrace) {
     throw error;
   });
