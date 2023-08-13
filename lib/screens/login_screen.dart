@@ -1,5 +1,6 @@
 //
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../constants.dart';
 import '../service/auth_service.dart';
 import '../main.dart';
@@ -26,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return;
   }
 
-  void attemptLogin() async {
+  void attemptLogin(AppState appState) async {
     setState(() {
       isLoading = true;
     });
@@ -47,8 +48,8 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
     //Attempt to login
-    await login(emailQuery, passwordQuery, saveCredentials)
-        .then((value) => pushToPage(const MyApp(showReload: false)))
+    await login(emailQuery, passwordQuery, saveCredentials, appState)
+        .then((value) => pushToPage(const HomePage()))
         .onError((error, stackTrace) => setState(() {
               isLoading = false;
               this.error = error.toString();
@@ -197,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               onPressed: () {
                                 if (isLoading == false) {
-                                  attemptLogin();
+                                  attemptLogin(context.read<AppState>());
                                 }
                               },
                               child: isLoading

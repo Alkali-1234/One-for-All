@@ -43,16 +43,25 @@ class _MABLACScreenState extends State<MABLACScreen> {
   //0 = Newest
   //1 Due date
 
-  bool isItemValid(
-      String title, String description, int subject, int type, DateTime due) {
+  bool isItemValid(MabPost post) {
+    final title = post.title;
+    final description = post.description;
+    final due = post.dueDate;
+    final type = post.type;
+    final subject = post.subject;
+
     //1: Does item title or desc contain search query
     if (title.toLowerCase().contains(searchQuery.toLowerCase()) ||
         description.toLowerCase().contains(searchQuery.toLowerCase())) {
       //2: Does item type match filter
       if (type == selectedTypeFilter || selectedTypeFilter == 0) {
         //3: Does item subject match filter
+        //If subject filter is 1 only show items with subject 1
+        //If subject filter is 0 show all items
+        //If subject filter is 2 show items with subject other than 1
         if (subject + 1 == selectedSubjectFilter ||
-            selectedSubjectFilter == 0) {
+            selectedSubjectFilter == 0 ||
+            (selectedSubjectFilter == 2 && subject != 1)) {
           //4: Does item due date match filter
           if (due.isBefore(DateTime.now()
                   .add(Duration(days: getDueDates[selectedDueFilter]))) ||
@@ -558,130 +567,110 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                           child: SizedBox.expand(
                                             child: LayoutBuilder(
                                                 builder: (context, c) {
-                                              return ListView.builder(
-                                                  itemCount: selectedSection ==
-                                                          0
-                                                      ? getMabData.posts.length
-                                                      : getLACData.posts.length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    return selectedSection == 1
-                                                        ? isItemValid(
-                                                                getLACData
-                                                                    .posts[
-                                                                        index]
-                                                                    .title,
-                                                                getLACData
-                                                                    .posts[
-                                                                        index]
-                                                                    .description,
-                                                                getLACData
-                                                                    .posts[
-                                                                        index]
-                                                                    .subject,
-                                                                getLACData
-                                                                    .posts[
-                                                                        index]
-                                                                    .type,
-                                                                getLACData
-                                                                    .posts[
-                                                                        index]
-                                                                    .dueDate)
-                                                            ? ListItem(
-                                                                theme: theme,
-                                                                textTheme:
-                                                                    textTheme,
-                                                                c: c,
-                                                                title: getLACData
-                                                                    .posts[
-                                                                        index]
-                                                                    .title,
-                                                                description:
-                                                                    getLACData
-                                                                        .posts[
-                                                                            index]
-                                                                        .description,
-                                                                subject: getLACData
-                                                                    .posts[
-                                                                        index]
-                                                                    .subject,
-                                                                type: getLACData
-                                                                    .posts[
-                                                                        index]
-                                                                    .type,
-                                                                due: getLACData
-                                                                    .posts[
-                                                                        index]
-                                                                    .dueDate,
-                                                                attatchements:
-                                                                    getMabData
-                                                                        .posts[
-                                                                            index]
-                                                                        .fileAttatchments,
-                                                                image: getMabData
-                                                                    .posts[
-                                                                        index]
-                                                                    .image,
-                                                              )
-                                                            : Container()
-                                                        : isItemValid(
-                                                                getMabData
-                                                                    .posts[
-                                                                        index]
-                                                                    .title,
-                                                                getMabData
-                                                                    .posts[
-                                                                        index]
-                                                                    .description,
-                                                                getMabData
-                                                                    .posts[
-                                                                        index]
-                                                                    .subject,
-                                                                getMabData
-                                                                    .posts[
-                                                                        index]
-                                                                    .type,
-                                                                getMabData
-                                                                    .posts[
-                                                                        index]
-                                                                    .dueDate)
-                                                            ? ListItem(
-                                                                theme: theme,
-                                                                textTheme:
-                                                                    textTheme,
-                                                                c: c,
-                                                                title: getMabData
-                                                                    .posts[
-                                                                        index]
-                                                                    .title,
-                                                                description:
-                                                                    getMabData
-                                                                        .posts[
-                                                                            index]
-                                                                        .description,
-                                                                subject: getMabData
-                                                                    .posts[
-                                                                        index]
-                                                                    .subject,
-                                                                type: getMabData
-                                                                    .posts[
-                                                                        index]
-                                                                    .type,
-                                                                due: getMabData
-                                                                    .posts[
-                                                                        index]
-                                                                    .dueDate,
-                                                                attatchements:
-                                                                    getMabData
-                                                                        .posts[
-                                                                            index]
-                                                                        .fileAttatchments,
-                                                                image: getMabData
-                                                                    .posts[
-                                                                        index]
-                                                                    .image,
-                                                              )
-                                                            : Container();
+                                              return StreamBuilder(
+                                                  stream: FirebaseFirestore
+                                                      .instance
+                                                      .collection("communities")
+                                                      .doc(
+                                                          "P3xcmRih8YYxkOqsuV7u")
+                                                      .snapshots(),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot
+                                                            .connectionState ==
+                                                        ConnectionState
+                                                            .waiting) {
+                                                      return Center(
+                                                          child: Text(
+                                                        "Loading...",
+                                                        style: textTheme
+                                                            .displaySmall,
+                                                      ));
+                                                    }
+                                                    if (snapshot.hasError) {
+                                                      return Center(
+                                                          child: Text(
+                                                        "Error: ${snapshot.error}",
+                                                        style: textTheme
+                                                            .displaySmall!
+                                                            .copyWith(
+                                                                color: theme
+                                                                    .error),
+                                                      ));
+                                                    }
+                                                    if (!snapshot.hasData ||
+                                                        snapshot.data?.exists ==
+                                                            false) {
+                                                      return Center(
+                                                          child: Text(
+                                                        "No data",
+                                                        style: textTheme
+                                                            .displaySmall,
+                                                      ));
+                                                    }
+                                                    MabData mabData =
+                                                        MabData(uid: 0, posts: [
+                                                      for (var post
+                                                          in (selectedSection ==
+                                                                  0
+                                                              ? snapshot
+                                                                  .data!["MAB"]
+                                                              : snapshot.data![
+                                                                  "LAC"]))
+                                                        MabPost(
+                                                            uid: 0,
+                                                            title:
+                                                                post["title"],
+                                                            description: post[
+                                                                "description"],
+                                                            date: DateTime.parse(
+                                                                post["date"]
+                                                                    .toDate()
+                                                                    .toString()),
+                                                            authorUID: 0,
+                                                            image:
+                                                                post["image"] ??
+                                                                    "",
+                                                            fileAttatchments: [
+                                                              for (String file
+                                                                  in post[
+                                                                      "files"])
+                                                                file
+                                                            ],
+                                                            dueDate: DateTime
+                                                                .parse(post["date"]
+                                                                    .toDate()
+                                                                    .toString()),
+                                                            type: post["type"],
+                                                            subject:
+                                                                post["subject"])
+                                                    ]);
+
+                                                    return ListView.builder(
+                                                        //MabData is misleading, it's actually both !!!!! (no way) (crazy right?)
+                                                        itemCount: mabData
+                                                            .posts.length,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          MabPost post = mabData
+                                                              .posts[index];
+                                                          return isItemValid(
+                                                                  post)
+                                                              ? Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                      vertical:
+                                                                          5),
+                                                                  child: ListItem(
+                                                                      theme:
+                                                                          theme,
+                                                                      textTheme:
+                                                                          textTheme,
+                                                                      c: c,
+                                                                      post:
+                                                                          post),
+                                                                )
+                                                              : const SizedBox();
+                                                        });
                                                   });
                                             }),
                                           )),
@@ -1106,28 +1095,23 @@ class ListItem extends StatelessWidget {
     required this.theme,
     required this.textTheme,
     required this.c,
-    required this.title,
-    required this.description,
-    required this.subject,
-    required this.type,
-    required this.due,
-    required this.attatchements,
-    this.image,
+    required this.post,
   });
 
   final ColorScheme theme;
   final TextTheme textTheme;
   final BoxConstraints c;
-  final String title;
-  final String description;
-  final int subject;
-  final int type;
-  final DateTime due;
-  final List<String> attatchements;
-  final String? image;
+  final MabPost post;
 
   @override
   Widget build(BuildContext context) {
+    String title = post.title;
+    String description = post.description;
+    String image = post.image;
+    List<String> attatchements = post.fileAttatchments;
+    int type = post.type;
+    int subject = post.subject;
+    DateTime due = post.dueDate;
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: Container(

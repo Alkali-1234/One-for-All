@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/user_data.dart';
 import 'package:oneforall/service/auth_service.dart';
+import 'package:provider/provider.dart';
 import '../main.dart';
 import 'login_screen.dart';
 import 'get_started.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoadingScreen extends StatefulWidget {
-  const LoadingScreen({super.key});
+  const LoadingScreen({super.key, required this.appstate});
+  final AppState appstate;
 
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
@@ -20,8 +22,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   Icon? loadingStatus;
 
   void pushToPage(Widget page) {
-    Navigator.of(context)
-        .pushReplacement(MaterialPageRoute(builder: (context) => page));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => page));
     return;
   }
 
@@ -37,7 +38,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     loadingScreenAnimation();
   }
 
-  void initializeApp() async {
+  void initializeApp(AppState appState) async {
     setState(() {
       verbose = "Initializing...";
     });
@@ -62,12 +63,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
       if (theme == 0) {
         passedUserTheme = defaultBlueTheme;
         primaryGradient = defaultBluePrimaryGradient;
+        widget.appstate.currentUserSelectedTheme = defaultBlueTheme;
       } else if (theme == 1) {
         passedUserTheme = darkTheme;
         primaryGradient = darkPrimaryGradient;
+        widget.appstate.currentUserSelectedTheme = darkTheme;
       } else if (theme == 2) {
         passedUserTheme = lightTheme;
         primaryGradient = lightPrimaryGradient;
+        widget.appstate.currentUserSelectedTheme = lightTheme;
       }
     }
     if (prefs.containsKey("language")) {
@@ -102,7 +106,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       verbose = "Logging in...";
     });
     try {
-      await login(email, password, true);
+      await login(email, password, true, appState);
     } catch (e) {
       setState(() {
         verbose = "Error logging in. Going to login page... \n $e";
@@ -115,9 +119,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       verbose = "Finished!";
     });
     await Future.delayed(const Duration(seconds: 1));
-    pushToPage(const MyApp(
-      showReload: false,
-    ));
+    pushToPage(const HomePage());
   }
 
   @override
@@ -125,7 +127,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     super.initState();
     loadingScreenAnimation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      initializeApp();
+      initializeApp(context.read<AppState>());
     });
   }
 

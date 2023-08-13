@@ -14,7 +14,8 @@ class UserData {
       required this.flashCardSets,
       required this.username,
       required this.email,
-      required this.profilePicture});
+      required this.profilePicture,
+      required this.assignedCommunity});
 
   final int uid;
   int exp;
@@ -24,6 +25,7 @@ class UserData {
   String email;
   String profilePicture;
   List<FlashcardSet> flashCardSets;
+  String? assignedCommunity;
 
   set setExp(int exp) => this.exp = exp;
   set setStreak(int streak) => this.streak = streak;
@@ -40,7 +42,10 @@ class UserData {
 
 UserData? userData;
 
+@Deprecated("Use stream builder and provider instead")
 void setUserData(UserData data) => userData = data;
+
+@Deprecated("Use stream builder and provider instead")
 get getUserData => userData!;
 
 class FlashcardSet {

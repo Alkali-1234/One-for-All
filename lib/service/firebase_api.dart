@@ -6,6 +6,7 @@ import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:googleapis_auth/googleapis_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:oneforall/service/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../data/community_data.dart';
 import 'dart:io';
 import 'dart:convert';
@@ -25,7 +26,21 @@ Future backgroundHandler(RemoteMessage message) async {
 Future initializeFCM(String assignedCommunity) async {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
-  await _firebaseMessaging.requestPermission();
+  NotificationSettings settings = await _firebaseMessaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+  if (settings.authorizationStatus == AuthorizationStatus.denied ||
+      settings.authorizationStatus == AuthorizationStatus.notDetermined) {
+    print("Notifications not enabled");
+    throw Exception(
+        "Notifications are required! You may disable notifications later in settings.");
+  }
   final fcmToken = await _firebaseMessaging.getToken();
   print('Initialized FCM with token: $fcmToken');
   if (fcmToken != null) {
@@ -34,7 +49,38 @@ Future initializeFCM(String assignedCommunity) async {
 
   //* Subscribe to the topic
 
-  //TODO use with shared prefs
+  final prefs = await SharedPreferences.getInstance();
+  if (prefs.containsKey("setting_notifications_MAB")) {
+    if (prefs.getBool("setting_notifications_MAB")!) {
+      await _firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
+    } else {
+      await _firebaseMessaging.unsubscribeFromTopic("MAB_$assignedCommunity");
+    }
+  } else {
+    await _firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
+  }
+  if (prefs.containsKey("setting_notifications_LAC")) {
+    if (prefs.getBool("setting_notifications_LAC")!) {
+      await _firebaseMessaging.subscribeToTopic("LAC_$assignedCommunity");
+    } else {
+      await _firebaseMessaging.unsubscribeFromTopic("LAC_$assignedCommunity");
+    }
+  } else {
+    await _firebaseMessaging.subscribeToTopic("LAC_$assignedCommunity");
+  }
+  if (prefs.containsKey("setting_notifications_RecentActivity")) {
+    if (prefs.getBool("setting_notifications_RecentActivity")!) {
+      await _firebaseMessaging
+          .subscribeToTopic("Recent_Activity_$assignedCommunity");
+    } else {
+      await _firebaseMessaging
+          .unsubscribeFromTopic("Recent_Activity_$assignedCommunity");
+    }
+  } else {
+    await _firebaseMessaging
+        .subscribeToTopic("Recent_Activity_$assignedCommunity");
+  }
+
   await _firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
   await _firebaseMessaging.subscribeToTopic("LAC_$assignedCommunity");
   await _firebaseMessaging
@@ -60,39 +106,42 @@ void handleNotification(RemoteMessage message) {
   print(message.data.toString());
   print(message.notification!.title);
   //* Get notification data
+  //! DEPRECATED
   if (message.data.containsKey('MAB')) {
-    //Assume that it has all fields (uid, title, description, date, authorUID, image, fileAttatchments, dueDate, type, subject)
-    final int uid = int.parse(message.data["uid"]);
-    final String title = message.data["title"];
-    final String description = message.data["description"];
-    final DateTime date = DateTime.parse(message.data["date"]);
-    final String authorUID = message.data["authorUID"];
-    final String image = message.data["image"];
-    final List<String> fileAttatchments =
-        message.data["fileAttatchments"].split(",");
-    final DateTime dueDate = DateTime.parse(message.data["dueDate"]);
-    final int type = int.parse(message.data["type"]);
-    final int subject = int.parse(message.data["subject"]);
+    //! Deprecated
+    // //Assume that it has all fields (uid, title, description, date, authorUID, image, fileAttatchments, dueDate, type, subject)
+    //// final int uid = int.parse(message.data["uid"]);
+    //// final String title = message.data["title"];
+    //// final String description = message.data["description"];
+    // // final DateTime date = DateTime.parse(message.data["date"]);
+    // // final String authorUID = message.data["authorUID"];
+    // // final String image = message.data["image"];
+    // // final List<String> fileAttatchments =
+    // //     message.data["fileAttatchments"].split(",");
+    // // final DateTime dueDate = DateTime.parse(message.data["dueDate"]);
+    // // final int type = int.parse(message.data["type"]);
+    // // final int subject = int.parse(message.data["subject"]);
 
-    getMabData.addPost(
-        uid: uid,
-        title: title,
-        description: description,
-        date: date,
-        authorUID: authorUID,
-        image: image,
-        fileAttatchments: fileAttatchments,
-        dueDate: dueDate,
-        type: type,
-        subject: subject);
+    // // getMabData.addPost(
+    // //     uid: uid,
+    // //     title: title,
+    // //     description: description,
+    // //     date: date,
+    // //     authorUID: authorUID,
+    // //     image: image,
+    // //     fileAttatchments: fileAttatchments,
+    // //     dueDate: dueDate,
+    // //     type: type,
+    // //     subject: subject);
   } else if (message.data.containsKey('LAC')) {
     print("Handle LAC Notification");
   } else if (message.data.containsKey('Recent_Activity')) {
     print("Handle Recent Activity Notification");
   }
-  //Name format:
-  // "{notificationtype} {notificationid}"
-  //Types: MAB, LAC, Recent Activity, etc.
+  //EXT
+  //// Name format:
+  //// "{notificationtype} {notificationid}"
+  //// Types: MAB, LAC, Recent Activity, etc.
 }
 
 //* Send notification section

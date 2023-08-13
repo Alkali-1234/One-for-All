@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 //ignore: unused_import
 import 'package:flutter/material.dart';
+import 'package:oneforall/main.dart';
 import 'package:oneforall/service/files_service.dart';
 import 'package:oneforall/service/firebase_api.dart';
 //ignore: unused_import
@@ -15,7 +16,8 @@ import 'community_service.dart';
 
 get getUserAuth => FirebaseAuth.instance;
 
-Future login(String email, String password, bool saveCredentials) async {
+Future login(String email, String password, bool saveCredentials,
+    AppState appState) async {
   try {
     await FirebaseAuth.instance
         .signInWithEmailAndPassword(email: email, password: password)
@@ -34,6 +36,8 @@ Future login(String email, String password, bool saveCredentials) async {
 
   var auth = FirebaseAuth.instance;
   //Set user data
+  final assignedCommunity =
+      await getValue("users", auth.currentUser!.uid, "assignedCommunity");
   await getDocument("users", auth.currentUser!.uid).then((value) {
     //set flashcard sets for setUserData
     //* Initialize an empty list of flashcard sets
@@ -60,6 +64,21 @@ Future login(String email, String password, bool saveCredentials) async {
       }
     }
 
+    //* New Method
+    appState.setCurrentUser(UserData(
+        uid: int.tryParse(auth.currentUser!.uid) ?? 0,
+        exp: value.data()!["exp"],
+        streak: value.data()!["streak"],
+        posts: value.data()!["posts"],
+        flashCardSets: flashcardSets,
+        username: auth.currentUser!.displayName ?? "Invalid Username!",
+        email: auth.currentUser!.email ?? "Invalid Email!",
+        profilePicture: auth.currentUser!.photoURL ?? "",
+        assignedCommunity: assignedCommunity));
+
+    print(appState.getCurrentUser);
+
+    //! Deprecated method
     setUserData(UserData(
         uid: int.tryParse(auth.currentUser!.uid) ?? 0,
         exp: value.data()["exp"],
@@ -68,7 +87,8 @@ Future login(String email, String password, bool saveCredentials) async {
         flashCardSets: flashcardSets,
         username: auth.currentUser!.displayName ?? "Invalid Username!",
         email: auth.currentUser!.email ?? "Invalid Email!",
-        profilePicture: auth.currentUser!.photoURL ?? ""));
+        profilePicture: auth.currentUser!.photoURL ?? "",
+        assignedCommunity: assignedCommunity));
   }).catchError((error, stackTrace) {
     debugPrint("err on auth service: getDocument");
     throw error;
@@ -103,8 +123,7 @@ Future login(String email, String password, bool saveCredentials) async {
   });
 
   //* Set community data
-  final assignedCommunity =
-      await getValue("users", auth.currentUser!.uid, "assignedCommunity");
+
   if (assignedCommunity != null) {
     await getCommunityData(assignedCommunity).then((value) {
       return;
@@ -119,15 +138,27 @@ Future login(String email, String password, bool saveCredentials) async {
     throw Exception("assigned_community_not_string");
   }
 
+  //* Notifications
+  final prefs = await SharedPreferences.getInstance();
+  if (!prefs.containsKey("setting_notifications_MAB")) {
+    prefs.setBool("setting_notifications_MAB", true);
+  }
+  if (!prefs.containsKey("setting_notifications_LAC")) {
+    prefs.setBool("setting_notifications_LAC", true);
+  }
+  if (!prefs.containsKey("setting_notifications_RecentActivity")) {
+    prefs.setBool("setting_notifications_RecentActivity", true);
+  }
+
   //* initialize FCM
   await initializeFCM(assignedCommunity);
   //* hasOpenedBefore = true
-  final prefs = await SharedPreferences.getInstance();
   prefs.setBool("hasOpenedBefore", true);
   return true;
 }
 
-Future createAccount(String email, String password, String username) async {
+Future createAccount(
+    String email, String password, String username, AppState appState) async {
   try {
     await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password)
@@ -149,7 +180,7 @@ Future createAccount(String email, String password, String username) async {
       .catchError((error, stackTrace) {
     throw error;
   });
-  await login(email, password, false).catchError((error, stackTrace) {
+  await login(email, password, false, appState).catchError((error, stackTrace) {
     throw error;
   });
   //* First time load = false

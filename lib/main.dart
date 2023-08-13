@@ -2,7 +2,9 @@
 
 //Firebase
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter/material.dart';
@@ -33,14 +35,11 @@ void main() async {
     "Initialized app! : ${Firebase.app().options.projectId}",
   );
 
-  runApp(const MyApp(
-    showReload: true,
-  ));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, required this.showReload});
-  final bool showReload;
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -51,44 +50,12 @@ class MyApp extends StatelessWidget {
       builder: ((context, child) {
         var appState = Provider.of<AppState>(context);
         return MaterialApp(
-          title: 'One for All',
-          navigatorKey: navigatorKey,
-          theme: appState.currentUserSelectedTheme,
-          // theme: ThemeData(
-          //   colorScheme: ColorScheme.fromSwatch().copyWith(
-          //     primary: const Color.fromRGBO(0, 0, 0, 0.25),
-          //     secondary: const Color.fromRGBO(255, 255, 255, 0.25),
-          //     tertiary: const Color.fromRGBO(255, 255, 255, 0.50),
-          //     primaryContainer: const Color.fromRGBO(255, 255, 255, 0.07),
-          //     onPrimary: const Color.fromRGBO(255, 255, 255, 1),
-          //     onSecondary: const Color.fromRGBO(255, 255, 255, 1),
-          //     background: const Color.fromRGBO(24, 4, 44, 1.0),
-          //     error: Colors.red,
-          //   ),
-          //   textTheme: const TextTheme(
-          //     displayLarge: TextStyle(
-          //       color: Color.fromRGBO(255, 255, 255, 1.0),
-          //       fontSize: 40,
-          //       fontWeight: FontWeight.bold,
-          //       letterSpacing: -1.5,
-          //     ),
-          //     displayMedium: TextStyle(
-          //       color: Color.fromRGBO(255, 255, 255, 1.0),
-          //       fontSize: 24,
-          //       fontWeight: FontWeight.w500,
-          //       letterSpacing: -0.5,
-          //     ),
-          //     displaySmall: TextStyle(
-          //       color: Color.fromRGBO(255, 255, 255, 1.0),
-          //       fontSize: 14,
-          //       fontWeight: FontWeight.w400,
-          //       letterSpacing: 0,
-          //     ),
-          //   ),
-          //   useMaterial3: true,
-          // ),
-          home: showReload ? const LoadingScreen() : const HomePage(),
-        );
+            title: 'One for All',
+            navigatorKey: navigatorKey,
+            theme: appState.currentUserSelectedTheme,
+            home: LoadingScreen(
+              appstate: appState,
+            ));
       }),
     );
   }
@@ -97,25 +64,67 @@ class MyApp extends StatelessWidget {
 //AppState
 class AppState extends ChangeNotifier {
   // //* get theme func
-  // Future<ThemeData> getSavedTheme() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   if (prefs.containsKey("theme")) {
-  //     final theme = prefs.getInt("theme");
-  //     if (theme == 0) {
-  //       return defaultBlueTheme;
-  //     } else if (theme == 1) {
-  //       return darkTheme;
-  //     } else if (theme == 2) {
-  //       return lightTheme;
-  //     } else {
-  //       return defaultBlueTheme;
-  //     }
-  //   } else {
-  //     return defaultBlueTheme;
-  //   }
-  // }
+  Future<ThemeData> getSavedTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey("theme")) {
+      final theme = prefs.getInt("theme");
+      if (theme == 0) {
+        return defaultBlueTheme;
+      } else if (theme == 1) {
+        return darkTheme;
+      } else if (theme == 2) {
+        return lightTheme;
+      } else {
+        return defaultBlueTheme;
+      }
+    } else {
+      return defaultBlueTheme;
+    }
+  }
 
-  ThemeData _currentUserSelectedTheme = passedUserTheme;
+  //* User data section
+
+  ///The current user data
+  late UserData _currentUser;
+
+  ///Gets the current user data
+  UserData get getCurrentUser => _currentUser;
+
+  ///Sets the current user data
+  void setCurrentUser(UserData user) {
+    print(user);
+    print("User set!");
+    _currentUser = user;
+    print(_currentUser);
+    notifyListeners();
+  }
+
+  //! Might be useless, as streambuilder is used instead
+  //* Community data section
+  late MabData _mabData;
+  MabData get getMabData => _mabData;
+  void setMabData(MabData mabData) {
+    _mabData = mabData;
+    notifyListeners();
+  }
+
+  late LACData _lacData;
+  LACData get getLacData => _lacData;
+  void setLacData(LACData lacData) {
+    _lacData = lacData;
+    notifyListeners();
+  }
+
+  late RecentActivities _recentActivities;
+  RecentActivities get getRecentActivities => _recentActivities;
+  set setRecentActivities(RecentActivities recentActivities) {
+    _recentActivities = recentActivities;
+    notifyListeners();
+  }
+
+  final prefs = SharedPreferences.getInstance();
+
+  ThemeData _currentUserSelectedTheme = defaultBlueTheme;
   ThemeData get currentUserSelectedTheme => _currentUserSelectedTheme;
   set currentUserSelectedTheme(ThemeData theme) {
     _currentUserSelectedTheme = theme;
@@ -320,7 +329,7 @@ class SidebarXWidget extends StatelessWidget {
   }
 }
 
-//Home Screen
+/// Home **Screen** NOT Home Page
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -337,6 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    AppState appState = Provider.of(context);
     void setMABSelectedFilter(int filter) {
       setState(() {
         if (filter > MABSelectedFilter) {
@@ -567,99 +577,161 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       SizedBox(
                         height: MediaQuery.of(context).size.height * 0.17,
-                        child: ListView.builder(
-                          itemCount: getMabData.posts.length,
-                          itemBuilder: (context, index) {
-                            return AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 100),
-                              transitionBuilder: (child, animation) =>
-                                  FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              ),
-                              child: MABSelectedFilter == 0 ||
-                                      getMabData.posts[index].type ==
-                                          MABSelectedFilter
-                                  ? Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 5.0),
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          side: BorderSide(
-                                              color: theme.secondary, width: 1),
-                                          padding: const EdgeInsets.all(8),
-                                          backgroundColor: theme.secondary,
-                                          foregroundColor: theme.onSecondary,
-                                          shadowColor: Colors.black,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        onPressed: () => {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) => MABModal(
-                                                    title: getMabData
-                                                        .posts[index].title,
-                                                    description: getMabData
-                                                        .posts[index]
-                                                        .description,
-                                                    image: getMabData
-                                                        .posts[index].image,
-                                                    attatchements: getMabData
-                                                        .posts[index]
-                                                        .fileAttatchments,
-                                                  ))
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            SizedBox(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.5,
-                                              height: 30,
-                                              child: FittedBox(
-                                                child: Text(
-                                                  getMabData.posts[index].title,
-                                                  style: textTheme.displaySmall!
-                                                      .copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                  textAlign: TextAlign.left,
+                        child: StreamBuilder(
+                            initialData: null,
+                            //!!! Change this to the actual community ID
+                            stream: FirebaseFirestore.instance
+                                .collection("communities")
+                                .doc("P3xcmRih8YYxkOqsuV7u")
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                  child: Text("Loading MAB data...",
+                                      style: textTheme.displaySmall!),
+                                );
+                              }
+
+                              if (snapshot.hasError) {
+                                return Center(
+                                  child: Text(
+                                    "Error loading MAB data ${snapshot.error}",
+                                    style: textTheme.displaySmall!
+                                        .copyWith(color: theme.error),
+                                  ),
+                                );
+                              }
+
+                              if (!snapshot.hasData) {
+                                return Center(
+                                  child: Text(
+                                    "No MAB data",
+                                    style: textTheme.displaySmall!
+                                        .copyWith(color: theme.error),
+                                  ),
+                                );
+                              }
+                              MabData mabData = MabData(uid: 0, posts: [
+                                for (var post in snapshot.data!["MAB"])
+                                  MabPost(
+                                      uid: 0,
+                                      title: post["title"],
+                                      description: post["description"],
+                                      date: DateTime.parse(
+                                          post["date"].toDate().toString()),
+                                      authorUID: 0,
+                                      image: post["image"] ?? "",
+                                      fileAttatchments: [
+                                        for (String file in post["files"]) file
+                                      ],
+                                      dueDate: DateTime.parse(
+                                          post["date"].toDate().toString()),
+                                      type: post["type"],
+                                      subject: post["subject"])
+                              ]);
+                              return ListView.builder(
+                                itemCount: mabData.posts.length,
+                                itemBuilder: (context, index) {
+                                  MabPost post = mabData.posts[index];
+                                  return AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 100),
+                                    transitionBuilder: (child, animation) =>
+                                        FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    ),
+                                    child: MABSelectedFilter == 0 ||
+                                            post.type == MABSelectedFilter
+                                        ? Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 5.0),
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                side: BorderSide(
+                                                    color: theme.secondary,
+                                                    width: 1),
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                                backgroundColor:
+                                                    theme.secondary,
+                                                foregroundColor:
+                                                    theme.onSecondary,
+                                                shadowColor: Colors.black,
+                                                elevation: 0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
                                                 ),
+                                              ),
+                                              onPressed: () => {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) =>
+                                                        MABModal(
+                                                          title: post.title,
+                                                          description:
+                                                              post.description,
+                                                          image: post.image,
+                                                          attatchements: post
+                                                              .fileAttatchments,
+                                                        ))
+                                              },
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  SizedBox(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.5,
+                                                    height: 30,
+                                                    child: FittedBox(
+                                                      child: Text(
+                                                        post.title,
+                                                        style: textTheme
+                                                            .displaySmall!
+                                                            .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                        textAlign:
+                                                            TextAlign.left,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        const BorderRadius.all(
+                                                            Radius.circular(
+                                                                8.0)),
+                                                    child: Container(
+                                                      color: theme.secondary,
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(6.0),
+                                                        child: Text(
+                                                          //days left due, and the day it is due
+                                                          "${post.dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(post.dueDate)})",
+                                                          style: textTheme
+                                                              .displaySmall,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
                                               ),
                                             ),
-                                            ClipRRect(
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(8.0)),
-                                              child: Container(
-                                                color: theme.secondary,
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(6.0),
-                                                  child: Text(
-                                                    //days left due, and the day it is due
-                                                    "${getMabData.posts[index].dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(getMabData.posts[index].dueDate)})",
-                                                    style:
-                                                        textTheme.displaySmall,
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                  : const SizedBox.shrink(),
-                            );
-                          },
-                        ),
+                                          )
+                                        : const SizedBox.shrink(),
+                                  );
+                                },
+                              );
+                            }),
                       ),
                     ],
                   ),

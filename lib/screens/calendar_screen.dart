@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/community_data.dart';
+import 'package:oneforall/service/community_service.dart';
 import 'package:provider/provider.dart';
 import '../data/user_data.dart';
 import '../main.dart';
@@ -243,9 +246,43 @@ class Calendar extends StatelessWidget {
 
   get getCalendarDataEvents => calendarDataEvents;
 
-  void initializeCalendarEvents() {
+  void initializeCalendarEvents(AppState appState) async {
+    List<MabPost> mabPosts = [];
+    List<LACPost> lacPosts = [];
+
+    if (appState.getCurrentUser.assignedCommunity == null) {
+      return;
+    }
+
+    //i know what i'm doing
+    //istg if this breaks i'm gonna cry
+    getValue("communities", appState.getCurrentUser.assignedCommunity!, "MAB")
+        .then((value) {
+      for (var element in value) {
+        print(element);
+        //Tranform Map to MabPost
+        mabPosts.add(MabPost(
+          authorUID: element["authorUID"],
+          uid: 0,
+          title: element["title"],
+          description: element["description"],
+          dueDate: DateTime.parse(element["dueDate"].toDate().toString()),
+          date: DateTime.parse(element["date"].toDate().toString()),
+          image: element["image"] ?? "",
+          fileAttatchments: element["fileAttatchments"] ?? [],
+          type: element["type"],
+          subject: element["subject"],
+        ));
+      }
+    });
+
+    getValue("communities", appState.getCurrentUser.assignedCommunity!, "LAC")
+        .then((value) {
+      lacPosts = value;
+    });
+
     //Get data from MAB
-    for (var e in getMabData.posts) {
+    for (MabPost e in mabPosts) {
       //Check if event is in selected month and year, if yes, add to calendarDataEvents
       if (e.dueDate.month == selectedMonth && e.dueDate.year == selectedYear) {
         getCalendarDataEvents["events"][e.dueDate.day].add(e);
@@ -253,7 +290,7 @@ class Calendar extends StatelessWidget {
     }
 
     //Get data from LAC
-    for (var e in getLACData.posts) {
+    for (LACPost e in lacPosts) {
       //Check if event is in selected month and year, if yes, add to calendarDataEvents
       if (e.dueDate.month == selectedMonth && e.dueDate.year == selectedYear) {
         getCalendarDataEvents["events"][e.dueDate.day].add(e);
@@ -261,7 +298,8 @@ class Calendar extends StatelessWidget {
     }
   }
 
-  void initializeCalendar(int firstDayOfMonth, int lastDayOfMonth) {
+  void initializeCalendar(
+      int firstDayOfMonth, int lastDayOfMonth, AppState appState) {
     int currentDate = 1;
     //First week
     for (int i = 0; i < 7; i++) {
@@ -317,7 +355,7 @@ class Calendar extends StatelessWidget {
         currentDate++;
       }
     }
-    initializeCalendarEvents();
+    initializeCalendarEvents(appState);
   }
 
   @override
@@ -350,7 +388,8 @@ class Calendar extends StatelessWidget {
     }
 
     initState() {
-      initializeCalendar(firstDayOfMonth, lastDayOfMonth);
+      initializeCalendar(
+          firstDayOfMonth, lastDayOfMonth, context.read<AppState>());
     }
 
     initState();

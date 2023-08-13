@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:oneforall/main.dart';
 import 'package:oneforall/screens/login_screen.dart';
+import 'package:provider/provider.dart';
 import '../constants.dart';
 import '../service/auth_service.dart';
 import 'package:email_validator/email_validator.dart';
@@ -620,7 +622,8 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
         return;
       }
       //*Create account
-      await createAccount(emailQuery, passwordQuery, userNameQuery)
+      await createAccount(emailQuery, passwordQuery, userNameQuery,
+              context.read<AppState>())
           .then((value) => debugPrint("Account created"))
           .onError((error, stackTrace) => setState(() {
                 isLoading = false;
