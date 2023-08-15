@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
@@ -179,12 +177,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 }
 
-//ignore: must_be_immutable
-class Calendar extends StatelessWidget {
-  Calendar(
+class Calendar extends StatefulWidget {
+  const Calendar(
       {super.key, required this.selectedYear, required this.selectedMonth});
   final int selectedYear;
   final int selectedMonth;
+
+  @override
+  State<Calendar> createState() => _CalendarState();
+}
+
+class _CalendarState extends State<Calendar> {
+  // int firstDayOfMonth =
+  //       DateTime(widget.selectedYear, widget.selectedMonth, 1).weekday;
+  //   int lastDayOfMonth =
+  //       DateTime(widget.selectedYear, widget.selectedMonth + 1, 0)
+  //           .day; //Last day of month
+
+  bool loading = false;
+
   Object calendarData = {
     "week1": {
       "dates": [0, 0, 0, 0, 0, 0, 0]
@@ -247,22 +258,112 @@ class Calendar extends StatelessWidget {
   get getCalendarDataEvents => calendarDataEvents;
 
   void initializeCalendarEvents(AppState appState) async {
+    print("Initializing calendar events");
+    //* Reset calendar data
+    calendarDataEvents = {
+      "events": {
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
+        7: [],
+        8: [],
+        9: [],
+        10: [],
+        11: [],
+        12: [],
+        13: [],
+        14: [],
+        15: [],
+        16: [],
+        17: [],
+        18: [],
+        19: [],
+        20: [],
+        21: [],
+        22: [],
+        23: [],
+        24: [],
+        25: [],
+        26: [],
+        27: [],
+        28: [],
+        29: [],
+        30: [],
+        31: []
+      }
+    };
+    //oh god
+    //i forgot
+    // LEAP YEARS
+    //i wanna die
+    //working with dates is a pain
+
     List<MabPost> mabPosts = [];
     List<LACPost> lacPosts = [];
 
+    //Check if data is already stored in appState
+    if (appState.getMabData!.posts.isNotEmpty) {
+      setState(() {
+        mabPosts = appState.getMabData!.posts;
+        for (MabPost e in mabPosts) {
+          //Check if event is in selected month and year, if yes, add to calendarDataEvents
+          if (e.dueDate.month == widget.selectedMonth &&
+              e.dueDate.year == widget.selectedYear) {
+            getCalendarDataEvents["events"][e.dueDate.day].add(e);
+          }
+        }
+      });
+    }
+
+    if (appState.getLacData!.posts.isNotEmpty) {
+      setState(() {
+        lacPosts = appState.getLacData!.posts;
+        for (LACPost e in lacPosts) {
+          //Check if event is in selected month and year, if yes, add to calendarDataEvents
+          if (e.dueDate.month == widget.selectedMonth &&
+              e.dueDate.year == widget.selectedYear) {
+            getCalendarDataEvents["events"][e.dueDate.day].add(e);
+          }
+        }
+      });
+      return;
+    }
+
+    print("Getting MAB Data");
+
+    //if user is not assigned to a community, return
     if (appState.getCurrentUser.assignedCommunity == null) {
       return;
     }
 
+    if (loading) {
+      return;
+    }
+
+    setState(() {
+      loading = true;
+    });
+
     //i know what i'm doing
     //istg if this breaks i'm gonna cry
-    getValue("communities", appState.getCurrentUser.assignedCommunity!, "MAB")
+    //i'm not crying you're crying
+    //YOO IT WORKED
+    //nvm it broke
+    // wait wait wait i think i fixed it
+    //LET'S GOO I FIXED IT
+    //i'm so happy
+    //i'm gonna cry
+    await getValue(
+            "communities", appState.getCurrentUser.assignedCommunity!, "MAB")
         .then((value) {
       for (var element in value) {
         print(element);
         //Tranform Map to MabPost
         mabPosts.add(MabPost(
-          authorUID: element["authorUID"],
+          authorUID: 0,
           uid: 0,
           title: element["title"],
           description: element["description"],
@@ -276,15 +377,32 @@ class Calendar extends StatelessWidget {
       }
     });
 
-    getValue("communities", appState.getCurrentUser.assignedCommunity!, "LAC")
+    await getValue(
+            "communities", appState.getCurrentUser.assignedCommunity!, "LAC")
         .then((value) {
-      lacPosts = value;
+      for (var element in value) {
+        print(element);
+        //Tranform Map to LACPost
+        lacPosts.add(LACPost(
+          authorUID: 0,
+          uid: 0,
+          title: element["title"],
+          description: element["description"],
+          dueDate: DateTime.parse(element["dueDate"].toDate().toString()),
+          date: DateTime.parse(element["date"].toDate().toString()),
+          image: element["image"] ?? "",
+          fileAttatchments: element["fileAttatchments"] ?? [],
+          type: element["type"],
+          subject: element["subject"],
+        ));
+      }
     });
 
     //Get data from MAB
     for (MabPost e in mabPosts) {
       //Check if event is in selected month and year, if yes, add to calendarDataEvents
-      if (e.dueDate.month == selectedMonth && e.dueDate.year == selectedYear) {
+      if (e.dueDate.month == widget.selectedMonth &&
+          e.dueDate.year == widget.selectedYear) {
         getCalendarDataEvents["events"][e.dueDate.day].add(e);
       }
     }
@@ -292,10 +410,21 @@ class Calendar extends StatelessWidget {
     //Get data from LAC
     for (LACPost e in lacPosts) {
       //Check if event is in selected month and year, if yes, add to calendarDataEvents
-      if (e.dueDate.month == selectedMonth && e.dueDate.year == selectedYear) {
+      if (e.dueDate.month == widget.selectedMonth &&
+          e.dueDate.year == widget.selectedYear) {
         getCalendarDataEvents["events"][e.dueDate.day].add(e);
       }
     }
+    // Set data to appstate
+    //for some reason does this 4 times??????
+    print("Setting data to appstate");
+    print(mabPosts.toList());
+    print(lacPosts.toList());
+    //has been set before... hmm
+    appState.setMabData(MabData(uid: 0, posts: mabPosts));
+    appState.setLacData(LACData(uid: 0, posts: lacPosts));
+
+    setState(() {});
   }
 
   void initializeCalendar(
@@ -355,16 +484,22 @@ class Calendar extends StatelessWidget {
         currentDate++;
       }
     }
-    initializeCalendarEvents(appState);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initializeCalendar(
+        DateTime(widget.selectedYear, widget.selectedMonth, 1).weekday,
+        DateTime(widget.selectedYear, widget.selectedMonth + 1, 0).day,
+        context.read<AppState>());
   }
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    int firstDayOfMonth = DateTime(selectedYear, selectedMonth, 1).weekday;
-    int lastDayOfMonth =
-        DateTime(selectedYear, selectedMonth + 1, 0).day; //Last day of month
+    initializeCalendarEvents(context.read<AppState>());
 
     Color getDateColor(int date) {
       //1 Event = 0xFF00FFA3
@@ -386,13 +521,6 @@ class Calendar extends StatelessWidget {
       }
       return theme.secondary;
     }
-
-    initState() {
-      initializeCalendar(
-          firstDayOfMonth, lastDayOfMonth, context.read<AppState>());
-    }
-
-    initState();
 
     return SizedBox.expand(
         child: Container(
@@ -429,8 +557,10 @@ class Calendar extends StatelessWidget {
                   Container(
                     width: 30,
                     height: 30,
-                    decoration: selectedYear == DateTime.now().year.toInt() &&
-                            selectedMonth == DateTime.now().month.toInt() &&
+                    decoration: widget.selectedYear ==
+                                DateTime.now().year.toInt() &&
+                            widget.selectedMonth ==
+                                DateTime.now().month.toInt() &&
                             getCalendarData["week${i + 1}"]["dates"][j] ==
                                 DateTime.now().day.toInt()
                         ? BoxDecoration(
@@ -452,7 +582,7 @@ class Calendar extends StatelessWidget {
                                   title:
                                       "${getCalendarDataEvents["events"][getCalendarData["week${i + 1}"]["dates"][j]].length} Events",
                                   description:
-                                      "${getCalendarData["week${i + 1}"]["dates"][j]} of ${getMonthsOfTheYear[selectedMonth]}, $selectedYear",
+                                      "${getCalendarData["week${i + 1}"]["dates"][j]} of ${getMonthsOfTheYear[widget.selectedMonth]}, ${widget.selectedYear}",
                                 );
                               });
                         } else {

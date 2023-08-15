@@ -58,7 +58,7 @@ class CommunityData {
       ]);
 
       print(mabData);
-      appState.setMabData(mabData);
+      // appState.setMabData(mabData);
 
       return mabData;
     });
@@ -77,7 +77,7 @@ class CommunityData {
       late LACData lacData;
       event.data()!.forEach((key, value) {
         if (key == "LAC") {
-          lacData = LACData(uid: int.parse(key));
+          lacData = LACData(uid: int.parse(key), posts: []);
           value.forEach((key, value) {
             lacData.posts.add(LACPost(
                 uid: int.parse(key),
@@ -93,7 +93,7 @@ class CommunityData {
           });
         }
       });
-      appState.setLacData(lacData);
+      // appState.setLacData(lacData);
       return lacData;
     });
   }
@@ -113,10 +113,11 @@ class MabData {
 
 MabData? mabData;
 
-@Deprecated("Use [CommunityData] instead")
+//! Removed deprecated code
+// @Deprecated("Use [CommunityData] instead")
 
-///Deprecated. Use [CommunityData] instead
-void setMabData(MabData data) => mabData = data;
+// ///Deprecated. Use [CommunityData] instead
+// void setMabData(MabData data) => mabData = data;
 @Deprecated("Use stream builder and provider instead")
 
 ///Deprecated. Use [CommunityData] instead
@@ -150,34 +151,10 @@ class MabPost {
 class LACData {
   LACData({
     required this.uid,
+    required this.posts,
   });
   final int uid;
-
-  List<LACPost> posts = [
-    LACPost(
-        uid: 0,
-        title: "Super long sentence like wow forreal guys??? Like a!",
-        description: "i really like ducks.",
-        date: DateTime(2001, 9, 11),
-        authorUID: 0,
-        image: "https://picsum.photos/200/300",
-        fileAttatchments: ["https://picsum.photos/200/300"],
-        dueDate: DateTime(2023, 7, 21),
-        type: 2,
-        subject: 1),
-    LACPost(
-        uid: 0,
-        title: "Derevee?",
-        description:
-            "In my world, everyone is a pony, and they all eat rainbows, and poop butterflies.",
-        date: DateTime(2001, 9, 11),
-        authorUID: 0,
-        image: "https://picsum.photos/200/300",
-        fileAttatchments: ["https://picsum.photos/200/300"],
-        dueDate: DateTime(2023, 7, 15),
-        type: 1,
-        subject: 0),
-  ];
+  List<LACPost> posts = [];
 }
 
 class LACPost {
@@ -205,7 +182,7 @@ class LACPost {
 }
 
 @Deprecated("Use stream builder and provider instead")
-get getLACData => LACData(uid: 0);
+get getLACData => LACData(uid: 0, posts: []);
 
 class RecentActivities {
   RecentActivities({

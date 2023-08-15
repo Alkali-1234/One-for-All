@@ -101,16 +101,18 @@ class AppState extends ChangeNotifier {
 
   //! Might be useless, as streambuilder is used instead
   //* Community data section
-  late MabData _mabData;
-  MabData get getMabData => _mabData;
+  MabData? _mabData;
+  MabData? get getMabData => _mabData;
   void setMabData(MabData mabData) {
+    print("Mab data set! ${mabData.posts}");
     _mabData = mabData;
     notifyListeners();
   }
 
-  late LACData _lacData;
-  LACData get getLacData => _lacData;
+  LACData? _lacData;
+  LACData? get getLacData => _lacData;
   void setLacData(LACData lacData) {
+    print("Lac data set! ${lacData.posts}");
     _lacData = lacData;
     notifyListeners();
   }

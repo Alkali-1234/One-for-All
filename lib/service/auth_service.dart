@@ -123,20 +123,20 @@ Future login(String email, String password, bool saveCredentials,
   });
 
   //* Set community data
+  // ! No longer needed
+  // if (assignedCommunity != null) {
+  //   await getCommunityData(assignedCommunity).then((value) {
+  //     return;
+  //   }).catchError((error, stackTrace) {
+  //     throw error;
+  //   });
+  // } else {
+  //   throw Exception("user_not_assigned_to_community");
+  // }
 
-  if (assignedCommunity != null) {
-    await getCommunityData(assignedCommunity).then((value) {
-      return;
-    }).catchError((error, stackTrace) {
-      throw error;
-    });
-  } else {
-    throw Exception("user_not_assigned_to_community");
-  }
-
-  if (assignedCommunity is! String) {
-    throw Exception("assigned_community_not_string");
-  }
+  // if (assignedCommunity is! String) {
+  //   throw Exception("assigned_community_not_string");
+  // }
 
   //* Notifications
   final prefs = await SharedPreferences.getInstance();
@@ -149,6 +149,9 @@ Future login(String email, String password, bool saveCredentials,
   if (!prefs.containsKey("setting_notifications_RecentActivity")) {
     prefs.setBool("setting_notifications_RecentActivity", true);
   }
+
+  //if my hypothesis is correct, this should be null
+  print(appState.getMabData?.posts);
 
   //* initialize FCM
   await initializeFCM(assignedCommunity);

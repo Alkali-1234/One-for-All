@@ -190,22 +190,23 @@ Future joinCommunity(String communityID, String password) async {
 
   //* Save data to community_data.dart
   setCommunityData(communityDocument);
-  setMabData(
-      //! data is not complete in community document
-      MabData(uid: 0, posts: [
-    for (var post in communityDocument["MAB"])
-      MabPost(
-          uid: communityDocument["MAB"].indexOf(post),
-          title: post["title"],
-          description: post["description"],
-          date: DateTime.parse(post["date"].toDate().toString()),
-          authorUID: post["authorUID"],
-          image: post["image"],
-          fileAttatchments: post["files"],
-          dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
-          type: post["type"],
-          subject: post["subject"]),
-  ]));
+  //! Deprecated
+  // setMabData(
+  //     //! data is not complete in community document
+  //     MabData(uid: 0, posts: [
+  //   for (var post in communityDocument["MAB"])
+  //     MabPost(
+  //         uid: communityDocument["MAB"].indexOf(post),
+  //         title: post["title"],
+  //         description: post["description"],
+  //         date: DateTime.parse(post["date"].toDate().toString()),
+  //         authorUID: post["authorUID"],
+  //         image: post["image"],
+  //         fileAttatchments: post["files"],
+  //         dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
+  //         type: post["type"],
+  //         subject: post["subject"]),
+  // ]));
   return communityDocument;
 }
 
@@ -233,20 +234,21 @@ Future getCommunityData(String communityID) async {
 
   //* Save data to community_data.dart
   setCommunityData(document);
-  setMabData(MabData(uid: 0, posts: [
-    for (var post in document.data()["MAB"])
-      MabPost(
-          uid: 0,
-          title: post["title"],
-          description: post["description"],
-          date: DateTime.parse(post["date"].toDate().toString()),
-          authorUID: 0,
-          image: post["image"] ?? "",
-          fileAttatchments: [for (String file in post["files"]) file],
-          dueDate: DateTime.parse(post["date"].toDate().toString()),
-          type: post["type"],
-          subject: post["subject"]),
-  ]));
+  //! Deprecated
+  // setMabData(MabData(uid: 0, posts: [
+  //   for (var post in document.data()["MAB"])
+  //     MabPost(
+  //         uid: 0,
+  //         title: post["title"],
+  //         description: post["description"],
+  //         date: DateTime.parse(post["date"].toDate().toString()),
+  //         authorUID: 0,
+  //         image: post["image"] ?? "",
+  //         fileAttatchments: [for (String file in post["files"]) file],
+  //         dueDate: DateTime.parse(post["date"].toDate().toString()),
+  //         type: post["type"],
+  //         subject: post["subject"]),
+  // ]));
   //* If the user is in a section, get the section data
   //TODO
   return document;
