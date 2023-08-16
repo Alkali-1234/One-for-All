@@ -257,6 +257,8 @@ class _CalendarState extends State<Calendar> {
 
   get getCalendarDataEvents => calendarDataEvents;
 
+  //! faulty but works
+  //WORKING CODE, DO NOT TOUCH
   void initializeCalendarEvents(AppState appState) async {
     print("Initializing calendar events");
     //* Reset calendar data
@@ -305,7 +307,7 @@ class _CalendarState extends State<Calendar> {
     List<LACPost> lacPosts = [];
 
     //Check if data is already stored in appState
-    if (appState.getMabData!.posts.isNotEmpty) {
+    if (appState.getMabData?.posts.isNotEmpty ?? false) {
       setState(() {
         mabPosts = appState.getMabData!.posts;
         for (MabPost e in mabPosts) {
@@ -318,7 +320,7 @@ class _CalendarState extends State<Calendar> {
       });
     }
 
-    if (appState.getLacData!.posts.isNotEmpty) {
+    if (appState.getLacData?.posts.isNotEmpty ?? false) {
       setState(() {
         lacPosts = appState.getLacData!.posts;
         for (LACPost e in lacPosts) {

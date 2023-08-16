@@ -15,7 +15,8 @@ class UserData {
       required this.username,
       required this.email,
       required this.profilePicture,
-      required this.assignedCommunity});
+      required this.assignedCommunity,
+      required this.assignedSection});
 
   final int uid;
   int exp;
@@ -26,6 +27,7 @@ class UserData {
   String profilePicture;
   List<FlashcardSet> flashCardSets;
   String? assignedCommunity;
+  String? assignedSection;
 
   set setExp(int exp) => this.exp = exp;
   set setStreak(int streak) => this.streak = streak;

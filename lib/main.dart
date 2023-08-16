@@ -132,6 +132,12 @@ class AppState extends ChangeNotifier {
     _currentUserSelectedTheme = theme;
     notifyListeners();
   }
+
+  Map<String, dynamic> communityData = {};
+  void setCommunityData(Map<String, dynamic> data) {
+    communityData = data;
+    notifyListeners();
+  }
 }
 
 //Home Page

@@ -3,6 +3,7 @@ import 'package:oneforall/main.dart';
 import 'package:provider/provider.dart';
 
 //Screens
+import 'community_screen.dart';
 import 'mab_lac_screen.dart';
 import 'calendar_screen.dart';
 import 'flashcards_screen.dart';
@@ -174,21 +175,23 @@ class _NavigationScreenState extends State<NavigationScreen> {
                           NavigationItem(
                             theme: theme,
                             constraints: constraints,
-                            icon: Icons.forum,
-                            name: "Forums",
+                            icon: Icons.people_rounded,
+                            name: "Community",
                             onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return const UnavailableItemDialog();
-                                  });
+                              //navigate to community screen
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CommunityScreen()),
+                              );
                             },
                           ),
                           NavigationItem(
                             theme: theme,
                             constraints: constraints,
-                            icon: Icons.share,
-                            name: "Sharing",
+                            icon: Icons.forum,
+                            name: "Forums",
                             onPressed: () {
                               showDialog(
                                   context: context,

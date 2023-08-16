@@ -66,29 +66,33 @@ Future login(String email, String password, bool saveCredentials,
 
     //* New Method
     appState.setCurrentUser(UserData(
-        uid: int.tryParse(auth.currentUser!.uid) ?? 0,
-        exp: value.data()!["exp"],
-        streak: value.data()!["streak"],
-        posts: value.data()!["posts"],
-        flashCardSets: flashcardSets,
-        username: auth.currentUser!.displayName ?? "Invalid Username!",
-        email: auth.currentUser!.email ?? "Invalid Email!",
-        profilePicture: auth.currentUser!.photoURL ?? "",
-        assignedCommunity: assignedCommunity));
+      uid: int.tryParse(auth.currentUser!.uid) ?? 0,
+      exp: value.data()!["exp"],
+      streak: value.data()!["streak"],
+      posts: value.data()!["posts"],
+      flashCardSets: flashcardSets,
+      username: auth.currentUser!.displayName ?? "Invalid Username!",
+      email: auth.currentUser!.email ?? "Invalid Email!",
+      profilePicture: auth.currentUser!.photoURL ?? "",
+      assignedCommunity: assignedCommunity,
+      assignedSection: value.data()!["assignedSection"],
+    ));
 
     print(appState.getCurrentUser);
 
     //! Deprecated method
     setUserData(UserData(
-        uid: int.tryParse(auth.currentUser!.uid) ?? 0,
-        exp: value.data()["exp"],
-        streak: value.data()["streak"],
-        posts: value.data()["posts"],
-        flashCardSets: flashcardSets,
-        username: auth.currentUser!.displayName ?? "Invalid Username!",
-        email: auth.currentUser!.email ?? "Invalid Email!",
-        profilePicture: auth.currentUser!.photoURL ?? "",
-        assignedCommunity: assignedCommunity));
+      uid: int.tryParse(auth.currentUser!.uid) ?? 0,
+      exp: value.data()["exp"],
+      streak: value.data()["streak"],
+      posts: value.data()["posts"],
+      flashCardSets: flashcardSets,
+      username: auth.currentUser!.displayName ?? "Invalid Username!",
+      email: auth.currentUser!.email ?? "Invalid Email!",
+      profilePicture: auth.currentUser!.photoURL ?? "",
+      assignedCommunity: assignedCommunity,
+      assignedSection: value.data()!["assignedSection"],
+    ));
   }).catchError((error, stackTrace) {
     debugPrint("err on auth service: getDocument");
     throw error;

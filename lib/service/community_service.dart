@@ -116,7 +116,7 @@ Future getDocument(String collection, String document) async {
   //* Get the community document
   CollectionReference communityCollection =
       FirebaseFirestore.instance.collection(collection);
-  var doc;
+  late DocumentSnapshot doc;
   try {
     await communityCollection.doc(document).get().then((value) {
       if (value.data() == null) {

@@ -43,6 +43,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     //is it there because of the loading screen????
     //make sure its empty
     appState.setMabData(MabData(uid: 0, posts: []));
+    appState.setCommunityData({});
     // I SWEAR TO GOD IF THIS WORKS
     // I WILL BE SO HAPPY
     setState(() {
@@ -137,6 +138,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
     });
   }
 
+  final buildNumber = const String.fromEnvironment('buildNumber');
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,6 +161,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
                 style: const TextStyle(color: Colors.white, fontSize: 20),
                 textAlign: TextAlign.center,
               ),
+              Text("Build: $buildNumber",
+                  style: const TextStyle(color: Colors.white, fontSize: 10))
             ],
           ),
         ),
