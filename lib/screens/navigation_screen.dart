@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oneforall/main.dart';
+import 'package:oneforall/screens/forum_screen.dart';
 import 'package:provider/provider.dart';
 
 //Screens
@@ -187,18 +188,22 @@ class _NavigationScreenState extends State<NavigationScreen> {
                               );
                             },
                           ),
-                          NavigationItem(
-                            theme: theme,
-                            constraints: constraints,
-                            icon: Icons.forum,
-                            name: "Forums",
-                            onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return const UnavailableItemDialog();
-                                  });
-                            },
+                          Hero(
+                            tag: "forums",
+                            child: NavigationItem(
+                              theme: theme,
+                              constraints: constraints,
+                              icon: Icons.forum,
+                              name: "Forums",
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ForumScreen()),
+                                );
+                              },
+                            ),
                           ),
                           NavigationItem(
                             theme: theme,

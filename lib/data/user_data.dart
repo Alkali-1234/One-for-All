@@ -76,6 +76,7 @@ class Flashcard {
 }
 
 //! check if this still throws an error
+@Deprecated("No longer used")
 Future reloadFlashcards() async {
   //* Get flashcard sets from shared preferences
   await SharedPreferences.getInstance().then((value) {

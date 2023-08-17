@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+// import 'package:oneforall/data/community_data.dart';
 import 'package:provider/provider.dart';
 import '../service/community_service.dart';
 
@@ -50,12 +51,22 @@ class _CommunityScreenState extends State<CommunityScreen> {
           .doc(appState.getCurrentUser.assignedCommunity)
           .collection("sections")
           .get();
+      //Add section data to community data, and also ids
       appState.communityData.addEntries([
         MapEntry("_sections", sectionData.docs.map((e) => e.data()).toList()),
       ]);
-      for (var element in sectionData.docs) {
-        print(element.data());
-      }
+      //* Add ids
+      appState.communityData.update("_sections", (value) {
+        List<dynamic> temp = value;
+        for (var i = 0; i < temp.length; i++) {
+          temp[i].addEntries([
+            MapEntry("id", sectionData.docs[i].id),
+          ]);
+        }
+
+        return temp;
+      });
+
       setState(() {
         localCommunityData = value.data()!;
       });
@@ -256,18 +267,41 @@ class CommunitySettingsModal extends StatefulWidget {
 class _CommunitySettingsModalState extends State<CommunitySettingsModal> {
   @override
   Widget build(BuildContext context) {
+    var theme = context.watch<AppState>().currentUserSelectedTheme.colorScheme;
+    var textTheme =
+        context.watch<AppState>().currentUserSelectedTheme.textTheme;
     return Dialog(
+      backgroundColor: theme.background,
       child: Container(
+        padding: const EdgeInsets.all(8),
         height: 300,
         width: 300,
         child: Column(
           children: [
-            Text("Community Settings"),
-            TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text("Close"))
+            Text("Community Settings", style: textTheme.displayMedium),
+            //! Hardcoded
+            Text("No permissions to edit this community",
+                style: textTheme.displaySmall),
+            //* Leave community
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.error,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)))),
+                    child:
+                        Text("Leave Community", style: textTheme.displaySmall)),
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Close", style: textTheme.displaySmall)),
+              ],
+            )
           ],
         ),
       ),
@@ -284,20 +318,114 @@ class SelectedSection extends StatefulWidget {
 }
 
 class _SelectedSectionState extends State<SelectedSection> {
+  String passwordQuery = "";
+  String errorMessage = "";
+  bool loading = false;
+
+  Future attemptJoin(AppState appState) async {
+    if (passwordQuery == "") {
+      setState(() {
+        errorMessage = "Please enter a password";
+      });
+    } else {
+      setState(() {
+        loading = true;
+      });
+    }
+    if (passwordQuery != widget.sectionData["password"]) {
+      setState(() {
+        errorMessage = "Incorrect password";
+        loading = false;
+      });
+      return;
+    }
+    await joinSection(appState.getCurrentUser.assignedCommunity!,
+            widget.sectionData["id"])
+        .catchError((e) {
+      setState(() {
+        errorMessage = e.toString();
+        loading = false;
+      });
+      return;
+    });
+    //* Update app state
+    appState.communityData["_sections"][widget.sectionData["id"]]["members"]
+        .add(appState.getCurrentUser.uid);
+    setState(() {
+      loading = false;
+    });
+    //* Show snackbar
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.green,
+        content: Text(
+          "Joined section ${widget.sectionData["name"]}",
+          style: const TextStyle(color: Colors.white),
+        )));
+  }
+
   @override
   Widget build(BuildContext context) {
+    var theme = context.watch<AppState>().currentUserSelectedTheme.colorScheme;
+    var textTheme =
+        context.watch<AppState>().currentUserSelectedTheme.textTheme;
     return Dialog(
+      backgroundColor: theme.background,
       child: Container(
+        padding: const EdgeInsets.all(8),
         height: 300,
         width: 300,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Section Settings"),
-            TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text("Close"))
+            Column(
+              children: [
+                Text("Section ${widget.sectionData["name"]}",
+                    style: textTheme.displayMedium),
+                Text("Members: ${widget.sectionData["members"]?.length ?? 0}",
+                    style: textTheme.displaySmall),
+                //* password
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 40,
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        passwordQuery = value;
+                      });
+                    },
+                    style: textTheme.displaySmall,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.all(0),
+                      hintText: "Password",
+                      errorText: errorMessage.isNotEmpty ? errorMessage : null,
+                      filled: true,
+                      fillColor: theme.primary,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: theme.onBackground),
+                          borderRadius: BorderRadius.circular(10)),
+                      hintStyle: textTheme.displaySmall,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Close", style: textTheme.displaySmall)),
+                TextButton(
+                    onPressed: () => attemptJoin(context.read<AppState>()),
+                    child: loading
+                        ? CircularProgressIndicator(color: theme.onBackground)
+                        : Text("Join", style: textTheme.displaySmall)),
+              ],
+            )
           ],
         ),
       ),

@@ -69,7 +69,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                 color: theme.onPrimary,
                               ),
                             ),
-                            Text(getUserData.username,
+                            Text(appState.getCurrentUser.username,
                                 style: textTheme.displaySmall),
                             Container(
                               width: 30,
@@ -83,7 +83,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(15)),
                                   child: Image.network(
-                                      getUserData.profilePicture,
+                                      appState.getCurrentUser.profilePicture,
                                       fit: BoxFit.cover)),
                             )
                           ],
@@ -143,11 +143,13 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                   ListView.builder(
                                       shrinkWrap: true,
                                       scrollDirection: Axis.vertical,
-                                      itemCount:
-                                          getUserData.flashCardSets.length,
+                                      itemCount: appState
+                                          .getCurrentUser.flashCardSets.length,
                                       itemBuilder: (context, index) {
-                                        return isItemValid(getUserData
-                                                .flashCardSets[index].title)
+                                        return isItemValid(appState
+                                                .getCurrentUser
+                                                .flashCardSets[index]
+                                                .title)
                                             ? Padding(
                                                 padding: const EdgeInsets.only(
                                                     bottom: 8),
@@ -172,10 +174,9 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                                             context: context,
                                                             builder: (context) =>
                                                                 SelectedSetModal(
-                                                                  flashcardSet:
-                                                                      getUserData
-                                                                              .flashCardSets[
-                                                                          index],
+                                                                  flashcardSet: appState
+                                                                      .getCurrentUser
+                                                                      .flashCardSets[index],
                                                                   index: index,
                                                                 ));
                                                       },
@@ -197,7 +198,8 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                                       ),
                                                       child: Center(
                                                           child: Text(
-                                                        getUserData
+                                                        appState
+                                                            .getCurrentUser
                                                             .flashCardSets[
                                                                 index]
                                                             .title,
@@ -236,7 +238,7 @@ class _NewSetModalState extends State<NewSetModal> {
   bool isLoading = false;
   bool success = false;
 
-  Future createSet() async {
+  Future createSet(AppState appState) async {
     //* Spam prevention
     if (isLoading || success) {
       return;
@@ -297,8 +299,12 @@ class _NewSetModalState extends State<NewSetModal> {
       await value.setString("flashcardSets", jsonEncode(flashcardSetsObject));
     });
 
-    //* Reload when done
-    await reloadFlashcards();
+    //* Add the set to the current user
+    appState.addFlashcardSet(FlashcardSet(
+        id: flashcardSets.length,
+        flashcards: [],
+        title: titleQuery,
+        description: ""));
 
     //* Rebuild
     setState(() {});
@@ -394,7 +400,7 @@ class _NewSetModalState extends State<NewSetModal> {
                           ),
                         ),
                         onPressed: () {
-                          createSet();
+                          createSet(context.read<AppState>());
                         },
                         child: isLoading
                             ? const CircularProgressIndicator()

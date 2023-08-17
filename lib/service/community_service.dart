@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 //ignore: unused_import
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -34,21 +35,32 @@ Future addNewMABEvent(String title, String description, int type, int subject,
     await FirebaseFirestore.instance
         .collection("communities")
         .doc(getSavedCommunityData.id)
-        .update({
-      "MAB": FieldValue.arrayUnion([
-        {
-          "title": title,
-          "description": description,
-          "date": Timestamp.now(),
-          "authorUID": getUserAuth.currentUser!.uid,
-          "image": imageURL,
-          "files": fileURLs,
-          "dueDate": dueDate,
-          "type": type,
-          "subject": subject
-        }
-      ])
+        .collection("MAB")
+        .add({
+      "title": title,
+      "description": description,
+      "date": Timestamp.now(),
+      "authorUID": getUserAuth.currentUser!.uid,
+      "image": imageURL ?? "",
+      "files": fileURLs,
+      "dueDate": dueDate,
+      "type": type,
     });
+    //     .update({
+    //   "MAB": FieldValue.arrayUnion([
+    //     {
+    //       "title": title,
+    //       "description": description,
+    //       "date": Timestamp.now(),
+    //       "authorUID": getUserAuth.currentUser!.uid,
+    //       "image": imageURL,
+    //       "files": fileURLs,
+    //       "dueDate": dueDate,
+    //       "type": type,
+    //       "subject": subject
+    //     }
+    //   ])
+    // });
   } catch (e) {
     debugPrint(e.toString());
     rethrow;
@@ -208,6 +220,28 @@ Future joinCommunity(String communityID, String password) async {
   //         subject: post["subject"]),
   // ]));
   return communityDocument;
+}
+
+Future joinSection(String communityID, String sectionID) async {
+  try {
+    await FirebaseFirestore.instance
+        .collection("communities")
+        .doc(communityID)
+        .collection("sections")
+        .doc(sectionID)
+        .update({
+      "members": FieldValue.arrayUnion([FirebaseAuth.instance.currentUser!.uid])
+    });
+    //Add section to user's section
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .update({
+      "sections": FieldValue.arrayUnion([sectionID])
+    });
+  } catch (e) {
+    rethrow;
+  }
 }
 
 Future getCommunityData(String communityID) async {

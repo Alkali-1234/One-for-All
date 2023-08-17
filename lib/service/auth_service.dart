@@ -75,7 +75,8 @@ Future login(String email, String password, bool saveCredentials,
       email: auth.currentUser!.email ?? "Invalid Email!",
       profilePicture: auth.currentUser!.photoURL ?? "",
       assignedCommunity: assignedCommunity,
-      assignedSection: value.data()!["assignedSection"],
+      //! user may have multiple sections
+      assignedSection: value.data()!["sections"][0],
     ));
 
     print(appState.getCurrentUser);
@@ -91,7 +92,7 @@ Future login(String email, String password, bool saveCredentials,
       email: auth.currentUser!.email ?? "Invalid Email!",
       profilePicture: auth.currentUser!.photoURL ?? "",
       assignedCommunity: assignedCommunity,
-      assignedSection: value.data()!["assignedSection"],
+      assignedSection: value.data()!["sections"][0],
     ));
   }).catchError((error, stackTrace) {
     debugPrint("err on auth service: getDocument");
@@ -121,7 +122,8 @@ Future login(String email, String password, bool saveCredentials,
 
       //* Add the flashcard sets to the user data
       for (FlashcardSet set in flashcardSets) {
-        getUserData.flashCardSets.add(set);
+        // getUserData.flashCardSets.add(set);
+        appState.getCurrentUser.flashCardSets.add(set);
       }
     }
   });

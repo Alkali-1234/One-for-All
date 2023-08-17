@@ -7,7 +7,6 @@ import 'package:googleapis_auth/googleapis_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:oneforall/service/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../data/community_data.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;

@@ -4,7 +4,7 @@ import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/community_data.dart';
 import 'package:oneforall/service/community_service.dart';
 import 'package:provider/provider.dart';
-import '../data/user_data.dart';
+// import '../data/user_data.dart';
 import '../main.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -55,7 +55,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   color: theme.onPrimary,
                                 ),
                               ),
-                              Text(getUserData.username,
+                              Text(appState.getCurrentUser.username,
                                   style: textTheme.displaySmall),
                               Container(
                                 width: 30,
@@ -69,7 +69,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(15)),
                                     child: Image.network(
-                                        getUserData.profilePicture,
+                                        appState.getCurrentUser.profilePicture,
                                         fit: BoxFit.cover)),
                               )
                             ],
@@ -306,6 +306,9 @@ class _CalendarState extends State<Calendar> {
     List<MabPost> mabPosts = [];
     List<LACPost> lacPosts = [];
 
+    bool loadMabData = true;
+    bool loadLacData = true;
+
     //Check if data is already stored in appState
     if (appState.getMabData?.posts.isNotEmpty ?? false) {
       setState(() {
@@ -317,6 +320,7 @@ class _CalendarState extends State<Calendar> {
             getCalendarDataEvents["events"][e.dueDate.day].add(e);
           }
         }
+        loadMabData = false;
       });
     }
 
@@ -331,7 +335,7 @@ class _CalendarState extends State<Calendar> {
           }
         }
       });
-      return;
+      loadLacData = false;
     }
 
     print("Getting MAB Data");
@@ -358,47 +362,51 @@ class _CalendarState extends State<Calendar> {
     //LET'S GOO I FIXED IT
     //i'm so happy
     //i'm gonna cry
-    await getValue(
-            "communities", appState.getCurrentUser.assignedCommunity!, "MAB")
-        .then((value) {
-      for (var element in value) {
-        print(element);
-        //Tranform Map to MabPost
-        mabPosts.add(MabPost(
-          authorUID: 0,
-          uid: 0,
-          title: element["title"],
-          description: element["description"],
-          dueDate: DateTime.parse(element["dueDate"].toDate().toString()),
-          date: DateTime.parse(element["date"].toDate().toString()),
-          image: element["image"] ?? "",
-          fileAttatchments: element["fileAttatchments"] ?? [],
-          type: element["type"],
-          subject: element["subject"],
-        ));
-      }
-    });
+    if (loadMabData) {
+      await getValue(
+              "communities", appState.getCurrentUser.assignedCommunity!, "MAB")
+          .then((value) {
+        for (var element in value) {
+          print(element);
+          //Tranform Map to MabPost
+          mabPosts.add(MabPost(
+            authorUID: 0,
+            uid: 0,
+            title: element["title"],
+            description: element["description"],
+            dueDate: DateTime.parse(element["dueDate"].toDate().toString()),
+            date: DateTime.parse(element["date"].toDate().toString()),
+            image: element["image"] ?? "",
+            fileAttatchments: element["fileAttatchments"] ?? [],
+            type: element["type"],
+            subject: element["subject"],
+          ));
+        }
+      });
+    }
 
-    await getValue(
-            "communities", appState.getCurrentUser.assignedCommunity!, "LAC")
-        .then((value) {
-      for (var element in value) {
-        print(element);
-        //Tranform Map to LACPost
-        lacPosts.add(LACPost(
-          authorUID: 0,
-          uid: 0,
-          title: element["title"],
-          description: element["description"],
-          dueDate: DateTime.parse(element["dueDate"].toDate().toString()),
-          date: DateTime.parse(element["date"].toDate().toString()),
-          image: element["image"] ?? "",
-          fileAttatchments: element["fileAttatchments"] ?? [],
-          type: element["type"],
-          subject: element["subject"],
-        ));
-      }
-    });
+    if (loadLacData) {
+      await getValue(
+              "communities", appState.getCurrentUser.assignedCommunity!, "LAC")
+          .then((value) {
+        for (var element in value) {
+          print(element);
+          //Tranform Map to LACPost
+          lacPosts.add(LACPost(
+            authorUID: 0,
+            uid: 0,
+            title: element["title"],
+            description: element["description"],
+            dueDate: DateTime.parse(element["dueDate"].toDate().toString()),
+            date: DateTime.parse(element["date"].toDate().toString()),
+            image: element["image"] ?? "",
+            fileAttatchments: element["fileAttatchments"] ?? [],
+            type: element["type"],
+            subject: element["subject"],
+          ));
+        }
+      });
+    }
 
     //Get data from MAB
     for (MabPost e in mabPosts) {

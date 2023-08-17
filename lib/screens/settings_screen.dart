@@ -212,22 +212,25 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   CircleAvatar(
                                       radius: 30,
                                       backgroundImage: NetworkImage(
-                                        getUserData.profilePicture == ""
+                                        appState.getCurrentUser
+                                                    .profilePicture ==
+                                                ""
                                             ? "https://picsum.photos/200"
-                                            : getUserData.profilePicture,
+                                            : appState
+                                                .getCurrentUser.profilePicture,
                                       )),
                                   const SizedBox(width: 16.0),
                                   Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
-                                        getUserData.username,
+                                        appState.getCurrentUser.username,
                                         style: textTheme.displaySmall!.copyWith(
                                             fontWeight: FontWeight.bold),
                                         textAlign: TextAlign.end,
                                       ),
                                       Text(
-                                        getUserData.email,
+                                        appState.getCurrentUser.email,
                                         style: textTheme.displaySmall,
                                         textAlign: TextAlign.end,
                                       ),

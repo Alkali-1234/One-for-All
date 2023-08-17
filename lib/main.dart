@@ -99,6 +99,11 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addFlashcardSet(FlashcardSet flashcardSet) {
+    _currentUser.flashCardSets.add(flashcardSet);
+    notifyListeners();
+  }
+
   //! Might be useless, as streambuilder is used instead
   //* Community data section
   MabData? _mabData;
@@ -217,7 +222,8 @@ class _HomePageState extends State<HomePage> {
                           size: 30,
                         ),
                       ),
-                      Text(getUserData.username, style: textTheme.displaySmall),
+                      Text(appState.getCurrentUser.username,
+                          style: textTheme.displaySmall),
                       Container(
                         width: 30,
                         height: 30,
@@ -229,7 +235,8 @@ class _HomePageState extends State<HomePage> {
                         child: ClipRRect(
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(15)),
-                            child: Image.network(getUserData.profilePicture,
+                            child: Image.network(
+                                appState.getCurrentUser.profilePicture,
                                 fit: BoxFit.cover)),
                       )
                     ],
@@ -354,7 +361,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    AppState appState = Provider.of(context);
+    // AppState appState = Provider.of(context);
     void setMABSelectedFilter(int filter) {
       setState(() {
         if (filter > MABSelectedFilter) {
@@ -367,6 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
       debugPrint("Selected Filter: $MABSelectedFilter");
     }
 
+    var appState = Provider.of<AppState>(context);
     return Column(
       children: [
         //WIDGET
@@ -590,8 +598,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             //!!! Change this to the actual community ID
                             stream: FirebaseFirestore.instance
                                 .collection("communities")
-                                .doc("P3xcmRih8YYxkOqsuV7u")
-                                .snapshots(),
+                                .doc(appState.getCurrentUser.assignedCommunity)
+                                .collection("MAB")
+                                .snapshots()
+                                .distinct(),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -621,7 +631,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 );
                               }
                               MabData mabData = MabData(uid: 0, posts: [
-                                for (var post in snapshot.data!["MAB"])
+                                for (var post in snapshot.data!.docs)
                                   MabPost(
                                       uid: 0,
                                       title: post["title"],
@@ -634,7 +644,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         for (String file in post["files"]) file
                                       ],
                                       dueDate: DateTime.parse(
-                                          post["date"].toDate().toString()),
+                                          post["dueDate"].toDate().toString()),
                                       type: post["type"],
                                       subject: post["subject"])
                               ]);
@@ -787,7 +797,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: Colors.yellow,
                               size: 36,
                             ),
-                            Text(getUserData.exp.toString(),
+                            Text(appState.getCurrentUser.exp.toString(),
                                 style: textTheme.displayMedium!
                                     .copyWith(fontWeight: FontWeight.bold)),
                           ],
@@ -813,7 +823,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: Colors.orange,
                               size: 36,
                             ),
-                            Text(getUserData.streak.toString(),
+                            Text(appState.getCurrentUser.streak.toString(),
                                 style: textTheme.displayMedium!
                                     .copyWith(fontWeight: FontWeight.bold)),
                           ],
@@ -839,7 +849,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: Color.fromRGBO(201, 201, 201, 1),
                               size: 36,
                             ),
-                            Text(getUserData.posts.toString(),
+                            Text(appState.getCurrentUser.posts.toString(),
                                 style: textTheme.displayMedium!
                                     .copyWith(fontWeight: FontWeight.bold)),
                           ],

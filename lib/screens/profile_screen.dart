@@ -4,8 +4,12 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:oneforall/screens/dev_screen.dart';
 import 'package:oneforall/service/auth_service.dart';
-import '../data/user_data.dart';
+import 'package:provider/provider.dart';
+//Deprecated import
+// import '../data/user_data.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../main.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,20 +20,33 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   //* Previous data
-  String previousProfilePicture = getUserData.profilePicture;
-  String previousUsername = getUserData.username;
-  String previousEmail = getUserData.email;
+  String previousProfilePicture = "";
+  String previousUsername = "";
+  String previousEmail = "";
 
   //* Current
-  var profilePicture = getUserData.profilePicture;
-  String username = getUserData.username;
-  String email = getUserData.email;
+  dynamic profilePicture = "https://picsum.photos/200";
+  String username = "";
+  String email = "";
 
-  ImageProvider pfpImage = NetworkImage(getUserData.profilePicture);
+  ImageProvider pfpImage = const NetworkImage("https://picsum.photos/200");
+
+  initializeUserData(AppState appState) {
+    //* Initialize user data
+    profilePicture = appState.getCurrentUser.profilePicture;
+    username = appState.getCurrentUser.username;
+    email = appState.getCurrentUser.email;
+    pfpImage = NetworkImage(appState.getCurrentUser.profilePicture);
+
+    //* Initialize previous data
+    previousProfilePicture = appState.getCurrentUser.profilePicture;
+    previousUsername = appState.getCurrentUser.username;
+    previousEmail = appState.getCurrentUser.email;
+  }
 
   final _formKey = GlobalKey<FormState>();
 
-  void _saveChanges() async {
+  void _saveChanges(AppState appState) async {
     if (_formKey.currentState!.validate()) {
       debugPrint("e");
       // Save changes to the user profile
@@ -38,7 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         try {
           String newLink = await changeUserProfilePicture(
               profilePicture, previousProfilePicture);
-          getUserData.profilePicture = newLink;
+          appState.getCurrentUser.profilePicture = newLink;
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -54,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         //* Change username
         try {
           await changeUserName(username);
-          getUserData.username = username;
+          appState.getCurrentUser.username = username;
         } on Exception catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -124,9 +141,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    if (profilePicture == "") {
-      profilePicture = NetworkImage("https://picsum.photos/200");
-    }
+    initializeUserData(Provider.of<AppState>(context, listen: false));
   }
 
   @override
@@ -237,7 +252,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () => _saveChanges(),
+                  onPressed: () => _saveChanges(context.read<AppState>()),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.secondary,
                     padding: const EdgeInsets.symmetric(

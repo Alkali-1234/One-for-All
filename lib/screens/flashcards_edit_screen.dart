@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
+import 'package:oneforall/main.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/user_data.dart';
 
@@ -28,7 +30,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
     }
   }
 
-  Future saveFlashcards() async {
+  Future saveFlashcards(AppState appState) async {
     //* Determine wether flashcard is stored on cloud or locally
     //TODO implement
 
@@ -36,16 +38,17 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
     //! Will always use the local storage method for now
     //* Set the flashcard set to the new flashcard set
     setState(() {
-      getUserData.flashCardSets[widget.setIndex].flashcards =
+      appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards =
           List<Flashcard>.empty(growable: true);
       for (var i in getQuestionQuery["queries"]) {
-        getUserData.flashCardSets[widget.setIndex].flashcards.add(Flashcard(
-            id: i["id"], question: i["question"], answer: i["answer"]));
+        appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards.add(
+            Flashcard(
+                id: i["id"], question: i["question"], answer: i["answer"]));
       }
     });
     Object objectifiedFlashcardSets = {
       "sets": [
-        for (var set in getUserData.flashCardSets)
+        for (var set in appState.getCurrentUser.flashCardSets)
           {
             "title": set.title,
             "description": set.description,
@@ -75,13 +78,16 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
   @override
   void initState() {
     super.initState();
-    initializeQueries(getUserData.flashCardSets[widget.setIndex]);
+    var set =
+        context.read<AppState>().getCurrentUser.flashCardSets[widget.setIndex];
+    initializeQueries(set);
   }
 
   @override
   Widget build(BuildContext context) {
     var theme = passedUserTheme.colorScheme;
     var textTheme = passedUserTheme.textTheme;
+    var appState = context.watch<AppState>();
     return Container(
         decoration: passedUserTheme == defaultBlueTheme
             ? const BoxDecoration(
@@ -110,7 +116,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                 color: theme.onPrimary,
                               ),
                             ),
-                            Text(getUserData.username,
+                            Text(appState.getCurrentUser.username,
                                 style: textTheme.displaySmall),
                             Container(
                               width: 30,
@@ -124,7 +130,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(15)),
                                   child: Image.network(
-                                      getUserData.profilePicture,
+                                      appState.getCurrentUser.profilePicture,
                                       fit: BoxFit.cover)),
                             ),
                           ],
@@ -347,7 +353,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                               children: [
                                 ElevatedButton(
                                     onPressed: () {
-                                      saveFlashcards();
+                                      saveFlashcards(context.read<AppState>());
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: theme.secondary,

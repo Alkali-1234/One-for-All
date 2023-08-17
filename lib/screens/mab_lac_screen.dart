@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:oneforall/constants.dart';
-import 'package:oneforall/data/user_data.dart';
+// import 'package:oneforall/data/user_data.dart';
 import 'package:provider/provider.dart';
 import '../data/community_data.dart';
 import '../main.dart';
@@ -94,7 +94,9 @@ class _MABLACScreenState extends State<MABLACScreen> {
                   onPressed: () {
                     showDialog(
                         context: context,
-                        builder: (context) => const NewEventModal());
+                        builder: (context) => NewEventModal(
+                              selectedSection: selectedSection,
+                            ));
                   },
                   backgroundColor: theme.secondary,
                   child: const Icon(Icons.add),
@@ -118,7 +120,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                 color: theme.onPrimary,
                               ),
                             ),
-                            Text(getUserData.username,
+                            Text(appState.getCurrentUser.username,
                                 style: textTheme.displaySmall),
                             Container(
                               width: 30,
@@ -132,7 +134,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(15)),
                                   child: Image.network(
-                                    getUserData.profilePicture,
+                                    appState.getCurrentUser.profilePicture,
                                     fit: BoxFit.cover,
                                   )),
                             )
@@ -568,12 +570,30 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                             child: LayoutBuilder(
                                                 builder: (context, c) {
                                               return StreamBuilder(
-                                                  stream: FirebaseFirestore
-                                                      .instance
-                                                      .collection("communities")
-                                                      .doc(
-                                                          "P3xcmRih8YYxkOqsuV7u")
-                                                      .snapshots(),
+                                                  stream: selectedSection == 0
+                                                      ? FirebaseFirestore
+                                                          .instance
+                                                          .collection(
+                                                              "communities")
+                                                          .doc(appState
+                                                              .getCurrentUser
+                                                              .assignedCommunity)
+                                                          .collection("MAB")
+                                                          .snapshots()
+                                                      : FirebaseFirestore
+                                                          .instance
+                                                          .collection(
+                                                              "communities")
+                                                          .doc(appState
+                                                              .getCurrentUser
+                                                              .assignedCommunity)
+                                                          .collection(
+                                                              "sections")
+                                                          .doc(appState
+                                                              .getCurrentUser
+                                                              .assignedSection)
+                                                          .collection("LAC")
+                                                          .snapshots(),
                                                   builder: (context, snapshot) {
                                                     if (snapshot
                                                             .connectionState ==
@@ -597,9 +617,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                                                     .error),
                                                       ));
                                                     }
-                                                    if (!snapshot.hasData ||
-                                                        snapshot.data?.exists ==
-                                                            false) {
+                                                    if (!snapshot.hasData) {
                                                       return Center(
                                                           child: Text(
                                                         "No data",
@@ -612,10 +630,12 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                                       for (var post
                                                           in (selectedSection ==
                                                                   0
-                                                              ? snapshot
-                                                                  .data!["MAB"]
-                                                              : snapshot.data![
-                                                                  "LAC"]))
+                                                              ? snapshot.data
+                                                                      ?.docs ??
+                                                                  []
+                                                              : snapshot.data
+                                                                      ?.docs ??
+                                                                  []))
                                                         MabPost(
                                                             uid: 0,
                                                             title:
@@ -636,8 +656,8 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                                                       "files"])
                                                                 file
                                                             ],
-                                                            dueDate: DateTime
-                                                                .parse(post["date"]
+                                                            dueDate: DateTime.parse(
+                                                                post["dueDate"]
                                                                     .toDate()
                                                                     .toString()),
                                                             type: post["type"],
@@ -685,7 +705,8 @@ class _MABLACScreenState extends State<MABLACScreen> {
 }
 
 class NewEventModal extends StatefulWidget {
-  const NewEventModal({super.key});
+  const NewEventModal({super.key, required this.selectedSection});
+  final int selectedSection;
 
   @override
   State<NewEventModal> createState() => _NewEventModalState();
@@ -731,8 +752,12 @@ class _NewEventModalState extends State<NewEventModal> {
       });
       //* Add the event to the community document
       try {
-        await addNewMABEvent(
-            title, description, type, subject, dueDate!, attatchements, image);
+        if (widget.selectedSection == 0) {
+          await addNewMABEvent(title, description, type, subject, dueDate!,
+              attatchements, image);
+        } else {
+          //TODO add new LAC event
+        }
       } catch (e) {
         setState(() {
           error = "Error adding event $e";
