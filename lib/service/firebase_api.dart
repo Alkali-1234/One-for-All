@@ -22,7 +22,7 @@ Future backgroundHandler(RemoteMessage message) async {
   //Types: MAB, LAC, Recent Activity, etc.
 }
 
-Future initializeFCM(String assignedCommunity) async {
+Future initializeFCM(String assignedCommunity, String assignedSection) async {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   NotificationSettings settings = await _firebaseMessaging.requestPermission(
@@ -34,11 +34,9 @@ Future initializeFCM(String assignedCommunity) async {
     provisional: false,
     sound: true,
   );
-  if (settings.authorizationStatus == AuthorizationStatus.denied ||
-      settings.authorizationStatus == AuthorizationStatus.notDetermined) {
+  if (settings.authorizationStatus == AuthorizationStatus.denied || settings.authorizationStatus == AuthorizationStatus.notDetermined) {
     print("Notifications not enabled");
-    throw Exception(
-        "Notifications are required! You may disable notifications later in settings.");
+    throw Exception("Notifications are required! You may disable notifications later in settings.");
   }
   final fcmToken = await _firebaseMessaging.getToken();
   print('Initialized FCM with token: $fcmToken');
@@ -69,21 +67,17 @@ Future initializeFCM(String assignedCommunity) async {
   }
   if (prefs.containsKey("setting_notifications_RecentActivity")) {
     if (prefs.getBool("setting_notifications_RecentActivity")!) {
-      await _firebaseMessaging
-          .subscribeToTopic("Recent_Activity_$assignedCommunity");
+      await _firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
     } else {
-      await _firebaseMessaging
-          .unsubscribeFromTopic("Recent_Activity_$assignedCommunity");
+      await _firebaseMessaging.unsubscribeFromTopic("Recent_Activity_$assignedCommunity");
     }
   } else {
-    await _firebaseMessaging
-        .subscribeToTopic("Recent_Activity_$assignedCommunity");
+    await _firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
   }
 
   await _firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
-  await _firebaseMessaging.subscribeToTopic("LAC_$assignedCommunity");
-  await _firebaseMessaging
-      .subscribeToTopic("Recent_Activity_$assignedCommunity");
+  await _firebaseMessaging.subscribeToTopic("LAC_${assignedCommunity}_$assignedSection");
+  await _firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
 
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -147,8 +141,7 @@ void handleNotification(RemoteMessage message) {
 //pray to god this works
 //you don't know how long it took me to get this
 //update: IT WORKS!!!!
-Future sendNotification(
-    String title, String body, Map<String, dynamic> data, String topic) async {
+Future sendNotification(String title, String body, Map<String, dynamic> data, String topic) async {
   print("Sending notification");
   final String accessToken = await getAccessToken(); // FCM server key
   print('Server Key: $accessToken');
@@ -164,8 +157,7 @@ Future sendNotification(
     'topic': topic,
   };
 
-  const String url =
-      'https://fcm.googleapis.com/v1/projects/one-for-all-vcr/messages:send';
+  const String url = 'https://fcm.googleapis.com/v1/projects/one-for-all-vcr/messages:send';
 
   try {
     final http.Response response = await http.post(Uri.parse(url),
@@ -181,8 +173,7 @@ Future sendNotification(
       print('Notification sent successfully!');
       return true;
     } else {
-      print(
-          'Error sending notification ${response.statusCode}, ${response.body}');
+      print('Error sending notification ${response.statusCode}, ${response.body}');
       return false;
     }
   } catch (e) {
@@ -198,12 +189,12 @@ Future<String> getAccessToken() async {
   //Get the service account credentials
   final Directory currentDirectory = Directory.current;
   print(currentDirectory.path);
-  final keyFile = ServiceAccountCredentials.fromJson(json.decode(
-      await getFileContents(
-          'assets/private/one-for-all-vcr-notificationacc.json')));
+  final keyFile = ServiceAccountCredentials.fromJson(json.decode(await getFileContents('assets/private/one-for-all-vcr-notificationacc.json')));
 
   //Set the scope for firebase messaging
-  final scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
+  final scopes = [
+    'https://www.googleapis.com/auth/firebase.messaging'
+  ];
 
   //Get the access token
   final client = await auth.clientViaServiceAccount(keyFile, scopes);

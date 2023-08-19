@@ -132,7 +132,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
-    loadingScreenAnimation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       initializeApp(context.read<AppState>());
     });
@@ -161,8 +160,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                 style: const TextStyle(color: Colors.white, fontSize: 20),
                 textAlign: TextAlign.center,
               ),
-              Text("Build: $buildNumber",
-                  style: const TextStyle(color: Colors.white, fontSize: 10))
+              Text("Build: $buildNumber", style: const TextStyle(color: Colors.white, fontSize: 10))
             ],
           ),
         ),

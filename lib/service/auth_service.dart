@@ -16,12 +16,9 @@ import 'community_service.dart';
 
 get getUserAuth => FirebaseAuth.instance;
 
-Future login(String email, String password, bool saveCredentials,
-    AppState appState) async {
+Future login(String email, String password, bool saveCredentials, AppState appState) async {
   try {
-    await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password)
-        .catchError((error, stacktrace) {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password).catchError((error, stacktrace) {
       throw error;
     });
   } catch (e) {
@@ -36,8 +33,7 @@ Future login(String email, String password, bool saveCredentials,
 
   var auth = FirebaseAuth.instance;
   //Set user data
-  final assignedCommunity =
-      await getValue("users", auth.currentUser!.uid, "assignedCommunity");
+  final assignedCommunity = await getValue("users", auth.currentUser!.uid, "assignedCommunity");
   await getDocument("users", auth.currentUser!.uid).then((value) {
     //set flashcard sets for setUserData
     //* Initialize an empty list of flashcard sets
@@ -49,15 +45,7 @@ Future login(String email, String password, bool saveCredentials,
         flashcardSets.add(FlashcardSet(
             id: i,
             flashcards: [
-              for (var j = 0;
-                  j < value.data()!["flashcardSets"][i]["questions"].length;
-                  j++)
-                Flashcard(
-                    id: j,
-                    question: value.data()!["flashcardSets"][i]["questions"][j]
-                        ["question"],
-                    answer: value.data()!["flashcardSets"][i]["questions"][j]
-                        ["answer"])
+              for (var j = 0; j < value.data()!["flashcardSets"][i]["questions"].length; j++) Flashcard(id: j, question: value.data()!["flashcardSets"][i]["questions"][j]["question"], answer: value.data()!["flashcardSets"][i]["questions"][j]["answer"])
             ],
             title: "${value.data()!["flashcardSets"][i]["title"]} (Cloud)",
             description: value.data()!["flashcardSets"][i]["description"]));
@@ -107,17 +95,9 @@ Future login(String email, String password, bool saveCredentials,
       //* Convert the decoded `dynamic` object back to your desired Dart object structure
       List<FlashcardSet> flashcardSets = [];
       for (var set in decodedObject['sets']) {
-        flashcardSets.add(FlashcardSet(
-            id: decodedObject['sets'].indexOf(set),
-            title: "${set["title"]} (Local)",
-            description: "description_unavailable",
-            flashcards: [
-              for (var flashcard in set['questions'])
-                Flashcard(
-                    id: set['questions'].indexOf(flashcard),
-                    question: flashcard['question'],
-                    answer: flashcard['answer'])
-            ]));
+        flashcardSets.add(FlashcardSet(id: decodedObject['sets'].indexOf(set), title: "${set["title"]} (Local)", description: "description_unavailable", flashcards: [
+          for (var flashcard in set['questions']) Flashcard(id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'])
+        ]));
       }
 
       //* Add the flashcard sets to the user data
@@ -160,33 +140,25 @@ Future login(String email, String password, bool saveCredentials,
   print(appState.getMabData?.posts);
 
   //* initialize FCM
-  await initializeFCM(assignedCommunity);
+  await initializeFCM(assignedCommunity, appState.getCurrentUser.assignedSection![0]);
   //* hasOpenedBefore = true
   prefs.setBool("hasOpenedBefore", true);
   return true;
 }
 
-Future createAccount(
-    String email, String password, String username, AppState appState) async {
+Future createAccount(String email, String password, String username, AppState appState) async {
   try {
-    await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: password)
-        .catchError((error, stacktrace) {
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password).catchError((error, stacktrace) {
       throw error.toString();
     });
   } catch (e) {
     rethrow;
   }
 
-  await FirebaseAuth.instance.currentUser!
-      .updateDisplayName(username)
-      .onError((error, stackTrace) => throw stackTrace);
-  await FirebaseAuth.instance.currentUser!
-      .updatePhotoURL("https://api.dicebear.com/api/initials/$username.svg")
-      .onError((error, stackTrace) => throw stackTrace);
+  await FirebaseAuth.instance.currentUser!.updateDisplayName(username).onError((error, stackTrace) => throw stackTrace);
+  await FirebaseAuth.instance.currentUser!.updatePhotoURL("https://api.dicebear.com/api/initials/$username.svg").onError((error, stackTrace) => throw stackTrace);
   //Create user data
-  await createUserData(FirebaseAuth.instance.currentUser!.uid)
-      .catchError((error, stackTrace) {
+  await createUserData(FirebaseAuth.instance.currentUser!.uid).catchError((error, stackTrace) {
     throw error;
   });
   await login(email, password, false, appState).catchError((error, stackTrace) {
@@ -211,10 +183,9 @@ Future saveFCMToken(String token) async {
     }
   }
   try {
-    await FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .update({"fcmToken": token});
+    await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser!.uid).update({
+      "fcmToken": token
+    });
   } catch (e) {
     rethrow;
   }
@@ -224,9 +195,7 @@ Future saveFCMToken(String token) async {
 
 Future changeUserName(String username) async {
   try {
-    await FirebaseAuth.instance.currentUser!
-        .updateDisplayName(username)
-        .catchError((error, stacktrace) {
+    await FirebaseAuth.instance.currentUser!.updateDisplayName(username).catchError((error, stacktrace) {
       throw error;
     });
   } catch (e) {
@@ -235,21 +204,17 @@ Future changeUserName(String username) async {
   return true;
 }
 
-Future changeUserProfilePicture(
-    File file, String? previousProfilePicture) async {
+Future changeUserProfilePicture(File file, String? previousProfilePicture) async {
   String url = "";
   //* Upload new profile picture to firebase storage
   try {
-    url = await uploadUserPP(
-        file, "profile_picture_${FirebaseAuth.instance.currentUser!.uid}");
+    url = await uploadUserPP(file, "profile_picture_${FirebaseAuth.instance.currentUser!.uid}");
   } catch (e) {
     rethrow;
   }
 
   try {
-    await FirebaseAuth.instance.currentUser!
-        .updatePhotoURL(url)
-        .catchError((error, stacktrace) {
+    await FirebaseAuth.instance.currentUser!.updatePhotoURL(url).catchError((error, stacktrace) {
       throw error;
     });
   } catch (e) {
@@ -264,9 +229,7 @@ Future changeUserProfilePicture(
 
 Future changeUserEmail(String email) async {
   try {
-    await FirebaseAuth.instance.currentUser!
-        .updateEmail(email)
-        .catchError((error, stacktrace) {
+    await FirebaseAuth.instance.currentUser!.updateEmail(email).catchError((error, stacktrace) {
       throw error;
     });
   } catch (e) {
