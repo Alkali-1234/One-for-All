@@ -9,8 +9,7 @@ import 'dart:io';
 import 'files_service.dart';
 import 'firebase_api.dart';
 
-Future addNewMABEvent(String title, String description, int type, int subject,
-    Timestamp dueDate, List<File> attatchements, File? image) async {
+Future addNewMABEvent(String title, String description, int type, int subject, Timestamp dueDate, List<File> attatchements, File? image) async {
   //* Upload the image
   String? imageURL;
   try {
@@ -32,11 +31,7 @@ Future addNewMABEvent(String title, String description, int type, int subject,
   debugPrint(getSavedCommunityData.id);
 
   try {
-    await FirebaseFirestore.instance
-        .collection("communities")
-        .doc(getSavedCommunityData.id)
-        .collection("MAB")
-        .add({
+    await FirebaseFirestore.instance.collection("communities").doc(getSavedCommunityData.id).collection("MAB").add({
       "title": title,
       "description": description,
       "date": Timestamp.now(),
@@ -79,21 +74,20 @@ Future addNewMABEvent(String title, String description, int type, int subject,
     "type": type.toString(),
     "subject": subject.toString(),
   };
-  sendNotification(type == 1 ? "New Announcement" : "New Task", title, data,
-      "MAB_${getSavedCommunityData.id}");
+  sendNotification(type == 1 ? "New Announcement" : "New Task", title, data, "MAB_${getSavedCommunityData.id}");
 }
 
 Future createUserData(String uid) async {
   //* Create user data
-  CollectionReference userCollection =
-      FirebaseFirestore.instance.collection("users");
+  CollectionReference userCollection = FirebaseFirestore.instance.collection("users");
   try {
     await userCollection.doc(uid).set({
       "exp": 0,
       "streak": 0,
       "posts": 0,
       "flashCardSets": [],
-      "assignedCommunity": null
+      "assignedCommunity": null,
+      "sections": null,
     }).catchError((error, stackTrace) {
       throw error;
     });
@@ -104,8 +98,7 @@ Future createUserData(String uid) async {
 
 Future getValue(String collection, String document, String field) async {
   //* Get the collection
-  CollectionReference communityCollection =
-      FirebaseFirestore.instance.collection(collection);
+  CollectionReference communityCollection = FirebaseFirestore.instance.collection(collection);
   var val;
   try {
     await communityCollection.doc(document).get().then((value) {
@@ -126,8 +119,7 @@ Future getValue(String collection, String document, String field) async {
 
 Future getDocument(String collection, String document) async {
   //* Get the community document
-  CollectionReference communityCollection =
-      FirebaseFirestore.instance.collection(collection);
+  CollectionReference communityCollection = FirebaseFirestore.instance.collection(collection);
   late DocumentSnapshot doc;
   try {
     await communityCollection.doc(document).get().then((value) {
@@ -148,8 +140,7 @@ Future getDocument(String collection, String document) async {
 
 Future getCommunity(String communityID) async {
   //* Get the community document
-  CollectionReference communityCollection =
-      FirebaseFirestore.instance.collection("communities");
+  CollectionReference communityCollection = FirebaseFirestore.instance.collection("communities");
   var document;
   try {
     await communityCollection.doc(communityID).get().then((value) {
@@ -197,7 +188,9 @@ Future joinCommunity(String communityID, String password) async {
     throw Exception("User is not authenticated");
   }
   FirebaseFirestore.instance.collection("communities").doc(communityID).update({
-    "members": FieldValue.arrayUnion([getUserAuth.uid])
+    "members": FieldValue.arrayUnion([
+      getUserAuth.uid
+    ])
   });
 
   //* Save data to community_data.dart
@@ -224,20 +217,16 @@ Future joinCommunity(String communityID, String password) async {
 
 Future joinSection(String communityID, String sectionID) async {
   try {
-    await FirebaseFirestore.instance
-        .collection("communities")
-        .doc(communityID)
-        .collection("sections")
-        .doc(sectionID)
-        .update({
-      "members": FieldValue.arrayUnion([FirebaseAuth.instance.currentUser!.uid])
+    await FirebaseFirestore.instance.collection("communities").doc(communityID).collection("sections").doc(sectionID).update({
+      "members": FieldValue.arrayUnion([
+        FirebaseAuth.instance.currentUser!.uid
+      ])
     });
     //Add section to user's section
-    await FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .update({
-      "sections": FieldValue.arrayUnion([sectionID])
+    await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser!.uid).update({
+      "sections": FieldValue.arrayUnion([
+        sectionID
+      ])
     });
   } catch (e) {
     rethrow;
@@ -246,8 +235,7 @@ Future joinSection(String communityID, String sectionID) async {
 
 Future getCommunityData(String communityID) async {
   //* Get the community document
-  CollectionReference communityCollection =
-      FirebaseFirestore.instance.collection("communities");
+  CollectionReference communityCollection = FirebaseFirestore.instance.collection("communities");
   var document;
   try {
     await communityCollection.doc(communityID).get().then((value) {

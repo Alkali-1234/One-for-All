@@ -33,7 +33,7 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
 
   var auth = FirebaseAuth.instance;
   //Set user data
-  final assignedCommunity = await getValue("users", auth.currentUser!.uid, "assignedCommunity");
+  final assignedCommunity = await getValue("users", auth.currentUser!.uid, "assignedCommunity") ?? "";
   await getDocument("users", auth.currentUser!.uid).then((value) {
     //set flashcard sets for setUserData
     //* Initialize an empty list of flashcard sets

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oneforall/main.dart';
 import 'package:oneforall/screens/forum_screen.dart';
+import 'package:oneforall/screens/premium_screen.dart';
 import 'package:provider/provider.dart';
 
 //Screens
@@ -78,9 +79,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                               debugPrint("Flashcards");
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const FlashcardsScreen()),
+                                MaterialPageRoute(builder: (context) => const FlashcardsScreen()),
                               );
                             },
                           ),
@@ -136,9 +135,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                               debugPrint("Calendar");
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CalendarScreen()),
+                                MaterialPageRoute(builder: (context) => const CalendarScreen()),
                               );
                             },
                           ),
@@ -151,8 +148,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                               debugPrint("M.A.B");
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => MABLACScreen()),
+                                MaterialPageRoute(builder: (context) => MABLACScreen()),
                               );
                             },
                           ),
@@ -182,9 +178,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                               //navigate to community screen
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CommunityScreen()),
+                                MaterialPageRoute(builder: (context) => const CommunityScreen()),
                               );
                             },
                           ),
@@ -198,9 +192,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ForumScreen()),
+                                  MaterialPageRoute(builder: (context) => const ForumScreen()),
                                 );
                               },
                             ),
@@ -211,11 +203,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
                             icon: Icons.diamond,
                             name: "Premium",
                             onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return const UnavailableItemDialog();
-                                  });
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const PremiumScreen(
+                                        totalSpent: 0,
+                                      )));
                             },
                           ),
                           Hero(
@@ -230,8 +221,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => SettingsScreen(
-                                              currentTheme: appState
-                                                  .currentUserSelectedTheme,
+                                              currentTheme: appState.currentUserSelectedTheme,
                                             )));
                               },
                             ),
@@ -250,8 +240,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
             child: Center(
               child: Row(
                 children: [
-                  Text("\"Buy premium for free rizz\"\n -Sun Tzu, Art of War",
-                      style: textTheme.displayMedium),
+                  Text("\"Buy premium for free rizz\"\n -Sun Tzu, Art of War", style: textTheme.displayMedium),
                 ],
               ),
             ))
@@ -261,13 +250,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
 }
 
 class NavigationItem extends StatelessWidget {
-  const NavigationItem(
-      {super.key,
-      required this.theme,
-      required this.constraints,
-      required this.icon,
-      required this.name,
-      this.onPressed});
+  const NavigationItem({super.key, required this.theme, required this.constraints, required this.icon, required this.name, this.onPressed});
 
   final ColorScheme theme;
   final BoxConstraints constraints;
@@ -324,14 +307,12 @@ class UnavailableItemDialog extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("This item is not available yet",
-                  style: Theme.of(context).textTheme.displayMedium),
+              Text("This item is not available yet", style: Theme.of(context).textTheme.displayMedium),
               FloatingActionButton.small(
                   onPressed: () => Navigator.pop(context),
                   child: Text(
                     "Ok",
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.onBackground),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
                   )),
             ],
           ),

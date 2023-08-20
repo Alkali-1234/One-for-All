@@ -44,6 +44,7 @@ Future initializeFCM(String assignedCommunity, String assignedSection) async {
     await saveFCMToken(fcmToken);
   }
 
+  if (assignedCommunity == "") return;
   //* Subscribe to the topic
 
   final prefs = await SharedPreferences.getInstance();

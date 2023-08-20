@@ -9,9 +9,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 
 class ThreadScreen extends StatefulWidget {
-  const ThreadScreen({super.key, required this.threadID, required this.subscribed});
+  const ThreadScreen({super.key, required this.threadID, required this.subscribed, required this.target});
   final String threadID;
   final bool subscribed;
+  final String target;
 
   @override
   State<ThreadScreen> createState() => _ThreadScreenState();
@@ -26,18 +27,34 @@ class _ThreadScreenState extends State<ThreadScreen> {
         isLoading = true;
       });
       try {
-        await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").doc(widget.threadID).update(
-          {
-            "replies": FieldValue.arrayUnion([
-              {
-                "message": messageQuery,
-                "author": appState.getCurrentUser.username,
-                "authorpfp": appState.getCurrentUser.profilePicture,
-                "time": Timestamp.now(),
-              }
-            ])
-          },
-        );
+        if (widget.target == "community") {
+          await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").doc(widget.threadID).update(
+            {
+              "replies": FieldValue.arrayUnion([
+                {
+                  "message": messageQuery,
+                  "author": appState.getCurrentUser.username,
+                  "authorpfp": appState.getCurrentUser.profilePicture,
+                  "time": Timestamp.now(),
+                }
+              ])
+            },
+          );
+        }
+        if (widget.target == "local") {
+          await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("forum").doc(widget.threadID).update(
+            {
+              "replies": FieldValue.arrayUnion([
+                {
+                  "message": messageQuery,
+                  "author": appState.getCurrentUser.username,
+                  "authorpfp": appState.getCurrentUser.profilePicture,
+                  "time": Timestamp.now(),
+                }
+              ])
+            },
+          );
+        }
       } on Exception catch (e) {
         isLoading = false;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -74,7 +91,7 @@ class _ThreadScreenState extends State<ThreadScreen> {
             )
           : BoxDecoration(color: tm.background),
       child: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").doc(widget.threadID).snapshots(),
+          stream: widget.target == "community" ? FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").doc(widget.threadID).snapshots() : FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("forum").doc(widget.threadID).snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Scaffold(
@@ -87,7 +104,7 @@ class _ThreadScreenState extends State<ThreadScreen> {
                 ),
               );
             }
-            if (!snapshot.hasData) {
+            if (!snapshot.hasData || snapshot.data!.exists == false) {
               return Scaffold(
                 backgroundColor: Colors.transparent,
                 appBar: AppBar(

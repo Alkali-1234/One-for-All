@@ -29,8 +29,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
     }
 
     //* Get community data from database
-    await getDocument("communities", appState.getCurrentUser.assignedCommunity!)
-        .then((value) async {
+    await getDocument("communities", appState.getCurrentUser.assignedCommunity!).then((value) async {
       value is DocumentSnapshot;
       appState.setCommunityData(value.data()!);
       appState.communityData.addEntries([
@@ -46,11 +45,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       //     ]);
       //   });
       // });
-      QuerySnapshot sectionData = await FirebaseFirestore.instance
-          .collection("communities")
-          .doc(appState.getCurrentUser.assignedCommunity)
-          .collection("sections")
-          .get();
+      QuerySnapshot sectionData = await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").get();
       //Add section data to community data, and also ids
       appState.communityData.addEntries([
         MapEntry("_sections", sectionData.docs.map((e) => e.data()).toList()),
@@ -102,25 +97,18 @@ class _CommunityScreenState extends State<CommunityScreen> {
               Container(
                 height: 200,
                 width: double.infinity,
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image:
-                            NetworkImage(appState.communityData["image"] ?? ""),
-                        fit: BoxFit.cover)),
+                decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(appState.communityData["image"] ?? ""), fit: BoxFit.cover)),
               ),
               //Gradient
               Container(
                 height: 200,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                      theme.background.withOpacity(0),
-                      theme.background.withOpacity(0.5),
-                      theme.background.withOpacity(1),
-                    ])),
+                    gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                  theme.background.withOpacity(0),
+                  theme.background.withOpacity(0.5),
+                  theme.background.withOpacity(1),
+                ])),
               ),
               // Back button and settings button
               Padding(
@@ -140,9 +128,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     //Settings button
                     IconButton(
                         onPressed: () {
-                          showDialog(
-                              context: context,
-                              builder: (_) => const CommunitySettingsModal());
+                          showDialog(context: context, builder: (_) => const CommunitySettingsModal());
                         },
                         icon: Icon(
                           Icons.settings,
@@ -234,13 +220,11 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         showDialog(
                             context: context,
                             builder: (_) => SelectedSection(
-                                  sectionData: appState
-                                      .communityData["_sections"][index],
+                                  sectionData: appState.communityData["_sections"][index],
                                 ));
                       },
                       title: Text(
-                        appState.communityData["_sections"][index]["name"] ??
-                            "",
+                        appState.communityData["_sections"][index]["name"] ?? "",
                         style: textTheme.displaySmall,
                       ),
                       trailing: Text(
@@ -268,8 +252,7 @@ class _CommunitySettingsModalState extends State<CommunitySettingsModal> {
   @override
   Widget build(BuildContext context) {
     var theme = context.watch<AppState>().currentUserSelectedTheme.colorScheme;
-    var textTheme =
-        context.watch<AppState>().currentUserSelectedTheme.textTheme;
+    var textTheme = context.watch<AppState>().currentUserSelectedTheme.textTheme;
     return Dialog(
       backgroundColor: theme.background,
       child: Container(
@@ -280,21 +263,12 @@ class _CommunitySettingsModalState extends State<CommunitySettingsModal> {
           children: [
             Text("Community Settings", style: textTheme.displayMedium),
             //! Hardcoded
-            Text("No permissions to edit this community",
-                style: textTheme.displaySmall),
+            Text("No permissions to edit this community", style: textTheme.displaySmall),
             //* Leave community
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.error,
-                        shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(8)))),
-                    child:
-                        Text("Leave Community", style: textTheme.displaySmall)),
+                ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: theme.error, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8)))), child: Text("Leave Community", style: textTheme.displaySmall)),
                 TextButton(
                     onPressed: () {
                       Navigator.pop(context);
@@ -339,9 +313,7 @@ class _SelectedSectionState extends State<SelectedSection> {
       });
       return;
     }
-    await joinSection(appState.getCurrentUser.assignedCommunity!,
-            widget.sectionData["id"])
-        .catchError((e) {
+    await joinSection(appState.getCurrentUser.assignedCommunity!, widget.sectionData["id"]).catchError((e) {
       setState(() {
         errorMessage = e.toString();
         loading = false;
@@ -349,8 +321,8 @@ class _SelectedSectionState extends State<SelectedSection> {
       return;
     });
     //* Update app state
-    appState.communityData["_sections"][widget.sectionData["id"]]["members"]
-        .add(appState.getCurrentUser.uid);
+    appState.communityData["_sections"][widget.sectionData["id"]]["members"].add(appState.getCurrentUser.uid);
+    appState.getCurrentUser.assignedSection = widget.sectionData["id"];
     setState(() {
       loading = false;
     });
@@ -366,8 +338,8 @@ class _SelectedSectionState extends State<SelectedSection> {
   @override
   Widget build(BuildContext context) {
     var theme = context.watch<AppState>().currentUserSelectedTheme.colorScheme;
-    var textTheme =
-        context.watch<AppState>().currentUserSelectedTheme.textTheme;
+    var textTheme = context.watch<AppState>().currentUserSelectedTheme.textTheme;
+    var appState = context.watch<AppState>();
     return Dialog(
       backgroundColor: theme.background,
       child: Container(
@@ -379,10 +351,8 @@ class _SelectedSectionState extends State<SelectedSection> {
           children: [
             Column(
               children: [
-                Text("Section ${widget.sectionData["name"]}",
-                    style: textTheme.displayMedium),
-                Text("Members: ${widget.sectionData["members"]?.length ?? 0}",
-                    style: textTheme.displaySmall),
+                Text("Section ${widget.sectionData["name"]}", style: textTheme.displayMedium),
+                Text("Members: ${widget.sectionData["members"]?.length ?? 0}", style: textTheme.displaySmall),
                 //* password
                 const SizedBox(height: 10),
                 SizedBox(
@@ -400,11 +370,8 @@ class _SelectedSectionState extends State<SelectedSection> {
                       errorText: errorMessage.isNotEmpty ? errorMessage : null,
                       filled: true,
                       fillColor: theme.primary,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: theme.onBackground),
-                          borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: theme.onBackground), borderRadius: BorderRadius.circular(10)),
                       hintStyle: textTheme.displaySmall,
                     ),
                   ),
@@ -419,11 +386,7 @@ class _SelectedSectionState extends State<SelectedSection> {
                       Navigator.pop(context);
                     },
                     child: Text("Close", style: textTheme.displaySmall)),
-                TextButton(
-                    onPressed: () => attemptJoin(context.read<AppState>()),
-                    child: loading
-                        ? CircularProgressIndicator(color: theme.onBackground)
-                        : Text("Join", style: textTheme.displaySmall)),
+                appState.getCurrentUser.assignedSection != widget.sectionData["id"] ? TextButton(onPressed: () => attemptJoin(context.read<AppState>()), child: loading ? CircularProgressIndicator(color: theme.onBackground) : Text("Join", style: textTheme.displaySmall)) : Text("Joined", style: textTheme.displaySmall),
               ],
             )
           ],
