@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
+import 'package:provider/provider.dart';
 import '../data/user_data.dart';
 import 'dart:math';
 import 'package:animations/animations.dart';
+
+import '../main.dart';
 
 class FlashcardsPlayScreen extends StatefulWidget {
   const FlashcardsPlayScreen({super.key, required this.flashcardsSet});
@@ -39,12 +42,7 @@ class _FlashcardsPlayScreen extends State<FlashcardsPlayScreen> {
 
     return Container(
         //! Appstate for some reason changes the theme to default blue theme when going to this page for some reason, maybe because after the first frame, it defaults to blue?
-        decoration: passedUserTheme == defaultBlueTheme
-            ? const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/images/purpwallpaper 2.png'),
-                    fit: BoxFit.cover))
-            : BoxDecoration(color: passedUserTheme.colorScheme.background),
+        decoration: passedUserTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: passedUserTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -58,8 +56,7 @@ class _FlashcardsPlayScreen extends State<FlashcardsPlayScreen> {
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   GestureDetector(
                                     onTap: () => Navigator.pop(context),
@@ -82,8 +79,7 @@ class _FlashcardsPlayScreen extends State<FlashcardsPlayScreen> {
                     //Body
                     PageTransitionSwitcher(
                       reverse: reversed,
-                      transitionBuilder:
-                          (child, primaryAnimation, secondaryAnimation) {
+                      transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
                         return SharedAxisTransition(
                           fillColor: Colors.transparent,
                           transitionType: SharedAxisTransitionType.horizontal,
@@ -93,17 +89,9 @@ class _FlashcardsPlayScreen extends State<FlashcardsPlayScreen> {
                         );
                       },
                       child: selectedScreen == 0
-                          ? SelectModeScreen(
-                              textTheme: textTheme,
-                              theme: theme,
-                              set: set,
-                              changeScreenFunction: changeScreen)
+                          ? SelectModeScreen(textTheme: textTheme, theme: theme, set: set, changeScreenFunction: changeScreen)
                           : selectedScreen == 1
-                              ? StartScreen(
-                                  textTheme: textTheme,
-                                  theme: theme,
-                                  set: set,
-                                  changeScreenFunction: changeScreen)
+                              ? StartScreen(textTheme: textTheme, theme: theme, set: set, changeScreenFunction: changeScreen)
                               : selectedScreen == 2
                                   ? const Placeholder()
                                   : selectedScreen == 3
@@ -134,16 +122,11 @@ class SelectModeScreen extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 60),
-        Text("Flashcards",
-            style: textTheme.displayLarge!
-                .copyWith(fontStyle: FontStyle.italic, fontSize: 48)),
+        Text("Flashcards", style: textTheme.displayLarge!.copyWith(fontStyle: FontStyle.italic, fontSize: 48)),
         Text("Let's get started.", style: textTheme.displayMedium),
         const SizedBox(height: 60),
         Container(
-          decoration: BoxDecoration(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: theme.onPrimary)),
+          decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(10), border: Border.all(color: theme.onPrimary)),
           child: Padding(
             padding: const EdgeInsets.all(48.0),
             child: Text(
@@ -156,23 +139,16 @@ class SelectModeScreen extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 48.0),
           child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100),
-                gradient: primaryGradient),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), gradient: primaryGradient),
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => {changeScreenFunction(1)},
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  foregroundColor: theme.onPrimary,
-                  elevation: 0,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 48, vertical: 16)),
+              onPressed: () => {
+                changeScreenFunction(1)
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, foregroundColor: theme.onPrimary, elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16)),
               child: Text(
                 "Infinity Mode",
-                style: textTheme.displaySmall!.copyWith(
-                    color: theme.onPrimary, fontWeight: FontWeight.bold),
+                style: textTheme.displaySmall!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -188,21 +164,12 @@ class SelectModeScreen extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () => {
-                showDialog(
-                    context: context,
-                    builder: (_) => const UnavailableItemDialog()),
+                showDialog(context: context, builder: (_) => const UnavailableItemDialog()),
               },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  foregroundColor: theme.onPrimary,
-                  elevation: 0,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 48, vertical: 16)),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, foregroundColor: theme.onPrimary, elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16)),
               child: Text(
                 "Normal Mode",
-                style: textTheme.displaySmall!.copyWith(
-                    color: theme.onPrimary, fontWeight: FontWeight.w500),
+                style: textTheme.displaySmall!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.w500),
               ),
             ),
           ),
@@ -231,16 +198,11 @@ class StartScreen extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 60),
-        Text("Infinity Mode",
-            style: textTheme.displayLarge!
-                .copyWith(fontStyle: FontStyle.italic, fontSize: 48)),
+        Text("Infinity Mode", style: textTheme.displayLarge!.copyWith(fontStyle: FontStyle.italic, fontSize: 48)),
         Text("Repeats until you stop it.", style: textTheme.displayMedium),
         const SizedBox(height: 60),
         Container(
-          decoration: BoxDecoration(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: theme.onPrimary)),
+          decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(10), border: Border.all(color: theme.onPrimary)),
           child: Padding(
             padding: const EdgeInsets.all(48.0),
             child: Text(
@@ -253,23 +215,16 @@ class StartScreen extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 48.0),
           child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100),
-                gradient: primaryGradient),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), gradient: primaryGradient),
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => {changeScreenFunction(3)},
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  foregroundColor: theme.onPrimary,
-                  elevation: 0,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 48, vertical: 16)),
+              onPressed: () => {
+                changeScreenFunction(3)
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, foregroundColor: theme.onPrimary, elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16)),
               child: Text(
                 "Start",
-                style: textTheme.displaySmall!.copyWith(
-                    color: theme.onPrimary, fontWeight: FontWeight.bold),
+                style: textTheme.displaySmall!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -287,17 +242,10 @@ class StartScreen extends StatelessWidget {
               onPressed: () => {
                 changeScreenFunction(0),
               },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  foregroundColor: theme.onPrimary,
-                  elevation: 0,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 48, vertical: 16)),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, foregroundColor: theme.onPrimary, elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16)),
               child: Text(
                 "Nevermind",
-                style: textTheme.displaySmall!.copyWith(
-                    color: theme.onPrimary, fontWeight: FontWeight.w500),
+                style: textTheme.displaySmall!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.w500),
               ),
             ),
           ),
@@ -314,16 +262,14 @@ class PlayScreen extends StatefulWidget {
   State<PlayScreen> createState() => _PlayScreenState();
 }
 
-class _PlayScreenState extends State<PlayScreen>
-    with SingleTickerProviderStateMixin {
+class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateMixin {
   late AnimationController _cardAnimationController;
   late Animation<double> _cardAnimation;
   DateTime startingTime = DateTime.now();
-  Flashcard currentCard = Flashcard(
-      id: 0,
-      question: "If this card shows up, something went wrong.",
-      answer: "If this card shows up, something went wrong. (backside)");
-  Object flashcardWeights = {"weights": []};
+  Flashcard currentCard = Flashcard(id: 0, question: "If this card shows up, something went wrong.", answer: "If this card shows up, something went wrong. (backside)");
+  Object flashcardWeights = {
+    "weights": []
+  };
   get getFlashcardWeights => flashcardWeights;
   int questionNumber = 1;
   bool flipped = false;
@@ -345,12 +291,10 @@ class _PlayScreenState extends State<PlayScreen>
     });
     //Change the weight of the current card
     //Look for the card in the weights list
-    int index = getFlashcardWeights["weights"]
-        .indexWhere((element) => element["card"] == currentCard);
+    int index = getFlashcardWeights["weights"].indexWhere((element) => element["card"] == currentCard);
     debugPrint("Index: $index");
     //Change the weight of the card
-    changeWeights(index,
-        getFlashcardWeights["weights"][index]["weight"] + weightDifference);
+    changeWeights(index, getFlashcardWeights["weights"][index]["weight"] + weightDifference);
     //Get the next card
     //Get the total weight
     int totalWeight = 0;
@@ -389,12 +333,10 @@ class _PlayScreenState extends State<PlayScreen>
     for (var i = 0; i < getFlashcardWeights["weights"].length; i++) {
       totalWeight += getFlashcardWeights["weights"][i]["weight"] as int;
     }
-    int score =
-        totalWeight - (500 * getFlashcardWeights["weights"].length as int);
+    int score = totalWeight - (500 * getFlashcardWeights["weights"].length as int);
     //Calculate accuracy
     //Accuracy is starting total weight over current total weight
-    double accuracy =
-        (500 * getFlashcardWeights["weights"].length as int) / totalWeight;
+    double accuracy = (500 * getFlashcardWeights["weights"].length as int) / totalWeight;
     //Calculate time spent
     DateTime currentTime = DateTime.now();
     Duration timeSpent = startingTime.difference(currentTime);
@@ -432,13 +374,9 @@ class _PlayScreenState extends State<PlayScreen>
       vsync: this,
       duration: const Duration(milliseconds: 150),
     );
-    _cardAnimation =
-        Tween<double>(begin: 1, end: 0).animate(_cardAnimationController);
+    _cardAnimation = Tween<double>(begin: 1, end: 0).animate(_cardAnimationController);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (_) => const ThreeTwoOneGoRibbon());
+      showDialog(barrierDismissible: false, context: context, builder: (_) => const ThreeTwoOneGoRibbon());
     });
   }
 
@@ -463,8 +401,7 @@ class _PlayScreenState extends State<PlayScreen>
               children: [
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 150),
-                  child: Text("Question $questionNumber",
-                      style: textTheme.displayMedium),
+                  child: Text("Question $questionNumber", style: textTheme.displayMedium),
                 ),
                 const SizedBox(height: 10),
                 AnimatedBuilder(
@@ -488,8 +425,7 @@ class _PlayScreenState extends State<PlayScreen>
                                   await _cardAnimationController.reverse();
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      theme.secondary.withOpacity(0.115),
+                                  backgroundColor: theme.secondary.withOpacity(0.115),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -499,19 +435,15 @@ class _PlayScreenState extends State<PlayScreen>
                                 child: Padding(
                                   padding: const EdgeInsets.all(12.0),
                                   child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       const SizedBox.shrink(),
                                       Text(
-                                        !flipped
-                                            ? currentCard.question
-                                            : currentCard.answer,
+                                        !flipped ? currentCard.question : currentCard.answer,
                                         style: textTheme.displayMedium,
                                         textAlign: TextAlign.center,
                                       ),
-                                      Icon(Icons.rotate_left,
-                                          color: theme.onBackground),
+                                      Icon(Icons.rotate_left, color: theme.onBackground),
                                     ],
                                   ),
                                 )),
@@ -520,8 +452,7 @@ class _PlayScreenState extends State<PlayScreen>
                       );
                     }),
                 const SizedBox(height: 10),
-                Text("How well did you know this?",
-                    style: textTheme.displaySmall),
+                Text("How well did you know this?", style: textTheme.displaySmall),
                 const SizedBox(height: 10),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 150),
@@ -536,17 +467,12 @@ class _PlayScreenState extends State<PlayScreen>
                             Container(
                               height: 40,
                               width: double.infinity,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(100),
-                                  gradient: primaryGradient),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), gradient: primaryGradient),
                               child: ElevatedButton(
                                   onPressed: () {
                                     nextQuestion(-100);
                                   },
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      shadowColor: Colors.transparent,
-                                      foregroundColor: theme.onPrimary),
+                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, foregroundColor: theme.onPrimary),
                                   child: const Text("100% Knew it!")),
                             ),
                             const SizedBox(height: 10),
@@ -557,10 +483,7 @@ class _PlayScreenState extends State<PlayScreen>
                                   onPressed: () {
                                     nextQuestion(25);
                                   },
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: theme.secondary,
-                                      shadowColor: Colors.transparent,
-                                      foregroundColor: theme.onPrimary),
+                                  style: ElevatedButton.styleFrom(backgroundColor: theme.secondary, shadowColor: Colors.transparent, foregroundColor: theme.onPrimary),
                                   child: const Text("50% Some")),
                             ),
                             const SizedBox(height: 10),
@@ -571,10 +494,7 @@ class _PlayScreenState extends State<PlayScreen>
                                   onPressed: () {
                                     nextQuestion(75);
                                   },
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: theme.secondary,
-                                      shadowColor: Colors.transparent,
-                                      foregroundColor: theme.onPrimary),
+                                  style: ElevatedButton.styleFrom(backgroundColor: theme.secondary, shadowColor: Colors.transparent, foregroundColor: theme.onPrimary),
                                   child: const Text("0% None")),
                             ),
                           ],
@@ -607,14 +527,7 @@ class _PlayScreenState extends State<PlayScreen>
 }
 
 class FinishedScreen extends StatefulWidget {
-  const FinishedScreen(
-      {super.key,
-      required this.set,
-      required this.score,
-      required this.accuracy,
-      required this.timeSpent,
-      required this.questionsDone,
-      required this.weights});
+  const FinishedScreen({super.key, required this.set, required this.score, required this.accuracy, required this.timeSpent, required this.questionsDone, required this.weights});
   final FlashcardSet set;
   final int score;
   final double accuracy;
@@ -626,8 +539,7 @@ class FinishedScreen extends StatefulWidget {
   State<FinishedScreen> createState() => _FinishedScreenState();
 }
 
-class _FinishedScreenState extends State<FinishedScreen>
-    with TickerProviderStateMixin {
+class _FinishedScreenState extends State<FinishedScreen> with TickerProviderStateMixin {
 //* Animation variables for fading in animation on loading the screen
   late AnimationController _controller;
   //ignore: unused_field
@@ -653,8 +565,7 @@ class _FinishedScreenState extends State<FinishedScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration:
-          const Duration(milliseconds: 1000), // Adjust the duration as needed
+      duration: const Duration(milliseconds: 1000), // Adjust the duration as needed
     );
 
     _animation = Tween<double>(
@@ -675,15 +586,10 @@ class _FinishedScreenState extends State<FinishedScreen>
   Widget build(BuildContext context) {
     var theme = passedUserTheme.colorScheme;
     var textTheme = passedUserTheme.textTheme;
-
+    var appState = Provider.of<AppState>(context);
     return Container(
         //! Appstate for some reason changes the theme to default blue theme when going to this page for some reason, maybe because after the first frame, it defaults to blue?
-        decoration: passedUserTheme == defaultBlueTheme
-            ? const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/images/purpwallpaper 2.png'),
-                    fit: BoxFit.cover))
-            : BoxDecoration(color: passedUserTheme.colorScheme.background),
+        decoration: passedUserTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: passedUserTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -715,11 +621,7 @@ class _FinishedScreenState extends State<FinishedScreen>
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                          _buildAnimatedWidget(
-                              1,
-                              Text("Finished",
-                                  style: textTheme.displayLarge!
-                                      .copyWith(fontStyle: FontStyle.italic))),
+                          _buildAnimatedWidget(1, Text("Finished", style: textTheme.displayLarge!.copyWith(fontStyle: FontStyle.italic))),
                           const SizedBox(height: 24),
                           //Card
                           _buildAnimatedWidget(
@@ -731,49 +633,36 @@ class _FinishedScreenState extends State<FinishedScreen>
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0, vertical: 16.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             ClipRRect(
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(100)),
+                                              borderRadius: const BorderRadius.all(Radius.circular(100)),
                                               child: Image.network(
-                                                "https://picsum.photos/50",
+                                                appState.getCurrentUser.profilePicture,
                                                 height: 35,
                                                 width: 35,
                                               ),
                                             ),
                                             const SizedBox(width: 10),
-                                            Text("Alkaline",
-                                                style: textTheme.displayMedium!
-                                                    .copyWith(
-                                                        fontWeight:
-                                                            FontWeight.bold)),
+                                            Text(appState.getCurrentUser.username, maxLines: 1, overflow: TextOverflow.ellipsis, style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
                                           ],
                                         ),
                                         const SizedBox(height: 5),
-                                        Text(
-                                            "Finished flashcards with an accuracy of:",
-                                            style: textTheme.displaySmall),
+                                        Text("Finished flashcards with an accuracy of:", style: textTheme.displaySmall),
                                       ],
                                     ),
                                     Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
                                         Text(
                                           "${(widget.accuracy * 100).round()}%",
@@ -800,15 +689,13 @@ class _FinishedScreenState extends State<FinishedScreen>
                                 child: Padding(
                                   padding: const EdgeInsets.all(12.0),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "Score",
                                         style: textTheme.displayMedium,
                                       ),
-                                      Text(widget.score.toString(),
-                                          style: textTheme.displayMedium)
+                                      Text(widget.score.toString(), style: textTheme.displayMedium)
                                     ],
                                   ),
                                 )),
@@ -827,15 +714,13 @@ class _FinishedScreenState extends State<FinishedScreen>
                                 child: Padding(
                                   padding: const EdgeInsets.all(12.0),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "Questions done",
                                         style: textTheme.displayMedium,
                                       ),
-                                      Text(widget.questionsDone.toString(),
-                                          style: textTheme.displayMedium)
+                                      Text(widget.questionsDone.toString(), style: textTheme.displayMedium)
                                     ],
                                   ),
                                 )),
@@ -853,16 +738,13 @@ class _FinishedScreenState extends State<FinishedScreen>
                                 child: Padding(
                                   padding: const EdgeInsets.all(12.0),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "Time spent",
                                         style: textTheme.displayMedium,
                                       ),
-                                      Text(
-                                          "${removeMilliseconds(widget.timeSpent.abs().toString())} H",
-                                          style: textTheme.displayMedium)
+                                      Text("${removeMilliseconds(widget.timeSpent.abs().toString())} H", style: textTheme.displayMedium)
                                     ],
                                   ),
                                 )),
@@ -873,9 +755,7 @@ class _FinishedScreenState extends State<FinishedScreen>
                             6,
                             Row(
                               children: [
-                                Text(
-                                    "Questions - ${widget.set.flashcards.length}",
-                                    style: textTheme.displayMedium),
+                                Text("Questions - ${widget.set.flashcards.length}", style: textTheme.displayMedium),
                               ],
                             ),
                           ),
@@ -887,56 +767,41 @@ class _FinishedScreenState extends State<FinishedScreen>
                               child: ListView.builder(
                                 itemBuilder: (context, index) {
                                   return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 4.0),
+                                    padding: const EdgeInsets.symmetric(vertical: 4.0),
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        showDialog(
-                                            context: context,
-                                            builder: ((context) =>
-                                                QuestionModal(
-                                                    card:
-                                                        widget.set
-                                                            .flashcards[index],
-                                                    weightOfCard:
-                                                        getWeights["weights"]
-                                                                [index]
-                                                            ["weight"])));
+                                        showDialog(context: context, builder: ((context) => QuestionModal(card: widget.set.flashcards[index], weightOfCard: getWeights["weights"][index]["weight"])));
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: theme.secondary,
                                         shadowColor: Colors.transparent,
                                         elevation: 0,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16, vertical: 8),
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                         ),
                                         side: BorderSide(color: theme.tertiary),
                                       ),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Row(
                                             children: [
                                               Text(
-                                                widget.set.flashcards[index]
-                                                    .question,
-                                                style: textTheme.displaySmall!
-                                                    .copyWith(
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                                widget.set.flashcards[index].question,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
                                               ),
                                             ],
                                           ),
                                           Row(
                                             children: [
                                               Text(
-                                                widget.set.flashcards[index]
-                                                    .answer,
+                                                widget.set.flashcards[index].answer,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
                                                 style: textTheme.displaySmall,
                                               ),
                                             ],
@@ -950,7 +815,6 @@ class _FinishedScreenState extends State<FinishedScreen>
                               ),
                             ),
                           ),
-                          const Divider(),
                         ],
                       ),
                     )
@@ -960,11 +824,11 @@ class _FinishedScreenState extends State<FinishedScreen>
 
   //hopefully this thing from chatgpt works
   //TODO make this work, temp solution
+  //already works
   Widget _buildAnimatedWidget(int index, Widget child) {
     const delayInterval = 20; // Adjust the delay between each widget animation
     final startDelay = index * delayInterval;
-    final animationStartDelay =
-        Duration(milliseconds: startDelay) + Duration(milliseconds: 500);
+    final animationStartDelay = Duration(milliseconds: startDelay) + Duration(milliseconds: 500);
 
     // Create a separate AnimationController for each widget
     final widgetController = AnimationController(
@@ -1004,8 +868,7 @@ class _FinishedScreenState extends State<FinishedScreen>
 }
 
 class QuestionModal extends StatelessWidget {
-  const QuestionModal(
-      {super.key, required this.card, required this.weightOfCard});
+  const QuestionModal({super.key, required this.card, required this.weightOfCard});
   final Flashcard card;
   final int weightOfCard;
 
@@ -1116,14 +979,12 @@ class UnavailableItemDialog extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("This item is not available yet",
-                  style: Theme.of(context).textTheme.displayMedium),
+              Text("This item is not available yet", style: Theme.of(context).textTheme.displayMedium),
               FloatingActionButton.small(
                   onPressed: () => Navigator.pop(context),
                   child: Text(
                     "Ok",
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.onBackground),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
                   )),
             ],
           ),
@@ -1188,11 +1049,7 @@ class _ThreeTwoOneGoRibbonState extends State<ThreeTwoOneGoRibbon> {
             child: Text(
               text,
               key: ValueKey(text),
-              style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 48,
-                  fontStyle: FontStyle.italic),
+              style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 48, fontStyle: FontStyle.italic),
             ),
           ),
         ));

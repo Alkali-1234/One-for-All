@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:oneforall/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
@@ -15,8 +16,7 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen>
-    with TickerProviderStateMixin {
+class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStateMixin {
   // final _tabController = TabController(length: 3, vsync: TickerProvider());
   static const List<Tab> _themes = [
     Tab(text: "Great Default Blue"),
@@ -71,19 +71,19 @@ class _SettingsScreenState extends State<SettingsScreen>
   void clearCache() async {
     if (currentLoading != 0) return;
     debugPrint("Clear cache pressed");
-    await SharedPreferences.getInstance().then((prefs) {
-      prefs
-        ..remove("email")
-        ..remove("password")
-        ..remove("hasOpenedBefore")
-        ..remove("theme");
-    });
+    final prefs = await SharedPreferences.getInstance();
+    prefs
+      ..remove("email")
+      ..remove("password")
+      ..remove("theme")
+      ..remove("hasOpenedBefore");
     debugPrint("Cleared cache");
-    const SnackBar(
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       backgroundColor: Colors.black,
       content: Text("Cache cleared!", style: TextStyle(color: Colors.white)),
       duration: Duration(seconds: 1),
-    );
+    ));
   }
 
   void logoutUser() async {
@@ -98,8 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,
-          content: Text("Error logging out! ${error.toString()}",
-              style: const TextStyle(color: Colors.white)),
+          content: Text("Error logging out! ${error.toString()}", style: const TextStyle(color: Colors.white)),
         ),
       );
       setState(() {
@@ -111,6 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     setState(() {
       currentLoading = 0;
     });
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const LoginScreen()));
   }
 
   @override
@@ -132,13 +132,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     var textTheme = Theme.of(context).textTheme;
     var appState = Provider.of<AppState>(context);
     return Container(
-      decoration: appState.currentUserSelectedTheme == defaultBlueTheme
-          ? const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('assets/images/purpwallpaper 2.png'),
-                  fit: BoxFit.cover))
-          : BoxDecoration(
-              color: appState.currentUserSelectedTheme.colorScheme.background),
+      decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
@@ -170,9 +164,9 @@ class _SettingsScreenState extends State<SettingsScreen>
                             alignment: Alignment.topLeft,
                             child: IconButton(
                               onPressed: () {
+                                if (currentLoading != 0) return;
                                 if (Theme.of(context) != passedUserTheme) {
-                                  appState.currentUserSelectedTheme =
-                                      passedUserTheme;
+                                  appState.currentUserSelectedTheme = passedUserTheme;
                                 }
                                 Navigator.pop(context);
                               },
@@ -206,18 +200,12 @@ class _SettingsScreenState extends State<SettingsScreen>
                               padding: const EdgeInsets.all(16.0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   CircleAvatar(
                                       radius: 30,
                                       backgroundImage: NetworkImage(
-                                        appState.getCurrentUser
-                                                    .profilePicture ==
-                                                ""
-                                            ? "https://picsum.photos/200"
-                                            : appState
-                                                .getCurrentUser.profilePicture,
+                                        appState.getCurrentUser.profilePicture == "" ? "https://picsum.photos/200" : appState.getCurrentUser.profilePicture,
                                       )),
                                   const SizedBox(width: 16.0),
                                   Column(
@@ -225,8 +213,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     children: [
                                       Text(
                                         appState.getCurrentUser.username,
-                                        style: textTheme.displaySmall!.copyWith(
-                                            fontWeight: FontWeight.bold),
+                                        style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
                                         textAlign: TextAlign.end,
                                       ),
                                       Text(
@@ -251,11 +238,9 @@ class _SettingsScreenState extends State<SettingsScreen>
                             child: DefaultTabController(
                               length: _themes.length,
                               child: Builder(builder: (context) {
-                                _tabController =
-                                    DefaultTabController.of(context);
+                                _tabController = DefaultTabController.of(context);
                                 _tabController.addListener(() {
-                                  debugPrint(
-                                      "Selected Index: ${_tabController.index}");
+                                  debugPrint("Selected Index: ${_tabController.index}");
                                   if (!_tabController.indexIsChanging) {
                                     setState(() {
                                       selectedTheme = _tabController.index;
@@ -264,20 +249,17 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     switch (_tabController.index) {
                                       case 0:
                                         setState(() {
-                                          appState.currentUserSelectedTheme =
-                                              defaultBlueTheme;
+                                          appState.currentUserSelectedTheme = defaultBlueTheme;
                                         });
                                         break;
                                       case 1:
                                         setState(() {
-                                          appState.currentUserSelectedTheme =
-                                              darkTheme;
+                                          appState.currentUserSelectedTheme = darkTheme;
                                         });
                                         break;
                                       case 2:
                                         setState(() {
-                                          appState.currentUserSelectedTheme =
-                                              lightTheme;
+                                          appState.currentUserSelectedTheme = lightTheme;
                                         });
                                         break;
                                       default:
@@ -289,13 +271,11 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   controller: _tabController,
                                   children: _themes
                                       .map((Tab tab) => Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 5),
+                                            padding: const EdgeInsets.symmetric(horizontal: 5),
                                             child: Container(
                                               decoration: BoxDecoration(
                                                 color: theme.secondary,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                                borderRadius: BorderRadius.circular(10),
                                               ),
                                               child: Center(
                                                   child: Text(
@@ -321,9 +301,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   height: 10,
                                   width: 10,
                                   decoration: BoxDecoration(
-                                    color: selectedTheme == 0
-                                        ? theme.onBackground
-                                        : theme.primaryContainer,
+                                    color: selectedTheme == 0 ? theme.onBackground : theme.primaryContainer,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
@@ -331,9 +309,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   height: 10,
                                   width: 10,
                                   decoration: BoxDecoration(
-                                    color: selectedTheme == 1
-                                        ? theme.onBackground
-                                        : theme.primaryContainer,
+                                    color: selectedTheme == 1 ? theme.onBackground : theme.primaryContainer,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
@@ -341,9 +317,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   height: 10,
                                   width: 10,
                                   decoration: BoxDecoration(
-                                    color: selectedTheme == 2
-                                        ? theme.onBackground
-                                        : theme.primaryContainer,
+                                    color: selectedTheme == 2 ? theme.onBackground : theme.primaryContainer,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
@@ -382,10 +356,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (_) => ConfirmationModal(
-                                        clearCacheFunction: clearCache));
+                                showDialog(context: context, builder: (_) => ConfirmationModal(clearCacheFunction: clearCache));
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: theme.secondary,
@@ -407,6 +378,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                             child: ElevatedButton(
                               onPressed: () {
                                 debugPrint("Logout pressed");
+                                logoutUser();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: theme.error,
@@ -451,11 +423,7 @@ class ConfirmationModal extends StatelessWidget {
             child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: theme.primaryContainer,
-                      border: Border.all(color: theme.tertiary, width: 0.5),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(20))),
+                  decoration: BoxDecoration(color: theme.primaryContainer, border: Border.all(color: theme.tertiary, width: 0.5), borderRadius: const BorderRadius.all(Radius.circular(20))),
                 ))),
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -467,20 +435,14 @@ class ConfirmationModal extends StatelessWidget {
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Text("Are you sure?", style: textTheme.displayMedium),
               const SizedBox(height: 5),
-              Text(
-                  "This will delete saved email/password, theme informatino, and information that you have opened this app before.",
-                  style: textTheme.displaySmall),
+              Text("This will delete saved email/password, theme information, and information that you have opened this app before. (Not all chache)", style: textTheme.displaySmall),
               const SizedBox(height: 5),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextButton(
-                      onPressed: () => clearCacheFunction,
-                      child: Text("Yes", style: textTheme.displaySmall)),
+                  TextButton(onPressed: () => clearCacheFunction(), child: Text("Yes", style: textTheme.displaySmall)),
                   const SizedBox(width: 10),
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text("Cancel", style: textTheme.displaySmall))
+                  TextButton(onPressed: () => Navigator.pop(context), child: Text("Cancel", style: textTheme.displaySmall))
                 ],
               )
             ]),

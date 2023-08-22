@@ -39,10 +39,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: Container(
-          decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('assets/images/logbg.png'),
-                  fit: BoxFit.cover)),
+          decoration: const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/logbg.png'), fit: BoxFit.cover)),
           child: SizedBox(
             width: double.infinity,
             height: double.infinity,
@@ -85,12 +82,10 @@ class SettingsConfigurationScreen extends StatefulWidget {
   const SettingsConfigurationScreen({super.key});
 
   @override
-  State<SettingsConfigurationScreen> createState() =>
-      _SettingsConfigurationScreenState();
+  State<SettingsConfigurationScreen> createState() => _SettingsConfigurationScreenState();
 }
 
-class _SettingsConfigurationScreenState
-    extends State<SettingsConfigurationScreen> {
+class _SettingsConfigurationScreenState extends State<SettingsConfigurationScreen> {
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -102,19 +97,15 @@ class _SettingsConfigurationScreenState
         Column(
           children: [
             Row(children: [
-              Text("3. Configure your settings.",
-                  style: textTheme.displayMedium)
+              Text("3. Configure your settings.", style: textTheme.displayMedium)
             ]),
             const SizedBox(height: 50),
             Container(
                 width: double.infinity,
                 height: 200,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: theme.tertiary, width: 1),
-                    color: theme.primary),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), border: Border.all(color: theme.tertiary, width: 1), color: theme.primary),
                 child: Center(
-                  child: Text("Coming soon!", style: textTheme.displaySmall),
+                  child: Text("Currently unavailable cuz im too lazy to code it in rn :P You can configure settings later in the settings after setup is complete.", style: textTheme.displaySmall),
                 )),
           ],
         ),
@@ -122,26 +113,15 @@ class _SettingsConfigurationScreenState
         Container(
           height: 40,
           width: double.infinity,
-          decoration: BoxDecoration(
-              gradient: primaryGradient,
-              borderRadius: BorderRadius.all(Radius.circular(100))),
+          decoration: BoxDecoration(gradient: primaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
           child: ElevatedButton(
             onPressed: () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
             },
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                elevation: 0,
-                padding: const EdgeInsets.all(0),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100))),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, elevation: 0, padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 80),
-              child: Text("Done",
-                  style: textTheme.displaySmall!
-                      .copyWith(fontWeight: FontWeight.bold)),
+              child: Text("Done", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
             ),
           ),
         )
@@ -236,12 +216,10 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
       return;
     }
     //* Join community
-    joinCommunity(communityIDQuery, passwordQuery)
-        .then((value) => debugPrint("Joined community"))
-        .catchError((error, stackTrace) => setState(() {
-              this.error = error.toString();
-              isLoading = false;
-            }));
+    joinCommunity(communityIDQuery, passwordQuery).then((value) => debugPrint("Joined community")).catchError((error, stackTrace) => setState(() {
+          this.error = error.toString();
+          isLoading = false;
+        }));
 
     if (error != "") {
       return;
@@ -264,9 +242,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
       child: Column(children: [
         Row(
           children: [
-            Text("2. Join a school or a community",
-                style: textTheme.displayMedium!
-                    .copyWith(fontWeight: FontWeight.w400)),
+            Text("2. Join a school or a community", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w400)),
           ],
         ),
         const SizedBox(height: 50),
@@ -285,31 +261,26 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
                   style: textTheme.displaySmall,
                   cursorColor: theme.onBackground,
                   decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.only(left: 10, top: 0, bottom: 0),
+                    contentPadding: const EdgeInsets.only(left: 10, top: 0, bottom: 0),
                     filled: true,
                     fillColor: theme.primary.withOpacity(0.125),
                     hintText: "Community ID",
                     hintStyle: textTheme.displaySmall,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          const BorderSide(color: Colors.transparent, width: 0),
+                      borderSide: const BorderSide(color: Colors.transparent, width: 0),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          BorderSide(color: theme.onBackground, width: 1),
+                      borderSide: BorderSide(color: theme.onBackground, width: 1),
                     ),
                     disabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          const BorderSide(color: Colors.transparent, width: 0),
+                      borderSide: const BorderSide(color: Colors.transparent, width: 0),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          const BorderSide(color: Colors.transparent, width: 0),
+                      borderSide: const BorderSide(color: Colors.transparent, width: 0),
                     ),
                   ),
                 ),
@@ -318,19 +289,12 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
               SizedBox(
                 height: 40,
                 child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                        side: BorderSide(color: theme.tertiary, width: 1),
-                        backgroundColor: theme.secondary,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10))),
+                    style: ElevatedButton.styleFrom(side: BorderSide(color: theme.tertiary, width: 1), backgroundColor: theme.secondary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                     onPressed: () => {
                           getCommunityWithValidation(),
                         },
-                    icon:
-                        Icon(Icons.search, size: 20, color: theme.onBackground),
-                    label: Text("Search",
-                        style: textTheme.displaySmall!
-                            .copyWith(fontWeight: FontWeight.bold))),
+                    icon: Icon(Icons.search, size: 20, color: theme.onBackground),
+                    label: Text("Search", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold))),
               ),
             ],
           );
@@ -338,22 +302,14 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
         const SizedBox(height: 5),
         Row(
           children: [
-            !isSearchingCommunity &&
-                    !isSearchingCommunitySuccess &&
-                    getCommunityError == ""
-                ? Text("Community ID's are currently private",
-                    style:
-                        textTheme.displaySmall!.copyWith(color: Colors.yellow))
+            !isSearchingCommunity && !isSearchingCommunitySuccess && getCommunityError == ""
+                ? Text("Community ID's are currently private", style: textTheme.displaySmall!.copyWith(color: Colors.yellow))
                 : isSearchingCommunity
-                    ? Text("Searching for community...",
-                        style: textTheme.displaySmall)
+                    ? Text("Searching for community...", style: textTheme.displaySmall)
                     : isSearchingCommunitySuccess
-                        ? Text("Community found!",
-                            style: textTheme.displaySmall)
+                        ? Text("Community found!", style: textTheme.displaySmall)
                         : getCommunityError != ""
-                            ? Text(getCommunityError,
-                                style: textTheme.displaySmall!
-                                    .copyWith(color: theme.error))
+                            ? Text(getCommunityError, style: textTheme.displaySmall!.copyWith(color: theme.error))
                             : Container(),
           ],
         ),
@@ -363,9 +319,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
         communityData != null
             ? Container(
                 width: double.infinity,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: theme.tertiary, width: 1)),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), border: Border.all(color: theme.tertiary, width: 1)),
                 child: Stack(
                   children: [
                     //* Left Bottom image
@@ -385,25 +339,19 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                theme.background.withOpacity(0),
-                                theme.background.withOpacity(1),
-                                theme.background.withOpacity(1)
-                              ])),
+                          gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [
+                            theme.background.withOpacity(0),
+                            theme.background.withOpacity(1),
+                            theme.background.withOpacity(1)
+                          ])),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(communityData["name"],
-                                style: textTheme.displaySmall!
-                                    .copyWith(fontWeight: FontWeight.bold)),
-                            Text(communityData["subName"],
-                                style: textTheme.displaySmall),
+                            Text(communityData["name"], style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                            Text(communityData["subName"], style: textTheme.displaySmall),
                           ],
                         ),
                       ),
@@ -429,8 +377,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
               hintStyle: textTheme.displaySmall,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide:
-                    const BorderSide(color: Colors.transparent, width: 0),
+                borderSide: const BorderSide(color: Colors.transparent, width: 0),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -438,13 +385,11 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
               ),
               disabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide:
-                    const BorderSide(color: Colors.transparent, width: 0),
+                borderSide: const BorderSide(color: Colors.transparent, width: 0),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide:
-                    const BorderSide(color: Colors.transparent, width: 0),
+                borderSide: const BorderSide(color: Colors.transparent, width: 0),
               ),
             ),
           ),
@@ -455,9 +400,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
             error != ""
                 ? Padding(
                     padding: const EdgeInsets.only(top: 5),
-                    child: Text(error,
-                        style: textTheme.displaySmall!
-                            .copyWith(color: theme.error)),
+                    child: Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error)),
                   )
                 : Container(),
           ],
@@ -467,20 +410,12 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
         Container(
           height: 40,
           width: double.infinity,
-          decoration: BoxDecoration(
-              gradient: primaryGradient,
-              borderRadius: BorderRadius.all(Radius.circular(100))),
+          decoration: BoxDecoration(gradient: primaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
           child: ElevatedButton(
             onPressed: () => {
               joinCommunityWithValidation(),
             },
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                elevation: 0,
-                padding: const EdgeInsets.all(0),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100))),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, elevation: 0, padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),
             child: isLoading
                 ? SizedBox(
                     height: 20,
@@ -491,9 +426,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
                   )
                 : Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 80),
-                    child: Text("Join",
-                        style: textTheme.displaySmall!
-                            .copyWith(fontWeight: FontWeight.bold)),
+                    child: Text("Join", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
                   ),
           ),
         ),
@@ -503,21 +436,10 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (c) => const UnavalaibleItemDialog());
+              showDialog(context: context, builder: (c) => const UnavalaibleItemDialog());
             },
-            style: ElevatedButton.styleFrom(
-                backgroundColor: theme.secondary,
-                shadowColor: Colors.transparent,
-                elevation: 0,
-                side: BorderSide(color: theme.tertiary, width: 1),
-                padding: const EdgeInsets.all(0),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100))),
-            child: Text("I can do this later",
-                style: textTheme.displaySmall!
-                    .copyWith(fontWeight: FontWeight.normal)),
+            style: ElevatedButton.styleFrom(backgroundColor: theme.secondary, shadowColor: Colors.transparent, elevation: 0, side: BorderSide(color: theme.tertiary, width: 1), padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),
+            child: Text("I can do this later", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.normal)),
           ),
         ),
       ]),
@@ -526,11 +448,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
 }
 
 class AccountCreationScreen extends StatefulWidget {
-  const AccountCreationScreen(
-      {super.key,
-      required this.theme,
-      required this.textTheme,
-      required this.changeStep});
+  const AccountCreationScreen({super.key, required this.theme, required this.textTheme, required this.changeStep});
   final ColorScheme theme;
   final TextTheme textTheme;
   final Function changeStep;
@@ -564,10 +482,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
         isLoading = true;
       });
       //Check if forms are filled
-      if (userNameQuery == "" ||
-          emailQuery == "" ||
-          passwordQuery == "" ||
-          retypePasswordQuery == "") {
+      if (userNameQuery == "" || emailQuery == "" || passwordQuery == "" || retypePasswordQuery == "") {
         debugPrint("e");
         setState(() {
           isLoading = false;
@@ -622,13 +537,10 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
         return;
       }
       //*Create account
-      await createAccount(emailQuery, passwordQuery, userNameQuery,
-              context.read<AppState>())
-          .then((value) => debugPrint("Account created"))
-          .onError((error, stackTrace) => setState(() {
-                isLoading = false;
-                this.error = error.toString();
-              }));
+      await createAccount(emailQuery, passwordQuery, userNameQuery, context.read<AppState>()).then((value) => debugPrint("Account created")).onError((error, stackTrace) => setState(() {
+            isLoading = false;
+            this.error = error.toString();
+          }));
       if (error != "") {
         return;
       }
@@ -647,9 +559,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
         children: [
           Row(
             children: [
-              Text("1. Set up your account",
-                  style: widget.textTheme.displayMedium!
-                      .copyWith(fontWeight: FontWeight.w400)),
+              Text("1. Set up your account", style: widget.textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w400)),
             ],
           ),
           //Account creation form
@@ -695,20 +605,12 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
           Container(
             height: 40,
             width: double.infinity,
-            decoration: BoxDecoration(
-                gradient: primaryGradient,
-                borderRadius: BorderRadius.all(Radius.circular(100))),
+            decoration: BoxDecoration(gradient: primaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
             child: ElevatedButton(
               onPressed: () {
                 createAccountValidation();
               },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  elevation: 0,
-                  padding: const EdgeInsets.all(0),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100))),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, elevation: 0, padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 80),
                 child: isLoading
@@ -722,39 +624,22 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
                       )
                     : success
                         ? Icon(Icons.check, color: theme.onBackground, size: 20)
-                        : Text("Create Account",
-                            style: textTheme.displaySmall!
-                                .copyWith(fontWeight: FontWeight.bold)),
+                        : Text("Create Account", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
               ),
             ),
           ),
           //Error text
           const SizedBox(height: 5),
-          error != ""
-              ? Text(error,
-                  style: textTheme.displaySmall!.copyWith(color: theme.error))
-              : Container(),
+          error != "" ? Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error)) : Container(),
           const SizedBox(height: 5),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const LoginScreen()));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
               },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.secondary,
-                  shadowColor: Colors.transparent,
-                  elevation: 0,
-                  side: BorderSide(color: theme.tertiary, width: 1),
-                  padding: const EdgeInsets.all(0),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100))),
-              child: Text("I already have an account",
-                  style: textTheme.displaySmall!
-                      .copyWith(fontWeight: FontWeight.normal)),
+              style: ElevatedButton.styleFrom(backgroundColor: theme.secondary, shadowColor: Colors.transparent, elevation: 0, side: BorderSide(color: theme.tertiary, width: 1), padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),
+              child: Text("I already have an account", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.normal)),
             ),
           ),
         ],
@@ -828,9 +713,7 @@ class WelcomeScreen extends StatelessWidget {
         style: textTheme.displayLarge!.copyWith(fontSize: 48),
         textAlign: TextAlign.center,
       ),
-      Text("Let's get you started.",
-          style:
-              textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w400)),
+      Text("Let's get you started.", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w400)),
       const SizedBox(height: 20),
       Container(
           height: 200,
@@ -847,25 +730,15 @@ class WelcomeScreen extends StatelessWidget {
       const SizedBox(height: 50),
       Container(
         height: 40,
-        decoration: BoxDecoration(
-            gradient: primaryGradient,
-            borderRadius: BorderRadius.all(Radius.circular(100))),
+        decoration: BoxDecoration(gradient: primaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
         child: ElevatedButton(
           onPressed: () {
             changeCurrentStep(1 /*account creation*/);
           },
-          style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              elevation: 0,
-              padding: const EdgeInsets.all(0),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100))),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, elevation: 0, padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 80),
-            child: Text("Get Started",
-                style: textTheme.displaySmall!
-                    .copyWith(fontWeight: FontWeight.bold)),
+            child: Text("Get Started", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
           ),
         ),
       ),

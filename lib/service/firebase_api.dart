@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
+import '../env/env.dart' as env;
+
 // import './community_service.dart';
 // import '../data/user_data.dart';
 
@@ -77,7 +79,7 @@ Future initializeFCM(String assignedCommunity, String assignedSection) async {
   }
 
   await _firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
-  await _firebaseMessaging.subscribeToTopic("LAC_${assignedCommunity}_$assignedSection");
+  if (assignedSection != "") await _firebaseMessaging.subscribeToTopic("LAC_${assignedCommunity}_$assignedSection");
   await _firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
 
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
@@ -187,10 +189,24 @@ Future<String> getFileContents(String path) async {
 }
 
 Future<String> getAccessToken() async {
+  //! FIXME privateKey is somehow invalid
   //Get the service account credentials
   final Directory currentDirectory = Directory.current;
   print(currentDirectory.path);
-  final keyFile = ServiceAccountCredentials.fromJson(json.decode(await getFileContents('assets/private/one-for-all-vcr-notificationacc.json')));
+  final String email = env.Env.notificationClientEmail;
+  final String privateKey = env.Env.notificationPrivateKey;
+  final String clientId = env.Env.notificationClientId;
+  //wait 1 second
+  await Future.delayed(const Duration(seconds: 1));
+  print(privateKey);
+  // final keyFile = ServiceAccountCredentials(
+  //   email,
+  //   ClientId(clientId),
+  //   "-----BEGIN PRIVATE KEY-----\nMIIEugIBADANBgkqhkiG9w0BAQEFAASCBKQwggSgAgEAAoIBAQDHu1PHlU8t+F8u\nLiOgsmhleAkJVsvi9JZ+oy+3A5QQJ1oOXydtILqSrb4sfy6f7MA8A5sj813TlwVo\nEXX6kanoJ88LaSbXG7rqgGLFN2loWIuCLg1c6BTfzldwjbysX/gLMpTaiXPJj/xN\nACv6sL6D9tepE5eN1xSpiwrfuoatEJF25F42j+2je9yPiS/O/OTIDc08Gy/D1UnW\nVCY/ChN1T19/sQ4puKI9pfIPOL7JO8O+P28+ps/6APFpQVa5nO/mI9H8Xv9WvA2p\nLJOlHY9TBUfoI0XQ/JeVrOLd+s3MkWnLIDZqs5iMpH+NpStlmzGhkTGtbPblUuXX\nbjn5zZypAgMBAAECgf8fV1kdFjMLJPOEbOojR/6mAoXft2yXm3IeKm80hg/Tn6nX\n66ZQbTZGXcT9QQXWFgwbQq21EMaqGsC1qqIPE41KazPfLw9bLIzOrB6igyK70gKQ\ndzJGbiuVvmBK1yeDNagI+jlaZbV6Nu6FH62c8NHw6j0Fp+wQaR4czU1A8UTqse5l\ngypjBloyX6QEO+DWqhnFz4IiQvhh4vnaBzURW/XbSXk9Rj3/9sp0AIFcOqtd1EC7\n5LqQ0MlKgMAzQs7ak+UdmYUB+DiSOqskeFGekgT7VuiUovDQyLz+xd1jM7vN5vPw\nt3WD6TJRkYAbA+0eT4n7xuQ19mvrRGgDNr9kGskCgYEA/0TkSJn/EI+lDljTWrDI\nWnQsAW+TT0WwWsMfhx2o6TfJ9n3012+yqNqZIWxuvfEIJsO1e1v6pAh7r7nTq0MQ\npl/7pBIxNyZDRSS+/vIv6jwhGa/F3GH4bpXO3owcY9nsmeCGpcTy9SVCPLQd3Ivw\neKhiL77ECc5Z35s0ZzvqV30CgYEAyE26PlLaHCJ2SU4Tblf8W+Sek127dhOBf7xy\n+BYLINVp5wcB/q4PE9eaahwfUngNiF4Kx4lj31C1ZYkeAHUuV0NztASRak13eUiT\naL4F0HMEIc8wqsaghCXFPlqyNiPBo9TJTbJHbcfclVQ2T8mfMzxPXMzNUKpDSv0h\nNLgx2Z0CgYBd6srSq1Xckfz4OlYIl+Ie5X8LSDG6iLlJq2B+JbtvkscLmWvrl3z0\nAvk0AuD7oSKOoJK0wDKHB1f6XzQxXotRqx66TrcswzccyVg8FH7sfxLukG0LmD/+\n778cwg/v7M3QD3t6oeuBpiOokdwquJHQ0qLNTjJyKSmHy2KMWM7vQQKBgEri9HyU\nkULvh3XEoPMiJhFdGgRSiOGOTV4qYHlsFGEEKQHc1twWy0BJ3UtKlFNK2xRexHzx\nWsuE6yy45OSa6uZpK3rkMlGiAMbxYVtJn/bc6XCSe8l9VUnSrTmwwuwG1kCgL1rD\nCn16uXeC8oNGCCUpqSoyz5gW7+27UYzaSJjpAoGAUu3V771ku9FEABhxMPzx5k1U\neaQh/SpnirEbd2Wg3Fq2PfHBaMytY8U7AC+3QIDME6OD3s2TXIC8EUhGATh5RgT4\nfpc7UvbyqeuXhcg40xVNCeweHatqYJNvFgym4ADZ3gwrlENa9RWTvijV6utIbwDv\nYnI7MutQU3Het2xa4XQ=\n-----END PRIVATE KEY-----\n",
+  // );
+
+  //! temp
+  final keyFile = ServiceAccountCredentials.fromJson(File('assets/private/one-for-all-vcr-notificationacc.json').readAsStringSync());
 
   //Set the scope for firebase messaging
   final scopes = [

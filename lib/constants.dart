@@ -9,9 +9,12 @@ get getRareMainTheme => rareMainTheme;
 LinearGradient primaryGradient = const LinearGradient(
   colors: [
     Color.fromRGBO(0, 163, 255, 1),
-    Color.fromRGBO(0, 56, 164, 1),
+    Color.fromRGBO(0, 163, 255, 1),
   ],
-  stops: [0.0, 1.0],
+  stops: [
+    0.0,
+    1.0
+  ],
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
 );
@@ -60,22 +63,70 @@ get getDueDates => dueDates;
 
 const stdCalendarData = {
   "week1": {
-    "dates": [0, 0, 0, 0, 0, 0, 0]
+    "dates": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
   },
   "week2": {
-    "dates": [0, 0, 0, 0, 0, 0, 0]
+    "dates": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
   },
   "week3": {
-    "dates": [0, 0, 0, 0, 0, 0, 0]
+    "dates": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
   },
   "week4": {
-    "dates": [0, 0, 0, 0, 0, 0, 0]
+    "dates": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
   },
   "week5": {
-    "dates": [0, 0, 0, 0, 0, 0, 0]
+    "dates": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
   },
   "week6": {
-    "dates": [0, 0, 0, 0, 0, 0, 0]
+    "dates": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
   }
 };
 
@@ -212,9 +263,12 @@ ThemeData lightTheme = ThemeData(
 const defaultBluePrimaryGradient = LinearGradient(
   colors: [
     Color.fromRGBO(108, 115, 255, 1),
-    Color.fromRGBO(0, 9, 214, 1),
+    Color.fromRGBO(108, 115, 255, 1),
   ],
-  stops: [0.0, 1.0],
+  stops: [
+    0.0,
+    1.0
+  ],
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
 );
@@ -224,9 +278,12 @@ get getDefaultBluePrimaryGradient => defaultBluePrimaryGradient;
 const darkPrimaryGradient = LinearGradient(
   colors: [
     Color.fromRGBO(72, 72, 72, 1),
-    Color.fromRGBO(49, 49, 49, 1),
+    Color.fromRGBO(72, 72, 72, 1),
   ],
-  stops: [0.0, 1.0],
+  stops: [
+    0.0,
+    1.0
+  ],
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
 );
@@ -234,7 +291,7 @@ const darkPrimaryGradient = LinearGradient(
 get getDarkPrimaryGradient => darkPrimaryGradient;
 
 const lightPrimaryGradient = LinearGradient(colors: [
-  Color.fromRGBO(255, 255, 255, 1),
+  Color.fromRGBO(130, 130, 130, 1),
   Color.fromRGBO(130, 130, 130, 1)
 ]);
 

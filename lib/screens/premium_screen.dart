@@ -82,7 +82,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                             ),
                             Text(
                               "0\$",
-                              style: tt.displayLarge,
+                              style: tt.displayMedium,
                             ),
                             const SizedBox(height: 20),
                             //Features

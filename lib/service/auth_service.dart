@@ -62,26 +62,26 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
       username: auth.currentUser!.displayName ?? "Invalid Username!",
       email: auth.currentUser!.email ?? "Invalid Email!",
       profilePicture: auth.currentUser!.photoURL ?? "",
-      assignedCommunity: assignedCommunity,
+      assignedCommunity: (assignedCommunity.isEmpty || assignedCommunity == null) ? "0" : assignedCommunity,
       //! user may have multiple sections
-      assignedSection: value.data()!["sections"][0],
+      assignedSection: value.data()!["sections"].isEmpty ? "0" : value.data()!["sections"][0],
     ));
 
     print(appState.getCurrentUser);
 
-    //! Deprecated method
-    setUserData(UserData(
-      uid: int.tryParse(auth.currentUser!.uid) ?? 0,
-      exp: value.data()["exp"],
-      streak: value.data()["streak"],
-      posts: value.data()["posts"],
-      flashCardSets: flashcardSets,
-      username: auth.currentUser!.displayName ?? "Invalid Username!",
-      email: auth.currentUser!.email ?? "Invalid Email!",
-      profilePicture: auth.currentUser!.photoURL ?? "",
-      assignedCommunity: assignedCommunity,
-      assignedSection: value.data()!["sections"][0],
-    ));
+    // //! Deprecated method
+    // setUserData(UserData(
+    //   uid: int.tryParse(auth.currentUser!.uid) ?? 0,
+    //   exp: value.data()["exp"],
+    //   streak: value.data()["streak"],
+    //   posts: value.data()["posts"],
+    //   flashCardSets: flashcardSets,
+    //   username: auth.currentUser!.displayName ?? "Invalid Username!",
+    //   email: auth.currentUser!.email ?? "Invalid Email!",
+    //   profilePicture: auth.currentUser!.photoURL ?? "",
+    //   assignedCommunity: assignedCommunity,
+    //   assignedSection: value.data()!["sections"][0],
+    // ));
   }).catchError((error, stackTrace) {
     debugPrint("err on auth service: getDocument");
     throw error;
@@ -139,8 +139,10 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
   //if my hypothesis is correct, this should be null
   print(appState.getMabData?.posts);
 
+  final assignedSection = appState.getCurrentUser.assignedSection != "0" ? appState.getCurrentUser.assignedSection![0] : "";
+
   //* initialize FCM
-  await initializeFCM(assignedCommunity, appState.getCurrentUser.assignedSection![0]);
+  await initializeFCM(assignedCommunity, assignedSection);
   //* hasOpenedBefore = true
   prefs.setBool("hasOpenedBefore", true);
   return true;

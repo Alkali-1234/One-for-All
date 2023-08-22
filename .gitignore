@@ -52,3 +52,15 @@ app.*.map.json
 # assets/private
 /assets/private
 
+# keytool files
+/*.jks
+.keystore
+
+# Environment variables
+/.env
+/.env.local
+/.env.*.local
+.env
+
+# Env.g.dart
+/lib/env/env.g.dart

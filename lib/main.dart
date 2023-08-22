@@ -4,7 +4,9 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'firebase_options.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter/material.dart';
@@ -193,14 +195,7 @@ class _HomePageState extends State<HomePage> {
         child: Container(
           height: double.maxFinite,
           width: double.maxFinite,
-          decoration: appState.currentUserSelectedTheme == defaultBlueTheme
-              ? const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/images/purpwallpaper 2.png'),
-                      fit: BoxFit.cover))
-              : BoxDecoration(
-                  color:
-                      appState.currentUserSelectedTheme.colorScheme.background),
+          decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
           child: Column(children: [
             Hero(
               tag: "topAppBar",
@@ -214,16 +209,17 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
-                        onTap: () =>
-                            {_key.currentState?.openDrawer(), debugPrint("e")},
+                        onTap: () => {
+                          _key.currentState?.openDrawer(),
+                          debugPrint("e")
+                        },
                         child: Icon(
                           Icons.menu,
                           color: theme.onPrimary,
                           size: 30,
                         ),
                       ),
-                      Text(appState.getCurrentUser.username,
-                          style: textTheme.displaySmall),
+                      Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
                       Container(
                         width: 30,
                         height: 30,
@@ -232,12 +228,7 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(20),
                           gradient: getPrimaryGradient,
                         ),
-                        child: ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(15)),
-                            child: Image.network(
-                                appState.getCurrentUser.profilePicture,
-                                fit: BoxFit.cover)),
+                        child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
                       )
                     ],
                   ),
@@ -250,9 +241,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(8.0),
                 child: PageTransitionSwitcher(
                   reverse: reverseTransition,
-                  transitionBuilder:
-                      (child, primaryAnimation, secondaryAnimation) =>
-                          SharedAxisTransition(
+                  transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
                     transitionType: SharedAxisTransitionType.horizontal,
                     fillColor: Colors.transparent,
                     animation: primaryAnimation,
@@ -280,27 +269,21 @@ class _HomePageState extends State<HomePage> {
               items: [
                 BottomNavigationBarItem(
                   icon: Icon(
-                    selectedScreen == 0
-                        ? Icons.home_rounded
-                        : Icons.home_outlined,
+                    selectedScreen == 0 ? Icons.home_rounded : Icons.home_outlined,
                     color: theme.onPrimary,
                   ),
                   label: "Home",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(
-                    selectedScreen == 1
-                        ? Icons.grid_view_rounded
-                        : Icons.grid_view_outlined,
+                    selectedScreen == 1 ? Icons.grid_view_rounded : Icons.grid_view_outlined,
                     color: theme.onPrimary,
                   ),
                   label: "Navigation",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(
-                    selectedScreen == 2
-                        ? Icons.person_rounded
-                        : Icons.person_outline,
+                    selectedScreen == 2 ? Icons.person_rounded : Icons.person_outline,
                     color: theme.onPrimary,
                   ),
                   label: "Profile",
@@ -396,8 +379,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       dropdownColor: theme.secondary,
                       iconEnabledColor: Colors.white,
                       iconDisabledColor: Colors.white,
-                      hint:
-                          Text("MAB - Widget", style: textTheme.displayMedium),
+                      hint: Text("MAB - Widget", style: textTheme.displayMedium),
                       items: [
                         DropdownMenuItem(
                           value: 1,
@@ -454,9 +436,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     //Bit spaghetti but it works
                                     //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
                                     borderRadius: BorderRadius.circular(10),
-                                    gradient: MABSelectedFilter == 0
-                                        ? getPrimaryGradient
-                                        : null,
+                                    gradient: MABSelectedFilter == 0 ? getPrimaryGradient : null,
                                     boxShadow: MABSelectedFilter == 0
                                         ? [
                                             const BoxShadow(
@@ -466,9 +446,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             )
                                           ]
                                         : null,
-                                    color: MABSelectedFilter == 0
-                                        ? null
-                                        : theme.secondary),
+                                    color: MABSelectedFilter == 0 ? null : theme.secondary),
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.transparent,
@@ -477,7 +455,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                     ),
-                                    onPressed: () => {setMABSelectedFilter(0)},
+                                    onPressed: () => {
+                                          setMABSelectedFilter(0)
+                                        },
                                     child: FittedBox(
                                       child: Text(
                                         "All",
@@ -500,9 +480,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     //Bit spaghetti but it works
                                     //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
                                     borderRadius: BorderRadius.circular(10),
-                                    gradient: MABSelectedFilter == 1
-                                        ? getPrimaryGradient
-                                        : null,
+                                    gradient: MABSelectedFilter == 1 ? getPrimaryGradient : null,
                                     boxShadow: MABSelectedFilter == 1
                                         ? [
                                             const BoxShadow(
@@ -512,17 +490,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                             )
                                           ]
                                         : null,
-                                    color: MABSelectedFilter == 1
-                                        ? null
-                                        : theme.secondary),
+                                    color: MABSelectedFilter == 1 ? null : theme.secondary),
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.transparent,
                                         foregroundColor: theme.onSecondary,
                                         shadowColor: Colors.transparent,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                         )),
                                     onPressed: () => setMABSelectedFilter(1),
                                     child: FittedBox(
@@ -547,9 +522,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     //Bit spaghetti but it works
                                     //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
                                     borderRadius: BorderRadius.circular(10),
-                                    gradient: MABSelectedFilter == 2
-                                        ? getPrimaryGradient
-                                        : null,
+                                    gradient: MABSelectedFilter == 2 ? getPrimaryGradient : null,
                                     boxShadow: MABSelectedFilter == 2
                                         ? [
                                             const BoxShadow(
@@ -559,17 +532,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                             )
                                           ]
                                         : null,
-                                    color: MABSelectedFilter == 2
-                                        ? null
-                                        : theme.secondary),
+                                    color: MABSelectedFilter == 2 ? null : theme.secondary),
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.transparent,
                                         foregroundColor: theme.onSecondary,
                                         shadowColor: Colors.transparent,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(10),
                                         )),
                                     onPressed: () => setMABSelectedFilter(2),
                                     child: FittedBox(
@@ -596,18 +566,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: StreamBuilder(
                             initialData: null,
                             //!!! Change this to the actual community ID
-                            stream: FirebaseFirestore.instance
-                                .collection("communities")
-                                .doc(appState.getCurrentUser.assignedCommunity)
-                                .collection("MAB")
-                                .snapshots()
-                                .distinct(),
+                            stream: FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("MAB").snapshots().distinct(),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
                                 return Center(
-                                  child: Text("Loading MAB data...",
-                                      style: textTheme.displaySmall!),
+                                  child: Text("Loading MAB data...", style: textTheme.displaySmall!),
                                 );
                               }
 
@@ -615,8 +578,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 return Center(
                                   child: Text(
                                     "Error loading MAB data ${snapshot.error}",
-                                    style: textTheme.displaySmall!
-                                        .copyWith(color: theme.error),
+                                    style: textTheme.displaySmall!.copyWith(color: theme.error),
                                   ),
                                 );
                               }
@@ -625,8 +587,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 return Center(
                                   child: Text(
                                     "No MAB data",
-                                    style: textTheme.displaySmall!
-                                        .copyWith(color: theme.error),
+                                    style: textTheme.displaySmall!.copyWith(color: theme.error),
                                   ),
                                 );
                               }
@@ -636,15 +597,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                       uid: 0,
                                       title: post["title"],
                                       description: post["description"],
-                                      date: DateTime.parse(
-                                          post["date"].toDate().toString()),
+                                      date: DateTime.parse(post["date"].toDate().toString()),
                                       authorUID: 0,
                                       image: post["image"] ?? "",
                                       fileAttatchments: [
                                         for (String file in post["files"]) file
                                       ],
-                                      dueDate: DateTime.parse(
-                                          post["dueDate"].toDate().toString()),
+                                      dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
                                       type: post["type"],
                                       subject: post["subject"])
                               ]);
@@ -654,89 +613,61 @@ class _HomeScreenState extends State<HomeScreen> {
                                   MabPost post = mabData.posts[index];
                                   return AnimatedSwitcher(
                                     duration: const Duration(milliseconds: 100),
-                                    transitionBuilder: (child, animation) =>
-                                        FadeTransition(
+                                    transitionBuilder: (child, animation) => FadeTransition(
                                       opacity: animation,
                                       child: child,
                                     ),
-                                    child: MABSelectedFilter == 0 ||
-                                            post.type == MABSelectedFilter
+                                    child: MABSelectedFilter == 0 || post.type == MABSelectedFilter
                                         ? Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 5.0),
+                                            padding: const EdgeInsets.only(bottom: 5.0),
                                             child: ElevatedButton(
                                               style: ElevatedButton.styleFrom(
-                                                side: BorderSide(
-                                                    color: theme.secondary,
-                                                    width: 1),
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                backgroundColor:
-                                                    theme.secondary,
-                                                foregroundColor:
-                                                    theme.onSecondary,
+                                                side: BorderSide(color: theme.secondary, width: 1),
+                                                padding: const EdgeInsets.all(8),
+                                                backgroundColor: theme.secondary,
+                                                foregroundColor: theme.onSecondary,
                                                 shadowColor: Colors.black,
                                                 elevation: 0,
                                                 shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                                  borderRadius: BorderRadius.circular(10),
                                                 ),
                                               ),
                                               onPressed: () => {
                                                 showDialog(
                                                     context: context,
-                                                    builder: (context) =>
-                                                        MABModal(
+                                                    builder: (context) => MABModal(
                                                           title: post.title,
-                                                          description:
-                                                              post.description,
+                                                          description: post.description,
                                                           image: post.image,
-                                                          attatchements: post
-                                                              .fileAttatchments,
+                                                          attatchements: post.fileAttatchments,
                                                         ))
                                               },
                                               child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   SizedBox(
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.5,
+                                                    width: MediaQuery.of(context).size.width * 0.5,
                                                     height: 30,
                                                     child: FittedBox(
                                                       child: Text(
                                                         post.title,
-                                                        style: textTheme
-                                                            .displaySmall!
-                                                            .copyWith(
-                                                          fontWeight:
-                                                              FontWeight.bold,
+                                                        style: textTheme.displaySmall!.copyWith(
+                                                          fontWeight: FontWeight.bold,
                                                         ),
-                                                        textAlign:
-                                                            TextAlign.left,
+                                                        textAlign: TextAlign.left,
                                                       ),
                                                     ),
                                                   ),
                                                   ClipRRect(
-                                                    borderRadius:
-                                                        const BorderRadius.all(
-                                                            Radius.circular(
-                                                                8.0)),
+                                                    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
                                                     child: Container(
                                                       color: theme.secondary,
                                                       child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(6.0),
+                                                        padding: const EdgeInsets.all(6.0),
                                                         child: Text(
                                                           //days left due, and the day it is due
                                                           "${post.dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(post.dueDate)})",
-                                                          style: textTheme
-                                                              .displaySmall,
+                                                          style: textTheme.displaySmall,
                                                         ),
                                                       ),
                                                     ),
@@ -785,88 +716,80 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               RecentActivityCarousel(theme: theme, textTheme: textTheme),
               Expanded(
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(mainAxisSize: MainAxisSize.min, children: [
-                        //Top
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.star_rounded,
-                              color: Colors.yellow,
-                              size: 36,
-                            ),
-                            Text(appState.getCurrentUser.exp.toString(),
-                                style: textTheme.displayMedium!
-                                    .copyWith(fontWeight: FontWeight.bold)),
-                          ],
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                  Column(mainAxisSize: MainAxisSize.min, children: [
+                    //Top
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.star_rounded,
+                          color: Colors.yellow,
+                          size: 36,
                         ),
+                        Text(appState.getCurrentUser.exp.toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
 
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "EXP",
-                              style: textTheme.displaySmall,
-                              textAlign: TextAlign.end,
-                            ),
-                          ],
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "EXP",
+                          style: textTheme.displaySmall,
+                          textAlign: TextAlign.end,
                         ),
-                      ]),
-                      Column(mainAxisSize: MainAxisSize.min, children: [
-                        //Top
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.local_fire_department_rounded,
-                              color: Colors.orange,
-                              size: 36,
-                            ),
-                            Text(appState.getCurrentUser.streak.toString(),
-                                style: textTheme.displayMedium!
-                                    .copyWith(fontWeight: FontWeight.bold)),
-                          ],
+                      ],
+                    ),
+                  ]),
+                  Column(mainAxisSize: MainAxisSize.min, children: [
+                    //Top
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.local_fire_department_rounded,
+                          color: Colors.orange,
+                          size: 36,
                         ),
+                        Text(appState.getCurrentUser.streak.toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
 
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Streak",
-                              style: textTheme.displaySmall,
-                              textAlign: TextAlign.end,
-                            ),
-                          ],
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Streak",
+                          style: textTheme.displaySmall,
+                          textAlign: TextAlign.end,
                         ),
-                      ]),
-                      Column(mainAxisSize: MainAxisSize.min, children: [
-                        //Top
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.send_rounded,
-                              color: Color.fromRGBO(201, 201, 201, 1),
-                              size: 36,
-                            ),
-                            Text(appState.getCurrentUser.posts.toString(),
-                                style: textTheme.displayMedium!
-                                    .copyWith(fontWeight: FontWeight.bold)),
-                          ],
+                      ],
+                    ),
+                  ]),
+                  Column(mainAxisSize: MainAxisSize.min, children: [
+                    //Top
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.send_rounded,
+                          color: Color.fromRGBO(201, 201, 201, 1),
+                          size: 36,
                         ),
+                        Text(appState.getCurrentUser.posts.toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
 
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Posts",
-                              style: textTheme.displaySmall,
-                              textAlign: TextAlign.end,
-                            ),
-                          ],
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Posts",
+                          style: textTheme.displaySmall,
+                          textAlign: TextAlign.end,
                         ),
-                      ]),
-                    ]),
+                      ],
+                    ),
+                  ]),
+                ]),
               )
             ],
           ),
@@ -1045,13 +968,9 @@ class RecentActivityCard extends StatelessWidget {
                   Container(
                     width: 50,
                     height: 50,
-                    decoration: BoxDecoration(
-                        color: theme.onPrimary,
-                        gradient: getPrimaryGradient,
-                        shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: theme.onPrimary, gradient: getPrimaryGradient, shape: BoxShape.circle),
                     child: ClipRRect(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(25)),
+                        borderRadius: const BorderRadius.all(Radius.circular(25)),
                         child: Image.network(
                           activity.authorProfilePircture,
                           fit: BoxFit.cover,
@@ -1063,14 +982,11 @@ class RecentActivityCard extends StatelessWidget {
                     children: [
                       Text(
                         "${activity.authorName} just posted a new ${getTypes[activity.type]}!",
-                        style: textTheme.displayMedium!.copyWith(
-                            fontWeight: FontWeight.w600, fontSize: 20),
+                        style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w600, fontSize: 20),
                       ),
                       Row(
                         children: [
-                          Text(
-                              "${DateTime.now().difference(activity.date).inMinutes} Minutes ago",
-                              style: textTheme.displaySmall),
+                          Text("${DateTime.now().difference(activity.date).inMinutes} Minutes ago", style: textTheme.displaySmall),
                           Text(" • ", style: textTheme.displaySmall),
                           Text(activity.other, style: textTheme.displaySmall),
                           // Text(" • ", style: textTheme.displaySmall),
@@ -1089,22 +1005,172 @@ class RecentActivityCard extends StatelessWidget {
   }
 }
 
+// //Mab Modal
+// class MABModal extends StatelessWidget {
+//   const MABModal(
+//       {super.key,
+//       required this.title,
+//       required this.description,
+//       this.image,
+//       required this.attatchements});
+//   final String title, description;
+//   final List<String> attatchements;
+//   final String? image;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     var theme = Theme.of(context).colorScheme;
+//     var textTheme = Theme.of(context).textTheme;
+//     return Dialog(
+//       elevation: 2,
+//       backgroundColor: theme.background,
+//       child: Padding(
+//         padding: const EdgeInsets.all(16.0),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             const SizedBox(height: 8),
+//             //Main header
+//             Text(
+//               title,
+//               style: textTheme.displayMedium,
+//               textAlign: TextAlign.center,
+//             ),
+//             const SizedBox(height: 8),
+//             //Sub header
+//             Text(description,
+//                 style: textTheme.displaySmall, textAlign: TextAlign.center),
+//             const SizedBox(height: 8),
+//             //Image
+//             Container(
+//                 width: double.infinity,
+//                 height: 250,
+//                 decoration: BoxDecoration(
+//                     color: theme.primaryContainer,
+//                     borderRadius: const BorderRadius.all(Radius.circular(10)),
+//                     border: Border.all(color: theme.secondary, width: 1)),
+//                 child: Center(
+//                   child: image == null || image == ""
+//                       ? Text(
+//                           "No Image",
+//                           style: textTheme.displaySmall,
+//                         )
+//                       : Image.network(image!),
+//                 )),
+
+//             const SizedBox(height: 16),
+
+//             //Attatchements (row here to align text to the left)
+//             Row(
+//               children: [
+//                 Text(
+//                   "${attatchements.length} Attatchements",
+//                   style: textTheme.displaySmall,
+//                   textAlign: TextAlign.center,
+//                 ),
+//               ],
+//             ),
+//             ListView.builder(
+//                 shrinkWrap: true,
+//                 itemCount: attatchements.length,
+//                 itemBuilder: (context, index) {
+//                   return Padding(
+//                     padding: const EdgeInsets.only(top: 8.0),
+//                     child: ElevatedButton(
+//                       onPressed: () => {},
+//                       style: ElevatedButton.styleFrom(
+//                         side: BorderSide(color: theme.secondary, width: 1),
+//                         padding: const EdgeInsets.all(0),
+//                         backgroundColor: theme.secondary,
+//                         foregroundColor: theme.onSecondary,
+//                         shadowColor: Colors.black,
+//                         elevation: 2,
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(10),
+//                         ),
+//                       ),
+//                       child: Padding(
+//                         padding: const EdgeInsets.all(8.0),
+//                         child: Row(
+//                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                           children: [
+//                             //Replace with actual name
+//                             Text(attatchements[index],
+//                                 style: textTheme.displaySmall),
+//                             Icon(
+//                               Icons.download_sharp,
+//                               color: theme.onSecondary,
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ),
+//                   );
+//                 }),
+//             const SizedBox(height: 16),
+//             //Back button
+//             Container(
+//               height: 40,
+//               width: double.infinity,
+//               decoration: BoxDecoration(
+//                 gradient: getPrimaryGradient,
+//                 borderRadius: BorderRadius.circular(10),
+//               ),
+//               child: ElevatedButton(
+//                 style: ElevatedButton.styleFrom(
+//                   backgroundColor: Colors.transparent,
+//                   shadowColor: Colors.transparent,
+//                   shape: RoundedRectangleBorder(
+//                     borderRadius: BorderRadius.circular(10),
+//                   ),
+//                 ),
+//                 onPressed: () => {Navigator.pop(context)},
+//                 child: Text(
+//                   "Back",
+//                   style: textTheme.displaySmall!.copyWith(
+//                     fontWeight: FontWeight.bold,
+//                   ),
+//                 ),
+//               ),
+//             )
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 //Mab Modal
 class MABModal extends StatelessWidget {
-  const MABModal(
-      {super.key,
-      required this.title,
-      required this.description,
-      this.image,
-      required this.attatchements});
+  const MABModal({super.key, required this.title, required this.description, this.image, required this.attatchements});
   final String title, description;
   final List<String> attatchements;
   final String? image;
+  String extractFilenameFromUrl(String url) {
+    RegExp regExp = RegExp(r'(?<=cache%2F)[^?]+');
+    Match? match = regExp.firstMatch(url);
+
+    if (match != null) {
+      return match.group(0)!;
+    } else {
+      return ""; // Return an empty string or handle the absence of a match as needed.
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+
+    void downloadFile(String downloadURL) async {
+      //* Put download url link to cliboard and show snackbar
+      await Clipboard.setData(ClipboardData(text: downloadURL));
+
+      // //* Open download link in browser
+      //ignore: deprecated_member_use
+      await launch(downloadURL);
+    }
+
     return Dialog(
       elevation: 2,
       backgroundColor: theme.background,
@@ -1122,17 +1188,13 @@ class MABModal extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             //Sub header
-            Text(description,
-                style: textTheme.displaySmall, textAlign: TextAlign.center),
+            Text(description, style: textTheme.displaySmall, textAlign: TextAlign.center),
             const SizedBox(height: 8),
             //Image
             Container(
                 width: double.infinity,
                 height: 250,
-                decoration: BoxDecoration(
-                    color: theme.primaryContainer,
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    border: Border.all(color: theme.secondary, width: 1)),
+                decoration: BoxDecoration(color: theme.primaryContainer, borderRadius: const BorderRadius.all(Radius.circular(10)), border: Border.all(color: theme.secondary, width: 1)),
                 child: Center(
                   child: image == null || image == ""
                       ? Text(
@@ -1161,7 +1223,9 @@ class MABModal extends StatelessWidget {
                   return Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: ElevatedButton(
-                      onPressed: () => {},
+                      onPressed: () => {
+                        downloadFile(attatchements[index]),
+                      },
                       style: ElevatedButton.styleFrom(
                         side: BorderSide(color: theme.secondary, width: 1),
                         padding: const EdgeInsets.all(0),
@@ -1179,8 +1243,7 @@ class MABModal extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             //Replace with actual name
-                            Text(attatchements[index],
-                                style: textTheme.displaySmall),
+                            Text(extractFilenameFromUrl(attatchements[index]), style: textTheme.displaySmall),
                             Icon(
                               Icons.download_sharp,
                               color: theme.onSecondary,
@@ -1208,7 +1271,9 @@ class MABModal extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                onPressed: () => {Navigator.pop(context)},
+                onPressed: () => {
+                  Navigator.pop(context)
+                },
                 child: Text(
                   "Back",
                   style: textTheme.displaySmall!.copyWith(

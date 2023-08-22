@@ -16,7 +16,9 @@ class FlashcardsEditScreen extends StatefulWidget {
 }
 
 class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
-  Object questionQuery = {"queries": []};
+  Object questionQuery = {
+    "queries": []
+  };
 
   get getQuestionQuery => questionQuery;
 
@@ -38,12 +40,9 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
     //! Will always use the local storage method for now
     //* Set the flashcard set to the new flashcard set
     setState(() {
-      appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards =
-          List<Flashcard>.empty(growable: true);
+      appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards = List<Flashcard>.empty(growable: true);
       for (var i in getQuestionQuery["queries"]) {
-        appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards.add(
-            Flashcard(
-                id: i["id"], question: i["question"], answer: i["answer"]));
+        appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards.add(Flashcard(id: i["id"], question: i["question"], answer: i["answer"]));
       }
     });
     Object objectifiedFlashcardSets = {
@@ -54,7 +53,10 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
             "description": set.description,
             "questions": [
               for (var flashcard in set.flashcards)
-                {"question": flashcard.question, "answer": flashcard.answer}
+                {
+                  "question": flashcard.question,
+                  "answer": flashcard.answer
+                }
             ]
           }
       ]
@@ -78,8 +80,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
   @override
   void initState() {
     super.initState();
-    var set =
-        context.read<AppState>().getCurrentUser.flashCardSets[widget.setIndex];
+    var set = context.read<AppState>().getCurrentUser.flashCardSets[widget.setIndex];
     initializeQueries(set);
   }
 
@@ -89,15 +90,10 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
     var textTheme = passedUserTheme.textTheme;
     var appState = context.watch<AppState>();
     return Container(
-        decoration: passedUserTheme == defaultBlueTheme
-            ? const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/images/purpwallpaper 2.png'),
-                    fit: BoxFit.cover))
-            : BoxDecoration(color: passedUserTheme.colorScheme.background),
+        decoration: passedUserTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: passedUserTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
-                resizeToAvoidBottomInset: false,
+                resizeToAvoidBottomInset: true,
                 backgroundColor: Colors.transparent,
                 body: Column(
                   children: [
@@ -116,8 +112,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                 color: theme.onPrimary,
                               ),
                             ),
-                            Text(appState.getCurrentUser.username,
-                                style: textTheme.displaySmall),
+                            Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
                             Container(
                               width: 30,
                               height: 30,
@@ -126,12 +121,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                 borderRadius: BorderRadius.circular(20),
                                 gradient: getPrimaryGradient,
                               ),
-                              child: ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(15)),
-                                  child: Image.network(
-                                      appState.getCurrentUser.profilePicture,
-                                      fit: BoxFit.cover)),
+                              child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
                             ),
                           ],
                         ),
@@ -149,11 +139,8 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("Edit Set",
-                                    style: textTheme.displayMedium),
-                                Text(
-                                    "${getQuestionQuery["queries"].length} Questions",
-                                    style: textTheme.displayMedium)
+                                Text("Edit Set", style: textTheme.displayMedium),
+                                Text("${getQuestionQuery["queries"].length} Questions", style: textTheme.displayMedium)
                               ],
                             ),
                             const SizedBox(height: 10),
@@ -164,10 +151,8 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                   backgroundColor: theme.secondary,
                                   shadowColor: Colors.transparent,
                                   elevation: 0,
-                                  side: BorderSide(
-                                      color: theme.tertiary, width: 1),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10)),
+                                  side: BorderSide(color: theme.tertiary, width: 1),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -191,11 +176,8 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                       child: Container(
                                           decoration: BoxDecoration(
                                             color: Colors.transparent,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            border: Border.all(
-                                                color: theme.tertiary,
-                                                width: 1),
+                                            borderRadius: BorderRadius.circular(10),
+                                            border: Border.all(color: theme.tertiary, width: 1),
                                           ),
                                           child: Padding(
                                             padding: const EdgeInsets.all(8.0),
@@ -203,71 +185,37 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
                                                     Text(
                                                       "Q",
-                                                      style: textTheme
-                                                          .displayMedium,
+                                                      style: textTheme.displayMedium,
                                                     ),
                                                     const SizedBox(width: 10),
                                                     //Text Input for question
                                                     Expanded(
                                                       child: TextFormField(
-                                                        cursorColor:
-                                                            theme.onPrimary,
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        initialValue:
-                                                            getQuestionQuery[
-                                                                        "queries"]
-                                                                    [index]
-                                                                ["question"],
-                                                        decoration:
-                                                            InputDecoration(
-                                                          focusedBorder:
-                                                              OutlineInputBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            borderSide: BorderSide(
-                                                                color: theme
-                                                                    .onBackground,
-                                                                width: 1),
+                                                        cursorColor: theme.onPrimary,
+                                                        textAlign: TextAlign.center,
+                                                        initialValue: getQuestionQuery["queries"][index]["question"],
+                                                        decoration: InputDecoration(
+                                                          focusedBorder: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            borderSide: BorderSide(color: theme.onBackground, width: 1),
                                                           ),
-                                                          border:
-                                                              OutlineInputBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            borderSide:
-                                                                const BorderSide(
-                                                                    width: 0,
-                                                                    style: BorderStyle
-                                                                        .none),
+                                                          border: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            borderSide: const BorderSide(width: 0, style: BorderStyle.none),
                                                           ),
-                                                          contentPadding:
-                                                              const EdgeInsets
-                                                                  .all(0),
-                                                          hintText:
-                                                              "Enter Question",
-                                                          hintStyle: textTheme
-                                                              .displaySmall,
-                                                          fillColor:
-                                                              theme.primary,
+                                                          contentPadding: const EdgeInsets.all(0),
+                                                          hintText: "Enter Question",
+                                                          hintStyle: textTheme.displaySmall,
+                                                          fillColor: theme.primary,
                                                           filled: true,
                                                         ),
-                                                        style: textTheme
-                                                            .displaySmall,
+                                                        style: textTheme.displaySmall,
                                                         onChanged: (value) {
-                                                          getQuestionQuery[
-                                                                      "queries"]
-                                                                  [index][
-                                                              "question"] = value;
+                                                          getQuestionQuery["queries"][index]["question"] = value;
                                                         },
                                                       ),
                                                     ),
@@ -278,63 +226,32 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                                   children: [
                                                     Text(
                                                       "A",
-                                                      style: textTheme
-                                                          .displayMedium,
+                                                      style: textTheme.displayMedium,
                                                     ),
                                                     const SizedBox(width: 10),
                                                     Expanded(
                                                       child: TextFormField(
-                                                        cursorColor:
-                                                            theme.onPrimary,
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        initialValue:
-                                                            getQuestionQuery[
-                                                                    "queries"][
-                                                                index]["answer"],
-                                                        decoration:
-                                                            InputDecoration(
-                                                          border:
-                                                              OutlineInputBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            borderSide:
-                                                                const BorderSide(
-                                                                    width: 0,
-                                                                    style: BorderStyle
-                                                                        .none),
+                                                        cursorColor: theme.onPrimary,
+                                                        textAlign: TextAlign.center,
+                                                        initialValue: getQuestionQuery["queries"][index]["answer"],
+                                                        decoration: InputDecoration(
+                                                          border: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            borderSide: const BorderSide(width: 0, style: BorderStyle.none),
                                                           ),
-                                                          focusedBorder:
-                                                              OutlineInputBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            borderSide: BorderSide(
-                                                                color: theme
-                                                                    .onBackground,
-                                                                width: 1),
+                                                          focusedBorder: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            borderSide: BorderSide(color: theme.onBackground, width: 1),
                                                           ),
-                                                          contentPadding:
-                                                              const EdgeInsets
-                                                                  .all(0),
-                                                          hintText:
-                                                              "Enter Question",
-                                                          hintStyle: textTheme
-                                                              .displaySmall,
-                                                          fillColor:
-                                                              theme.primary,
+                                                          contentPadding: const EdgeInsets.all(0),
+                                                          hintText: "Enter Question",
+                                                          hintStyle: textTheme.displaySmall,
+                                                          fillColor: theme.primary,
                                                           filled: true,
                                                         ),
-                                                        style: textTheme
-                                                            .displaySmall,
+                                                        style: textTheme.displaySmall,
                                                         onChanged: (value) {
-                                                          getQuestionQuery[
-                                                                      "queries"]
-                                                                  [index][
-                                                              "answer"] = value;
+                                                          getQuestionQuery["queries"][index]["answer"] = value;
                                                         },
                                                       ),
                                                     ),
@@ -359,18 +276,13 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                       backgroundColor: theme.secondary,
                                       shadowColor: Colors.transparent,
                                       elevation: 0,
-                                      side: BorderSide(
-                                          color: theme.tertiary, width: 1),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
+                                      side: BorderSide(color: theme.tertiary, width: 1),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.save,
-                                            color: theme.onPrimary),
+                                        Icon(Icons.save, color: theme.onPrimary),
                                         const SizedBox(width: 10),
                                         Text(
                                           "Save",
@@ -386,18 +298,13 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                       backgroundColor: theme.secondary,
                                       shadowColor: Colors.transparent,
                                       elevation: 0,
-                                      side: BorderSide(
-                                          color: theme.tertiary, width: 1),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
+                                      side: BorderSide(color: theme.tertiary, width: 1),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.cancel,
-                                            color: theme.onPrimary),
+                                        Icon(Icons.cancel, color: theme.onPrimary),
                                         const SizedBox(width: 10),
                                         Text(
                                           "Cancel",
