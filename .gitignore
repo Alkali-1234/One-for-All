@@ -64,3 +64,21 @@ app.*.map.json
 
 # Env.g.dart
 /lib/env/env.g.dart
+
+# Keytool files
+/*.jks
+.keystore
+.key
+
+# Env files
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Evnied file (env.g.dart)
+.envied
+env.g.dart
+
