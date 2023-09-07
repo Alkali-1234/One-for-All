@@ -1,8 +1,9 @@
 import 'package:animations/animations.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/community_data.dart';
-import 'package:oneforall/service/community_service.dart';
+// import 'package:oneforall/service/community_service.dart';
 import 'package:provider/provider.dart';
 // import '../data/user_data.dart';
 import '../main.dart';
@@ -24,14 +25,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     var textTheme = Theme.of(context).textTheme;
     var appState = context.watch<AppState>();
     return Container(
-        decoration: appState.currentUserSelectedTheme == defaultBlueTheme
-            ? const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/images/purpwallpaper 2.png'),
-                    fit: BoxFit.cover))
-            : BoxDecoration(
-                color:
-                    appState.currentUserSelectedTheme.colorScheme.background),
+        decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -55,8 +49,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   color: theme.onPrimary,
                                 ),
                               ),
-                              Text(appState.getCurrentUser.username,
-                                  style: textTheme.displaySmall),
+                              Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
                               Container(
                                 width: 30,
                                 height: 30,
@@ -65,12 +58,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   borderRadius: BorderRadius.circular(20),
                                   gradient: getPrimaryGradient,
                                 ),
-                                child: ClipRRect(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(15)),
-                                    child: Image.network(
-                                        appState.getCurrentUser.profilePicture,
-                                        fit: BoxFit.cover)),
+                                child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
                               )
                             ],
                           ),
@@ -94,17 +82,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 children: [
                                   AnimatedSwitcher(
                                     duration: const Duration(milliseconds: 150),
-                                    transitionBuilder: (child, animation) =>
-                                        FadeTransition(
+                                    transitionBuilder: (child, animation) => FadeTransition(
                                       opacity: animation,
                                       child: child,
                                     ),
-                                    child: Text(selectedYear.toString(),
-                                        style: textTheme.displaySmall),
+                                    child: Text(selectedYear.toString(), style: textTheme.displaySmall),
                                   ),
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       GestureDetector(
                                         onTap: () {
@@ -123,8 +108,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                           size: 48,
                                         ),
                                       ),
-                                      Text(getMonthsOfTheYear[selectedMonth],
-                                          style: textTheme.displayLarge),
+                                      Text(getMonthsOfTheYear[selectedMonth], style: textTheme.displayLarge),
                                       GestureDetector(
                                         onTap: () {
                                           setState(() {
@@ -151,12 +135,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               flex: 5,
                               //not working
                               child: PageTransitionSwitcher(
-                                transitionBuilder:
-                                    (child, animation, secondaryAnimation) =>
-                                        SharedAxisTransition(
+                                transitionBuilder: (child, animation, secondaryAnimation) => SharedAxisTransition(
                                   fillColor: Colors.transparent,
-                                  transitionType:
-                                      SharedAxisTransitionType.horizontal,
+                                  transitionType: SharedAxisTransitionType.horizontal,
                                   animation: animation,
                                   secondaryAnimation: secondaryAnimation,
                                   child: child,
@@ -178,8 +159,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 }
 
 class Calendar extends StatefulWidget {
-  const Calendar(
-      {super.key, required this.selectedYear, required this.selectedMonth});
+  const Calendar({super.key, required this.selectedYear, required this.selectedMonth});
   final int selectedYear;
   final int selectedMonth;
 
@@ -198,22 +178,70 @@ class _CalendarState extends State<Calendar> {
 
   Object calendarData = {
     "week1": {
-      "dates": [0, 0, 0, 0, 0, 0, 0]
+      "dates": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "week2": {
-      "dates": [0, 0, 0, 0, 0, 0, 0]
+      "dates": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "week3": {
-      "dates": [0, 0, 0, 0, 0, 0, 0]
+      "dates": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "week4": {
-      "dates": [0, 0, 0, 0, 0, 0, 0]
+      "dates": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "week5": {
-      "dates": [0, 0, 0, 0, 0, 0, 0]
+      "dates": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "week6": {
-      "dates": [0, 0, 0, 0, 0, 0, 0]
+      "dates": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     }
   };
 
@@ -315,8 +343,7 @@ class _CalendarState extends State<Calendar> {
         mabPosts = appState.getMabData!.posts;
         for (MabPost e in mabPosts) {
           //Check if event is in selected month and year, if yes, add to calendarDataEvents
-          if (e.dueDate.month == widget.selectedMonth &&
-              e.dueDate.year == widget.selectedYear) {
+          if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
             getCalendarDataEvents["events"][e.dueDate.day].add(e);
           }
         }
@@ -329,8 +356,7 @@ class _CalendarState extends State<Calendar> {
         lacPosts = appState.getLacData!.posts;
         for (LACPost e in lacPosts) {
           //Check if event is in selected month and year, if yes, add to calendarDataEvents
-          if (e.dueDate.month == widget.selectedMonth &&
-              e.dueDate.year == widget.selectedYear) {
+          if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
             getCalendarDataEvents["events"][e.dueDate.day].add(e);
           }
         }
@@ -362,11 +388,10 @@ class _CalendarState extends State<Calendar> {
     //LET'S GOO I FIXED IT
     //i'm so happy
     //i'm gonna cry
-    if (loadMabData) {
-      await getValue(
-              "communities", appState.getCurrentUser.assignedCommunity!, "MAB")
-          .then((value) {
-        for (var element in value) {
+    if (loadMabData && appState.getCurrentUser.assignedCommunity != "0") {
+      await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity!).collection("MAB").get().then((value) {
+        for (var _element in value.docs) {
+          var element = _element.data();
           print(element);
           //Tranform Map to MabPost
           mabPosts.add(MabPost(
@@ -385,11 +410,10 @@ class _CalendarState extends State<Calendar> {
       });
     }
 
-    if (loadLacData) {
-      await getValue(
-              "communities", appState.getCurrentUser.assignedCommunity!, "LAC")
-          .then((value) {
-        for (var element in value) {
+    if (loadLacData && appState.getCurrentUser.assignedCommunity != "0" && appState.getCurrentUser.assignedSection != "0") {
+      await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity!).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("LAC").get().then((value) {
+        for (var _element in value.docs) {
+          var element = _element.data();
           print(element);
           //Tranform Map to LACPost
           lacPosts.add(LACPost(
@@ -411,8 +435,7 @@ class _CalendarState extends State<Calendar> {
     //Get data from MAB
     for (MabPost e in mabPosts) {
       //Check if event is in selected month and year, if yes, add to calendarDataEvents
-      if (e.dueDate.month == widget.selectedMonth &&
-          e.dueDate.year == widget.selectedYear) {
+      if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
         getCalendarDataEvents["events"][e.dueDate.day].add(e);
       }
     }
@@ -420,8 +443,7 @@ class _CalendarState extends State<Calendar> {
     //Get data from LAC
     for (LACPost e in lacPosts) {
       //Check if event is in selected month and year, if yes, add to calendarDataEvents
-      if (e.dueDate.month == widget.selectedMonth &&
-          e.dueDate.year == widget.selectedYear) {
+      if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
         getCalendarDataEvents["events"][e.dueDate.day].add(e);
       }
     }
@@ -437,8 +459,7 @@ class _CalendarState extends State<Calendar> {
     setState(() {});
   }
 
-  void initializeCalendar(
-      int firstDayOfMonth, int lastDayOfMonth, AppState appState) {
+  void initializeCalendar(int firstDayOfMonth, int lastDayOfMonth, AppState appState) {
     int currentDate = 1;
     //First week
     for (int i = 0; i < 7; i++) {
@@ -499,10 +520,7 @@ class _CalendarState extends State<Calendar> {
   @override
   void initState() {
     super.initState();
-    initializeCalendar(
-        DateTime(widget.selectedYear, widget.selectedMonth, 1).weekday,
-        DateTime(widget.selectedYear, widget.selectedMonth + 1, 0).day,
-        context.read<AppState>());
+    initializeCalendar(DateTime(widget.selectedYear, widget.selectedMonth, 1).weekday, DateTime(widget.selectedYear, widget.selectedMonth + 1, 0).day, context.read<AppState>());
   }
 
   @override
@@ -519,11 +537,9 @@ class _CalendarState extends State<Calendar> {
       if (getCalendarDataEvents["events"][date] != null) {
         if (getCalendarDataEvents["events"][date].length == 1) {
           return const Color(0xFF00FFA3);
-        } else if (getCalendarDataEvents["events"][date].length >= 2 &&
-            getCalendarDataEvents["events"][date].length <= 3) {
+        } else if (getCalendarDataEvents["events"][date].length >= 2 && getCalendarDataEvents["events"][date].length <= 3) {
           return const Color(0xFFF9FF00);
-        } else if (getCalendarDataEvents["events"][date].length >= 4 &&
-            getCalendarDataEvents["events"][date].length <= 5) {
+        } else if (getCalendarDataEvents["events"][date].length >= 4 && getCalendarDataEvents["events"][date].length <= 5) {
           return const Color(0xFFFF9900);
         } else if (getCalendarDataEvents["events"][date].length >= 6) {
           return const Color(0xFFFF0000);
@@ -567,21 +583,12 @@ class _CalendarState extends State<Calendar> {
                   Container(
                     width: 30,
                     height: 30,
-                    decoration: widget.selectedYear ==
-                                DateTime.now().year.toInt() &&
-                            widget.selectedMonth ==
-                                DateTime.now().month.toInt() &&
-                            getCalendarData["week${i + 1}"]["dates"][j] ==
-                                DateTime.now().day.toInt()
+                    decoration: widget.selectedYear == DateTime.now().year.toInt() && widget.selectedMonth == DateTime.now().month.toInt() && getCalendarData["week${i + 1}"]["dates"][j] == DateTime.now().day.toInt()
                         ? BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             gradient: getPrimaryGradient,
                           )
-                        : BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: getDateColor(
-                                getCalendarData["week${i + 1}"]["dates"][j]),
-                            border: Border.all(color: theme.tertiary)),
+                        : BoxDecoration(borderRadius: BorderRadius.circular(20), color: getDateColor(getCalendarData["week${i + 1}"]["dates"][j]), border: Border.all(color: theme.tertiary)),
                     child: ElevatedButton(
                       onPressed: () {
                         if (getCalendarData["week${i + 1}"]["dates"][j] != 0) {
@@ -589,10 +596,8 @@ class _CalendarState extends State<Calendar> {
                               context: context,
                               builder: (BuildContext context) {
                                 return SelectedDateModal(
-                                  title:
-                                      "${getCalendarDataEvents["events"][getCalendarData["week${i + 1}"]["dates"][j]].length} Events",
-                                  description:
-                                      "${getCalendarData["week${i + 1}"]["dates"][j]} of ${getMonthsOfTheYear[widget.selectedMonth]}, ${widget.selectedYear}",
+                                  title: "${getCalendarDataEvents["events"][getCalendarData["week${i + 1}"]["dates"][j]].length} Events",
+                                  description: "${getCalendarData["week${i + 1}"]["dates"][j]} of ${getMonthsOfTheYear[widget.selectedMonth]}, ${widget.selectedYear}",
                                 );
                               });
                         } else {
@@ -615,12 +620,7 @@ class _CalendarState extends State<Calendar> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      child: Text(
-                          getCalendarData["week${i + 1}"]["dates"][j] == 0
-                              ? "-"
-                              : getCalendarData["week${i + 1}"]["dates"][j]
-                                  .toString(),
-                          style: textTheme.displaySmall),
+                      child: Text(getCalendarData["week${i + 1}"]["dates"][j] == 0 ? "-" : getCalendarData["week${i + 1}"]["dates"][j].toString(), style: textTheme.displaySmall),
                     ),
                   ),
               ],
@@ -634,8 +634,7 @@ class _CalendarState extends State<Calendar> {
 
 //Mab Modal
 class SelectedDateModal extends StatelessWidget {
-  const SelectedDateModal(
-      {super.key, required this.title, required this.description});
+  const SelectedDateModal({super.key, required this.title, required this.description});
   final String title, description;
 
   @override
@@ -659,8 +658,7 @@ class SelectedDateModal extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             //Sub header
-            Text(description,
-                style: textTheme.displaySmall, textAlign: TextAlign.center),
+            Text(description, style: textTheme.displaySmall, textAlign: TextAlign.center),
             const SizedBox(height: 16),
             //Back button
             Container(
@@ -678,7 +676,9 @@ class SelectedDateModal extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                onPressed: () => {Navigator.pop(context)},
+                onPressed: () => {
+                  Navigator.pop(context)
+                },
                 child: Text(
                   "Back",
                   style: textTheme.displaySmall!.copyWith(

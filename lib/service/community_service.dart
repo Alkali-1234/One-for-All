@@ -4,12 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import '../data/community_data.dart';
+import '../main.dart';
 import 'auth_service.dart';
 import 'dart:io';
 import 'files_service.dart';
-import 'firebase_api.dart';
 
-Future addNewMABEvent(String title, String description, int type, int subject, Timestamp dueDate, List<File> attatchements, File? image) async {
+Future addNewMABEvent(String title, String description, int type, int subject, Timestamp dueDate, List<File> attatchements, File? image, AppState appState) async {
+  if (appState.getCurrentUser.assignedCommunity == "0") {
+    throw Exception("User is not in a community");
+  }
   //* Upload the image
   String? imageURL;
   try {
@@ -27,11 +30,9 @@ Future addNewMABEvent(String title, String description, int type, int subject, T
     rethrow;
   }
   //* Add the event to the community document
-  debugPrint(getSavedCommunityData.toString());
-  debugPrint(getSavedCommunityData.id);
 
   try {
-    await FirebaseFirestore.instance.collection("communities").doc(getSavedCommunityData.id).collection("MAB").add({
+    await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("MAB").add({
       "title": title,
       "description": description,
       "date": Timestamp.now(),
@@ -40,6 +41,7 @@ Future addNewMABEvent(String title, String description, int type, int subject, T
       "files": fileURLs,
       "dueDate": dueDate,
       "type": type,
+      "subject": subject,
     });
     //     .update({
     //   "MAB": FieldValue.arrayUnion([
@@ -60,21 +62,93 @@ Future addNewMABEvent(String title, String description, int type, int subject, T
     debugPrint(e.toString());
     rethrow;
   }
-  //* Send notification
-  Map<String, String> data = {
-    "MAB": "true",
-    "title": title,
-    "description": description,
-    "date": Timestamp.now().toString(),
-    "authorUID": getUserAuth.currentUser!.uid,
-    "image": imageURL ?? "",
-    //Seperate with commas
-    "files": fileURLs.join(","),
-    "dueDate": dueDate.toString(),
-    "type": type.toString(),
-    "subject": subject.toString(),
-  };
-  sendNotification(type == 1 ? "New Announcement" : "New Task", title, data, "MAB_${getSavedCommunityData.id}");
+  //! Deprecated, now using cloud functions
+  // //* Send notification
+  // Map<String, String> data = {
+  //   "MAB": "true",
+  //   "title": title,
+  //   "description": description,
+  //   "date": Timestamp.now().toString(),
+  //   "authorUID": getUserAuth.currentUser!.uid,
+  //   "image": imageURL ?? "",
+  //   //Seperate with commas
+  //   "files": fileURLs.join(","),
+  //   "dueDate": dueDate.toString(),
+  //   "type": type.toString(),
+  //   "subject": subject.toString(),
+  // };
+  // sendNotification(type == 1 ? "New Announcement" : "New Task", title, data, "MAB_${getSavedCommunityData.id}");
+}
+
+Future addNewLACEvent(String title, String description, int type, int subject, Timestamp dueDate, List<File> attatchements, File? image, AppState appState) async {
+  if (appState.getCurrentUser.assignedSection == "0") {
+    throw Exception("User is not in a section");
+  }
+  //* Upload the image
+  String? imageURL;
+  try {
+    if (image != null) {
+      imageURL = await uploadCommunityMabImage(image, image.path);
+    }
+  } catch (e) {
+    rethrow;
+  }
+  //* Upload the files
+  List<String> fileURLs = [];
+  try {
+    fileURLs = await uploadCommunityMabFiles(attatchements);
+  } catch (e) {
+    rethrow;
+  }
+  //* Add the event to the community document
+
+  try {
+    await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("LAC").add({
+      "title": title,
+      "description": description,
+      "date": Timestamp.now(),
+      "authorUID": getUserAuth.currentUser!.uid,
+      "image": imageURL ?? "",
+      "files": fileURLs,
+      "dueDate": dueDate,
+      "type": type,
+      "subject": subject,
+    });
+    //     .update({
+    //   "MAB": FieldValue.arrayUnion([
+    //     {
+    //       "title": title,
+    //       "description": description,
+    //       "date": Timestamp.now(),
+    //       "authorUID": getUserAuth.currentUser!.uid,
+    //       "image": imageURL,
+    //       "files": fileURLs,
+    //       "dueDate": dueDate,
+    //       "type": type,
+    //       "subject": subject
+    //     }
+    //   ])
+    // });
+  } catch (e) {
+    debugPrint(e.toString());
+    rethrow;
+  }
+  //! Deprecated, now using cloud functions
+  // //* Send notification
+  // Map<String, String> data = {
+  //   "MAB": "true",
+  //   "title": title,
+  //   "description": description,
+  //   "date": Timestamp.now().toString(),
+  //   "authorUID": getUserAuth.currentUser!.uid,
+  //   "image": imageURL ?? "",
+  //   //Seperate with commas
+  //   "files": fileURLs.join(","),
+  //   "dueDate": dueDate.toString(),
+  //   "type": type.toString(),
+  //   "subject": subject.toString(),
+  // };
+  // sendNotification(type == 1 ? "New Announcement" : "New Task", title, data, "MAB_${getSavedCommunityData.id}");
 }
 
 Future createUserData(String uid) async {

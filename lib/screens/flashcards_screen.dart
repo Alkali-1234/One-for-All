@@ -31,21 +31,12 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
     var textTheme = Theme.of(context).textTheme;
     var appState = Provider.of<AppState>(context);
     return Container(
-        decoration: appState.currentUserSelectedTheme == defaultBlueTheme
-            ? const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/images/purpwallpaper 2.png'),
-                    fit: BoxFit.cover))
-            : BoxDecoration(
-                color:
-                    appState.currentUserSelectedTheme.colorScheme.background),
+        decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 floatingActionButton: FloatingActionButton(
                   onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) => const NewSetModal());
+                    showDialog(context: context, builder: (context) => const NewSetOptions());
                   },
                   backgroundColor: theme.secondary,
                   child: const Icon(Icons.add),
@@ -69,8 +60,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                 color: theme.onPrimary,
                               ),
                             ),
-                            Text(appState.getCurrentUser.username,
-                                style: textTheme.displaySmall),
+                            Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
                             Container(
                               width: 30,
                               height: 30,
@@ -79,12 +69,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                 borderRadius: BorderRadius.circular(20),
                                 gradient: getPrimaryGradient,
                               ),
-                              child: ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(15)),
-                                  child: Image.network(
-                                      appState.getCurrentUser.profilePicture,
-                                      fit: BoxFit.cover)),
+                              child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
                             )
                           ],
                         ),
@@ -105,9 +90,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                 }),
                                 keyboardAppearance: Brightness.dark,
                                 cursorColor: theme.onPrimary,
-                                style: textTheme.displayMedium!.copyWith(
-                                    color: theme.onPrimary,
-                                    fontWeight: FontWeight.bold),
+                                style: textTheme.displayMedium!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
                                 decoration: InputDecoration(
                                     filled: true,
                                     fillColor: theme.primary,
@@ -119,13 +102,8 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                       ),
                                     ),
                                     hintText: 'Search',
-                                    suffixIcon: Icon(Icons.search,
-                                        color: theme.onPrimary, size: 50),
-                                    hintStyle: textTheme.displayMedium!
-                                        .copyWith(
-                                            color: theme.onPrimary
-                                                .withOpacity(0.25),
-                                            fontWeight: FontWeight.bold)),
+                                    suffixIcon: Icon(Icons.search, color: theme.onPrimary, size: 50),
+                                    hintStyle: textTheme.displayMedium!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
                               ),
                             ),
                             const SizedBox(height: 20),
@@ -135,85 +113,56 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                 children: [
                                   Row(
                                     children: [
-                                      Text("Library",
-                                          style: textTheme.displayLarge),
+                                      Text("Library", style: textTheme.displayLarge),
                                     ],
                                   ),
                                   const SizedBox(height: 20),
-                                  ListView.builder(
-                                      shrinkWrap: true,
-                                      scrollDirection: Axis.vertical,
-                                      itemCount: appState
-                                          .getCurrentUser.flashCardSets.length,
-                                      itemBuilder: (context, index) {
-                                        return isItemValid(appState
-                                                .getCurrentUser
-                                                .flashCardSets[index]
-                                                .title)
-                                            ? Padding(
-                                                padding: const EdgeInsets.only(
-                                                    bottom: 8),
-                                                child: Container(
-                                                  height: MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.1,
-                                                  width: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                    color: theme.secondary,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    border: Border.all(
-                                                      color: theme.tertiary,
-                                                    ),
-                                                  ),
-                                                  child: ElevatedButton(
-                                                      onPressed: () {
-                                                        showDialog(
-                                                            context: context,
-                                                            builder: (context) =>
-                                                                SelectedSetModal(
-                                                                  flashcardSet: appState
-                                                                      .getCurrentUser
-                                                                      .flashCardSets[index],
-                                                                  index: index,
-                                                                ));
-                                                      },
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        elevation: 0,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        shadowColor:
-                                                            Colors.transparent,
-                                                        foregroundColor:
-                                                            theme.onPrimary,
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
-                                                        ),
+                                  Expanded(
+                                    child: ListView.builder(
+                                        scrollDirection: Axis.vertical,
+                                        itemCount: appState.getCurrentUser.flashCardSets.length,
+                                        itemBuilder: (context, index) {
+                                          return isItemValid(appState.getCurrentUser.flashCardSets[index].title)
+                                              ? Padding(
+                                                  padding: const EdgeInsets.only(bottom: 8),
+                                                  child: Container(
+                                                    height: MediaQuery.of(context).size.height * 0.1,
+                                                    width: double.infinity,
+                                                    decoration: BoxDecoration(
+                                                      color: theme.secondary,
+                                                      borderRadius: BorderRadius.circular(10),
+                                                      border: Border.all(
+                                                        color: theme.tertiary,
                                                       ),
-                                                      child: Center(
-                                                          child: Text(
-                                                        appState
-                                                            .getCurrentUser
-                                                            .flashCardSets[
-                                                                index]
-                                                            .title,
-                                                        style: textTheme
-                                                            .displayMedium!
-                                                            .copyWith(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                      ))),
-                                                ),
-                                              )
-                                            : Container();
-                                      }),
+                                                    ),
+                                                    child: ElevatedButton(
+                                                        onPressed: () {
+                                                          showDialog(
+                                                              context: context,
+                                                              builder: (context) => SelectedSetModal(
+                                                                    flashcardSet: appState.getCurrentUser.flashCardSets[index],
+                                                                    index: index,
+                                                                  ));
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                          elevation: 0,
+                                                          backgroundColor: Colors.transparent,
+                                                          shadowColor: Colors.transparent,
+                                                          foregroundColor: theme.onPrimary,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                          ),
+                                                        ),
+                                                        child: Center(
+                                                            child: Text(
+                                                          appState.getCurrentUser.flashCardSets[index].title,
+                                                          style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
+                                                        ))),
+                                                  ),
+                                                )
+                                              : Container();
+                                        }),
+                                  ),
                                 ],
                               ),
                             ),
@@ -223,6 +172,175 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                     ),
                   ],
                 ))));
+  }
+}
+
+class ImportSetModal extends StatefulWidget {
+  const ImportSetModal({super.key});
+
+  @override
+  State<ImportSetModal> createState() => _ImportSetModalState();
+}
+
+class _ImportSetModalState extends State<ImportSetModal> {
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    // var appState = Provider.of<AppState>(context);
+    return Dialog(
+      backgroundColor: theme.background,
+      child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Text("Import from JSON string", style: textTheme.displayMedium),
+            const SizedBox(height: 10),
+            //Text Field
+            SizedBox(
+              height: 40,
+              child: TextField(
+                onChanged: (value) => setState(() {
+                  // titleQuery = value;
+                }),
+                keyboardAppearance: Brightness.dark,
+                cursorColor: theme.onPrimary,
+                style: textTheme.displaySmall!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
+                decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    filled: true,
+                    fillColor: theme.primary,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(
+                        width: 0,
+                        style: BorderStyle.none,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        width: 2,
+                        color: theme.onBackground,
+                      ),
+                    ),
+                    hintText: 'JSON String',
+                    hintStyle: textTheme.displaySmall!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
+              ),
+            ),
+            const SizedBox(height: 10),
+            //Buttons: Create and Cancel
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.secondary,
+                      foregroundColor: theme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () {},
+                    child: const Text("Import")),
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.secondary,
+                      foregroundColor: theme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Cancel")),
+              ],
+            )
+          ])),
+    );
+  }
+}
+
+class NewSetOptions extends StatefulWidget {
+  const NewSetOptions({super.key});
+
+  @override
+  State<NewSetOptions> createState() => _NewSetOptionsState();
+}
+
+class _NewSetOptionsState extends State<NewSetOptions> {
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    // var appState = Provider.of<AppState>(context);
+    return Dialog(
+      backgroundColor: theme.background,
+      child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            //* Create New
+            //Button style: Basically a square with an icon inside, and a text below it
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: theme.primary,
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showDialog(context: context, builder: (context) => const NewSetModal());
+                    },
+                    icon: Icon(Icons.add, color: theme.onBackground),
+                    label: Text("Create New", style: textTheme.displaySmall!.copyWith(color: theme.onBackground))),
+              ],
+            ),
+            const SizedBox(height: 16),
+            //* Import
+            //Button style: Basically a square with an icon inside, and a text below it
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: theme.primary,
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                    ),
+                    onPressed: () {},
+                    icon: Icon(Icons.file_copy, color: theme.onBackground),
+                    label: Text("Import", style: textTheme.displaySmall!.copyWith(color: theme.onBackground))),
+              ],
+            ),
+            const SizedBox(height: 16),
+            //* Generate
+            //Button style: Basically a square with an icon inside, and a text below it
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: theme.primary,
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                    ),
+                    onPressed: () {},
+                    icon: Icon(Icons.smart_toy, color: theme.onBackground),
+                    label: Text("Generate", style: textTheme.displaySmall!.copyWith(color: theme.onBackground))),
+              ],
+            ),
+          ])),
+    );
   }
 }
 
@@ -260,25 +378,13 @@ class _NewSetModalState extends State<NewSetModal> {
 
         //* Convert the decoded `dynamic` object back to your desired Dart object structure
         for (var set in decodedObject['sets']) {
-          flashcardSets.add(FlashcardSet(
-              id: decodedObject['sets'].indexOf(set),
-              title: set["title"],
-              description: "description_unavailable",
-              flashcards: [
-                for (var flashcard in set['questions'])
-                  Flashcard(
-                      id: set['questions'].indexOf(flashcard),
-                      question: flashcard['question'],
-                      answer: flashcard['answer'])
-              ]));
+          flashcardSets.add(FlashcardSet(id: decodedObject['sets'].indexOf(set), title: set["title"], description: "description_unavailable", flashcards: [
+            for (var flashcard in set['questions']) Flashcard(id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'])
+          ]));
         }
       }
     });
-    flashcardSets.add(FlashcardSet(
-        id: flashcardSets.length,
-        flashcards: [],
-        title: titleQuery,
-        description: ""));
+    flashcardSets.add(FlashcardSet(id: flashcardSets.length, flashcards: [], title: titleQuery, description: ""));
     //* Convert flashcard sets to json
     Object flashcardSetsObject = {
       "sets": [
@@ -288,7 +394,10 @@ class _NewSetModalState extends State<NewSetModal> {
             "description": set.description,
             "questions": [
               for (Flashcard flashcard in set.flashcards)
-                {"question": flashcard.question, "answer": flashcard.answer}
+                {
+                  "question": flashcard.question,
+                  "answer": flashcard.answer
+                }
             ]
           }
       ],
@@ -300,11 +409,7 @@ class _NewSetModalState extends State<NewSetModal> {
     });
 
     //* Add the set to the current user
-    appState.addFlashcardSet(FlashcardSet(
-        id: flashcardSets.length,
-        flashcards: [],
-        title: titleQuery,
-        description: ""));
+    appState.addFlashcardSet(FlashcardSet(id: flashcardSets.length, flashcards: [], title: titleQuery, description: ""));
 
     //* Rebuild
     setState(() {});
@@ -343,9 +448,9 @@ class _NewSetModalState extends State<NewSetModal> {
                     }),
                     keyboardAppearance: Brightness.dark,
                     cursorColor: theme.onPrimary,
-                    style: textTheme.displaySmall!.copyWith(
-                        color: theme.onPrimary, fontWeight: FontWeight.bold),
+                    style: textTheme.displaySmall!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
                     decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.all(0),
                         filled: true,
                         fillColor: theme.primary,
                         border: OutlineInputBorder(
@@ -363,9 +468,7 @@ class _NewSetModalState extends State<NewSetModal> {
                           ),
                         ),
                         hintText: 'Title',
-                        hintStyle: textTheme.displaySmall!.copyWith(
-                            color: theme.onPrimary.withOpacity(0.25),
-                            fontWeight: FontWeight.bold)),
+                        hintStyle: textTheme.displaySmall!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -383,9 +486,7 @@ class _NewSetModalState extends State<NewSetModal> {
                 ),
                 const SizedBox(height: 10),
                 //How to use text
-                Text(
-                    "You may put as much question as you will, each flashcard set are stored locally (CACHED!). Each set represents one collection of cards. For each card you encounter you must think of the answer in your head, and then flip the card by tapping it, revealing the answer. You then must choose the following buttons depending on your performance on the question (The buttons mentioned are the 100% knew it, 50% some, 0% didn’t know). Each question has a weight, depending on your performance on the question, the weight can go down and up. In which if it goes up it will show more frequently per as if it goes down it will show less frequently. For more information, look at the *docs*",
-                    style: textTheme.displaySmall),
+                Text("You may put as much question as you will, each flashcard set are stored locally (CACHED!). Each set represents one collection of cards. For each card you encounter you must think of the answer in your head, and then flip the card by tapping it, revealing the answer. You then must choose the following buttons depending on your performance on the question (The buttons mentioned are the 100% knew it, 50% some, 0% didn’t know). Each question has a weight, depending on your performance on the question, the weight can go down and up. In which if it goes up it will show more frequently per as if it goes down it will show less frequently. For more information, look at the *docs*", style: textTheme.displaySmall),
                 const SizedBox(height: 10),
                 //Buttons: Create and Cancel
                 Row(
@@ -425,8 +526,7 @@ class _NewSetModalState extends State<NewSetModal> {
 }
 
 class SelectedSetModal extends StatelessWidget {
-  const SelectedSetModal(
-      {super.key, required this.flashcardSet, required this.index});
+  const SelectedSetModal({super.key, required this.flashcardSet, required this.index});
   final FlashcardSet flashcardSet;
   final int index;
   @override
@@ -461,14 +561,10 @@ class SelectedSetModal extends StatelessWidget {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Number of questions",
-                                style: textTheme.displaySmall),
-                            Text(flashcardSet.flashcards.length.toString(),
-                                style: textTheme.displaySmall)
-                          ]),
+                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                        Text("Number of questions", style: textTheme.displaySmall),
+                        Text(flashcardSet.flashcards.length.toString(), style: textTheme.displaySmall)
+                      ]),
                     ),
                   ),
                 ],
@@ -486,10 +582,8 @@ class SelectedSetModal extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return FlashcardsPlayScreen(
-                              flashcardsSet: flashcardSet);
+                        Navigator.push(context, MaterialPageRoute(builder: (context) {
+                          return FlashcardsPlayScreen(flashcardsSet: flashcardSet);
                         }));
                       },
                       child: const Text("Open")),
@@ -501,8 +595,7 @@ class SelectedSetModal extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () => Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) {
                             return FlashcardsEditScreen(
                                 //Index is the index of the set in the user list of sets
                                 setIndex: index);

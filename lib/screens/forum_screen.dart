@@ -315,8 +315,8 @@ class _StreamBodyState extends State<StreamBody> {
   bool validateItem(List<dynamic> tags, String title, String description, DateTime dateCreated, DateTime lastActive) {
     bool isValid = true;
     //Check if item has selected tag
-    if (selectedTag != 0) {
-      if (tags.contains(tags[filters[0]]) == false) {
+    if (filters[0] != 0 && filters[0] != 1) {
+      if (tags.contains(this.tags[filters[0] - 1]) == false) {
         isValid = false;
       }
     }

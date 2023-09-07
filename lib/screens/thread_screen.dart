@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
-import 'package:oneforall/service/firebase_api.dart';
+// import 'package:oneforall/service/firebase_api.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -187,7 +187,7 @@ class _ThreadBodyState extends State<ThreadBody> {
         );
       }
       //Send notification
-      sendNotification("${appState.getCurrentUser.username} sent a new message", messageQuery, {}, "forum_${appState.getCurrentUser.assignedCommunity}_${widget.threadID}");
+      // sendNotification("${appState.getCurrentUser.username} sent a new message", messageQuery, {}, "forum_${appState.getCurrentUser.assignedCommunity}_${widget.threadID}");
       setState(() {
         isLoading = false;
         messageQuery = "";

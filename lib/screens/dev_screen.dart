@@ -20,7 +20,9 @@ class _DevScreenState extends State<DevScreen> {
     await sendNotification(
       "Test Notification",
       "This is a test notification from the dev screen.",
-      Map<String, dynamic>.from({"test": "test"}),
+      Map<String, dynamic>.from({
+        "test": "test"
+      }),
       "MAB_test",
       //Topics: MAB, LAC, Recent Activity
     );
@@ -32,18 +34,18 @@ class _DevScreenState extends State<DevScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
-            const Text("Dev Screen"),
-            const Text("This is a dev screen. It is not meant to be used."),
-            const Text("This screen is used for testing purposes only."),
-            const Text("This screen will be removed in the final release."),
-            ElevatedButton(
-                onPressed: () => testFunction1(),
-                child: const Text("Test Function 1 (Send Notification)")),
+            Text("Dev Screen"),
+            Text("This is a dev screen. It is not meant to be used."),
+            Text("This screen is used for testing purposes only."),
+            Text("This screen will be removed in the final release."),
+            // ElevatedButton(
+            //     onPressed: () => testFunction1(),
+            //     child: const Text("Test Function 1 (Send Notification)")),
           ],
         ),
       ),

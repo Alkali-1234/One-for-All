@@ -144,6 +144,8 @@ void handleNotification(RemoteMessage message) {
 //pray to god this works
 //you don't know how long it took me to get this
 //update: IT WORKS!!!!
+//! NO LONGER NEEDED
+@Deprecated("No longer used")
 Future sendNotification(String title, String body, Map<String, dynamic> data, String topic) async {
   print("Sending notification");
   final String accessToken = await getAccessToken(); // FCM server key
@@ -189,13 +191,15 @@ Future<String> getFileContents(String path) async {
 }
 
 Future<String> getAccessToken() async {
+  return "null";
   //! FIXME privateKey is somehow invalid
   //Get the service account credentials
+  //ignore: dead_code
   final Directory currentDirectory = Directory.current;
   print(currentDirectory.path);
-  final String email = env.Env.notificationClientEmail;
+  // final String email = env.Env.notificationClientEmail;
   final String privateKey = env.Env.notificationPrivateKey;
-  final String clientId = env.Env.notificationClientId;
+  // final String clientId = env.Env.notificationClientId;
   //wait 1 second
   await Future.delayed(const Duration(seconds: 1));
   print(privateKey);

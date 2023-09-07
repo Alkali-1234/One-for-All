@@ -51,21 +51,16 @@ class _MABLACScreenState extends State<MABLACScreen> {
     final subject = post.subject;
 
     //1: Does item title or desc contain search query
-    if (title.toLowerCase().contains(searchQuery.toLowerCase()) ||
-        description.toLowerCase().contains(searchQuery.toLowerCase())) {
+    if (title.toLowerCase().contains(searchQuery.toLowerCase()) || description.toLowerCase().contains(searchQuery.toLowerCase())) {
       //2: Does item type match filter
       if (type == selectedTypeFilter || selectedTypeFilter == 0) {
         //3: Does item subject match filter
         //If subject filter is 1 only show items with subject 1
         //If subject filter is 0 show all items
         //If subject filter is 2 show items with subject other than 1
-        if (subject + 1 == selectedSubjectFilter ||
-            selectedSubjectFilter == 0 ||
-            (selectedSubjectFilter == 2 && subject != 1)) {
+        if (subject + 1 == selectedSubjectFilter || selectedSubjectFilter == 0 || (selectedSubjectFilter == 2 && subject != 1)) {
           //4: Does item due date match filter
-          if (due.isBefore(DateTime.now()
-                  .add(Duration(days: getDueDates[selectedDueFilter]))) ||
-              selectedDueFilter == 0) {
+          if (due.isBefore(DateTime.now().add(Duration(days: getDueDates[selectedDueFilter]))) || selectedDueFilter == 0) {
             return true;
           }
         }
@@ -80,14 +75,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
     var textTheme = Theme.of(context).textTheme;
     var appState = Provider.of<AppState>(context);
     return Container(
-        decoration: appState.currentUserSelectedTheme == defaultBlueTheme
-            ? const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/images/purpwallpaper 2.png'),
-                    fit: BoxFit.cover))
-            : BoxDecoration(
-                color:
-                    appState.currentUserSelectedTheme.colorScheme.background),
+        decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 floatingActionButton: FloatingActionButton(
@@ -120,8 +108,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                 color: theme.onPrimary,
                               ),
                             ),
-                            Text(appState.getCurrentUser.username,
-                                style: textTheme.displaySmall),
+                            Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
                             Container(
                               width: 30,
                               height: 30,
@@ -131,8 +118,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                 gradient: getPrimaryGradient,
                               ),
                               child: ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(15)),
+                                  borderRadius: const BorderRadius.all(Radius.circular(15)),
                                   child: Image.network(
                                     appState.getCurrentUser.profilePicture,
                                     fit: BoxFit.cover,
@@ -154,15 +140,12 @@ class _MABLACScreenState extends State<MABLACScreen> {
                             child: Row(children: [
                               Flexible(
                                 flex: 1,
-                                child: LayoutBuilder(
-                                    builder: (context, constraints) {
+                                child: LayoutBuilder(builder: (context, constraints) {
                                   return Column(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       SizedBox(
-                                        height: selectedSection == 0
-                                            ? constraints.maxHeight
-                                            : constraints.maxHeight - 10,
+                                        height: selectedSection == 0 ? constraints.maxHeight : constraints.maxHeight - 10,
                                         width: constraints.maxWidth,
                                         child: ElevatedButton(
                                           onPressed: () {
@@ -174,10 +157,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                             elevation: 0,
                                             shadowColor: Colors.transparent,
                                             padding: const EdgeInsets.all(8),
-                                            backgroundColor:
-                                                selectedSection == 0
-                                                    ? theme.primaryContainer
-                                                    : theme.secondary,
+                                            backgroundColor: selectedSection == 0 ? theme.primaryContainer : theme.secondary,
                                             foregroundColor: theme.onPrimary,
                                             shape: const RoundedRectangleBorder(
                                               borderRadius: BorderRadius.only(
@@ -198,15 +178,12 @@ class _MABLACScreenState extends State<MABLACScreen> {
                               ),
                               Flexible(
                                 flex: 1,
-                                child: LayoutBuilder(
-                                    builder: (context, constraints) {
+                                child: LayoutBuilder(builder: (context, constraints) {
                                   return Column(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       SizedBox(
-                                        height: selectedSection == 1
-                                            ? constraints.maxHeight
-                                            : constraints.maxHeight - 10,
+                                        height: selectedSection == 1 ? constraints.maxHeight : constraints.maxHeight - 10,
                                         width: constraints.maxWidth,
                                         child: ElevatedButton(
                                           onPressed: () {
@@ -218,10 +195,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                             elevation: 0,
                                             shadowColor: Colors.transparent,
                                             padding: const EdgeInsets.all(8),
-                                            backgroundColor:
-                                                selectedSection == 1
-                                                    ? theme.primaryContainer
-                                                    : theme.secondary,
+                                            backgroundColor: selectedSection == 1 ? theme.primaryContainer : theme.secondary,
                                             foregroundColor: theme.onPrimary,
                                             shape: const RoundedRectangleBorder(
                                               borderRadius: BorderRadius.only(
@@ -267,32 +241,20 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                           }),
                                           keyboardAppearance: Brightness.dark,
                                           cursorColor: theme.onPrimary,
-                                          style: textTheme.displayMedium!
-                                              .copyWith(
-                                                  color: theme.onPrimary,
-                                                  fontWeight: FontWeight.bold),
+                                          style: textTheme.displayMedium!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
                                           decoration: InputDecoration(
                                               filled: true,
                                               fillColor: theme.primary,
                                               border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
+                                                borderRadius: BorderRadius.circular(10),
                                                 borderSide: const BorderSide(
                                                   width: 0,
                                                   style: BorderStyle.none,
                                                 ),
                                               ),
                                               hintText: 'Search',
-                                              suffixIcon: Icon(Icons.search,
-                                                  color: theme.onPrimary,
-                                                  size: 50),
-                                              hintStyle: textTheme
-                                                  .displayMedium!
-                                                  .copyWith(
-                                                      color: theme.onPrimary
-                                                          .withOpacity(0.25),
-                                                      fontWeight:
-                                                          FontWeight.bold)),
+                                              suffixIcon: Icon(Icons.search, color: theme.onPrimary, size: 50),
+                                              hintStyle: textTheme.displayMedium!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
                                         ),
                                       ),
                                       const SizedBox(height: 10),
@@ -303,72 +265,45 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                             Flexible(
                                               flex: 1,
                                               child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   //Filter by
 
                                                   //All
                                                   Flexible(
                                                     flex: 1,
-                                                    child: LayoutBuilder(
-                                                        builder: (context, c) {
+                                                    child: LayoutBuilder(builder: (context, c) {
                                                       return Container(
                                                         width: c.maxWidth - 10,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color:
-                                                              theme.secondary,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
+                                                        decoration: BoxDecoration(
+                                                          color: theme.secondary,
+                                                          borderRadius: BorderRadius.circular(10),
                                                         ),
                                                         child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
+                                                          padding: const EdgeInsets.all(8.0),
                                                           child: DropdownButton(
-                                                            value:
-                                                                selectedTypeFilter,
-                                                            icon: const Icon(
-                                                                null),
-                                                            underline:
-                                                                Container(),
+                                                            value: selectedTypeFilter,
+                                                            icon: const Icon(null),
+                                                            underline: Container(),
                                                             onChanged: (value) {
                                                               setState(() {
-                                                                selectedTypeFilter =
-                                                                    value
-                                                                        as int;
+                                                                selectedTypeFilter = value as int;
                                                               });
                                                             },
                                                             items: const [
                                                               DropdownMenuItem(
                                                                 value: 0,
-                                                                child: Text(
-                                                                    "All",
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .white)),
+                                                                child: Text("All", style: TextStyle(color: Colors.white)),
                                                               ),
                                                               DropdownMenuItem(
                                                                 value: 1,
-                                                                child:
-                                                                    FittedBox(
-                                                                  child: Text(
-                                                                      "Announces",
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.white)),
+                                                                child: FittedBox(
+                                                                  child: Text("Announces", style: TextStyle(color: Colors.white)),
                                                                 ),
                                                               ),
                                                               DropdownMenuItem(
                                                                 value: 2,
-                                                                child: Text(
-                                                                    "Tasks",
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .white)),
+                                                                child: Text("Tasks", style: TextStyle(color: Colors.white)),
                                                               ),
                                                             ],
                                                           ),
@@ -379,50 +314,30 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                                   //Subject
                                                   Flexible(
                                                     flex: 1,
-                                                    child: LayoutBuilder(
-                                                        builder: (context, c) {
+                                                    child: LayoutBuilder(builder: (context, c) {
                                                       return Container(
                                                         width: c.maxWidth - 10,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color:
-                                                              theme.secondary,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
+                                                        decoration: BoxDecoration(
+                                                          color: theme.secondary,
+                                                          borderRadius: BorderRadius.circular(10),
                                                         ),
                                                         child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
+                                                          padding: const EdgeInsets.all(8.0),
                                                           child: DropdownButton(
-                                                              value:
-                                                                  selectedSubjectFilter,
-                                                              icon: const Icon(
-                                                                  null),
-                                                              underline:
-                                                                  Container(),
-                                                              onChanged:
-                                                                  (value) {
+                                                              value: selectedSubjectFilter,
+                                                              icon: const Icon(null),
+                                                              underline: Container(),
+                                                              onChanged: (value) {
                                                                 setState(() {
-                                                                  selectedSubjectFilter =
-                                                                      value
-                                                                          as int;
+                                                                  selectedSubjectFilter = value as int;
                                                                 });
                                                               },
-                                                              items:
-                                                                  List.generate(
-                                                                      getSubjects
-                                                                              .length +
-                                                                          1,
-                                                                      (index) =>
-                                                                          DropdownMenuItem(
-                                                                            value:
-                                                                                index,
-                                                                            child: index == 0
-                                                                                ? const Text("All", style: TextStyle(color: Colors.white))
-                                                                                : FittedBox(child: Text(getSubjects[index - 1], style: const TextStyle(color: Colors.white))),
-                                                                          ))),
+                                                              items: List.generate(
+                                                                  getSubjects.length + 1,
+                                                                  (index) => DropdownMenuItem(
+                                                                        value: index,
+                                                                        child: index == 0 ? const Text("All", style: TextStyle(color: Colors.white)) : FittedBox(child: Text(getSubjects[index - 1], style: const TextStyle(color: Colors.white))),
+                                                                      ))),
                                                         ),
                                                       );
                                                     }),
@@ -430,71 +345,40 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                                   //Due
                                                   Flexible(
                                                     flex: 1,
-                                                    child: LayoutBuilder(
-                                                        builder: (context, c) {
+                                                    child: LayoutBuilder(builder: (context, c) {
                                                       return Container(
                                                         width: c.maxWidth - 10,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color:
-                                                              theme.secondary,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
+                                                        decoration: BoxDecoration(
+                                                          color: theme.secondary,
+                                                          borderRadius: BorderRadius.circular(10),
                                                         ),
                                                         child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
+                                                          padding: const EdgeInsets.all(8.0),
                                                           child: DropdownButton(
-                                                            value:
-                                                                selectedDueFilter,
-                                                            icon: const Icon(
-                                                                null),
-                                                            underline:
-                                                                Container(),
+                                                            value: selectedDueFilter,
+                                                            icon: const Icon(null),
+                                                            underline: Container(),
                                                             onChanged: (value) {
                                                               setState(() {
-                                                                selectedDueFilter =
-                                                                    value
-                                                                        as int;
+                                                                selectedDueFilter = value as int;
                                                               });
                                                             },
                                                             items: const [
                                                               DropdownMenuItem(
                                                                 value: 0,
-                                                                child: Text(
-                                                                    "All",
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .white)),
+                                                                child: Text("All", style: TextStyle(color: Colors.white)),
                                                               ),
                                                               DropdownMenuItem(
                                                                 value: 1,
-                                                                child:
-                                                                    FittedBox(
-                                                                  child: Text(
-                                                                      "3 Days",
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.white)),
+                                                                child: FittedBox(
+                                                                  child: Text("3 Days", style: TextStyle(color: Colors.white)),
                                                                 ),
                                                               ),
                                                               DropdownMenuItem(
                                                                 value: 2,
-                                                                child: Text(
-                                                                    "7 Days",
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .white)),
+                                                                child: Text("7 Days", style: TextStyle(color: Colors.white)),
                                                               ),
-                                                              DropdownMenuItem(
-                                                                  value: 3,
-                                                                  child: Text(
-                                                                      "14 Days",
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.white)))
+                                                              DropdownMenuItem(value: 3, child: Text("14 Days", style: TextStyle(color: Colors.white)))
                                                             ],
                                                           ),
                                                         ),
@@ -567,127 +451,57 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                       Flexible(
                                           flex: 20,
                                           child: SizedBox.expand(
-                                            child: LayoutBuilder(
-                                                builder: (context, c) {
+                                            child: LayoutBuilder(builder: (context, c) {
                                               return StreamBuilder(
-                                                  stream: selectedSection == 0
-                                                      ? FirebaseFirestore
-                                                          .instance
-                                                          .collection(
-                                                              "communities")
-                                                          .doc(appState
-                                                              .getCurrentUser
-                                                              .assignedCommunity)
-                                                          .collection("MAB")
-                                                          .snapshots()
-                                                      : FirebaseFirestore
-                                                          .instance
-                                                          .collection(
-                                                              "communities")
-                                                          .doc(appState
-                                                              .getCurrentUser
-                                                              .assignedCommunity)
-                                                          .collection(
-                                                              "sections")
-                                                          .doc(appState
-                                                              .getCurrentUser
-                                                              .assignedSection)
-                                                          .collection("LAC")
-                                                          .snapshots(),
+                                                  stream: selectedSection == 0 ? FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("MAB").snapshots() : FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("LAC").snapshots(),
                                                   builder: (context, snapshot) {
-                                                    if (snapshot
-                                                            .connectionState ==
-                                                        ConnectionState
-                                                            .waiting) {
+                                                    if (snapshot.connectionState == ConnectionState.waiting) {
                                                       return Center(
                                                           child: Text(
                                                         "Loading...",
-                                                        style: textTheme
-                                                            .displaySmall,
+                                                        style: textTheme.displaySmall,
                                                       ));
                                                     }
                                                     if (snapshot.hasError) {
                                                       return Center(
                                                           child: Text(
                                                         "Error: ${snapshot.error}",
-                                                        style: textTheme
-                                                            .displaySmall!
-                                                            .copyWith(
-                                                                color: theme
-                                                                    .error),
+                                                        style: textTheme.displaySmall!.copyWith(color: theme.error),
                                                       ));
                                                     }
                                                     if (!snapshot.hasData) {
                                                       return Center(
                                                           child: Text(
                                                         "No data",
-                                                        style: textTheme
-                                                            .displaySmall,
+                                                        style: textTheme.displaySmall,
                                                       ));
                                                     }
-                                                    MabData mabData =
-                                                        MabData(uid: 0, posts: [
-                                                      for (var post
-                                                          in (selectedSection ==
-                                                                  0
-                                                              ? snapshot.data
-                                                                      ?.docs ??
-                                                                  []
-                                                              : snapshot.data
-                                                                      ?.docs ??
-                                                                  []))
+                                                    MabData mabData = MabData(uid: 0, posts: [
+                                                      for (var post in (selectedSection == 0 ? snapshot.data?.docs ?? [] : snapshot.data?.docs ?? []))
                                                         MabPost(
                                                             uid: 0,
-                                                            title:
-                                                                post["title"],
-                                                            description: post[
-                                                                "description"],
-                                                            date: DateTime.parse(
-                                                                post["date"]
-                                                                    .toDate()
-                                                                    .toString()),
+                                                            title: post["title"],
+                                                            description: post["description"],
+                                                            date: DateTime.parse(post["date"].toDate().toString()),
                                                             authorUID: 0,
-                                                            image:
-                                                                post["image"] ??
-                                                                    "",
+                                                            image: post["image"] ?? "",
                                                             fileAttatchments: [
-                                                              for (String file
-                                                                  in post[
-                                                                      "files"])
-                                                                file
+                                                              for (String file in post["files"]) file
                                                             ],
-                                                            dueDate: DateTime.parse(
-                                                                post["dueDate"]
-                                                                    .toDate()
-                                                                    .toString()),
+                                                            dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
                                                             type: post["type"],
-                                                            subject:
-                                                                post["subject"])
+                                                            subject: post["subject"])
                                                     ]);
 
                                                     return ListView.builder(
                                                         //MabData is misleading, it's actually both !!!!! (no way) (crazy right?)
-                                                        itemCount: mabData
-                                                            .posts.length,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          MabPost post = mabData
-                                                              .posts[index];
-                                                          return isItemValid(
-                                                                  post)
+                                                        itemCount: mabData.posts.length,
+                                                        itemBuilder: (context, index) {
+                                                          MabPost post = mabData.posts[index];
+                                                          return isItemValid(post)
                                                               ? Padding(
-                                                                  padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                      vertical:
-                                                                          5),
-                                                                  child: ListItem(
-                                                                      theme:
-                                                                          theme,
-                                                                      textTheme:
-                                                                          textTheme,
-                                                                      c: c,
-                                                                      post:
-                                                                          post),
+                                                                  padding: const EdgeInsets.symmetric(vertical: 5),
+                                                                  child: ListItem(theme: theme, textTheme: textTheme, c: c, post: post),
                                                                 )
                                                               : const SizedBox();
                                                         });
@@ -753,10 +567,9 @@ class _NewEventModalState extends State<NewEventModal> {
       //* Add the event to the community document
       try {
         if (widget.selectedSection == 0) {
-          await addNewMABEvent(title, description, type, subject, dueDate!,
-              attatchements, image);
+          await addNewMABEvent(title, description, type, subject, dueDate!, attatchements, image, Provider.of<AppState>(context, listen: false));
         } else {
-          //TODO add new LAC event
+          await addNewLACEvent(title, description, type, subject, dueDate!, attatchements, image, Provider.of<AppState>(context, listen: false));
         }
       } catch (e) {
         setState(() {
@@ -802,8 +615,7 @@ class _NewEventModalState extends State<NewEventModal> {
                   hintStyle: textTheme.displaySmall,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                        const BorderSide(color: Colors.transparent, width: 0),
+                    borderSide: const BorderSide(color: Colors.transparent, width: 0),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -811,13 +623,11 @@ class _NewEventModalState extends State<NewEventModal> {
                   ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                        const BorderSide(color: Colors.transparent, width: 0),
+                    borderSide: const BorderSide(color: Colors.transparent, width: 0),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                        const BorderSide(color: Colors.transparent, width: 0),
+                    borderSide: const BorderSide(color: Colors.transparent, width: 0),
                   ),
                 ),
               ),
@@ -840,8 +650,7 @@ class _NewEventModalState extends State<NewEventModal> {
                   hintStyle: textTheme.displaySmall,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                        const BorderSide(color: Colors.transparent, width: 0),
+                    borderSide: const BorderSide(color: Colors.transparent, width: 0),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -849,13 +658,11 @@ class _NewEventModalState extends State<NewEventModal> {
                   ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                        const BorderSide(color: Colors.transparent, width: 0),
+                    borderSide: const BorderSide(color: Colors.transparent, width: 0),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                        const BorderSide(color: Colors.transparent, width: 0),
+                    borderSide: const BorderSide(color: Colors.transparent, width: 0),
                   ),
                 ),
               ),
@@ -872,9 +679,7 @@ class _NewEventModalState extends State<NewEventModal> {
                         initialDate: DateTime.now(),
                         firstDate: DateTime.now(),
                         lastDate: DateTime.now().add(const Duration(days: 365)),
-                        fieldLabelText: Text("Due date:",
-                                style: TextStyle(color: theme.onBackground))
-                            .data,
+                        fieldLabelText: Text("Due date:", style: TextStyle(color: theme.onBackground)).data,
                         builder: (context, child) => Theme(
                               data: ThemeData.dark().copyWith(
                                 colorScheme: ColorScheme.dark(
@@ -899,12 +704,7 @@ class _NewEventModalState extends State<NewEventModal> {
                       });
                     }
                   },
-                  child: Text(
-                      dueDate == null
-                          ? "Select a date"
-                          : DateFormat("dd/MM/yyyy").format(dueDate!.toDate()),
-                      style: textTheme.displaySmall!
-                          .copyWith(fontWeight: FontWeight.bold)),
+                  child: Text(dueDate == null ? "Select a date" : DateFormat("dd/MM/yyyy").format(dueDate!.toDate()), style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -930,14 +730,7 @@ class _NewEventModalState extends State<NewEventModal> {
                       });
                       debugPrint("Changed subject to $subject");
                     },
-                    items: List.generate(
-                        getSubjects.length,
-                        (index) => DropdownMenuItem(
-                            value: index,
-                            child: Text(getSubjects[index],
-                                textAlign: TextAlign.center,
-                                style: textTheme.displaySmall!
-                                    .copyWith(fontWeight: FontWeight.bold)))),
+                    items: List.generate(getSubjects.length, (index) => DropdownMenuItem(value: index, child: Text(getSubjects[index], textAlign: TextAlign.center, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)))),
                   ),
                 ),
               ],
@@ -966,17 +759,11 @@ class _NewEventModalState extends State<NewEventModal> {
                     items: [
                       DropdownMenuItem(
                         value: 1,
-                        child: Text("Announcement",
-                            textAlign: TextAlign.center,
-                            style: textTheme.displaySmall!
-                                .copyWith(fontWeight: FontWeight.bold)),
+                        child: Text("Announcement", textAlign: TextAlign.center, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
                       ),
                       DropdownMenuItem(
                         value: 2,
-                        child: Text("Task",
-                            textAlign: TextAlign.center,
-                            style: textTheme.displaySmall!
-                                .copyWith(fontWeight: FontWeight.bold)),
+                        child: Text("Task", textAlign: TextAlign.center, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -994,11 +781,7 @@ class _NewEventModalState extends State<NewEventModal> {
                   child: ElevatedButton(
                     onPressed: () async {
                       //* Show image picker
-                      final pickedFile = await ImagePicker().pickImage(
-                          source: ImageSource.gallery,
-                          imageQuality: 50,
-                          maxWidth: 500,
-                          maxHeight: 500);
+                      final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 50, maxWidth: 500, maxHeight: 500);
                       if (pickedFile == null) return;
                       setState(() {
                         image = File(pickedFile.path);
@@ -1015,8 +798,7 @@ class _NewEventModalState extends State<NewEventModal> {
                     ),
                     child: Text(
                       "Select an image",
-                      style: textTheme.displaySmall!
-                          .copyWith(fontWeight: FontWeight.bold),
+                      style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -1030,8 +812,7 @@ class _NewEventModalState extends State<NewEventModal> {
                 height: 200,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  image: DecorationImage(
-                      image: FileImage(image!), fit: BoxFit.cover),
+                  image: DecorationImage(image: FileImage(image!), fit: BoxFit.cover),
                 ),
               ),
             const SizedBox(height: 8),
@@ -1045,8 +826,7 @@ class _NewEventModalState extends State<NewEventModal> {
                   child: ElevatedButton(
                     onPressed: () async {
                       //* Show image picker
-                      final pickedFiles = await ImagePicker().pickMultipleMedia(
-                          imageQuality: 50, maxWidth: 500, maxHeight: 500);
+                      final pickedFiles = await ImagePicker().pickMultipleMedia(imageQuality: 50, maxWidth: 500, maxHeight: 500);
                       setState(() {
                         for (var file in pickedFiles) {
                           attatchements.add(File(file.path));
@@ -1065,8 +845,7 @@ class _NewEventModalState extends State<NewEventModal> {
                     ),
                     child: Text(
                       "Pick attatchements",
-                      style: textTheme.displaySmall!
-                          .copyWith(fontWeight: FontWeight.bold),
+                      style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -1092,20 +871,12 @@ class _NewEventModalState extends State<NewEventModal> {
                   ),
                   //* Confirm button text : if loading, show loading indicator, if not loading and there is error, show error text, else show confirm text
                   child: isLoading
-                      ? SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: CircularProgressIndicator(
-                              color: theme.onBackground))
+                      ? SizedBox(height: 25, width: 25, child: CircularProgressIndicator(color: theme.onBackground))
                       : !isLoading && error != ""
-                          ? Text(error,
-                              style: textTheme.displaySmall!
-                                  .copyWith(color: theme.error))
+                          ? Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error))
                           : success
                               ? Icon(Icons.check, color: theme.onBackground)
-                              : Text("Confirm",
-                                  style: textTheme.displaySmall!
-                                      .copyWith(fontWeight: FontWeight.bold)),
+                              : Text("Confirm", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
                 ))
           ],
         ),
@@ -1149,11 +920,7 @@ class ListItem extends StatelessWidget {
               showDialog(
                   context: context,
                   builder: (context) {
-                    return MABModal(
-                        title: title,
-                        description: description,
-                        image: image,
-                        attatchements: attatchements);
+                    return MABModal(title: title, description: description, image: image, attatchements: attatchements);
                   });
             },
             style: ElevatedButton.styleFrom(
@@ -1182,13 +949,9 @@ class ListItem extends StatelessWidget {
                     Flexible(
                       flex: 1,
                       child: Container(
-                        decoration: BoxDecoration(
-                            color: theme.secondary,
-                            borderRadius: BorderRadius.circular(5)),
+                        decoration: BoxDecoration(color: theme.secondary, borderRadius: BorderRadius.circular(5)),
                         padding: const EdgeInsets.all(5),
-                        child: Text(
-                            "${due.difference(DateTime.now()).inDays + 1} Days (${DateFormat("E").format(due)})",
-                            style: textTheme.displaySmall),
+                        child: Text("${due.difference(DateTime.now()).inDays + 1} Days (${DateFormat("E").format(due)})", style: textTheme.displaySmall),
                       ),
                     ),
                   ],
@@ -1208,11 +971,7 @@ class ListItem extends StatelessWidget {
                             borderRadius: BorderRadius.circular(20),
                             gradient: getPrimaryGradient,
                           ),
-                          child: ClipRRect(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(15)),
-                              child:
-                                  Image.network('https://picsum.photos/200')),
+                          child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network('https://picsum.photos/200')),
                         ),
                         const SizedBox(width: 10),
                         Text("Alkaline", style: textTheme.displaySmall),
@@ -1223,17 +982,13 @@ class ListItem extends StatelessWidget {
                           color: theme.onPrimary,
                         ),
                         const SizedBox(width: 3),
-                        Text(type == 1 ? "Announcement" : "Task",
-                            style: textTheme.displaySmall)
+                        Text(type == 1 ? "Announcement" : "Task", style: textTheme.displaySmall)
                       ],
                     ),
                     Container(
-                      decoration: BoxDecoration(
-                          color: theme.secondary,
-                          borderRadius: BorderRadius.circular(5)),
+                      decoration: BoxDecoration(color: theme.secondary, borderRadius: BorderRadius.circular(5)),
                       padding: const EdgeInsets.all(5),
-                      child: Text(getSubjects[subject],
-                          style: textTheme.displaySmall),
+                      child: Text(getSubjects[subject], style: textTheme.displaySmall),
                     ),
                   ],
                 )
@@ -1246,12 +1001,7 @@ class ListItem extends StatelessWidget {
 
 //Mab Modal
 class MABModal extends StatelessWidget {
-  const MABModal(
-      {super.key,
-      required this.title,
-      required this.description,
-      this.image,
-      required this.attatchements});
+  const MABModal({super.key, required this.title, required this.description, this.image, required this.attatchements});
   final String title, description;
   final List<String> attatchements;
   final String? image;
@@ -1297,17 +1047,13 @@ class MABModal extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             //Sub header
-            Text(description,
-                style: textTheme.displaySmall, textAlign: TextAlign.center),
+            Text(description, style: textTheme.displaySmall, textAlign: TextAlign.center),
             const SizedBox(height: 8),
             //Image
             Container(
                 width: double.infinity,
                 height: 250,
-                decoration: BoxDecoration(
-                    color: theme.primaryContainer,
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    border: Border.all(color: theme.secondary, width: 1)),
+                decoration: BoxDecoration(color: theme.primaryContainer, borderRadius: const BorderRadius.all(Radius.circular(10)), border: Border.all(color: theme.secondary, width: 1)),
                 child: Center(
                   child: image == null || image == ""
                       ? Text(
@@ -1356,8 +1102,7 @@ class MABModal extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             //Replace with actual name
-                            Text(extractFilenameFromUrl(attatchements[index]),
-                                style: textTheme.displaySmall),
+                            Text(extractFilenameFromUrl(attatchements[index]), style: textTheme.displaySmall),
                             Icon(
                               Icons.download_sharp,
                               color: theme.onSecondary,
@@ -1385,7 +1130,9 @@ class MABModal extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                onPressed: () => {Navigator.pop(context)},
+                onPressed: () => {
+                  Navigator.pop(context)
+                },
                 child: Text(
                   "Back",
                   style: textTheme.displaySmall!.copyWith(
