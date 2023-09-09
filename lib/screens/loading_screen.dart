@@ -8,6 +8,7 @@ import '../main.dart';
 import 'login_screen.dart';
 import 'get_started.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../banner_ad.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key, required this.appstate});
@@ -146,21 +147,27 @@ class _LoadingScreenState extends State<LoadingScreen> {
         color: Colors.black,
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Loading $loadingDots',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                ),
+              const BannerAdWidget(),
+              Column(
+                children: [
+                  Text(
+                    'Loading $loadingDots',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                  Text(
+                    verbose,
+                    style: const TextStyle(color: Colors.white, fontSize: 20),
+                    textAlign: TextAlign.center,
+                  ),
+                  Text("Build: $buildNumber", style: const TextStyle(color: Colors.white, fontSize: 10)),
+                ],
               ),
-              Text(
-                verbose,
-                style: const TextStyle(color: Colors.white, fontSize: 20),
-                textAlign: TextAlign.center,
-              ),
-              Text("Build: $buildNumber", style: const TextStyle(color: Colors.white, fontSize: 10))
+              const BannerAdWidget(),
             ],
           ),
         ),

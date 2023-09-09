@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:oneforall/banner_ad.dart';
 // import 'package:oneforall/data/community_data.dart';
 import 'package:provider/provider.dart';
 import '../service/community_service.dart';
@@ -80,6 +81,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
     var theme = appState.currentUserSelectedTheme.colorScheme;
     var textTheme = appState.currentUserSelectedTheme.textTheme;
     return Scaffold(
+      bottomNavigationBar: const BannerAdWidget(),
       backgroundColor: appState.currentUserSelectedTheme.colorScheme.background,
       body: SafeArea(child: Builder(builder: (context) {
         if (appState.communityData.isEmpty) {
@@ -89,7 +91,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
             style: textTheme.displaySmall,
           ));
         }
-
         return Column(
           children: [
             Stack(children: [

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/constants.dart';
+import 'package:oneforall/interstitial_ad.dart';
 import 'package:provider/provider.dart';
 import '../data/user_data.dart';
 import 'dart:math';
@@ -47,6 +49,7 @@ class _FlashcardsPlayScreen extends State<FlashcardsPlayScreen> {
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
                 backgroundColor: Colors.transparent,
+                bottomNavigationBar: const BannerAdWidget(),
                 body: Column(
                   children: [
                     //App Bar
@@ -77,26 +80,28 @@ class _FlashcardsPlayScreen extends State<FlashcardsPlayScreen> {
                         : Container(),
                     //End of App Bar
                     //Body
-                    PageTransitionSwitcher(
-                      reverse: reversed,
-                      transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
-                        return SharedAxisTransition(
-                          fillColor: Colors.transparent,
-                          transitionType: SharedAxisTransitionType.horizontal,
-                          animation: primaryAnimation,
-                          secondaryAnimation: secondaryAnimation,
-                          child: child,
-                        );
-                      },
-                      child: selectedScreen == 0
-                          ? SelectModeScreen(textTheme: textTheme, theme: theme, set: set, changeScreenFunction: changeScreen)
-                          : selectedScreen == 1
-                              ? StartScreen(textTheme: textTheme, theme: theme, set: set, changeScreenFunction: changeScreen)
-                              : selectedScreen == 2
-                                  ? const Placeholder()
-                                  : selectedScreen == 3
-                                      ? PlayScreen(set: set)
-                                      : const Placeholder(),
+                    Expanded(
+                      child: PageTransitionSwitcher(
+                        reverse: reversed,
+                        transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
+                          return SharedAxisTransition(
+                            fillColor: Colors.transparent,
+                            transitionType: SharedAxisTransitionType.horizontal,
+                            animation: primaryAnimation,
+                            secondaryAnimation: secondaryAnimation,
+                            child: child,
+                          );
+                        },
+                        child: selectedScreen == 0
+                            ? SelectModeScreen(textTheme: textTheme, theme: theme, set: set, changeScreenFunction: changeScreen)
+                            : selectedScreen == 1
+                                ? StartScreen(textTheme: textTheme, theme: theme, set: set, changeScreenFunction: changeScreen)
+                                : selectedScreen == 2
+                                    ? const Placeholder()
+                                    : selectedScreen == 3
+                                        ? PlayScreen(set: set)
+                                        : const Placeholder(),
+                      ),
                     ),
                   ],
                 ))));
@@ -384,143 +389,139 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    return SizedBox(
-      //! Temporary solution, Expanded was here, it worked last time, idk why it doesn't work now (please help)
-      height: MediaQuery.of(context).size.height * 0.95,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            //Top (nothign)
-            Container(),
-            //Main Content
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 150),
-                  child: Text("Question $questionNumber", style: textTheme.displayMedium),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          //Top (nothign)
+          Container(),
+          //Main Content
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 150),
+                child: Text("Question $questionNumber", style: textTheme.displayMedium),
+              ),
+              const SizedBox(height: 10),
+              AnimatedBuilder(
+                  animation: _cardAnimation,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      //Y stays the same, X changes
+                      scaleY: 1,
+                      scaleX: _cardAnimation.value,
+                      child: Center(
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.25,
+                          width: double.infinity,
+                          child: ElevatedButton(
+                              onPressed: () async {
+                                //* Forward then back
+                                await _cardAnimationController.forward();
+                                setState(() {
+                                  flipped = !flipped;
+                                });
+                                await _cardAnimationController.reverse();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: theme.secondary.withOpacity(0.115),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                shadowColor: Colors.transparent,
+                                // height: MediaQuery.of(context).size.height * 0.25,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const SizedBox.shrink(),
+                                    Text(
+                                      !flipped ? currentCard.question : currentCard.answer,
+                                      style: textTheme.displayMedium,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    Icon(Icons.rotate_left, color: theme.onBackground),
+                                  ],
+                                ),
+                              )),
+                        ),
+                      ),
+                    );
+                  }),
+              const SizedBox(height: 10),
+              Text("How well did you know this?", style: textTheme.displaySmall),
+              const SizedBox(height: 10),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 150),
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: animation,
+                  child: child,
                 ),
-                const SizedBox(height: 10),
-                AnimatedBuilder(
-                    animation: _cardAnimation,
-                    builder: (context, child) {
-                      return Transform.scale(
-                        //Y stays the same, X changes
-                        scaleY: 1,
-                        scaleX: _cardAnimation.value,
-                        child: Center(
-                          child: SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.25,
+                child: flipped
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            height: 40,
+                            width: double.infinity,
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), gradient: primaryGradient),
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  nextQuestion(-100);
+                                },
+                                style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, foregroundColor: theme.onPrimary),
+                                child: const Text("100% Knew it!")),
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            height: 40,
                             width: double.infinity,
                             child: ElevatedButton(
-                                onPressed: () async {
-                                  //* Forward then back
-                                  await _cardAnimationController.forward();
-                                  setState(() {
-                                    flipped = !flipped;
-                                  });
-                                  await _cardAnimationController.reverse();
+                                onPressed: () {
+                                  nextQuestion(25);
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: theme.secondary.withOpacity(0.115),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  shadowColor: Colors.transparent,
-                                  // height: MediaQuery.of(context).size.height * 0.25,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const SizedBox.shrink(),
-                                      Text(
-                                        !flipped ? currentCard.question : currentCard.answer,
-                                        style: textTheme.displayMedium,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      Icon(Icons.rotate_left, color: theme.onBackground),
-                                    ],
-                                  ),
-                                )),
+                                style: ElevatedButton.styleFrom(backgroundColor: theme.secondary, shadowColor: Colors.transparent, foregroundColor: theme.onPrimary),
+                                child: const Text("50% Some")),
                           ),
-                        ),
-                      );
-                    }),
-                const SizedBox(height: 10),
-                Text("How well did you know this?", style: textTheme.displaySmall),
-                const SizedBox(height: 10),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 150),
-                  transitionBuilder: (child, animation) => FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  ),
-                  child: flipped
-                      ? Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              height: 40,
-                              width: double.infinity,
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(100), gradient: primaryGradient),
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    nextQuestion(-100);
-                                  },
-                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, foregroundColor: theme.onPrimary),
-                                  child: const Text("100% Knew it!")),
-                            ),
-                            const SizedBox(height: 10),
-                            SizedBox(
-                              height: 40,
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    nextQuestion(25);
-                                  },
-                                  style: ElevatedButton.styleFrom(backgroundColor: theme.secondary, shadowColor: Colors.transparent, foregroundColor: theme.onPrimary),
-                                  child: const Text("50% Some")),
-                            ),
-                            const SizedBox(height: 10),
-                            SizedBox(
-                              height: 40,
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    nextQuestion(75);
-                                  },
-                                  style: ElevatedButton.styleFrom(backgroundColor: theme.secondary, shadowColor: Colors.transparent, foregroundColor: theme.onPrimary),
-                                  child: const Text("0% None")),
-                            ),
-                          ],
-                        )
-                      : Container(),
-                )
-              ],
-            ),
-            //Bottom
-            ElevatedButton(
-                onPressed: () {
-                  debugPrint("Finish");
-                  finishPlaying();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.secondary,
-                  shadowColor: Colors.transparent,
-                  // height: MediaQuery.of(context).size.height * 0.25,
-                ),
-                child: Text(
-                  "Finish",
-                  style: textTheme.displaySmall,
-                  textAlign: TextAlign.center,
-                ))
-          ],
-        ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            height: 40,
+                            width: double.infinity,
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  nextQuestion(75);
+                                },
+                                style: ElevatedButton.styleFrom(backgroundColor: theme.secondary, shadowColor: Colors.transparent, foregroundColor: theme.onPrimary),
+                                child: const Text("0% None")),
+                          ),
+                        ],
+                      )
+                    : Container(),
+              )
+            ],
+          ),
+          //Bottom
+          ElevatedButton(
+              onPressed: () {
+                debugPrint("Finish");
+                finishPlaying();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.secondary,
+                shadowColor: Colors.transparent,
+                // height: MediaQuery.of(context).size.height * 0.25,
+              ),
+              child: Text(
+                "Finish",
+                style: textTheme.displaySmall,
+                textAlign: TextAlign.center,
+              ))
+        ],
       ),
     );
   }
@@ -596,6 +597,7 @@ class _FinishedScreenState extends State<FinishedScreen> with TickerProviderStat
                 backgroundColor: Colors.transparent,
                 body: Column(
                   children: [
+                    const InterstitialAdWidget(),
                     //App Bar
                     Container(
                       color: Colors.transparent,

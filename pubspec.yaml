@@ -34,6 +34,7 @@ dependencies:
   googleapis_auth: ^1.4.1
   async: ^2.11.0
   envied: ^0.3.0+3
+  google_mobile_ads: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -49,7 +50,6 @@ flutter:
   assets:
     - assets/images/purpwallpaper 2.png
     - assets/images/logbg.png
-    - assets/private/one-for-all-vcr-notificationacc.json
   fonts:
     - family: MyFlutterApp
       fonts: 

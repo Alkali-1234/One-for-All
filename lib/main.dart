@@ -20,6 +20,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 // import 'package:path_provider/path_provider.dart';
 // import 'package:introduction_screen/introduction_screen.dart';
 import 'package:animations/animations.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 //Data
 import 'data/community_data.dart';
@@ -33,6 +34,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FlutterDownloader.initialize(debug: true);
+  await MobileAds.instance.initialize();
   debugPrint(
     "Initialized app! : ${Firebase.app().options.projectId}",
   );

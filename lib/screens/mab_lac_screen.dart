@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/constants.dart';
 // import 'package:oneforall/data/user_data.dart';
 import 'package:provider/provider.dart';
@@ -389,62 +390,62 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                               ),
                                             ),
                                             const SizedBox(height: 5),
-                                            const Flexible(
-                                              flex: 1,
-                                              child: Row(
-                                                children: [
-                                                  // Container(
-                                                  //   width:
-                                                  //       MediaQuery.of(context)
-                                                  //               .size
-                                                  //               .width *
-                                                  //           0.3,
-                                                  //   decoration: BoxDecoration(
-                                                  //     color: theme.secondary,
-                                                  //     borderRadius:
-                                                  //         BorderRadius.circular(
-                                                  //             10),
-                                                  //   ),
-                                                  //   child: Padding(
-                                                  //     padding:
-                                                  //         const EdgeInsets.all(
-                                                  //             8.0),
-                                                  //     child: DropdownButton(
-                                                  //       value: sortFilter,
-                                                  //       icon: const Icon(null),
-                                                  //       underline: Container(),
-                                                  //       onChanged: (value) {
-                                                  //         setState(() {
-                                                  //           sortFilter =
-                                                  //               value as int;
-                                                  //         });
-                                                  //       },
-                                                  //       items: const [
-                                                  //         DropdownMenuItem(
-                                                  //           value: 0,
-                                                  //           child: Text(
-                                                  //               "Newest",
-                                                  //               style: TextStyle(
-                                                  //                   color: Colors
-                                                  //                       .white)),
-                                                  //         ),
-                                                  //         DropdownMenuItem(
-                                                  //           value: 1,
-                                                  //           child: FittedBox(
-                                                  //             child: Text(
-                                                  //                 "Due Date",
-                                                  //                 style: TextStyle(
-                                                  //                     color: Colors
-                                                  //                         .white)),
-                                                  //           ),
-                                                  //         ),
-                                                  //       ],
-                                                  //     ),
-                                                  //   ),
-                                                  // ),
-                                                ],
-                                              ),
-                                            )
+                                            //   const Flexible(
+                                            //     flex: 1,
+                                            //     child: Row(
+                                            //       children: [
+                                            //         // Container(
+                                            //         //   width:
+                                            //         //       MediaQuery.of(context)
+                                            //         //               .size
+                                            //         //               .width *
+                                            //         //           0.3,
+                                            //         //   decoration: BoxDecoration(
+                                            //         //     color: theme.secondary,
+                                            //         //     borderRadius:
+                                            //         //         BorderRadius.circular(
+                                            //         //             10),
+                                            //         //   ),
+                                            //         //   child: Padding(
+                                            //         //     padding:
+                                            //         //         const EdgeInsets.all(
+                                            //         //             8.0),
+                                            //         //     child: DropdownButton(
+                                            //         //       value: sortFilter,
+                                            //         //       icon: const Icon(null),
+                                            //         //       underline: Container(),
+                                            //         //       onChanged: (value) {
+                                            //         //         setState(() {
+                                            //         //           sortFilter =
+                                            //         //               value as int;
+                                            //         //         });
+                                            //         //       },
+                                            //         //       items: const [
+                                            //         //         DropdownMenuItem(
+                                            //         //           value: 0,
+                                            //         //           child: Text(
+                                            //         //               "Newest",
+                                            //         //               style: TextStyle(
+                                            //         //                   color: Colors
+                                            //         //                       .white)),
+                                            //         //         ),
+                                            //         //         DropdownMenuItem(
+                                            //         //           value: 1,
+                                            //         //           child: FittedBox(
+                                            //         //             child: Text(
+                                            //         //                 "Due Date",
+                                            //         //                 style: TextStyle(
+                                            //         //                     color: Colors
+                                            //         //                         .white)),
+                                            //         //           ),
+                                            //         //         ),
+                                            //         //       ],
+                                            //         //     ),
+                                            //         //   ),
+                                            //         // ),
+                                            //       ],
+                                            //     ),
+                                            //   )
                                           ])),
                                       const SizedBox(height: 10),
                                       //List of items
@@ -510,6 +511,9 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                           )),
                                     ]),
                                   ))),
+                          // End of main body
+                          //Ad
+                          const Flexible(flex: 2, child: Center(child: BannerAdWidget())),
                         ]),
                       ),
                     ),

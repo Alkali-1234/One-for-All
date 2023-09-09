@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/main.dart';
 import 'package:oneforall/screens/forum_screen.dart';
 import 'package:oneforall/screens/premium_screen.dart';
@@ -9,6 +10,7 @@ import 'community_screen.dart';
 import 'mab_lac_screen.dart';
 import 'calendar_screen.dart';
 import 'flashcards_screen.dart';
+import 'quizzes_screen.dart';
 import 'settings_screen.dart';
 
 class NavigationScreen extends StatefulWidget {
@@ -89,11 +91,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
                             icon: Icons.extension,
                             name: "Quizzes",
                             onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return const UnavailableItemDialog();
-                                  });
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const QuizzesScreen()),
+                              );
                             },
                           ),
                         ],
@@ -235,14 +236,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
             ],
           ),
         ),
-        Flexible(
+        const Flexible(
             flex: 1,
             child: Center(
-              child: Row(
-                children: [
-                  Text("\"Buy premium for free rizz\"\n -Sun Tzu, Art of War", style: textTheme.displayMedium),
-                ],
-              ),
+              child: BannerAdWidget(),
             ))
       ],
     );

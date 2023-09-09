@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 // import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/screens/thread_screen.dart';
 import 'package:provider/provider.dart';
@@ -193,6 +194,7 @@ class _ForumScreenState extends State<ForumScreen> with TickerProviderStateMixin
             color: tm.onBackground,
           ),
         ),
+        bottomNavigationBar: const BannerAdWidget(),
         backgroundColor: tm.background,
         body: Container(
             decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/purpwallpaper 2.png"), fit: BoxFit.cover)) : BoxDecoration(color: tm.background),
