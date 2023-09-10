@@ -10,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
-import '../env/env.dart' as env;
+// import '../env/env.dart' as env;
 
 // import './community_service.dart';
 // import '../data/user_data.dart';
@@ -198,7 +198,7 @@ Future<String> getAccessToken() async {
   final Directory currentDirectory = Directory.current;
   print(currentDirectory.path);
   // final String email = env.Env.notificationClientEmail;
-  final String privateKey = env.Env.notificationPrivateKey;
+  final String privateKey = "0";
   // final String clientId = env.Env.notificationClientId;
   //wait 1 second
   await Future.delayed(const Duration(seconds: 1));
