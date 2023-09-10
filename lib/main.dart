@@ -26,6 +26,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'data/community_data.dart';
 
 //Screens
+import 'models/quizzes_models.dart';
 import 'screens/navigation_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/loading_screen.dart';
@@ -105,6 +106,15 @@ class AppState extends ChangeNotifier {
 
   void addFlashcardSet(FlashcardSet flashcardSet) {
     _currentUser.flashCardSets.add(flashcardSet);
+    notifyListeners();
+  }
+
+  // Quizzes Data
+  List<QuizSet> _quizzes = [];
+
+  List<QuizSet> get getQuizzes => _quizzes;
+  void setQuizzes(List<QuizSet> quizzes) {
+    _quizzes = quizzes;
     notifyListeners();
   }
 

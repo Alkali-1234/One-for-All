@@ -168,7 +168,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                             SizedBox(
                               height: MediaQuery.of(context).size.height * 0.65,
                               child: ListView.builder(
-                                  shrinkWrap: true,
+                                  physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                                   itemCount: getQuestionQuery["queries"].length,
                                   itemBuilder: (context, index) {
                                     return Padding(

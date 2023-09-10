@@ -12,6 +12,7 @@ import 'package:oneforall/service/firebase_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/user_data.dart';
 //ignore: unused_import
+import '../models/quizzes_models.dart';
 import 'community_service.dart';
 
 get getUserAuth => FirebaseAuth.instance;
@@ -85,6 +86,26 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
   }).catchError((error, stackTrace) {
     debugPrint("err on auth service: getDocument");
     throw error;
+  });
+  appState.setQuizzes([]);
+  //* Get quizzes data from shared preferences
+  await SharedPreferences.getInstance().then((value) {
+    if (value.containsKey("quizData")) {
+      dynamic decodedObject = jsonDecode(value.getString("quizData")!);
+
+      //* Convert the decoded `dynamic` object back to your desired Dart object structure
+      List<QuizSet> quizzes = [];
+      for (var quiz in decodedObject['quizzes']) {
+        quizzes.add(QuizSet(title: quiz['title'], description: quiz['description'], questions: [
+          for (var question in quiz['questions']) QuizQuestion(question: question['question'], answers: List<String>.from(question["answers"] as List), correctAnswer: List<int>.from(question["correctAnswer"] as List)),
+        ]));
+      }
+
+      //* Add the quizzes to the user data
+      for (QuizSet quiz in quizzes) {
+        appState.getQuizzes.add(quiz);
+      }
+    }
   });
 
   //* Get flashcard sets from shared preferences
