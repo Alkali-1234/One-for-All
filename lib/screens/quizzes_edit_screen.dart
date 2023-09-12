@@ -32,32 +32,32 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
     });
   }
 
-  void saveQuizSet(AppState appState) {
-    setState(() async {
-      appState.getQuizzes[widget.index] = quizSet;
-      // Save to prefs
+  void saveQuizSet(AppState appState) async {
+    final prefs = await SharedPreferences.getInstance();
+// Save to prefs
 
-      final prefs = await SharedPreferences.getInstance();
-      //Convert to Object
-      Object quizData = {
-        "quizzes": [
-          for (var quiz in appState.getQuizzes)
-            {
-              "title": quiz.title,
-              "description": quiz.description,
-              "questions": [
-                for (var question in quiz.questions)
-                  {
-                    "question": question.question,
-                    "answers": question.answers,
-                    "correctAnswer": question.correctAnswer
-                  }
-              ]
-            }
-        ]
-      };
-      //Save to prefs
-      await prefs.setString("quizData", jsonEncode(quizData));
+    //Convert to Object
+    Object quizData = {
+      "quizzes": [
+        for (var quiz in appState.getQuizzes)
+          {
+            "title": quiz.title,
+            "description": quiz.description,
+            "questions": [
+              for (var question in quiz.questions)
+                {
+                  "question": question.question,
+                  "answers": question.answers,
+                  "correctAnswer": question.correctAnswer
+                }
+            ]
+          }
+      ]
+    };
+    //Save to prefs
+    await prefs.setString("quizData", jsonEncode(quizData));
+    setState(() {
+      appState.getQuizzes[widget.index] = quizSet;
     });
     Navigator.pop(context);
   }
@@ -164,7 +164,7 @@ class QueryListItem extends StatelessWidget {
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            onPressed: () => showDialog(context: context, builder: (context) => EditQuestionModal(question: question, index: index, setQuizSet: setQuizSet)),
+            onPressed: () => showDialog(context: context, builder: (context) => EditQuestionModal(question: question, index: index, setQuizSet: setQuizSet, quizIndex: quizIndex)),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -310,10 +310,11 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
 
 ///* Edit question modal
 class EditQuestionModal extends StatefulWidget {
-  const EditQuestionModal({super.key, required this.index, required this.question, required this.setQuizSet});
+  const EditQuestionModal({super.key, required this.index, required this.question, required this.setQuizSet, required this.quizIndex});
   final int index;
   final QuizQuestion question;
   final Function setQuizSet;
+  final int quizIndex;
 
   @override
   State<EditQuestionModal> createState() => _EditQuestionModalState();
@@ -398,8 +399,8 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                   ),
                                   onPressed: () => setState(() {
+                                        _textAnswerControllers.add(TextEditingController(text: "Answer ${question.answers.length + 1}"));
                                         question.answers.add("Answer ${question.answers.length + 1}");
-                                        question.correctAnswer.add(question.answers.length + 1);
                                       }),
                                   icon: const Icon(Icons.add),
                                   label: const Text("Add Answer")),
@@ -448,7 +449,7 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
                                         value: question.correctAnswer.contains(index),
                                         onChanged: (value) => setState(() {
                                               if (value == null) return;
-                                              if (value) question.correctAnswer[index] = index;
+                                              if (value) question.correctAnswer.add(index);
                                               if (!value) question.correctAnswer.remove(index);
                                               setState(() {});
                                             }))
@@ -477,7 +478,7 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
                         ),
                         onPressed: () {
                           Navigator.pop(context);
-                          widget.setQuizSet(appState.getQuizzes[widget.index]);
+                          widget.setQuizSet(appState.getQuizzes[widget.quizIndex]);
                         },
                         icon: const Icon(Icons.done),
                         label: const Text("Done")),
