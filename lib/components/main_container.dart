@@ -26,14 +26,15 @@ class _MainContainerState extends State<MainContainer> {
               ),
             )
           : null,
-      child: SafeArea(
-        child: Column(
-          children: [
-            //App Bar
-            Hero(
-              tag: "topAppBar",
-              child: Container(
-                color: theme.secondary,
+      child: Column(
+        children: [
+          //App Bar
+          Hero(
+            tag: "topAppBar",
+            child: Container(
+              color: theme.secondary,
+              child: SafeArea(
+                bottom: false,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
@@ -62,12 +63,12 @@ class _MainContainerState extends State<MainContainer> {
                 ),
               ),
             ),
-            //End of App Bar
-            Expanded(
-              child: widget.child,
-            ),
-          ],
-        ),
+          ),
+          //End of App Bar
+          Expanded(
+            child: SafeArea(top: false, child: widget.child),
+          ),
+        ],
       ),
     );
   }

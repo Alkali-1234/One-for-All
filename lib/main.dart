@@ -203,18 +203,19 @@ class _HomePageState extends State<HomePage> {
       //Background
       backgroundColor: theme.background,
       //Main application
-      body: SafeArea(
-        child: Container(
-          height: double.maxFinite,
-          width: double.maxFinite,
-          decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
-          child: Column(children: [
-            Hero(
-              tag: "topAppBar",
-              child: Container(
-                width: double.infinity,
-                color: theme.secondary,
-                //Top App Bar
+      body: Container(
+        height: double.maxFinite,
+        width: double.maxFinite,
+        decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
+        child: Column(children: [
+          Hero(
+            tag: "topAppBar",
+            child: Container(
+              width: double.infinity,
+              color: theme.secondary,
+              //Top App Bar
+              child: SafeArea(
+                bottom: false,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
@@ -244,68 +245,68 @@ class _HomePageState extends State<HomePage> {
                       )
                     ],
                   ),
-                ), //END OF TOP APP BAR
-              ),
-            ),
-            //Main Content
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: PageTransitionSwitcher(
-                  reverse: reverseTransition,
-                  transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
-                    transitionType: SharedAxisTransitionType.horizontal,
-                    fillColor: Colors.transparent,
-                    animation: primaryAnimation,
-                    secondaryAnimation: secondaryAnimation,
-                    child: child,
-                  ),
-                  child: selectedScreen == 0
-                      ? const HomeScreen()
-                      : selectedScreen == 1
-                          ? const NavigationScreen()
-                          : selectedScreen == 2
-                              ? ProfileScreen()
-                              : Container(),
                 ),
+              ), //END OF TOP APP BAR
+            ),
+          ),
+          //Main Content
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: PageTransitionSwitcher(
+                reverse: reverseTransition,
+                transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
+                  transitionType: SharedAxisTransitionType.horizontal,
+                  fillColor: Colors.transparent,
+                  animation: primaryAnimation,
+                  secondaryAnimation: secondaryAnimation,
+                  child: child,
+                ),
+                child: selectedScreen == 0
+                    ? const HomeScreen()
+                    : selectedScreen == 1
+                        ? const NavigationScreen()
+                        : selectedScreen == 2
+                            ? const ProfileScreen()
+                            : Container(),
               ),
             ),
-            //END OF MAIN CONTENT
+          ),
+          //END OF MAIN CONTENT
 
-            //Bottom Nav Bar
-            BottomNavigationBar(
-              showSelectedLabels: false,
-              showUnselectedLabels: false,
-              backgroundColor: theme.secondary,
-              elevation: 0,
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    selectedScreen == 0 ? Icons.home_rounded : Icons.home_outlined,
-                    color: theme.onPrimary,
-                  ),
-                  label: "Home",
+          //Bottom Nav Bar
+          BottomNavigationBar(
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            backgroundColor: theme.secondary,
+            elevation: 0,
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(
+                  selectedScreen == 0 ? Icons.home_rounded : Icons.home_outlined,
+                  color: theme.onPrimary,
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    selectedScreen == 1 ? Icons.grid_view_rounded : Icons.grid_view_outlined,
-                    color: theme.onPrimary,
-                  ),
-                  label: "Navigation",
+                label: "Home",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  selectedScreen == 1 ? Icons.grid_view_rounded : Icons.grid_view_outlined,
+                  color: theme.onPrimary,
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    selectedScreen == 2 ? Icons.person_rounded : Icons.person_outline,
-                    color: theme.onPrimary,
-                  ),
-                  label: "Profile",
+                label: "Navigation",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  selectedScreen == 2 ? Icons.person_rounded : Icons.person_outline,
+                  color: theme.onPrimary,
                 ),
-              ],
-              onTap: (index) => setSelectedScreen(index),
-              currentIndex: selectedScreen,
-            )
-          ]),
-        ),
+                label: "Profile",
+              ),
+            ],
+            onTap: (index) => setSelectedScreen(index),
+            currentIndex: selectedScreen,
+          )
+        ]),
       ),
     );
   }
