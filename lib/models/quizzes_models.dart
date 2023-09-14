@@ -14,11 +14,13 @@ class QuizSet {
 
 class QuizQuestion {
   QuizQuestion({
+    required this.id,
     required this.question,
     required this.answers,
     required this.correctAnswer,
     this.type,
   });
+  int id;
   String question;
   List<String> answers;
   //Between 0 to length of answers

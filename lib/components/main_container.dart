@@ -5,8 +5,10 @@ import 'package:provider/provider.dart';
 import '../main.dart';
 
 class MainContainer extends StatefulWidget {
-  const MainContainer({super.key, required this.child});
+  const MainContainer({super.key, required this.child, this.onClose});
   final Widget child;
+  final Function? onClose;
+
   @override
   State<MainContainer> createState() => _MainContainerState();
 }
@@ -41,7 +43,7 @@ class _MainContainerState extends State<MainContainer> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
-                        onTap: () => Navigator.pop(context),
+                        onTap: widget.onClose != null ? () => widget.onClose!() : () => Navigator.pop(context),
                         child: Icon(
                           Icons.arrow_back,
                           color: theme.onPrimary,

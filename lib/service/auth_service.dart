@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 //ignore: unused_import
 import 'package:flutter/material.dart';
+import 'package:oneforall/constants.dart';
 import 'package:oneforall/main.dart';
 import 'package:oneforall/service/files_service.dart';
 import 'package:oneforall/service/firebase_api.dart';
@@ -97,7 +98,7 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
       List<QuizSet> quizzes = [];
       for (var quiz in decodedObject['quizzes']) {
         quizzes.add(QuizSet(title: quiz['title'], description: quiz['description'], questions: [
-          for (var question in quiz['questions']) QuizQuestion(question: question['question'], answers: List<String>.from(question["answers"] as List), correctAnswer: List<int>.from(question["correctAnswer"] as List)),
+          for (int i = 0; i < quiz["questions"].length; i++) QuizQuestion(id: i, question: quiz["questions"][i]["question"], answers: List<String>.from(quiz["questions"][i]["answers"] as List), correctAnswer: List<int>.from(quiz["questions"][i]["correctAnswer"] as List), type: quiz["questions"][i]["type"] != null ? quizTypes.values[quiz["questions"][i]["type"]] : quizTypes.multipleChoice),
         ]));
       }
 

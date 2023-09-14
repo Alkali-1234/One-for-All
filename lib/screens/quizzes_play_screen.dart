@@ -38,6 +38,19 @@ class _QuizzesPlayScreenState extends State<QuizzesPlayScreen> {
     return Scaffold(
       bottomNavigationBar: const BannerAdWidget(),
       body: MainContainer(
+          onClose: () {
+            if (currentScreen == 0) {
+              Navigator.of(context).pop();
+            }
+            if (currentScreen == 1) {
+              showDialog(
+                  context: context,
+                  builder: (context) => OnCloseDialog(onCloseFunction: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                      }));
+            }
+          },
           child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: PageTransitionSwitcher(
@@ -191,25 +204,30 @@ class _PlayScreenState extends State<PlayScreen> {
     return "$formattedMinutes:$formattedSeconds";
   }
 
-  void doNextQuestionAnimations(int score, int scoreBeingAdded) async {
+  void doNextQuestionAnimations(int scoreBeingAdded) async {
+    if (!mounted) return;
     setState(() {
       this.scoreBeingAdded = scoreBeingAdded;
     });
     await Future.delayed(const Duration(milliseconds: 250));
+    if (!mounted) return;
     setState(() {
       scoreStatAddTween = Tween<double>(begin: 1, end: 0);
     });
     await Future.delayed(const Duration(milliseconds: 400));
+    if (!mounted) return;
     setState(() {
       scoreStatTween = Tween<double>(begin: score.toDouble(), end: score.toDouble() + scoreBeingAdded);
     });
     await Future.delayed(const Duration(milliseconds: 400));
+    if (!mounted) return;
     setState(() {
       scoreStatAddTween = Tween<double>(begin: 0, end: 1);
     });
   }
 
   void nextQuestion(bool correct, int score, QuizQuestion question) {
+    if (!mounted) return;
     //* Check if quiz is finished
     if (quizSet.questions.indexOf(currentQuestion) + 1 > quizSet.questions.length - 1) {
       questionsDone++;
@@ -226,20 +244,16 @@ class _PlayScreenState extends State<PlayScreen> {
       }
       if (redemptionSet.questions.isNotEmpty) {
         initializeRedemption();
-
-        doNextQuestionAnimations(this.score, score);
         return;
       } else {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => InterstitialScreen(
-                  onClosed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EndScreen(score: score, correctAnswers: correctAnswers, totalQuestions: questionsDone, redemptionAmount: redemptionAmount, timeSpent: DateTime.now().difference(startTime), highestStreak: highestStreak))),
-                  onFailed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EndScreen(score: score, correctAnswers: correctAnswers, totalQuestions: questionsDone, redemptionAmount: redemptionAmount, timeSpent: DateTime.now().difference(startTime), highestStreak: highestStreak))),
+                  onClosed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EndScreen(score: this.score, correctAnswers: correctAnswers, totalQuestions: questionsDone, redemptionAmount: redemptionAmount, timeSpent: DateTime.now().difference(startTime), highestStreak: highestStreak))),
+                  onFailed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EndScreen(score: this.score, correctAnswers: correctAnswers, totalQuestions: questionsDone, redemptionAmount: redemptionAmount, timeSpent: DateTime.now().difference(startTime), highestStreak: highestStreak))),
                 )));
         return;
       }
     }
-
-    doNextQuestionAnimations(this.score, score);
     setState(() {
       questionsDone++;
       currentQuestion = quizSet.questions[quizSet.questions.indexOf(currentQuestion) + 1];
@@ -256,12 +270,13 @@ class _PlayScreenState extends State<PlayScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context).colorScheme;
+    // var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     return Column(
       children: [
         //* Statistics
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             //* Score
             Align(
@@ -318,8 +333,11 @@ class _PlayScreenState extends State<PlayScreen> {
               ? MultipleChoice(
                   question: currentQuestion,
                   nextQuestionFunction: nextQuestion,
+                  doAnimationFunction: doNextQuestionAnimations,
                 )
-              : const Placeholder(),
+              : currentQuestion.type == quizTypes.dropdown
+                  ? DropdownQuestion(question: currentQuestion, nextQuestionFunction: nextQuestion, doAnimationFunction: doNextQuestionAnimations)
+                  : const Placeholder(),
         ),
       ],
     );
@@ -328,9 +346,10 @@ class _PlayScreenState extends State<PlayScreen> {
 
 //* Multiple choice question
 class MultipleChoice extends StatefulWidget {
-  const MultipleChoice({super.key, required this.question, required this.nextQuestionFunction});
+  const MultipleChoice({super.key, required this.question, required this.nextQuestionFunction, required this.doAnimationFunction});
   final QuizQuestion question;
   final Function nextQuestionFunction;
+  final Function doAnimationFunction;
 
   @override
   State<MultipleChoice> createState() => _MultipleChoiceState();
@@ -349,6 +368,9 @@ class _MultipleChoiceState extends State<MultipleChoice> {
     setState(() {
       showAnswers = true;
     });
+    await Future.delayed(const Duration(milliseconds: 500));
+    int calculatedScore = calculateScore(correctAnswers, widget.question.correctAnswer.length);
+    widget.doAnimationFunction(calculatedScore);
     await Future.delayed(const Duration(seconds: 2));
     setState(() {
       showAnswers = false;
@@ -356,7 +378,7 @@ class _MultipleChoiceState extends State<MultipleChoice> {
     });
     widget.nextQuestionFunction(
       (correctAnswers == widget.question.correctAnswer.length),
-      calculateScore(correctAnswers, widget.question.correctAnswer.length),
+      calculatedScore,
       widget.question,
     );
   }
@@ -394,6 +416,7 @@ class _MultipleChoiceState extends State<MultipleChoice> {
             Text(
               widget.question.question,
               style: Theme.of(context).textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -452,7 +475,11 @@ class _MultipleChoiceState extends State<MultipleChoice> {
                         ? () {}
                         : () => setState(() {
                               if (widget.question.correctAnswer.length > 1) {
-                                selectedAnswers.add(widget.question.answers.indexOf(answer));
+                                if (selectedAnswers.contains(widget.question.answers.indexOf(answer))) {
+                                  selectedAnswers.remove(widget.question.answers.indexOf(answer));
+                                } else {
+                                  selectedAnswers.add(widget.question.answers.indexOf(answer));
+                                }
                               } else {
                                 selectedAnswers = [
                                   widget.question.answers.indexOf(answer)
@@ -474,6 +501,146 @@ class _MultipleChoiceState extends State<MultipleChoice> {
   }
 }
 
+//* Dropdown Question
+class DropdownQuestion extends StatefulWidget {
+  const DropdownQuestion({super.key, required this.question, required this.nextQuestionFunction, required this.doAnimationFunction});
+  final QuizQuestion question;
+  final Function nextQuestionFunction;
+  final Function doAnimationFunction;
+
+  @override
+  State<DropdownQuestion> createState() => _DropdownQuestionState();
+}
+
+class _DropdownQuestionState extends State<DropdownQuestion> {
+  //* Variables
+  List<int> selectedAnswers = [];
+  List<String> answers = [];
+  List<String> sentence = [];
+  bool showAnswers = false;
+
+  @override
+  void initState() {
+    super.initState();
+    //* Initialize variables
+    answers = widget.question.answers;
+    sentence = widget.question.question.split("<seperator />");
+    // ignore: unused_local_variable
+    for (var i in widget.question.correctAnswer) {
+      selectedAnswers.add(0);
+    }
+  }
+
+  void validateAnswer() {
+    setState(() {
+      showAnswers = true;
+    });
+    int correctAmount = 0;
+    for (int i = 0; i < selectedAnswers.length; i++) {
+      if (widget.question.correctAnswer[i] == selectedAnswers[i]) {
+        correctAmount++;
+      }
+    }
+    widget.doAnimationFunction(correctAmount * 100 ~/ widget.question.correctAnswer.length);
+    Future.delayed(const Duration(seconds: 2), () {
+      setState(() {
+        showAnswers = false;
+        selectedAnswers = [
+          for (int i = 0; i < widget.question.correctAnswer.length; i++) 0
+        ];
+      });
+      widget.nextQuestionFunction((correctAmount == widget.question.correctAnswer.length), correctAmount * 100 ~/ widget.question.correctAnswer.length, widget.question);
+    });
+  }
+
+  int indexOfDropDown(int pos) {
+    int index = 0;
+    for (int i = 0; i < sentence.length; i++) {
+      if (i == pos) return index;
+      if (sentence[i].contains("<dropdown answer=")) {
+        index++;
+      }
+    }
+    return index;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text("Dropdown", style: textTheme.displaySmall!.copyWith(fontStyle: FontStyle.italic)),
+        const SizedBox(height: 20),
+        //* Sentence
+        Wrap(
+          runSpacing: 5,
+          spacing: 10,
+          children: [
+            for (int i = 0; i < sentence.length; i++) ...[
+              if (sentence[i].contains("<dropdown answer="))
+                //* Dropdown
+                Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    color: showAnswers ? (widget.question.correctAnswer[indexOfDropDown(i)] == selectedAnswers[indexOfDropDown(i)] ? Colors.green : Colors.red) : theme.primaryContainer,
+                  ),
+                  child: DropdownButton<int>(
+                    value: selectedAnswers[indexOfDropDown(i)],
+                    onChanged: showAnswers
+                        ? null
+                        : (int? value) {
+                            setState(() {
+                              selectedAnswers[indexOfDropDown(i)] = value!;
+                            });
+                          },
+                    items: [
+                      for (int i = 0; i < widget.question.answers.length; i++) ...[
+                        DropdownMenuItem(
+                          value: i,
+                          child: Text(widget.question.answers[i], style: textTheme.displaySmall),
+                        )
+                      ]
+                    ],
+                  ),
+                )
+              else
+                Text(
+                  sentence[i],
+                  style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+            ]
+          ],
+        ),
+        const SizedBox(height: 20),
+        //* Validate answer button
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            gradient: selectedAnswers.isNotEmpty && !showAnswers ? primaryGradient : null,
+            border: selectedAnswers.isEmpty || showAnswers ? Border.all(color: theme.onBackground.withOpacity(0.25)) : null,
+          ),
+          height: 40,
+          child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                foregroundColor: theme.onBackground,
+                disabledForegroundColor: theme.onBackground.withOpacity(0.5),
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: selectedAnswers.isNotEmpty && !showAnswers ? () => validateAnswer() : null,
+              icon: const Icon(Icons.check),
+              label: const Text("Validate Answer")),
+        ),
+      ],
+    );
+  }
+}
+
 class EndScreen extends StatefulWidget {
   const EndScreen({super.key, required this.score, required this.correctAnswers, required this.totalQuestions, required this.redemptionAmount, required this.timeSpent, required this.highestStreak});
   final int score;
@@ -488,6 +655,30 @@ class EndScreen extends StatefulWidget {
 }
 
 class _EndScreenState extends State<EndScreen> with TickerProviderStateMixin {
+  List<int> formatDurationToSeperateInts(Duration duration) {
+    int minutes = (duration.inSeconds / 60).floor();
+    int remainingSeconds = duration.inSeconds - (minutes * 60);
+    return [
+      minutes,
+      remainingSeconds
+    ];
+  }
+
+  bool continueButtonEnabled = false;
+
+  void onAnimationFinished() async {
+    await Future.delayed(const Duration(seconds: 10));
+    setState(() {
+      continueButtonEnabled = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    onAnimationFinished();
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -517,19 +708,44 @@ class _EndScreenState extends State<EndScreen> with TickerProviderStateMixin {
             const SizedBox(height: 10),
             statisticCard(title: "Redemption Amount", value: widget.redemptionAmount, context: context, index: 5),
             const SizedBox(height: 10),
-            statisticCard(title: "Time Spent", value: widget.timeSpent.inSeconds, context: context, index: 6),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: theme.primaryContainer,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Time Spent", style: textTheme.displayMedium),
+                    //* Score, number adding animation
+                    Row(
+                      children: [
+                        NumberAddingAnimation(value: formatDurationToSeperateInts(widget.timeSpent)[0], context: context, index: 7),
+                        Text(":", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                        NumberAddingAnimation(value: formatDurationToSeperateInts(widget.timeSpent)[1], context: context, index: 6),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
             Expanded(
                 child: Center(
                     child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 backgroundColor: theme.primaryContainer,
+                disabledBackgroundColor: Colors.transparent,
                 foregroundColor: theme.onBackground,
+                disabledForegroundColor: theme.onBackground.withOpacity(0.5),
+                side: !continueButtonEnabled ? BorderSide(color: theme.onBackground.withOpacity(0.25)) : null,
                 shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
               ),
-              onPressed: () => Navigator.of(context).pop(),
-              label: const Text("Continue"),
-              icon: const Icon(Icons.check),
+              onPressed: continueButtonEnabled ? () => Navigator.of(context).pop() : null,
+              label: const Text("Back"),
+              icon: const Icon(Icons.arrow_back_rounded),
             ))),
           ],
         ),
@@ -594,6 +810,63 @@ class _NumberAddingAnimationState extends State<NumberAddingAnimation> {
       builder: (context, double value, child) {
         return Text(value.toInt().toString(), style: Theme.of(context).textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold));
       },
+    );
+  }
+}
+
+class OnCloseDialog extends StatefulWidget {
+  const OnCloseDialog({super.key, required this.onCloseFunction});
+  final Function onCloseFunction;
+
+  @override
+  State<OnCloseDialog> createState() => _OnCloseDialogState();
+}
+
+class _OnCloseDialogState extends State<OnCloseDialog> {
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var ttheme = Theme.of(context).textTheme;
+    return Dialog(
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: theme.background,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Are you sure you want to quit?", style: ttheme.displayMedium),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: theme.primaryContainer,
+                      foregroundColor: theme.onBackground,
+                      side: BorderSide(color: theme.onBackground.withOpacity(0.25)),
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                    ),
+                    onPressed: () => widget.onCloseFunction(),
+                    child: const Text("Quit")),
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: theme.primaryContainer,
+                      foregroundColor: theme.onBackground,
+                      side: BorderSide(color: theme.onBackground.withOpacity(0.25)),
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text("Cancel")),
+              ],
+            )
+          ],
+        ),
+      ),
     );
   }
 }

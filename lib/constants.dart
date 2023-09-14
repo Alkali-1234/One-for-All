@@ -300,5 +300,5 @@ get getLightPrimaryGradient => lightPrimaryGradient;
 enum quizTypes {
   multipleChoice,
   trueFalse,
-  shortAnswer,
+  dropdown,
 }
