@@ -7,8 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/constants.dart';
+import 'package:oneforall/functions/quizzes_functions.dart';
+import 'package:oneforall/main.dart';
 import 'package:oneforall/models/quizzes_models.dart';
 import 'package:oneforall/screens/interstitial_screen.dart';
+import 'package:provider/provider.dart';
 import './flashcardsPlay_screen.dart';
 
 class QuizzesPlayScreen extends StatefulWidget {
@@ -179,19 +182,20 @@ class _PlayScreenState extends State<PlayScreen> {
   int scoreBeingAdded = 0;
 
   //* Redemption
-  QuizSet redemptionSet = QuizSet(title: "Redemption", description: "Redemption", questions: []);
+  QuizSet redemptionSet = QuizSet(title: "Redemption", description: "Redemption", questions: [], settings: {});
 
   //* Functions
   void initializeVariables() {
     quizSet = widget.quizSet;
     currentQuestion = quizSet.questions[0];
+    redemptionSet = QuizSet(title: "Redemption", description: "Redemption", questions: [], settings: quizSet.settings);
   }
 
   void initializeRedemption() {
     setState(() {
       quizSet = redemptionSet;
       currentQuestion = quizSet.questions[0];
-      redemptionSet = QuizSet(title: "Redemption", description: "Redemption", questions: []);
+      redemptionSet = QuizSet(title: "Redemption", description: "Redemption", questions: [], settings: quizSet.settings);
       redemptionAmount++;
     });
   }
@@ -242,17 +246,14 @@ class _PlayScreenState extends State<PlayScreen> {
         correctStreak = 0;
         redemptionSet.questions.add(question);
       }
-      if (redemptionSet.questions.isNotEmpty) {
+      if (redemptionSet.questions.isNotEmpty && redemptionAmount < (int.parse(quizSet.settings["redemptionAmounts"] ?? "0"))) {
+        redemptionSequence();
+
         initializeRedemption();
         return;
-      } else {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (context) => InterstitialScreen(
-                  onClosed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EndScreen(score: this.score, correctAnswers: correctAnswers, totalQuestions: questionsDone, redemptionAmount: redemptionAmount, timeSpent: DateTime.now().difference(startTime), highestStreak: highestStreak))),
-                  onFailed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EndScreen(score: this.score, correctAnswers: correctAnswers, totalQuestions: questionsDone, redemptionAmount: redemptionAmount, timeSpent: DateTime.now().difference(startTime), highestStreak: highestStreak))),
-                )));
-        return;
       }
+      endSequence();
+      return;
     }
     setState(() {
       questionsDone++;
@@ -263,9 +264,45 @@ class _PlayScreenState extends State<PlayScreen> {
         this.score += score;
       } else {
         correctStreak = 0;
+        this.score += score * (correctStreak / 10.round() + 1).round();
         redemptionSet.questions.add(question);
       }
     });
+  }
+
+  Future<void> redemptionSequence() async {
+    showDialog(
+        context: context,
+        builder: (c) => Container(
+              color: Colors.black,
+              width: double.infinity,
+              child: Center(child: Text("Redemption #$redemptionAmount", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 50))),
+            ),
+        barrierDismissible: false);
+    await Future.delayed(const Duration(milliseconds: 2000));
+    if (!mounted) return;
+    Navigator.of(context).pop();
+    return;
+  }
+
+  Future<void> endSequence() async {
+    timer.cancel();
+    showDialog(
+        context: context,
+        builder: (c) => Container(
+              color: Colors.black,
+              width: double.infinity,
+              child: const Center(child: Text("All Done!", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 50))),
+            ),
+        barrierDismissible: false);
+    await Future.delayed(const Duration(milliseconds: 2000));
+    if (!mounted) return;
+    Navigator.of(context).pop();
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => InterstitialScreen(
+              onClosed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EndScreen(score: this.score, correctAnswers: correctAnswers, totalQuestions: questionsDone, redemptionAmount: redemptionAmount, timeSpent: DateTime.now().difference(startTime), highestStreak: highestStreak))),
+              onFailed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EndScreen(score: this.score, correctAnswers: correctAnswers, totalQuestions: questionsDone, redemptionAmount: redemptionAmount, timeSpent: DateTime.now().difference(startTime), highestStreak: highestStreak))),
+            )));
   }
 
   @override
@@ -392,7 +429,7 @@ class _MultipleChoiceState extends State<MultipleChoice> {
     } else {
       score = (correctAnswers / answersLength * 100).round();
     }
-    return score + Random().nextInt(10);
+    return score;
   }
 
   @override
@@ -676,7 +713,9 @@ class _EndScreenState extends State<EndScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    QuizzesFunctions().refreshQuizzesFromLocal(context.read<AppState>(), true);
     onAnimationFinished();
+    //* Notify listeners after build
   }
 
   @override

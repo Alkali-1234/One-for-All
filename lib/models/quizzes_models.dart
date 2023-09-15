@@ -6,10 +6,12 @@ class QuizSet {
     required this.title,
     required this.description,
     required this.questions,
+    required this.settings,
   });
   String title;
   String description;
   List<QuizQuestion> questions;
+  Map<String, dynamic> settings;
 }
 
 class QuizQuestion {

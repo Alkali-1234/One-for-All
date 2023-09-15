@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:oneforall/banner_ad.dart';
+import 'package:oneforall/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/main_container.dart';
 import 'package:oneforall/main.dart';
@@ -189,7 +192,30 @@ class SelectedQuizModal extends StatelessWidget {
                         ),
                         onPressed: () {
                           Navigator.pop(context);
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuizzesPlayScreen(quizSet: quiz)));
+                          QuizSet modifiedQuiz = QuizSet(
+                              title: quiz.title,
+                              description: quiz.description,
+                              questions: [],
+                              settings: quiz.settings.isNotEmpty
+                                  ? quiz.settings
+                                  : {
+                                      "shuffleQuestions": false,
+                                      "shuffleAnswers": false
+                                    });
+                          if (quiz.questions.isEmpty) return;
+                          if (quiz.settings["shuffleQuestions"] != null && quiz.settings["shuffleQuestions"] == true) {
+                            modifiedQuiz.questions = quiz.questions.toList()..shuffle();
+                          } else {
+                            modifiedQuiz.questions = quiz.questions.toList();
+                          }
+                          if (quiz.settings["shuffleAnswers"] != null && quiz.settings["shuffleAnswers"] == true) {
+                            for (var question in modifiedQuiz.questions.where((element) => element.type == quizTypes.multipleChoice)) {
+                              List<String> tempAns = question.answers.toList();
+                              question.answers.shuffle();
+                              question.correctAnswer = question.correctAnswer.map((e) => question.answers.indexOf(tempAns[e])).toList();
+                            }
+                          }
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuizzesPlayScreen(quizSet: modifiedQuiz)));
                         },
                         child: Text("Open", style: textTheme.displaySmall)),
                     ElevatedButton(
@@ -197,7 +223,10 @@ class SelectedQuizModal extends StatelessWidget {
                           backgroundColor: theme.primaryContainer,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide.none),
                         ),
-                        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuizzesEditScreen(index: index))),
+                        onPressed: () => {
+                              Navigator.pop(context),
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuizzesEditScreen(index: index))),
+                            },
                         child: Text("Edit", style: textTheme.displaySmall)),
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -235,7 +264,8 @@ class _NewQuizModalState extends State<NewQuizModal> {
       });
       return;
     }
-    appState.getQuizzes.add(QuizSet(title: _title, description: _description, questions: []));
+    Navigator.pop(context);
+    appState.getQuizzes.add(QuizSet(title: _title, description: _description, questions: [], settings: {}));
     final prefs = await SharedPreferences.getInstance();
     //Convert to Object
     Object quizData = {
@@ -258,7 +288,7 @@ class _NewQuizModalState extends State<NewQuizModal> {
     //Save to prefs
     await prefs.setString("quizData", jsonEncode(quizData));
     setState(() {});
-    Navigator.pop(context);
+    appState.thisNotifyListeners();
   }
 
   @override

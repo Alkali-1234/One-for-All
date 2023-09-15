@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/components/quizzes_components/drop_down_edit.dart';
 import 'package:oneforall/models/quizzes_models.dart';
+import 'package:oneforall/styles/styles.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants.dart';
@@ -21,6 +23,9 @@ class QuizzesEditScreen extends StatefulWidget {
 class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
   late QuizSet quizSet;
 
+  //* Keys
+  final settingsKey = GlobalKey<_QuizSettingsModalState>();
+
   @override
   void initState() {
     super.initState();
@@ -31,6 +36,34 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
     setState(() {
       this.quizSet = quizSet;
     });
+  }
+
+  void refreshQuizLocalSave(AppState appState) async {
+    final prefs = await SharedPreferences.getInstance();
+// Save to prefs
+
+    //Convert to Object
+    Object quizData = {
+      "quizzes": [
+        for (var quiz in appState.getQuizzes)
+          {
+            "title": quiz.title,
+            "description": quiz.description,
+            "questions": [
+              for (var question in quiz.questions)
+                {
+                  "question": question.question,
+                  "answers": question.answers,
+                  "correctAnswer": question.correctAnswer,
+                  "type": question.type?.index ?? quizTypes.multipleChoice.index
+                }
+            ],
+            "settings": quiz.settings
+          }
+      ]
+    };
+    //Save to prefs
+    await prefs.setString("quizData", jsonEncode(quizData));
   }
 
   void saveQuizSet(AppState appState) async {
@@ -52,7 +85,8 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                   "correctAnswer": question.correctAnswer,
                   "type": question.type?.index ?? quizTypes.multipleChoice.index
                 }
-            ]
+            ],
+            "settings": quiz.settings
           }
       ]
     };
@@ -80,7 +114,38 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Editing ${quizSet.title}", style: textTheme.displayMedium),
-                Text("${quizSet.questions.length.toString()} Questions", style: textTheme.displayMedium)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    //* Settings
+                    IconButton(
+                        onPressed: () => showDialog(
+                            context: context,
+                            builder: (c) => QuizSettingsModal(
+                                  key: settingsKey,
+                                  settings: quizSet.settings,
+                                  quizTitle: quizSet.title,
+                                  onClose: () => Navigator.pop(c),
+                                )),
+                        icon: Icon(Icons.settings, color: theme.onBackground)),
+
+                    const SizedBox(
+                      width: 2.5,
+                    ),
+                    //* Delete
+                    IconButton(
+                        onPressed: () => showDialog(
+                            context: context,
+                            builder: (c) => DeleteConfirmationModal(onConfirm: () {
+                                  Navigator.pop(c);
+                                  Navigator.pop(context);
+                                  appState.getQuizzes.removeAt(widget.index);
+                                  appState.thisNotifyListeners();
+                                  refreshQuizLocalSave(appState);
+                                })),
+                        icon: const Icon(Icons.delete, color: Colors.red))
+                  ],
+                )
               ],
             ),
             const SizedBox(height: 10),
@@ -528,7 +593,10 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
                         ],
                       )
                     : questionType == quizTypes.dropdown
-                        ? DropDownEdit(key: dropDownEditKey)
+                        ? DropDownEdit(
+                            key: dropDownEditKey,
+                            question: question,
+                          )
                         : Text(
                             "how tf (frick) did you get here",
                             style: textTheme.displaySmall,
@@ -588,5 +656,148 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
                 error != "" ? Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error)) : const SizedBox(),
               ],
             )));
+  }
+}
+
+class QuizSettingsModal extends StatefulWidget {
+  const QuizSettingsModal({super.key, required this.settings, required this.quizTitle, required this.onClose});
+  final Map<String, dynamic> settings;
+  final String quizTitle;
+  final Function onClose;
+
+  @override
+  State<QuizSettingsModal> createState() => _QuizSettingsModalState();
+}
+
+class _QuizSettingsModalState extends State<QuizSettingsModal> {
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    return Dialog(
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.background,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Settings for ${widget.quizTitle}", style: textTheme.displayMedium),
+              const SizedBox(height: 2),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Shuffle Questions", style: textTheme.displaySmall),
+                  Switch(
+                      activeColor: Colors.green,
+                      activeTrackColor: Colors.white,
+                      inactiveThumbColor: Colors.red,
+                      value: widget.settings["shuffleQuestions"] ?? false,
+                      onChanged: (value) => setState(() {
+                            widget.settings["shuffleQuestions"] = value;
+                          }))
+                ],
+              ),
+              const SizedBox(height: 2),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Shuffle Answers", style: textTheme.displaySmall),
+                  Switch(
+                      activeColor: Colors.green,
+                      activeTrackColor: Colors.white,
+                      inactiveThumbColor: Colors.red,
+                      value: widget.settings["shuffleAnswers"] ?? false,
+                      onChanged: (value) => setState(() {
+                            widget.settings["shuffleAnswers"] = value;
+                          }))
+                ],
+              ),
+              const SizedBox(height: 2),
+              //* Redemption amounts
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Redemption Amounts", style: textTheme.displaySmall),
+                  IntrinsicWidth(
+                    child: TextField(
+                      controller: TextEditingController(text: widget.settings["redemptionAmounts"] != null ? widget.settings["redemptionAmounts"].toString() : ""),
+                      keyboardType: TextInputType.number,
+                      style: textTheme.displaySmall,
+                      cursorColor: theme.onBackground,
+                      decoration: TextInputStyle(theme: theme, textTheme: textTheme).getTextInputStyle().copyWith(hintText: "Amount", hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.25), fontWeight: FontWeight.bold)),
+                      onChanged: (value) => setState(() {
+                        widget.settings["redemptionAmounts"] = value;
+                      }),
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 5),
+              ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.primaryContainer,
+                    foregroundColor: theme.onBackground,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () => widget.onClose(),
+                  icon: const Icon(Icons.check),
+                  label: const Text("Done"))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DeleteConfirmationModal extends StatelessWidget {
+  const DeleteConfirmationModal({super.key, required this.onConfirm});
+  final Function onConfirm;
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    return Dialog(
+      child: Container(
+          decoration: BoxDecoration(color: theme.background, borderRadius: const BorderRadius.all(Radius.circular(20))),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("Are you sure you want to delete this quiz?", style: textTheme.displayMedium),
+                const SizedBox(
+                  height: 5,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.primaryContainer,
+                          foregroundColor: theme.onBackground,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        onPressed: () => onConfirm(),
+                        child: const Text("Confirm")),
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.primaryContainer,
+                          foregroundColor: theme.onBackground,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text("Cancel"))
+                  ],
+                ),
+              ],
+            ),
+          )),
+    );
   }
 }

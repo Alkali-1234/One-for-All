@@ -68,6 +68,10 @@ class MyApp extends StatelessWidget {
 
 //AppState
 class AppState extends ChangeNotifier {
+  void thisNotifyListeners() {
+    notifyListeners();
+  }
+
   // //* get theme func
   Future<ThemeData> getSavedTheme() async {
     final prefs = await SharedPreferences.getInstance();
