@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/interstitial_ad.dart';
@@ -268,6 +269,8 @@ class PlayScreen extends StatefulWidget {
 }
 
 class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateMixin {
+  final AudioPlayer _player = AudioPlayer();
+
   late AnimationController _cardAnimationController;
   late Animation<double> _cardAnimation;
   DateTime startingTime = DateTime.now();
@@ -331,6 +334,8 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
   }
 
   void finishPlaying() {
+    //Stop audio
+    _player.stop();
     //Calculate score
     //Score is difference between starting total weight and current total weight
     int totalWeight = 0;
@@ -380,6 +385,8 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
       duration: const Duration(milliseconds: 150),
     );
     _cardAnimation = Tween<double>(begin: 1, end: 0).animate(_cardAnimationController);
+    _player.setAsset("assets/audio/quizAudio.mp3");
+    _player.play();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showDialog(barrierDismissible: false, context: context, builder: (_) => const ThreeTwoOneGoRibbon());
     });

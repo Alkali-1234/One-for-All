@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:animations/animations.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,6 +12,7 @@ import 'package:oneforall/models/quizzes_models.dart';
 import 'package:oneforall/screens/interstitial_screen.dart';
 import 'package:provider/provider.dart';
 import './flashcardsPlay_screen.dart';
+import 'package:just_audio/just_audio.dart';
 
 class QuizzesPlayScreen extends StatefulWidget {
   const QuizzesPlayScreen({super.key, required this.quizSet});
@@ -25,6 +25,9 @@ class QuizzesPlayScreen extends StatefulWidget {
 class _QuizzesPlayScreenState extends State<QuizzesPlayScreen> {
   bool reversed = false;
   int currentScreen = 0;
+
+  final playScreenKey = GlobalKey<_PlayScreenState>();
+
   void changeScreen(int screen) {
     setState(() {
       if (screen > currentScreen) {
@@ -49,6 +52,8 @@ class _QuizzesPlayScreenState extends State<QuizzesPlayScreen> {
               showDialog(
                   context: context,
                   builder: (context) => OnCloseDialog(onCloseFunction: () {
+                        QuizzesFunctions().refreshQuizzesFromLocal(context.read<AppState>(), true);
+                        playScreenKey.currentState!.audioPlayer.stop();
                         Navigator.of(context).pop();
                         Navigator.of(context).pop();
                       }));
@@ -68,7 +73,7 @@ class _QuizzesPlayScreenState extends State<QuizzesPlayScreen> {
                 child: currentScreen == 0
                     ? PlayScreenConfirmation(changeScreenFunction: changeScreen)
                     : currentScreen == 1
-                        ? PlayScreen(quizSet: widget.quizSet)
+                        ? PlayScreen(key: playScreenKey, quizSet: widget.quizSet)
                         : const Placeholder(),
               ))),
     );
@@ -157,6 +162,9 @@ class _PlayScreenState extends State<PlayScreen> {
         elapsedTime++;
       });
     });
+    audioPlayer.setAsset("assets/audio/quizAudio.mp3");
+    audioPlayer.setLoopMode(LoopMode.one);
+    audioPlayer.play();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showDialog(context: context, builder: (context) => const ThreeTwoOneGoRibbon(), barrierDismissible: false);
     });
@@ -175,6 +183,9 @@ class _PlayScreenState extends State<PlayScreen> {
   DateTime startTime = DateTime.now();
   int elapsedTime = 0;
   late Timer timer;
+
+  //* Audio
+  final AudioPlayer audioPlayer = AudioPlayer();
 
   //* Animation
   Tween<double> scoreStatTween = Tween<double>(begin: 0, end: 0);
@@ -230,6 +241,8 @@ class _PlayScreenState extends State<PlayScreen> {
     });
   }
 
+  final reorderKey = GlobalKey<_ReorderQuestionState>();
+
   void nextQuestion(bool correct, int score, QuizQuestion question) {
     if (!mounted) return;
     //* Check if quiz is finished
@@ -241,7 +254,8 @@ class _PlayScreenState extends State<PlayScreen> {
         if (correctStreak > highestStreak) {
           highestStreak = correctStreak;
         }
-        this.score += score * (correctStreak / 10.round() + 1).round();
+        //TODO: Have streak affect the score
+        this.score += score;
       } else {
         correctStreak = 0;
         redemptionSet.questions.add(question);
@@ -267,6 +281,10 @@ class _PlayScreenState extends State<PlayScreen> {
         this.score += score * (correctStreak / 10.round() + 1).round();
         redemptionSet.questions.add(question);
       }
+      if (currentQuestion.type == quizTypes.reorder) {
+        if (reorderKey.currentState == null) return;
+        reorderKey.currentState!.selectedAnswers = List.generate(currentQuestion.correctAnswer.length, (index) => -1);
+      }
     });
   }
 
@@ -287,6 +305,7 @@ class _PlayScreenState extends State<PlayScreen> {
 
   Future<void> endSequence() async {
     timer.cancel();
+    audioPlayer.stop();
     showDialog(
         context: context,
         builder: (c) => Container(
@@ -374,7 +393,9 @@ class _PlayScreenState extends State<PlayScreen> {
                 )
               : currentQuestion.type == quizTypes.dropdown
                   ? DropdownQuestion(question: currentQuestion, nextQuestionFunction: nextQuestion, doAnimationFunction: doNextQuestionAnimations)
-                  : const Placeholder(),
+                  : currentQuestion.type == quizTypes.reorder
+                      ? ReorderQuestion(key: reorderKey, question: currentQuestion, nextQuestionFunction: nextQuestion, doAnimationFunction: doNextQuestionAnimations)
+                      : const Placeholder(),
         ),
       ],
     );
@@ -395,12 +416,17 @@ class MultipleChoice extends StatefulWidget {
 class _MultipleChoiceState extends State<MultipleChoice> {
   List<int> selectedAnswers = [];
   bool showAnswers = false;
+  final AudioPlayer audioPlayer = AudioPlayer();
   void validateAnswer() async {
     int correctAnswers = 0;
     for (var answer in selectedAnswers) {
       if (widget.question.correctAnswer.contains(answer)) {
         correctAnswers++;
       }
+    }
+    if (correctAnswers == widget.question.correctAnswer.length) {
+      await audioPlayer.setAsset("assets/audio/successSound.mp3");
+      audioPlayer.play();
     }
     setState(() {
       showAnswers = true;
@@ -672,6 +698,182 @@ class _DropdownQuestionState extends State<DropdownQuestion> {
               onPressed: selectedAnswers.isNotEmpty && !showAnswers ? () => validateAnswer() : null,
               icon: const Icon(Icons.check),
               label: const Text("Validate Answer")),
+        ),
+      ],
+    );
+  }
+}
+
+//* Reorder Question
+class ReorderQuestion extends StatefulWidget {
+  const ReorderQuestion({super.key, required this.question, required this.nextQuestionFunction, required this.doAnimationFunction});
+  final QuizQuestion question;
+  final Function nextQuestionFunction;
+  final Function doAnimationFunction;
+
+  @override
+  State<ReorderQuestion> createState() => _ReorderQuestionState();
+}
+
+class _ReorderQuestionState extends State<ReorderQuestion> {
+  List<int> selectedAnswers = [];
+  bool showAnswers = false;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedAnswers = List.generate(widget.question.correctAnswer.length, (index) => -1);
+  }
+
+  void validateAnswers() {
+    setState(() {
+      showAnswers = true;
+    });
+    int correctAnswers = 0;
+    for (int i = 0; i < selectedAnswers.length; i++) {
+      if (selectedAnswers[i] == widget.question.correctAnswer[i]) {
+        correctAnswers++;
+      }
+    }
+    widget.doAnimationFunction(100 * correctAnswers);
+    Future.delayed(const Duration(seconds: 2), () {
+      setState(() {
+        showAnswers = false;
+      });
+      widget.nextQuestionFunction((correctAnswers == widget.question.correctAnswer.length), 100 * correctAnswers, widget.question);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    return Column(
+      children: [
+        const SizedBox(
+          height: 20,
+        ),
+        Text("Reorder", style: textTheme.displaySmall!.copyWith(fontStyle: FontStyle.italic)),
+        const SizedBox(
+          height: 10,
+        ),
+        Text(
+          widget.question.question,
+          style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        //* Validate Answer
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            gradient: selectedAnswers.isNotEmpty && !showAnswers ? primaryGradient : null,
+            border: selectedAnswers.isEmpty || showAnswers ? Border.all(color: theme.onBackground.withOpacity(0.25)) : null,
+          ),
+          child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                foregroundColor: theme.onBackground,
+                disabledForegroundColor: theme.onBackground.withOpacity(0.5),
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: showAnswers || selectedAnswers.contains(-1) ? null : () => validateAnswers(),
+              icon: const Icon(Icons.check),
+              label: const Text("Validate Answers")),
+        ),
+        //* Gridvew of answers
+        Expanded(
+          flex: 1,
+          child: Center(
+            child: Wrap(
+              runSpacing: 10,
+              spacing: 10,
+              children: [
+                for (var answer in widget.question.answers) ...[
+                  Draggable<int>(
+                    data: widget.question.answers.indexOf(answer),
+                    feedback: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: theme.primaryContainer,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                        child: Text(answer, style: textTheme.displaySmall),
+                      ),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: theme.primaryContainer,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                        child: Text(answer, style: textTheme.displaySmall),
+                      ),
+                    ),
+                  )
+                ]
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: Center(
+            child: Wrap(
+              runSpacing: 10,
+              spacing: 10,
+              children: [
+                for (int i = 0; i < widget.question.correctAnswer.length; i++) ...[
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      showAnswers
+                          ? Text(
+                              widget.question.answers[widget.question.correctAnswer[i]],
+                              style: textTheme.displaySmall!.copyWith(color: Colors.green, fontWeight: FontWeight.bold),
+                            )
+                          : const SizedBox.shrink(),
+                      const SizedBox(height: 10),
+                      DragTarget<int>(
+                        builder: (context, candidateData, rejectedData) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: !showAnswers
+                                  ? theme.primaryContainer
+                                  : widget.question.correctAnswer[i] == selectedAnswers[i]
+                                      ? Colors.green
+                                      : Colors.red,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                              child: selectedAnswers[i] != -1
+                                  ? Text(
+                                      widget.question.answers[selectedAnswers[i]],
+                                      style: textTheme.displaySmall,
+                                    )
+                                  : Text("Order #${i + 1}", style: textTheme.displaySmall),
+                            ),
+                          );
+                        },
+                        onAccept: (data) {
+                          setState(() {
+                            selectedAnswers[i] = data;
+                          });
+                        },
+                      ),
+                    ],
+                  )
+                ]
+              ],
+            ),
+          ),
         ),
       ],
     );

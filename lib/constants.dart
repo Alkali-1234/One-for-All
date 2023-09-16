@@ -301,4 +301,5 @@ enum quizTypes {
   multipleChoice,
   trueFalse,
   dropdown,
+  reorder,
 }

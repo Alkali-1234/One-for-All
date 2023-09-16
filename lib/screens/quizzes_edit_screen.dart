@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:oneforall/components/main_container.dart';
+import 'package:oneforall/components/quizzes_components/drag_and_drop_edit.dart';
 import 'package:oneforall/components/quizzes_components/drop_down_edit.dart';
 import 'package:oneforall/models/quizzes_models.dart';
 import 'package:oneforall/styles/styles.dart';
@@ -414,33 +415,22 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
 
   //* Keys
   final dropDownEditKey = GlobalKey<DropDownEditState>();
+  final reorderEditKey = GlobalKey<ReorderEditState>();
 
   //* Functions
   void validateDropdownQuestion(AppState appState) {
     if (dropDownEditKey.currentState == null) {
-      setState(() {
-        error = "Something went wrong. Please try again";
-      });
-      return;
+      throw Exception("Something went wrong. Please try again");
     }
     final dropDownEditState = dropDownEditKey.currentState;
     if (dropDownEditState!.dropdownSentence.isEmpty) {
-      setState(() {
-        error = "There must be at least 1 dropdown";
-      });
-      return;
+      throw Exception("Sentence is empty");
     }
     if (dropDownEditState.dropdownAnswers.isEmpty || dropDownEditState.dropdownSentence.isEmpty) {
-      setState(() {
-        error = "Answers is empty or there is no sentence";
-      });
-      return;
+      throw Exception("There must be at least 1 answer and 1 sentence");
     }
     if (dropDownEditState.dropdownSentence.indexOf("<seperator />") > 0) {
-      setState(() {
-        error = "Illegal word <seperator />";
-      });
-      return;
+      throw Exception("Illegal word: <seperator />");
     }
 
     QuizQuestion quizQuestion = QuizQuestion(
@@ -452,6 +442,24 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
             if (sentence.contains("<dropdown answer=")) int.parse(sentence.split("=")[1].split(" ")[0]),
         ],
         type: quizTypes.dropdown);
+    appState.getQuizzes[widget.quizIndex].questions[widget.index] = quizQuestion;
+  }
+
+  void validateReorderQuestion(AppState appState) {
+    //* Check if there is atleast 1 drag item and 1 drop item
+    if (reorderEditKey.currentState == null) {
+      throw Exception("Something went wrong. Please try again");
+    }
+    if (reorderEditKey.currentState!.draggables.isEmpty || reorderEditKey.currentState!.correctOrder.isEmpty) {
+      throw Exception("There must be at least 1 drag item and 1 drop item");
+    }
+    //* Check if there is no duplicate drag items
+    for (var draggable in reorderEditKey.currentState!.draggables) {
+      if (reorderEditKey.currentState!.draggables.where((element) => element == draggable).length > 1) {
+        throw Exception("There cannot be duplicate drag items");
+      }
+    }
+    QuizQuestion quizQuestion = QuizQuestion(id: widget.index, question: reorderEditKey.currentState!.question, answers: reorderEditKey.currentState!.draggables, correctAnswer: reorderEditKey.currentState!.correctOrder, type: quizTypes.reorder);
     appState.getQuizzes[widget.quizIndex].questions[widget.index] = quizQuestion;
   }
 
@@ -467,194 +475,215 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
               color: theme.background,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text("Edit Question ${widget.index + 1}", style: textTheme.displayMedium),
-                const SizedBox(height: 10),
-                //* Question type (Multiple Choices) more will be added Soon™
-                DropdownButton(
-                    value: questionType,
-                    style: textTheme.displaySmall,
-                    items: [
-                      DropdownMenuItem(
-                          value: quizTypes.multipleChoice,
-                          child: Text(
-                            "Multiple Choice",
-                            style: textTheme.displaySmall,
-                          )),
-                      DropdownMenuItem(value: quizTypes.dropdown, child: Text("Dropdown", style: textTheme.displaySmall))
-                    ],
-                    onChanged: (value) => setState(() {
-                          questionType = value as quizTypes;
-                        })),
-                const SizedBox(height: 10),
-                //* Question
-                questionType == quizTypes.multipleChoice
-                    ? Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextField(
-                            controller: _questionController,
-                            style: textTheme.displaySmall,
-                            cursorColor: theme.onBackground,
-                            decoration: InputDecoration(
-                              fillColor: theme.primary,
-                              filled: true,
-                              hintText: "Question",
-                              hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.25), fontWeight: FontWeight.bold),
-                              border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(10)),
-                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: theme.onBackground, width: 1), borderRadius: BorderRadius.circular(10)),
-                            ),
-                            onChanged: (value) => setState(() {
-                              question.question = value;
-                            }),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("Edit Question ${widget.index + 1}", style: textTheme.displayMedium),
+                  const SizedBox(height: 10),
+                  //* Question type (Multiple Choices, Dropdown, Drag an Drop) more will be added Soon™
+                  DropdownButton(
+                      value: questionType,
+                      style: textTheme.displaySmall,
+                      items: [
+                        DropdownMenuItem(
+                            value: quizTypes.multipleChoice,
+                            child: Text(
+                              "Multiple Choice",
+                              style: textTheme.displaySmall,
+                            )),
+                        DropdownMenuItem(value: quizTypes.dropdown, child: Text("Dropdown", style: textTheme.displaySmall)),
+                        DropdownMenuItem(value: quizTypes.reorder, child: Text("Reorder", style: textTheme.displaySmall)),
+                      ],
+                      onChanged: (value) => setState(() {
+                            questionType = value as quizTypes;
+                          })),
+                  const SizedBox(height: 10),
+                  //* Question
+                  questionType == quizTypes.multipleChoice
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextField(
+                              controller: _questionController,
+                              style: textTheme.displaySmall,
+                              cursorColor: theme.onBackground,
+                              decoration: InputDecoration(
+                                fillColor: theme.primary,
+                                filled: true,
+                                hintText: "Question",
+                                hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.25), fontWeight: FontWeight.bold),
+                                border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(10)),
+                                focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: theme.onBackground, width: 1), borderRadius: BorderRadius.circular(10)),
+                              ),
+                              onChanged: (value) => setState(() {
+                                question.question = value;
+                              }),
 
-                            //* Answers | Checklist (Answer)
-                          ),
-                          const SizedBox(height: 10),
-                          //* Add answer
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: theme.primaryContainer,
-                                    foregroundColor: theme.onBackground,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  onPressed: () => setState(() {
-                                        _textAnswerControllers.add(TextEditingController(text: "Answer ${question.answers.length + 1}"));
-                                        question.answers.add("Answer ${question.answers.length + 1}");
-                                      }),
-                                  icon: const Icon(Icons.add),
-                                  label: const Text("Add Answer")),
-                              ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: theme.primaryContainer,
-                                    foregroundColor: theme.onBackground,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  onPressed: () => setState(() {
-                                        question.answers.removeLast();
-                                        question.correctAnswer.removeLast();
-                                      }),
-                                  icon: const Icon(Icons.delete),
-                                  label: const Text("Delete Answer")),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            height: 200,
-                            child: ListView.builder(
-                              itemBuilder: (context, index) {
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(bottom: 8.0),
-                                      child: SizedBox(
-                                        width: 200,
-                                        child: TextField(
-                                          controller: _textAnswerControllers[index],
-                                          style: textTheme.displaySmall,
-                                          cursorColor: theme.onBackground,
-                                          decoration: InputDecoration(
-                                            fillColor: theme.primary,
-                                            filled: true,
-                                            hintText: "Answer ${index + 1}",
-                                            hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.25), fontWeight: FontWeight.bold),
-                                            border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(10)),
-                                            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: theme.onBackground, width: 1), borderRadius: BorderRadius.circular(10)),
+                              //* Answers | Checklist (Answer)
+                            ),
+                            const SizedBox(height: 10),
+                            //* Add answer
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: theme.primaryContainer,
+                                      foregroundColor: theme.onBackground,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    onPressed: () => setState(() {
+                                          _textAnswerControllers.add(TextEditingController(text: "Answer ${question.answers.length + 1}"));
+                                          question.answers.add("Answer ${question.answers.length + 1}");
+                                        }),
+                                    icon: const Icon(Icons.add),
+                                    label: const Text("Add Answer")),
+                                ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: theme.primaryContainer,
+                                      foregroundColor: theme.onBackground,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    onPressed: () => setState(() {
+                                          question.answers.removeLast();
+                                          question.correctAnswer.removeLast();
+                                        }),
+                                    icon: const Icon(Icons.delete),
+                                    label: const Text("Delete Answer")),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              height: 200,
+                              child: ListView.builder(
+                                itemBuilder: (context, index) {
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 8.0),
+                                        child: SizedBox(
+                                          width: 200,
+                                          child: TextField(
+                                            controller: _textAnswerControllers[index],
+                                            style: textTheme.displaySmall,
+                                            cursorColor: theme.onBackground,
+                                            decoration: InputDecoration(
+                                              fillColor: theme.primary,
+                                              filled: true,
+                                              hintText: "Answer ${index + 1}",
+                                              hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.25), fontWeight: FontWeight.bold),
+                                              border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(10)),
+                                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: theme.onBackground, width: 1), borderRadius: BorderRadius.circular(10)),
+                                            ),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                question.answers[index] = value;
+                                              });
+                                            },
                                           ),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              question.answers[index] = value;
-                                            });
-                                          },
                                         ),
                                       ),
-                                    ),
-                                    Checkbox(
-                                        checkColor: theme.onBackground,
-                                        value: question.correctAnswer.contains(index),
-                                        onChanged: (value) => setState(() {
-                                              if (value == null) return;
-                                              if (value) question.correctAnswer.add(index);
-                                              if (!value) question.correctAnswer.remove(index);
-                                              setState(() {});
-                                            }))
-                                  ],
-                                );
-                              },
-                              itemCount: question.answers.length,
+                                      Checkbox(
+                                          checkColor: theme.onBackground,
+                                          value: question.correctAnswer.contains(index),
+                                          onChanged: (value) => setState(() {
+                                                if (value == null) return;
+                                                if (value) question.correctAnswer.add(index);
+                                                if (!value) question.correctAnswer.remove(index);
+                                                setState(() {});
+                                              }))
+                                    ],
+                                  );
+                                },
+                                itemCount: question.answers.length,
+                              ),
                             ),
+                          ],
+                        )
+                      : questionType == quizTypes.dropdown
+                          ? DropDownEdit(
+                              key: dropDownEditKey,
+                              question: question,
+                            )
+                          : questionType == quizTypes.reorder
+                              ? ReorderEdit(key: reorderEditKey, question: widget.question.type == quizTypes.reorder ? question : null)
+                              : Text(
+                                  "how tf (frick) did you get here",
+                                  style: textTheme.displaySmall,
+                                ),
+                  const SizedBox(height: 10),
+                  //* Done
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.primaryContainer,
+                            foregroundColor: theme.onBackground,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
-                        ],
-                      )
-                    : questionType == quizTypes.dropdown
-                        ? DropDownEdit(
-                            key: dropDownEditKey,
-                            question: question,
-                          )
-                        : Text(
-                            "how tf (frick) did you get here",
-                            style: textTheme.displaySmall,
-                          ),
-                const SizedBox(height: 10),
-                //* Done
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryContainer,
-                          foregroundColor: theme.onBackground,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        ),
-                        onPressed: () {
-                          if (questionType == quizTypes.multipleChoice) {
-                            if (question.question == "") {
-                              setState(() {
-                                error = "Question cannot be empty";
-                              });
-                              return;
-                            }
-                            if (question.answers.length < 2) {
-                              setState(() {
-                                error = "There must be at least 2 answers";
-                              });
-                              return;
-                            }
-                            if (question.correctAnswer.isEmpty) {
-                              setState(() {
-                                error = "There must be at least 1 correct answer";
-                              });
-                              return;
-                            }
-                            //* check for duplicates
-                            for (var answer in question.answers) {
-                              if (question.answers.where((element) => element == answer).length > 1) {
+                          onPressed: () {
+                            if (questionType == quizTypes.multipleChoice) {
+                              if (question.question == "") {
                                 setState(() {
-                                  error = "There cannot be duplicate answers";
+                                  error = "Question cannot be empty";
+                                });
+                                return;
+                              }
+                              if (question.answers.length < 2) {
+                                setState(() {
+                                  error = "There must be at least 2 answers";
+                                });
+                                return;
+                              }
+                              if (question.correctAnswer.isEmpty) {
+                                setState(() {
+                                  error = "There must be at least 1 correct answer";
+                                });
+                                return;
+                              }
+                              //* check for duplicates
+                              for (var answer in question.answers) {
+                                if (question.answers.where((element) => element == answer).length > 1) {
+                                  setState(() {
+                                    error = "There cannot be duplicate answers";
+                                  });
+                                  return;
+                                }
+                              }
+                            }
+                            if (questionType == quizTypes.dropdown) {
+                              try {
+                                validateDropdownQuestion(appState);
+                              } on Exception catch (e) {
+                                setState(() {
+                                  error = e.toString();
                                 });
                                 return;
                               }
                             }
-                          }
-                          if (questionType == quizTypes.dropdown) {
-                            validateDropdownQuestion(appState);
-                          }
-                          Navigator.pop(context);
-                          widget.setQuizSet(appState.getQuizzes[widget.quizIndex]);
-                        },
-                        icon: const Icon(Icons.done),
-                        label: const Text("Done")),
-                  ],
-                ),
+                            if (questionType == quizTypes.reorder) {
+                              try {
+                                validateReorderQuestion(appState);
+                              } on Exception catch (e) {
+                                setState(() {
+                                  error = e.toString();
+                                });
+                              }
+                            }
+                            Navigator.pop(context);
+                            widget.setQuizSet(appState.getQuizzes[widget.quizIndex]);
+                          },
+                          icon: const Icon(Icons.done),
+                          label: const Text("Done")),
+                    ],
+                  ),
 
-                error != "" ? Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error)) : const SizedBox(),
-              ],
+                  error != "" ? Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error)) : const SizedBox(),
+                ],
+              ),
             )));
   }
 }

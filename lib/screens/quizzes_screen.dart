@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/constants.dart';
@@ -209,7 +207,7 @@ class SelectedQuizModal extends StatelessWidget {
                             modifiedQuiz.questions = quiz.questions.toList();
                           }
                           if (quiz.settings["shuffleAnswers"] != null && quiz.settings["shuffleAnswers"] == true) {
-                            for (var question in modifiedQuiz.questions.where((element) => element.type == quizTypes.multipleChoice)) {
+                            for (var question in modifiedQuiz.questions.where((element) => element.type == quizTypes.multipleChoice || element.type == quizTypes.reorder)) {
                               List<String> tempAns = question.answers.toList();
                               question.answers.shuffle();
                               question.correctAnswer = question.correctAnswer.map((e) => question.answers.indexOf(tempAns[e])).toList();

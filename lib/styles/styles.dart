@@ -10,19 +10,19 @@ class TextInputStyle {
 
   InputDecoration getTextInputStyle() {
     final style = InputDecoration(
-      filled: true,
-      fillColor: theme.primary,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(
-          color: theme.primary,
+        filled: true,
+        fillColor: theme.primary,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
         ),
-      ),
-    );
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: theme.onBackground,
+          ),
+        ),
+        hintStyle: textTheme.displaySmall);
     return style;
   }
 }
