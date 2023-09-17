@@ -581,6 +581,7 @@ class _DropdownQuestionState extends State<DropdownQuestion> {
   List<String> answers = [];
   List<String> sentence = [];
   bool showAnswers = false;
+  AudioPlayer audioPlayer = AudioPlayer();
 
   @override
   void initState() {
@@ -594,7 +595,7 @@ class _DropdownQuestionState extends State<DropdownQuestion> {
     }
   }
 
-  void validateAnswer() {
+  void validateAnswer() async {
     setState(() {
       showAnswers = true;
     });
@@ -604,6 +605,8 @@ class _DropdownQuestionState extends State<DropdownQuestion> {
         correctAmount++;
       }
     }
+    await audioPlayer.setAsset("assets/audio/successSound.mp3");
+    audioPlayer.play();
     widget.doAnimationFunction(correctAmount * 100 ~/ widget.question.correctAnswer.length);
     Future.delayed(const Duration(seconds: 2), () {
       setState(() {
@@ -644,30 +647,39 @@ class _DropdownQuestionState extends State<DropdownQuestion> {
             for (int i = 0; i < sentence.length; i++) ...[
               if (sentence[i].contains("<dropdown answer="))
                 //* Dropdown
-                Container(
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    color: showAnswers ? (widget.question.correctAnswer[indexOfDropDown(i)] == selectedAnswers[indexOfDropDown(i)] ? Colors.green : Colors.red) : theme.primaryContainer,
-                  ),
-                  child: DropdownButton<int>(
-                    value: selectedAnswers[indexOfDropDown(i)],
-                    onChanged: showAnswers
-                        ? null
-                        : (int? value) {
-                            setState(() {
-                              selectedAnswers[indexOfDropDown(i)] = value!;
-                            });
-                          },
-                    items: [
-                      for (int i = 0; i < widget.question.answers.length; i++) ...[
-                        DropdownMenuItem(
-                          value: i,
-                          child: Text(widget.question.answers[i], style: textTheme.displaySmall),
-                        )
-                      ]
-                    ],
-                  ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    showAnswers ? Text(widget.question.answers[widget.question.correctAnswer[indexOfDropDown(i)]], style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.green)) : const SizedBox(),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.all(Radius.circular(10)),
+                        color: showAnswers ? (widget.question.correctAnswer[indexOfDropDown(i)] == selectedAnswers[indexOfDropDown(i)] ? Colors.green : Colors.red) : theme.primaryContainer,
+                      ),
+                      child: DropdownButton<int>(
+                        value: selectedAnswers[indexOfDropDown(i)],
+                        onChanged: showAnswers
+                            ? null
+                            : (int? value) {
+                                setState(() {
+                                  selectedAnswers[indexOfDropDown(i)] = value!;
+                                });
+                              },
+                        items: [
+                          for (int i = 0; i < widget.question.answers.length; i++) ...[
+                            DropdownMenuItem(
+                              value: i,
+                              child: Text(widget.question.answers[i], style: textTheme.displaySmall),
+                            )
+                          ]
+                        ],
+                      ),
+                    ),
+                  ],
                 )
               else
                 Text(
@@ -718,6 +730,7 @@ class ReorderQuestion extends StatefulWidget {
 class _ReorderQuestionState extends State<ReorderQuestion> {
   List<int> selectedAnswers = [];
   bool showAnswers = false;
+  AudioPlayer audioPlayer = AudioPlayer();
 
   @override
   void initState() {
@@ -725,7 +738,7 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
     selectedAnswers = List.generate(widget.question.correctAnswer.length, (index) => -1);
   }
 
-  void validateAnswers() {
+  void validateAnswers() async {
     setState(() {
       showAnswers = true;
     });
@@ -735,6 +748,8 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
         correctAnswers++;
       }
     }
+    await audioPlayer.setAsset("assets/audio/successSound.mp3");
+    audioPlayer.play();
     widget.doAnimationFunction(100 * correctAnswers);
     Future.delayed(const Duration(seconds: 2), () {
       setState(() {
@@ -926,71 +941,72 @@ class _EndScreenState extends State<EndScreen> with TickerProviderStateMixin {
     var textTheme = Theme.of(context).textTheme;
     return Scaffold(
       body: MainContainer(
+          onClose: () => null,
           child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            Text("Quiz Finished", style: textTheme.displayLarge!.copyWith(fontStyle: FontStyle.italic)),
-            const SizedBox(
-              height: 50,
-            ),
-            statisticCard(title: "Score", value: widget.score, context: context, index: 1),
-            const SizedBox(
-              height: 10,
-            ),
-            statisticCard(title: "Total Questions", value: widget.totalQuestions, context: context, index: 2),
-            const SizedBox(height: 10),
-            statisticCard(title: "Correct Answers", value: widget.correctAnswers, context: context, index: 3),
-            const SizedBox(height: 10),
-            statisticCard(title: "Highest Streak", value: widget.highestStreak, context: context, index: 4),
-            const SizedBox(height: 10),
-            statisticCard(title: "Redemption Amount", value: widget.redemptionAmount, context: context, index: 5),
-            const SizedBox(height: 10),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: theme.primaryContainer,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Time Spent", style: textTheme.displayMedium),
-                    //* Score, number adding animation
-                    Row(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 10,
+                ),
+                Text("Quiz Finished", style: textTheme.displayLarge!.copyWith(fontStyle: FontStyle.italic)),
+                const SizedBox(
+                  height: 50,
+                ),
+                statisticCard(title: "Score", value: widget.score, context: context, index: 1),
+                const SizedBox(
+                  height: 10,
+                ),
+                statisticCard(title: "Total Questions", value: widget.totalQuestions, context: context, index: 2),
+                const SizedBox(height: 10),
+                statisticCard(title: "Correct Answers", value: widget.correctAnswers, context: context, index: 3),
+                const SizedBox(height: 10),
+                statisticCard(title: "Highest Streak", value: widget.highestStreak, context: context, index: 4),
+                const SizedBox(height: 10),
+                statisticCard(title: "Redemption Amount", value: widget.redemptionAmount, context: context, index: 5),
+                const SizedBox(height: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: theme.primaryContainer,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        NumberAddingAnimation(value: formatDurationToSeperateInts(widget.timeSpent)[0], context: context, index: 7),
-                        Text(":", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
-                        NumberAddingAnimation(value: formatDurationToSeperateInts(widget.timeSpent)[1], context: context, index: 6),
+                        Text("Time Spent", style: textTheme.displayMedium),
+                        //* Score, number adding animation
+                        Row(
+                          children: [
+                            NumberAddingAnimation(value: formatDurationToSeperateInts(widget.timeSpent)[0], context: context, index: 7),
+                            Text(":", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                            NumberAddingAnimation(value: formatDurationToSeperateInts(widget.timeSpent)[1], context: context, index: 6),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+                Expanded(
+                    child: Center(
+                        child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: theme.primaryContainer,
+                    disabledBackgroundColor: Colors.transparent,
+                    foregroundColor: theme.onBackground,
+                    disabledForegroundColor: theme.onBackground.withOpacity(0.5),
+                    side: !continueButtonEnabled ? BorderSide(color: theme.onBackground.withOpacity(0.25)) : null,
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                  ),
+                  onPressed: continueButtonEnabled ? () => Navigator.of(context).pop() : null,
+                  label: const Text("Back"),
+                  icon: const Icon(Icons.arrow_back_rounded),
+                ))),
+              ],
             ),
-            Expanded(
-                child: Center(
-                    child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                backgroundColor: theme.primaryContainer,
-                disabledBackgroundColor: Colors.transparent,
-                foregroundColor: theme.onBackground,
-                disabledForegroundColor: theme.onBackground.withOpacity(0.5),
-                side: !continueButtonEnabled ? BorderSide(color: theme.onBackground.withOpacity(0.25)) : null,
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-              ),
-              onPressed: continueButtonEnabled ? () => Navigator.of(context).pop() : null,
-              label: const Text("Back"),
-              icon: const Icon(Icons.arrow_back_rounded),
-            ))),
-          ],
-        ),
-      )),
+          )),
     );
   }
 

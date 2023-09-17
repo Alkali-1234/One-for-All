@@ -53,6 +53,7 @@ flutter:
     - assets/images/logbg.png
     - assets/audio/quizAudio.mp3
     - assets/audio/successSound.mp3
+    - assets/images/logo.png
   fonts:
     - family: MyFlutterApp
       fonts: 

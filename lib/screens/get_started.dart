@@ -716,17 +716,16 @@ class WelcomeScreen extends StatelessWidget {
       Text("Let's get you started.", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w400)),
       const SizedBox(height: 20),
       Container(
-          height: 200,
-          width: 200,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.white),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          // decoration: BoxDecoration(
-          //     image: DecorationImage(
-          //         image: AssetImage(
-          //             'assets/images/getstarted.png'))),
-          child: Center(child: Text("Logo", style: textTheme.displayMedium))),
+        height: 200,
+        width: 200,
+        decoration: const BoxDecoration(
+          image: DecorationImage(image: AssetImage('assets/images/logo.png'), fit: BoxFit.cover),
+        ),
+        // decoration: BoxDecoration(
+        //     image: DecorationImage(
+        //         image: AssetImage(
+        //             'assets/images/getstarted.png'))),
+      ),
       const SizedBox(height: 50),
       Container(
         height: 40,
