@@ -203,12 +203,22 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 
   void initializeRedemption() {
-    setState(() {
-      quizSet = redemptionSet;
-      currentQuestion = quizSet.questions[0];
-      redemptionSet = QuizSet(title: "Redemption", description: "Redemption", questions: [], settings: quizSet.settings);
-      redemptionAmount++;
-    });
+    quizSet = redemptionSet;
+    currentQuestion = quizSet.questions[0];
+    redemptionSet = QuizSet(title: "Redemption", description: "Redemption", questions: [], settings: quizSet.settings);
+    redemptionAmount++;
+    if (currentQuestion.type == quizTypes.reorder) {
+      if (reorderKey.currentState == null) return;
+      reorderKey.currentState!.selectedAnswers = List.generate(currentQuestion.answers.length, (index) => -1);
+    }
+
+    if (currentQuestion.type == quizTypes.dropdown) {
+      if (dropdownKey.currentState == null) return;
+      dropdownKey.currentState!.sentence = currentQuestion.question.split("<seperator />");
+      dropdownKey.currentState!.selectedAnswers = List.generate(currentQuestion.correctAnswer.length, (index) => 0);
+    }
+    setState(() {});
+    // currentQuestion = quizSet.questions[quizSet.questions.indexOf(currentQuestion) + 1];
   }
 
   String formatSeconds(int seconds) {
@@ -242,6 +252,7 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 
   final reorderKey = GlobalKey<_ReorderQuestionState>();
+  final dropdownKey = GlobalKey<_DropdownQuestionState>();
 
   void nextQuestion(bool correct, int score, QuizQuestion question) {
     if (!mounted) return;
@@ -269,23 +280,28 @@ class _PlayScreenState extends State<PlayScreen> {
       endSequence();
       return;
     }
-    setState(() {
-      questionsDone++;
-      currentQuestion = quizSet.questions[quizSet.questions.indexOf(currentQuestion) + 1];
-      if (correct) {
-        correctAnswers++;
-        correctStreak++;
-        this.score += score;
-      } else {
-        correctStreak = 0;
-        this.score += score * (correctStreak / 10.round() + 1).round();
-        redemptionSet.questions.add(question);
-      }
-      if (currentQuestion.type == quizTypes.reorder) {
-        if (reorderKey.currentState == null) return;
-        reorderKey.currentState!.selectedAnswers = List.generate(currentQuestion.correctAnswer.length, (index) => -1);
-      }
-    });
+    questionsDone++;
+    if (correct) {
+      correctAnswers++;
+      correctStreak++;
+      this.score += score;
+    } else {
+      correctStreak = 0;
+      this.score += score * (correctStreak / 10.round() + 1).round();
+      redemptionSet.questions.add(question);
+    }
+
+    currentQuestion = quizSet.questions[quizSet.questions.indexOf(currentQuestion) + 1];
+    if (currentQuestion.type == quizTypes.reorder) {
+      if (reorderKey.currentState == null) return;
+      reorderKey.currentState!.selectedAnswers = List.generate(currentQuestion.answers.length, (index) => -1);
+    }
+    if (currentQuestion.type == quizTypes.dropdown) {
+      if (dropdownKey.currentState == null) return;
+      dropdownKey.currentState!.sentence = currentQuestion.question.split("<seperator />");
+      dropdownKey.currentState!.selectedAnswers = List.generate(currentQuestion.correctAnswer.length, (index) => 0);
+    }
+    setState(() {});
   }
 
   Future<void> redemptionSequence() async {
@@ -392,7 +408,7 @@ class _PlayScreenState extends State<PlayScreen> {
                   doAnimationFunction: doNextQuestionAnimations,
                 )
               : currentQuestion.type == quizTypes.dropdown
-                  ? DropdownQuestion(question: currentQuestion, nextQuestionFunction: nextQuestion, doAnimationFunction: doNextQuestionAnimations)
+                  ? DropdownQuestion(key: dropdownKey, question: currentQuestion, nextQuestionFunction: nextQuestion, doAnimationFunction: doNextQuestionAnimations)
                   : currentQuestion.type == quizTypes.reorder
                       ? ReorderQuestion(key: reorderKey, question: currentQuestion, nextQuestionFunction: nextQuestion, doAnimationFunction: doNextQuestionAnimations)
                       : const Placeholder(),
@@ -744,7 +760,7 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
     });
     int correctAnswers = 0;
     for (int i = 0; i < selectedAnswers.length; i++) {
-      if (selectedAnswers[i] == widget.question.correctAnswer[i]) {
+      if (selectedAnswers.length > i && selectedAnswers[i] == widget.question.correctAnswer[i]) {
         correctAnswers++;
       }
     }
@@ -763,6 +779,7 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+
     return Column(
       children: [
         const SizedBox(
@@ -868,7 +885,7 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
                             ),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                              child: selectedAnswers[i] != -1
+                              child: selectedAnswers.length > i && selectedAnswers[i] != -1
                                   ? Text(
                                       widget.question.answers[selectedAnswers[i]],
                                       style: textTheme.displaySmall,
@@ -878,6 +895,12 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
                           );
                         },
                         onAccept: (data) {
+                          for (var i = 0; i < widget.question.correctAnswer.length - selectedAnswers.length; i++) {
+                            //Add missing answers
+                            //fuck state
+                            selectedAnswers.add(-1);
+                          }
+
                           setState(() {
                             selectedAnswers[i] = data;
                           });

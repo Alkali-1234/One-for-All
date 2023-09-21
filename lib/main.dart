@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'firebase_options.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
+// import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/data/user_data.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +34,7 @@ import 'screens/loading_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FlutterDownloader.initialize(debug: true);
+  // await FlutterDownloader.initialize(debug: true);
   await MobileAds.instance.initialize();
   debugPrint(
     "Initialized app! : ${Firebase.app().options.projectId}",

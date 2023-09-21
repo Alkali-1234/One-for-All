@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/constants.dart';
+import 'package:oneforall/styles/styles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/main_container.dart';
 import 'package:oneforall/main.dart';
@@ -28,7 +29,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
       backgroundColor: theme.background,
       floatingActionButton: FloatingActionButton(
           onPressed: () {
-            showDialog(context: context, builder: (context) => const NewQuizModal());
+            showDialog(context: context, builder: (context) => const NewSetOptions());
           },
           backgroundColor: theme.secondary,
           child: Icon(Icons.add, color: theme.onBackground)),
@@ -83,7 +84,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               ),
                               onPressed: () {
-                                showDialog(context: context, builder: (context) => const NewQuizModal());
+                                showDialog(context: context, builder: (context) => const NewSetOptions());
                               },
                               icon: Icon(
                                 Icons.add,
@@ -144,6 +145,29 @@ class SelectedQuizModal extends StatelessWidget {
   const SelectedQuizModal({super.key, required this.quiz, required this.index});
   final QuizSet quiz;
   final int index;
+
+  String getSetJson() {
+    dynamic quizData = {
+      "quizzes": [
+        {
+          "title": quiz.title,
+          "description": quiz.description,
+          "questions": [
+            for (var question in quiz.questions)
+              {
+                "question": question.question,
+                "answers": question.answers,
+                "correctAnswer": question.correctAnswer,
+                "type": question.type?.index ?? quizTypes.multipleChoice.index
+              }
+          ],
+          "settings": quiz.settings
+        }
+      ]
+    };
+    return jsonEncode(quizData);
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -179,6 +203,12 @@ class SelectedQuizModal extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
+                Text("JSON Encoded quiz set. Copy this for importing quiz sets.", style: textTheme.displaySmall),
+                const SizedBox(height: 10),
+                SelectableText(getSetJson(), style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold), maxLines: 5),
+                const SizedBox(
+                  height: 10,
+                ),
                 //Open, Edit, and Close
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -336,6 +366,7 @@ class _NewQuizModalState extends State<NewQuizModal> {
                 const SizedBox(
                   height: 10,
                 ),
+
                 //Add and Cancel buttons
                 Align(
                   alignment: Alignment.bottomCenter,
@@ -360,5 +391,202 @@ class _NewQuizModalState extends State<NewQuizModal> {
             ),
           ),
         ));
+  }
+}
+
+class NewSetOptions extends StatefulWidget {
+  const NewSetOptions({super.key});
+
+  @override
+  State<NewSetOptions> createState() => _NewSetOptionsState();
+}
+
+class _NewSetOptionsState extends State<NewSetOptions> {
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    // var appState = Provider.of<AppState>(context);
+    return Dialog(
+      backgroundColor: theme.background,
+      child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            //* Create New
+            //Button style: Basically a square with an icon inside, and a text below it
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: theme.primary,
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showDialog(context: context, builder: (context) => const NewQuizModal());
+                    },
+                    icon: Icon(Icons.add, color: theme.onBackground),
+                    label: Text("Create New", style: textTheme.displaySmall!.copyWith(color: theme.onBackground))),
+              ],
+            ),
+            const SizedBox(height: 16),
+            //* Import
+            //Button style: Basically a square with an icon inside, and a text below it
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: theme.primary,
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showDialog(context: context, builder: (context) => const ImportQuizModal());
+                    },
+                    icon: Icon(Icons.file_copy, color: theme.onBackground),
+                    label: Text("Import", style: textTheme.displaySmall!.copyWith(color: theme.onBackground))),
+              ],
+            ),
+            const SizedBox(height: 16),
+            //* Generate
+            //Button style: Basically a square with an icon inside, and a text below it
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: theme.primary,
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                    ),
+                    onPressed: () {},
+                    icon: Icon(Icons.smart_toy, color: theme.onBackground),
+                    label: Text("Generate", style: textTheme.displaySmall!.copyWith(color: theme.onBackground))),
+              ],
+            ),
+          ])),
+    );
+  }
+}
+
+class ImportQuizModal extends StatefulWidget {
+  const ImportQuizModal({super.key});
+
+  @override
+  State<ImportQuizModal> createState() => _ImportQuizModalState();
+}
+
+class _ImportQuizModalState extends State<ImportQuizModal> {
+  String error = "";
+
+  String jsonString = "";
+
+  void validateJSON(AppState appState) async {
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      dynamic decodedObject = jsonDecode(jsonString);
+
+      //* Convert the decoded `dynamic` object back to your desired Dart object structure
+      List<QuizSet> quizzes = [];
+      for (var quiz in decodedObject['quizzes']) {
+        quizzes.add(
+          QuizSet(
+              title: quiz['title'],
+              description: quiz['description'],
+              questions: [
+                for (int i = 0; i < quiz["questions"].length; i++) QuizQuestion(id: i, question: quiz["questions"][i]["question"], answers: List<String>.from(quiz["questions"][i]["answers"] as List), correctAnswer: List<int>.from(quiz["questions"][i]["correctAnswer"] as List), type: quiz["questions"][i]["type"] != null ? quizTypes.values[quiz["questions"][i]["type"]] : quizTypes.multipleChoice),
+              ],
+              settings: quiz["settings"] ?? {}),
+        );
+      }
+
+      //* Add the quizzes to the user data
+      for (QuizSet quiz in quizzes) {
+        appState.getQuizzes.add(quiz);
+      }
+    } catch (e) {
+      setState(() {
+        error = "String not formatted correctly? ${e.toString()}";
+      });
+    }
+    appState.thisNotifyListeners();
+    //Convert to Object
+    Object quizData = {
+      "quizzes": [
+        for (var quiz in appState.getQuizzes)
+          {
+            "title": quiz.title,
+            "description": quiz.description,
+            "questions": [
+              for (var question in quiz.questions)
+                {
+                  "question": question.question,
+                  "answers": question.answers,
+                  "correctAnswer": question.correctAnswer,
+                  "type": question.type?.index ?? quizTypes.multipleChoice.index
+                }
+            ],
+            "settings": quiz.settings
+          }
+      ]
+    };
+    //Save to prefs
+    await prefs.setString("quizData", jsonEncode(quizData));
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+
+    return Dialog(
+        child: Container(
+            decoration: BoxDecoration(color: theme.background, borderRadius: const BorderRadius.all(Radius.circular(20.0))),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Text("Import from JSON String", style: textTheme.displaySmall),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                TextField(
+                  style: textTheme.displaySmall,
+                  cursorColor: theme.onBackground,
+                  decoration: TextInputStyle(theme: theme, textTheme: textTheme).getTextInputStyle().copyWith(hintText: "JSON String", hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.25), fontWeight: FontWeight.bold)),
+                  onChanged: (value) => setState(() {
+                    jsonString = value;
+                  }),
+                ),
+                const SizedBox(height: 5),
+                error != "" ? Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error)) : const SizedBox(),
+                const SizedBox(height: 5),
+                ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.primaryContainer,
+                      foregroundColor: theme.onBackground,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide.none),
+                    ),
+                    onPressed: () => validateJSON(context.read<AppState>()),
+                    icon: const Icon(Icons.add),
+                    label: const Text("Import"))
+              ],
+            )));
   }
 }

@@ -42,7 +42,7 @@ class ReorderEditState extends State<ReorderEdit> {
       correctOrder = widget.question!.correctAnswer;
     }
     questionController = TextEditingController(text: question);
-    currentlyEditingController = TextEditingController(text: draggables.length > currentlyEditing ? draggables[currentlyEditing] : "");
+    currentlyEditingController = TextEditingController(text: currentlyEditing != -1 ? draggables[currentlyEditing] : "");
   }
 
   @override
@@ -117,7 +117,7 @@ class ReorderEditState extends State<ReorderEdit> {
               children: [
                 for (int i = 0; i < draggables.length; i++) ...[
                   SizedBox(
-                    height: 40,
+                    height: 50,
                     child: LayoutBuilder(builder: (context, constraints) {
                       return Draggable<int>(
                           data: i,
@@ -136,21 +136,26 @@ class ReorderEditState extends State<ReorderEdit> {
                             children: [
                               Container(
                                 decoration: BoxDecoration(color: theme.primaryContainer, borderRadius: BorderRadius.circular(10)),
-                                padding: const EdgeInsets.all(1),
+                                padding: const EdgeInsets.all(10),
                                 child: Center(
                                   child: GestureDetector(
                                       onDoubleTap: () {
                                         setState(() {
                                           currentlyEditing = i;
+                                          currentlyEditingController.text = draggables[i];
+                                          currentlyEditingController.selection = TextSelection(baseOffset: 0, extentOffset: currentlyEditingController.text.length);
                                         });
-                                        currentlyEditingController.selection = TextSelection(baseOffset: 0, extentOffset: currentlyEditingController.text.length);
                                       },
                                       child: currentlyEditing == i
                                           ? IntrinsicWidth(
                                               child: TextField(
+                                                autofocus: true,
                                                 cursorColor: theme.onBackground,
                                                 style: textTheme.displaySmall,
                                                 controller: currentlyEditingController,
+                                                // onTap: () {
+                                                //   currentlyEditingController.selection = TextSelection(baseOffset: 0, extentOffset: currentlyEditingController.text.length);
+                                                // },
                                                 decoration: TextInputStyle(theme: theme, textTheme: textTheme).getTextInputStyle().copyWith(hintText: "Option", contentPadding: const EdgeInsets.only(left: 5)),
                                                 onChanged: (value) => draggables[i] = value,
                                                 onEditingComplete: () => setState(() {
