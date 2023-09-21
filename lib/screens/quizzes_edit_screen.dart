@@ -106,107 +106,147 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
     var textTheme = Theme.of(context).textTheme;
     return Scaffold(
       body: MainContainer(
+          onClose: () => showDialog(
+              context: context,
+              builder: (c) => Dialog(
+                  child: Container(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: theme.background,
+                        borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("Are you sure you want to exit? All unsaved changes will be lost!", style: textTheme.displayMedium),
+                          const SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: theme.primaryContainer,
+                                    foregroundColor: theme.onBackground,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  onPressed: () => {
+                                        refreshQuizLocalSave(appState),
+                                        Navigator.pop(context)
+                                      },
+                                  child: const Text("Confirm")),
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: theme.primaryContainer,
+                                    foregroundColor: theme.onBackground,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text("Cancel"))
+                            ],
+                          ),
+                        ],
+                      )))),
           child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
               children: [
-                Text("Editing ${quizSet.title}", style: textTheme.displayMedium),
+                const SizedBox(height: 10),
                 Row(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    //* Settings
-                    IconButton(
-                        onPressed: () => showDialog(
-                            context: context,
-                            builder: (c) => QuizSettingsModal(
-                                  key: settingsKey,
-                                  settings: quizSet.settings,
-                                  quizTitle: quizSet.title,
-                                  onClose: () => Navigator.pop(c),
-                                )),
-                        icon: Icon(Icons.settings, color: theme.onBackground)),
+                    Text("Editing ${quizSet.title}", style: textTheme.displayMedium),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        //* Settings
+                        IconButton(
+                            onPressed: () => showDialog(
+                                context: context,
+                                builder: (c) => QuizSettingsModal(
+                                      key: settingsKey,
+                                      settings: quizSet.settings,
+                                      quizTitle: quizSet.title,
+                                      onClose: () => Navigator.pop(c),
+                                    )),
+                            icon: Icon(Icons.settings, color: theme.onBackground)),
 
-                    const SizedBox(
-                      width: 2.5,
-                    ),
-                    //* Delete
-                    IconButton(
-                        onPressed: () => showDialog(
-                            context: context,
-                            builder: (c) => DeleteConfirmationModal(onConfirm: () {
-                                  Navigator.pop(c);
-                                  Navigator.pop(context);
-                                  appState.getQuizzes.removeAt(widget.index);
-                                  appState.thisNotifyListeners();
-                                  refreshQuizLocalSave(appState);
-                                })),
-                        icon: const Icon(Icons.delete, color: Colors.red))
+                        const SizedBox(
+                          width: 2.5,
+                        ),
+                        //* Delete
+                        IconButton(
+                            onPressed: () => showDialog(
+                                context: context,
+                                builder: (c) => DeleteConfirmationModal(onConfirm: () {
+                                      Navigator.pop(c);
+                                      Navigator.pop(context);
+                                      appState.getQuizzes.removeAt(widget.index);
+                                      appState.thisNotifyListeners();
+                                      refreshQuizLocalSave(appState);
+                                    })),
+                            icon: const Icon(Icons.delete, color: Colors.red))
+                      ],
+                    )
                   ],
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.primaryContainer,
+                        foregroundColor: theme.onBackground,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      onPressed: () => showDialog(context: context, builder: (context) => NewQuestionModal(quizSet: quizSet, setQuizSet: setQuizSet)),
+                      icon: const Icon(Icons.add),
+                      label: const Text("Add Question")),
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: Column(
+                    children: [
+                      //* Queries
+                      Flexible(
+                          flex: 10,
+                          child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              return QueryListItem(question: quizSet.questions[index], index: index, setQuizSet: setQuizSet, quizIndex: widget.index);
+                            },
+                            itemCount: quizSet.questions.length,
+                          )),
+                      const SizedBox(height: 10),
+                      Flexible(
+                          flex: 1,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: theme.primaryContainer,
+                                    foregroundColor: theme.onBackground,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  icon: Icon(Icons.save, color: theme.onBackground),
+                                  onPressed: () => saveQuizSet(appState),
+                                  label: const Text("Save")),
+                              // ElevatedButton.icon(
+                              //     style: ElevatedButton.styleFrom(
+                              //       backgroundColor: theme.primaryContainer,
+                              //       foregroundColor: theme.onBackground,
+                              //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              //     ),
+                              //     icon: Icon(Icons.close, color: theme.onBackground),
+                              //     onPressed: () => Navigator.pop(context),
+                              //     label: const Text("Cancel")),
+                            ],
+                          )),
+                    ],
+                  ),
                 )
               ],
             ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.primaryContainer,
-                    foregroundColor: theme.onBackground,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: () => showDialog(context: context, builder: (context) => NewQuestionModal(quizSet: quizSet, setQuizSet: setQuizSet)),
-                  icon: const Icon(Icons.add),
-                  label: const Text("Add Question")),
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: Column(
-                children: [
-                  //* Queries
-                  Flexible(
-                      flex: 10,
-                      child: ListView.builder(
-                        itemBuilder: (context, index) {
-                          return QueryListItem(question: quizSet.questions[index], index: index, setQuizSet: setQuizSet, quizIndex: widget.index);
-                        },
-                        itemCount: quizSet.questions.length,
-                      )),
-                  const SizedBox(height: 10),
-                  Flexible(
-                      flex: 1,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: theme.primaryContainer,
-                                foregroundColor: theme.onBackground,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              ),
-                              icon: Icon(Icons.save, color: theme.onBackground),
-                              onPressed: () => saveQuizSet(appState),
-                              label: const Text("Save")),
-                          // ElevatedButton.icon(
-                          //     style: ElevatedButton.styleFrom(
-                          //       backgroundColor: theme.primaryContainer,
-                          //       foregroundColor: theme.onBackground,
-                          //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          //     ),
-                          //     icon: Icon(Icons.close, color: theme.onBackground),
-                          //     onPressed: () => Navigator.pop(context),
-                          //     label: const Text("Cancel")),
-                        ],
-                      )),
-                ],
-              ),
-            )
-          ],
-        ),
-      )),
+          )),
     );
   }
 }
@@ -217,6 +257,11 @@ class QueryListItem extends StatelessWidget {
   final int index;
   final Function setQuizSet;
   final int quizIndex;
+
+  void duplicateQuestion(QuizQuestion question, AppState appState) {
+    appState.getQuizzes[quizIndex].questions.insert(index, QuizQuestion(id: appState.getQuizzes[quizIndex].questions.length + 1, question: question.question, answers: question.answers, correctAnswer: question.correctAnswer));
+    setQuizSet(appState.getQuizzes[quizIndex]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -281,6 +326,7 @@ class QueryListItem extends StatelessWidget {
                 },
                 icon: const Icon(Icons.add),
                 label: const Text("Add")),
+            ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: theme.primaryContainer, foregroundColor: theme.onBackground, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))), onPressed: () => duplicateQuestion(question, appState), icon: const Icon(Icons.copy), label: const Text("Duplicate")),
             ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.primaryContainer,

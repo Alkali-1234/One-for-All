@@ -61,9 +61,9 @@ Future initializeFCM(String assignedCommunity, String assignedSection) async {
   }
   if (prefs.containsKey("setting_notifications_LAC")) {
     if (prefs.getBool("setting_notifications_LAC")!) {
-      await _firebaseMessaging.subscribeToTopic("LAC_$assignedCommunity");
+      await _firebaseMessaging.subscribeToTopic("LAC_${assignedCommunity}_$assignedSection");
     } else {
-      await _firebaseMessaging.unsubscribeFromTopic("LAC_$assignedCommunity");
+      await _firebaseMessaging.unsubscribeFromTopic("LAC_${assignedCommunity}_$assignedSection");
     }
   } else {
     await _firebaseMessaging.subscribeToTopic("LAC_$assignedCommunity");
