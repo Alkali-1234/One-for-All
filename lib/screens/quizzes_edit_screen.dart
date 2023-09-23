@@ -29,6 +29,9 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
   //* Keys
   final settingsKey = GlobalKey<_QuizSettingsModalState>();
 
+  //* Controllers
+  final listController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -157,38 +160,48 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Editing ${quizSet.title}", style: textTheme.displayMedium),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        //* Settings
-                        IconButton(
-                            onPressed: () => showDialog(
-                                context: context,
-                                builder: (c) => QuizSettingsModal(
-                                      key: settingsKey,
-                                      settings: quizSet.settings,
-                                      quizTitle: quizSet.title,
-                                      onClose: () => Navigator.pop(c),
-                                    )),
-                            icon: Icon(Icons.settings, color: theme.onBackground)),
+                    Flexible(
+                      flex: 3,
+                      child: Text(
+                        "Editing ${quizSet.title}",
+                        style: textTheme.displayMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Flexible(
+                      flex: 1,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          //* Settings
+                          IconButton(
+                              onPressed: () => showDialog(
+                                  context: context,
+                                  builder: (c) => QuizSettingsModal(
+                                        key: settingsKey,
+                                        settings: quizSet.settings,
+                                        quizTitle: quizSet.title,
+                                        onClose: () => Navigator.pop(c),
+                                      )),
+                              icon: Icon(Icons.settings, color: theme.onBackground)),
 
-                        const SizedBox(
-                          width: 2.5,
-                        ),
-                        //* Delete
-                        IconButton(
-                            onPressed: () => showDialog(
-                                context: context,
-                                builder: (c) => DeleteConfirmationModal(onConfirm: () {
-                                      Navigator.pop(c);
-                                      Navigator.pop(context);
-                                      appState.getQuizzes.removeAt(widget.index);
-                                      appState.thisNotifyListeners();
-                                      refreshQuizLocalSave(appState);
-                                    })),
-                            icon: const Icon(Icons.delete, color: Colors.red))
-                      ],
+                          const SizedBox(
+                            width: 2.5,
+                          ),
+                          //* Delete
+                          IconButton(
+                              onPressed: () => showDialog(
+                                  context: context,
+                                  builder: (c) => DeleteConfirmationModal(onConfirm: () {
+                                        Navigator.pop(c);
+                                        Navigator.pop(context);
+                                        appState.getQuizzes.removeAt(widget.index);
+                                        appState.thisNotifyListeners();
+                                        refreshQuizLocalSave(appState);
+                                      })),
+                              icon: const Icon(Icons.delete, color: Colors.red))
+                        ],
+                      ),
                     )
                   ],
                 ),
@@ -201,7 +214,7 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                         foregroundColor: theme.onBackground,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
-                      onPressed: () => showDialog(context: context, builder: (context) => NewQuestionModal(quizSet: quizSet, setQuizSet: setQuizSet)),
+                      onPressed: () => showDialog(context: context, builder: (context) => NewQuestionModal(quizSet: quizSet, setQuizSet: setQuizSet, listController: listController)),
                       icon: const Icon(Icons.add),
                       label: const Text("Add Question")),
                 ),
@@ -213,6 +226,7 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                       Flexible(
                           flex: 10,
                           child: ListView.builder(
+                            controller: listController,
                             itemBuilder: (context, index) {
                               return QueryListItem(question: quizSet.questions[index], index: index, setQuizSet: setQuizSet, quizIndex: widget.index);
                             },
@@ -232,16 +246,46 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                                   ),
                                   icon: Icon(Icons.save, color: theme.onBackground),
                                   onPressed: () => saveQuizSet(appState),
+                                  label: const Text("Save & Quit")),
+                              ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: theme.primaryContainer,
+                                    foregroundColor: theme.onBackground,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  icon: Icon(Icons.save, color: theme.onBackground),
+                                  onPressed: () async {
+                                    final prefs = await SharedPreferences.getInstance();
+// Save to prefs
+
+                                    //Convert to Object
+                                    Object quizData = {
+                                      "quizzes": [
+                                        for (var quiz in appState.getQuizzes)
+                                          {
+                                            "title": quiz.title,
+                                            "description": quiz.description,
+                                            "questions": [
+                                              for (var question in quiz.questions)
+                                                {
+                                                  "question": question.question,
+                                                  "answers": question.answers,
+                                                  "correctAnswer": question.correctAnswer,
+                                                  "type": question.type?.index ?? quizTypes.multipleChoice.index
+                                                }
+                                            ],
+                                            "settings": quiz.settings
+                                          }
+                                      ]
+                                    };
+                                    //Save to prefs
+                                    await prefs.setString("quizData", jsonEncode(quizData));
+                                    setState(() {
+                                      appState.getQuizzes[widget.index] = quizSet;
+                                    });
+                                    // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.green, content: Text("Saved", style: TextStyle(color: Colors.white))));
+                                  },
                                   label: const Text("Save")),
-                              // ElevatedButton.icon(
-                              //     style: ElevatedButton.styleFrom(
-                              //       backgroundColor: theme.primaryContainer,
-                              //       foregroundColor: theme.onBackground,
-                              //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              //     ),
-                              //     icon: Icon(Icons.close, color: theme.onBackground),
-                              //     onPressed: () => Navigator.pop(context),
-                              //     label: const Text("Cancel")),
                             ],
                           )),
                     ],
@@ -304,7 +348,7 @@ class QueryListItem extends StatelessWidget {
                         softWrap: true,
                       ),
                     ),
-                    Flexible(flex: 1, child: Text("${question.correctAnswer.length.toString()} Correct Answers", style: textTheme.displaySmall)),
+                    Flexible(flex: 1, child: FittedBox(child: Text("${question.correctAnswer.length.toString()} Correct Answers", style: textTheme.displaySmall))),
                   ],
                 )
               ],
@@ -351,9 +395,10 @@ class QueryListItem extends StatelessWidget {
 
 ///New quesetion modal
 class NewQuestionModal extends StatefulWidget {
-  const NewQuestionModal({super.key, required this.quizSet, required this.setQuizSet});
+  const NewQuestionModal({super.key, required this.quizSet, required this.setQuizSet, required this.listController});
   final QuizSet quizSet;
   final Function setQuizSet;
+  final ScrollController listController;
 
   @override
   State<NewQuestionModal> createState() => _NewQuestionModalState();
@@ -412,7 +457,9 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
                         ],
                         correctAnswer: [],
                       )),
-                      widget.setQuizSet(widget.quizSet)
+                      widget.setQuizSet(widget.quizSet),
+                      //! FIXME fake
+                      widget.listController.animateTo(widget.listController.positions.last.maxScrollExtent, duration: const Duration(milliseconds: 200), curve: Curves.decelerate)
                     },
                     child: const Text("Create"),
                   ),

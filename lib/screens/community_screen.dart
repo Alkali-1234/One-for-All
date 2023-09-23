@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/banner_ad.dart';
 // import 'package:oneforall/data/community_data.dart';
@@ -16,9 +17,11 @@ class CommunityScreen extends StatefulWidget {
 
 class _CommunityScreenState extends State<CommunityScreen> {
   Map<String, dynamic> localCommunityData = {};
+  String error = "";
 
   void initializeCommunityData(AppState appState) async {
-    if (appState.getCurrentUser.assignedCommunity == null) {
+    if (appState.getCurrentUser.assignedCommunity == null || appState.getCurrentUser.assignedCommunity == "0" || FirebaseAuth.instance.currentUser!.isAnonymous) {
+      error = "No assigned community";
       return;
     }
 
@@ -66,6 +69,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
       setState(() {
         localCommunityData = value.data()!;
       });
+    }).catchError((e) {
+      setState(() {
+        error = e.toString();
+      });
     });
   }
 
@@ -84,6 +91,29 @@ class _CommunityScreenState extends State<CommunityScreen> {
       bottomNavigationBar: const BannerAdWidget(),
       backgroundColor: appState.currentUserSelectedTheme.colorScheme.background,
       body: SafeArea(child: Builder(builder: (context) {
+        if (error != "") {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(error, style: textTheme.displaySmall!.copyWith(color: Colors.red)),
+                const SizedBox(
+                  height: 5,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: theme.primaryContainer, foregroundColor: theme.onBackground, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))), onPressed: () => Navigator.of(context).pop(), icon: const Icon(Icons.arrow_back), label: const Text("Back")),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: theme.primaryContainer, foregroundColor: theme.onBackground, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))), onPressed: () => initializeCommunityData(appState), icon: const Icon(Icons.restart_alt_outlined), label: const Text("Retry"))
+                  ],
+                )
+              ],
+            ),
+          );
+        }
         if (appState.communityData.isEmpty) {
           return Center(
               child: Text(

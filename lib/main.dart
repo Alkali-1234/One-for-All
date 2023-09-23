@@ -357,6 +357,14 @@ class _HomeScreenState extends State<HomeScreen> {
   int MABSelectedFilter = 0;
   bool reverseTransition = false;
 
+  late Stream mabDataStream;
+
+  @override
+  void initState() {
+    super.initState();
+    mabDataStream = context.read<AppState>().getCurrentUser.assignedCommunity != "0" ? FirebaseFirestore.instance.collection("communities").doc(context.read<AppState>().getCurrentUser.assignedCommunity).collection("MAB").snapshots().distinct() : const Stream.empty();
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -582,8 +590,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: MediaQuery.of(context).size.height * 0.17,
                         child: StreamBuilder(
                             initialData: null,
-                            //!!! Change this to the actual community ID
-                            stream: FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("MAB").snapshots().distinct(),
+                            stream: mabDataStream,
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return Center(

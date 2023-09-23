@@ -336,12 +336,89 @@ class _NewSetOptionsState extends State<NewSetOptions> {
                       elevation: 0,
                       shadowColor: Colors.transparent,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showDialog(context: context, builder: (context) => const GenerateFlashcardsModal());
+                    },
                     icon: Icon(Icons.smart_toy, color: theme.onBackground),
                     label: Text("Generate", style: textTheme.displaySmall!.copyWith(color: theme.onBackground))),
               ],
             ),
           ])),
+    );
+  }
+}
+
+class GenerateFlashcardsModal extends StatefulWidget {
+  const GenerateFlashcardsModal({super.key});
+
+  @override
+  State<GenerateFlashcardsModal> createState() => _GenerateFlashcardsModalState();
+}
+
+class _GenerateFlashcardsModalState extends State<GenerateFlashcardsModal> {
+  int? selectedQuiz = null;
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<AppState>();
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    return Dialog(
+      child: Container(
+        decoration: BoxDecoration(color: theme.background, borderRadius: const BorderRadius.all(Radius.circular(20.0))),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Generate Flashcards", style: textTheme.displayMedium),
+            const SizedBox(height: 5),
+            Text(
+              "Generate from quiz: ",
+              style: textTheme.displaySmall,
+            ),
+            Row(
+              children: [
+                Text("Select quiz : ", style: textTheme.displaySmall),
+                const SizedBox(width: 5),
+                DropdownButton<int>(
+                    value: selectedQuiz,
+                    hint: Text(
+                      "Select Quiz",
+                      style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    items: [
+                      for (int i = 0; i < appState.getQuizzes.length; i++) ...[
+                        DropdownMenuItem(value: i, child: Text(appState.getQuizzes[i].title, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)))
+                      ]
+                    ],
+                    onChanged: (value) => setState(() {
+                          selectedQuiz = value;
+                        })),
+              ],
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Container(
+              height: 40,
+              decoration: BoxDecoration(gradient: getPrimaryGradient, borderRadius: const BorderRadius.all(Radius.circular(10))),
+              child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, elevation: 0, shadowColor: Colors.transparent, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))),
+                  onPressed: () {
+                    if (selectedQuiz == null) return;
+                    //TODO support all question types
+                    appState.getCurrentUser.flashCardSets.add(FlashcardSet(id: appState.getCurrentUser.flashCardSets.length + 1, title: appState.getQuizzes[selectedQuiz!].title, description: appState.getQuizzes[selectedQuiz!].description, flashcards: [
+                      for (int i = 0; i < appState.getQuizzes[selectedQuiz!].questions.length; i++) ...[
+                        Flashcard(id: i, question: appState.getQuizzes[selectedQuiz!].questions[i].type == quizTypes.multipleChoice ? appState.getQuizzes[selectedQuiz!].questions[i].question : "not supported", answer: appState.getQuizzes[selectedQuiz!].questions[i].type == quizTypes.multipleChoice ? List<String>.generate(appState.getQuizzes[selectedQuiz!].questions[i].correctAnswer.length, (index) => appState.getQuizzes[selectedQuiz!].questions[i].answers[index]).join(", ") : "not supported")
+                      ]
+                    ]));
+                  },
+                  child: Text("Generate", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold))),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

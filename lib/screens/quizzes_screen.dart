@@ -242,6 +242,20 @@ class SelectedQuizModal extends StatelessWidget {
                               question.answers.shuffle();
                               question.correctAnswer = question.correctAnswer.map((e) => question.answers.indexOf(tempAns[e])).toList();
                             }
+                            for (var question in modifiedQuiz.questions.where((element) => element.type == quizTypes.dropdown)) {
+                              List<String> tempAns = question.answers.toList();
+                              question.answers.shuffle();
+                              question.correctAnswer = question.correctAnswer.map((e) => question.answers.indexOf(tempAns[e])).toList();
+                              //* Change the correct answer in sentence
+                              List<String> sentence = question.question.split("<seperator />");
+                              int dropdownIndex = 0;
+                              for (var i = 0; i < sentence.length; i++) {
+                                if (sentence[i].contains("<dropdown ")) {
+                                  sentence[i] = "<dropdown answer=${question.correctAnswer[dropdownIndex]} />";
+                                  dropdownIndex++;
+                                }
+                              }
+                            }
                           }
                           Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuizzesPlayScreen(quizSet: modifiedQuiz)));
                         },
@@ -521,6 +535,7 @@ class _ImportQuizModalState extends State<ImportQuizModal> {
       setState(() {
         error = "String not formatted correctly? ${e.toString()}";
       });
+      return;
     }
     appState.thisNotifyListeners();
     //Convert to Object

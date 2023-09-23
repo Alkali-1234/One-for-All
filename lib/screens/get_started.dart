@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oneforall/components/animations/fade_in_transition.dart';
 import 'package:oneforall/main.dart';
 import 'package:oneforall/screens/login_screen.dart';
 import 'package:provider/provider.dart';
@@ -113,7 +114,7 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
         Container(
           height: 40,
           width: double.infinity,
-          decoration: BoxDecoration(gradient: primaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
+          decoration: BoxDecoration(gradient: defaultBluePrimaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
           child: ElevatedButton(
             onPressed: () {
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
@@ -410,7 +411,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
         Container(
           height: 40,
           width: double.infinity,
-          decoration: BoxDecoration(gradient: primaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
+          decoration: BoxDecoration(gradient: defaultBluePrimaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
           child: ElevatedButton(
             onPressed: () => {
               joinCommunityWithValidation(),
@@ -605,7 +606,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
           Container(
             height: 40,
             width: double.infinity,
-            decoration: BoxDecoration(gradient: primaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
+            decoration: BoxDecoration(gradient: defaultBluePrimaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
             child: ElevatedButton(
               onPressed: () {
                 createAccountValidation();
@@ -708,39 +709,63 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Text(
-        "Welcome!",
-        style: textTheme.displayLarge!.copyWith(fontSize: 48),
-        textAlign: TextAlign.center,
+      FadeInTransition(
+        child: Text(
+          "Welcome!",
+          style: textTheme.displayLarge!.copyWith(fontSize: 48),
+          textAlign: TextAlign.center,
+        ),
       ),
-      Text("Let's get you started.", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w400)),
+      FadeInTransition(delayMilliseconds: 150 * 1, child: Text("Let's get you started.", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w400))),
       const SizedBox(height: 20),
-      Container(
-        height: 200,
-        width: 200,
-        decoration: const BoxDecoration(
-          image: DecorationImage(image: AssetImage('assets/images/logo.png'), fit: BoxFit.cover),
-        ),
-        // decoration: BoxDecoration(
-        //     image: DecorationImage(
-        //         image: AssetImage(
-        //             'assets/images/getstarted.png'))),
-      ),
-      const SizedBox(height: 50),
-      Container(
-        height: 40,
-        decoration: BoxDecoration(gradient: primaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
-        child: ElevatedButton(
-          onPressed: () {
-            changeCurrentStep(1 /*account creation*/);
-          },
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, elevation: 0, padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 80),
-            child: Text("Get Started", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+      FadeInTransition(
+        delayMilliseconds: 150 * 2,
+        child: Container(
+          height: 200,
+          width: 200,
+          decoration: const BoxDecoration(
+            image: DecorationImage(image: AssetImage('assets/images/logo.png'), fit: BoxFit.cover),
           ),
+          // decoration: BoxDecoration(
+          //     image: DecorationImage(
+          //         image: AssetImage(
+          //             'assets/images/getstarted.png'))),
         ),
       ),
+      const SizedBox(height: 75),
+      // FadeInTransition(
+      //   delayMilliseconds: 150 * 3,
+      //   child: Container(
+      //     height: 40,
+      //     decoration: BoxDecoration(gradient: defaultBluePrimaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
+      //     child: ElevatedButton(
+      //       onPressed: () {
+      //         changeCurrentStep(1 /*account creation*/);
+      //       },
+      //       style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, elevation: 0, padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),
+      //       child: Padding(
+      //         padding: const EdgeInsets.symmetric(horizontal: 80),
+      //         child: Text("Get Started", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+      //       ),
+      //     ),
+      //   ),
+      // ),
+
+      TapRegion(
+        onTapInside: (event) => changeCurrentStep(1),
+        onTapOutside: (event) => changeCurrentStep(1),
+        child: FadeInTransition(
+            delayMilliseconds: 150 * 3 + 500,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Continue", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                const SizedBox(width: 15),
+                Transform.flip(flipX: true, child: const Icon(Icons.arrow_back_rounded, color: Colors.white))
+              ],
+            )),
+      ),
+
       const SizedBox(height: 100),
     ]);
   }

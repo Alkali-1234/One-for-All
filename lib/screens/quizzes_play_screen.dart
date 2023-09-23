@@ -65,6 +65,7 @@ class _QuizzesPlayScreenState extends State<QuizzesPlayScreen> {
                 reverse: reversed,
                 duration: const Duration(milliseconds: 200),
                 transitionBuilder: (child, animation, secondaryAnimation) => SharedAxisTransition(
+                  fillColor: Colors.transparent,
                   animation: animation,
                   secondaryAnimation: secondaryAnimation,
                   transitionType: SharedAxisTransitionType.horizontal,

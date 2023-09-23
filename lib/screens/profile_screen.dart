@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/screens/dev_screen.dart';
 import 'package:oneforall/service/auth_service.dart';
@@ -47,20 +48,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
   void _saveChanges(AppState appState) async {
+    if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.red, content: Text("User is guest!", style: TextStyle(color: Colors.white))));
+      return;
+    }
     if (_formKey.currentState!.validate()) {
       debugPrint("e");
       // Save changes to the user profile
       if (profilePicture is File) {
         //* Change profile picture
         try {
-          String newLink = await changeUserProfilePicture(
-              profilePicture, previousProfilePicture);
+          String newLink = await changeUserProfilePicture(profilePicture, previousProfilePicture);
           appState.getCurrentUser.profilePicture = newLink;
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error changing profile picture! $e',
-                  style: const TextStyle(color: Colors.white)),
+              content: Text('Error changing profile picture! $e', style: const TextStyle(color: Colors.white)),
               backgroundColor: Colors.red,
             ),
           );
@@ -75,8 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         } on Exception catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error changing username! $e',
-                  style: TextStyle(color: Colors.white)),
+              content: Text('Error changing username! $e', style: TextStyle(color: Colors.white)),
               backgroundColor: Colors.red,
             ),
           );
@@ -90,8 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         } on Exception catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error changing email! $e',
-                  style: TextStyle(color: Colors.white)),
+              content: Text('Error changing email! $e', style: TextStyle(color: Colors.white)),
               backgroundColor: Colors.red,
             ),
           );
@@ -101,8 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       debugPrint('Changes saved!');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content:
-              Text('Changes saved!', style: TextStyle(color: Colors.white)),
+          content: Text('Changes saved!', style: TextStyle(color: Colors.white)),
           backgroundColor: Colors.green,
         ),
       );
@@ -113,9 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       //* Show snack bar
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-              'Changes not saved! Please be sure that all fields are filled and changed',
-              style: TextStyle(color: Colors.white)),
+          content: Text('Changes not saved! Please be sure that all fields are filled and changed', style: TextStyle(color: Colors.white)),
           backgroundColor: Colors.red,
         ),
       );
@@ -205,9 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       TextFormField(
                         initialValue: username,
-                        decoration: InputDecoration(
-                            labelText: 'Username',
-                            labelStyle: TextStyle(color: theme.onBackground)),
+                        decoration: InputDecoration(labelText: 'Username', labelStyle: TextStyle(color: theme.onBackground)),
                         style: textTheme.displaySmall!,
                         onChanged: (value) => setState(() => username = value),
                         validator: (value) {
@@ -220,9 +216,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 10),
                       TextFormField(
                         initialValue: email,
-                        decoration: InputDecoration(
-                            labelText: 'Email',
-                            labelStyle: TextStyle(color: theme.onBackground)),
+                        decoration: InputDecoration(labelText: 'Email', labelStyle: TextStyle(color: theme.onBackground)),
                         style: textTheme.displaySmall!,
                         onChanged: (value) => setState(() => email = value),
                         validator: (value) {
@@ -235,18 +229,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 10),
                       TextButton(
                           style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.transparent),
-                            padding: MaterialStateProperty.all(
-                                const EdgeInsets.all(8)),
+                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                            padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
                           ),
                           onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => const DevScreen()));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const DevScreen()));
                           },
-                          child: Text('Change Password (Dev)',
-                              style: textTheme.displaySmall!
-                                  .copyWith(fontWeight: FontWeight.w500))),
+                          child: Text('Change Password (Dev)', style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.w500))),
                     ],
                   ),
                 ),
@@ -255,15 +244,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: () => _saveChanges(context.read<AppState>()),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.secondary,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: Text('Save Changes',
-                      style: textTheme.displaySmall!
-                          .copyWith(fontWeight: FontWeight.bold)),
+                  child: Text('Save Changes', style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -302,18 +288,14 @@ class SavingSettingsModal extends StatelessWidget {
             ),
             Card(
               color: theme.primaryContainer,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  side: BorderSide(color: theme.tertiary, width: 0.5)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: theme.tertiary, width: 0.5)),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Saving changes...',
-                        style: textTheme.displaySmall!
-                            .copyWith(fontWeight: FontWeight.bold)),
+                    Text('Saving changes...', style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 20),
                     LinearProgressIndicator(
                       backgroundColor: theme.onBackground,

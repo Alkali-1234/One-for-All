@@ -262,8 +262,12 @@ ThemeData lightTheme = ThemeData(
 
 const defaultBluePrimaryGradient = LinearGradient(
   colors: [
-    Color.fromRGBO(80, 88, 255, 1),
-    Color.fromRGBO(80, 88, 255, 1),
+    // candidate 1
+    // Color.fromRGBO(0, 150, 255, 1),
+    // Color.fromRGBO(0, 150, 255, 1),
+    // candidate 2
+    Color.fromRGBO(31, 81, 255, 1),
+    Color.fromRGBO(31, 81, 255, 1),
   ],
   stops: [
     0.0,

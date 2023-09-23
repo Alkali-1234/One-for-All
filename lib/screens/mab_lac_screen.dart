@@ -70,6 +70,18 @@ class _MABLACScreenState extends State<MABLACScreen> {
     return false;
   }
 
+  //* Streams
+  late Stream mabDataStream;
+  late Stream lacDataStream;
+
+  @override
+  void initState() {
+    super.initState();
+    var appState = context.read<AppState>();
+    mabDataStream = appState.getCurrentUser.assignedCommunity != "0" ? FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("MAB").snapshots() : const Stream.empty();
+    lacDataStream = appState.getCurrentUser.assignedSection != "0" ? FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("LAC").snapshots() : const Stream.empty();
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -454,7 +466,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                           child: SizedBox.expand(
                                             child: LayoutBuilder(builder: (context, c) {
                                               return StreamBuilder(
-                                                  stream: selectedSection == 0 ? FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("MAB").snapshots() : FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("LAC").snapshots(),
+                                                  stream: selectedSection == 0 ? mabDataStream : lacDataStream,
                                                   builder: (context, snapshot) {
                                                     if (snapshot.connectionState == ConnectionState.waiting) {
                                                       return Center(

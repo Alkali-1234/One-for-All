@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "369551606717",
+    "project_id": "one-for-all-vcr",
+    "storage_bucket": "one-for-all-vcr.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369551606717:android:104dc284da64b5524a08d4",
+        "android_client_info": {
+          "package_name": "com.vcomrade.oneforall"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "369551606717-leha8i4ojvdfigpi6ga1n00j656e7dnm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1HCWfopqBGMgIQlrF9SpAdO8ADwOByd4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "369551606717-leha8i4ojvdfigpi6ga1n00j656e7dnm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "369551606717-bn1o8v0i10lcfcltt1qgp5elsotftd70.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.oneforall"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
