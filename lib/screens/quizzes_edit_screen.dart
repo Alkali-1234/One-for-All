@@ -306,7 +306,16 @@ class QueryListItem extends StatelessWidget {
   final int quizIndex;
 
   void duplicateQuestion(QuizQuestion question, AppState appState) {
-    appState.getQuizzes[quizIndex].questions.insert(index, QuizQuestion(id: appState.getQuizzes[quizIndex].questions.length + 1, question: question.question, answers: question.answers, correctAnswer: question.correctAnswer));
+    //* New Quizquestion in order to not point to the same object
+    QuizQuestion newQuestion = QuizQuestion(id: appState.getQuizzes[quizIndex].questions.length, question: question.question, answers: [], correctAnswer: [], type: question.type);
+    for (String answer in question.answers) {
+      newQuestion.answers.add(answer);
+    }
+    for (int correctAnswer in question.correctAnswer) {
+      newQuestion.correctAnswer.add(correctAnswer);
+    }
+
+    appState.getQuizzes[quizIndex].questions.insert(index, newQuestion);
     setQuizSet(appState.getQuizzes[quizIndex]);
   }
 
@@ -433,6 +442,8 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
                           "Multiple Choice",
                           style: textTheme.displaySmall,
                         )),
+                    DropdownMenuItem(value: quizTypes.reorder, child: Text("Reorder", style: textTheme.displaySmall)),
+                    DropdownMenuItem(value: quizTypes.dropdown, child: Text("Dropdown", style: textTheme.displaySmall)),
                   ],
                   onChanged: (value) => setState(() {
                         questionType = value as quizTypes;
@@ -449,17 +460,41 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     onPressed: () => {
-                      widget.quizSet.questions.add(QuizQuestion(
-                        id: widget.quizSet.questions.length + 1,
-                        question: "Question",
-                        answers: [
-                          "Answer 1"
-                        ],
-                        correctAnswer: [],
-                      )),
+                      switch (questionType) {
+                        quizTypes.multipleChoice => widget.quizSet.questions.add(QuizQuestion(id: widget.quizSet.questions.length + 1, question: "Question", answers: [
+                            "Answer 1"
+                          ], correctAnswer: [
+                            0
+                          ])),
+                        quizTypes.reorder => widget.quizSet.questions.add(QuizQuestion(
+                            id: widget.quizSet.questions.length + 1,
+                            question: "Question",
+                            answers: [
+                              "Answer 1",
+                              "Answer 2"
+                            ],
+                            correctAnswer: [
+                              0,
+                              1
+                            ],
+                            type: quizTypes.reorder)),
+                        quizTypes.dropdown => widget.quizSet.questions.add(QuizQuestion(
+                            id: widget.quizSet.questions.length + 1,
+                            question: "Question <dropdown answer=0 />",
+                            answers: [
+                              "Answer 1"
+                            ],
+                            correctAnswer: [
+                              0
+                            ],
+                            type: quizTypes.dropdown)),
+                        _ => null,
+                      },
                       widget.setQuizSet(widget.quizSet),
                       //! FIXME fake
-                      widget.listController.animateTo(widget.listController.positions.last.maxScrollExtent, duration: const Duration(milliseconds: 200), curve: Curves.decelerate)
+                      //** ------------ Update --------------- **
+                      //* Should be real this time */
+                      widget.listController.animateTo(widget.listController.position.maxScrollExtent, duration: const Duration(milliseconds: 200), curve: Curves.decelerate)
                     },
                     child: const Text("Create"),
                   ),
@@ -662,6 +697,7 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
                                         child: SizedBox(
                                           width: 200,
                                           child: TextField(
+                                            onTap: () => _textAnswerControllers[index].selection = TextSelection(baseOffset: 0, extentOffset: _textAnswerControllers[index].text.length),
                                             controller: _textAnswerControllers[index],
                                             style: textTheme.displaySmall,
                                             cursorColor: theme.onBackground,

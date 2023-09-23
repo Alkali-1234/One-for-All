@@ -8,7 +8,6 @@ import 'package:oneforall/screens/thread_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'dart:async';
-import 'package:async/async.dart';
 import '../main.dart';
 
 class ForumScreen extends StatefulWidget {
@@ -153,7 +152,14 @@ class _ForumScreenState extends State<ForumScreen> with TickerProviderStateMixin
         selectedTab = _tabController.index + 1;
       });
     });
+    var appState = context.read<AppState>();
+    communityForumStream = appState.getCurrentUser.assignedCommunity != "0" ? FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").snapshots() : const Stream.empty();
+    localForumStream = appState.getCurrentUser.assignedSection != "0" ? FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection ?? "").collection("forum").snapshots() : const Stream.empty();
   }
+
+  //* Strams
+  late Stream communityForumStream;
+  late Stream localForumStream;
 
   @override
   Widget build(BuildContext context) {
@@ -241,14 +247,7 @@ class _ForumScreenState extends State<ForumScreen> with TickerProviderStateMixin
                   Expanded(
                     child: StreamBuilder(
                         // stream: FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").snapshots(),
-                        stream: selectedTab == 0
-                            ? StreamGroup.merge([
-                                FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").snapshots(),
-                                FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection ?? "").collection("forum").snapshots()
-                              ])
-                            : selectedTab == 1
-                                ? FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").snapshots()
-                                : FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection ?? "").collection("forum").snapshots(),
+                        stream: selectedTab == 1 ? communityForumStream : localForumStream,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
                           if (snapshot.hasError) return Center(child: Text("Error loading data ${snapshot.error}"));

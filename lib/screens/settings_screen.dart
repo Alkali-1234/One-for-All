@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:oneforall/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -32,15 +33,21 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
   late TabController _tabController;
   //0 = not loading, 1 = save in progress, 2 = clear cache in progress, 3 = logout in progress
 
+  Map<String, bool> notificationSettings = {
+    "MAB": true,
+    "LAC": true,
+    "RA": true,
+  };
+
   void saveSettings() async {
     if (currentLoading != 0) return;
     debugPrint("Save pressed");
     setState(() {
       currentLoading = 1;
     });
-    await SharedPreferences.getInstance().then((prefs) {
-      prefs.setInt("theme", selectedTheme);
-    });
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setInt("theme", selectedTheme);
+    //* Theme
     ThemeData themeUsed = selectedTheme == 0
         ? defaultBlueTheme
         : selectedTheme == 1
@@ -55,6 +62,32 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
               ? darkPrimaryGradient
               : lightPrimaryGradient;
     });
+    //* Notification settings
+    prefs.setBool("setting_notifications_MAB", notificationSettings["MAB"]!);
+    prefs.setBool("setting_notifications_LAC", notificationSettings["LAC"]!);
+    prefs.setBool("setting_notifications_RecentActivity", notificationSettings["RA"]!);
+
+    var appState = context.read<AppState>();
+
+    //* Subscribe and unsubscribe from topics
+    if (notificationSettings["MAB"]!) {
+      await FirebaseMessaging.instance.subscribeToTopic("MAB_${appState.getCurrentUser.assignedCommunity}");
+    } else {
+      await FirebaseMessaging.instance.unsubscribeFromTopic("MAB_${appState.getCurrentUser.assignedCommunity}");
+    }
+
+    if (notificationSettings["LAC"]!) {
+      await FirebaseMessaging.instance.subscribeToTopic("LAC_${appState.getCurrentUser.assignedCommunity}_${appState.getCurrentUser.assignedSection}");
+    } else {
+      await FirebaseMessaging.instance.unsubscribeFromTopic("LAC_${appState.getCurrentUser.assignedCommunity}_${appState.getCurrentUser.assignedSection}");
+    }
+
+    if (notificationSettings["RA"]!) {
+      await FirebaseMessaging.instance.subscribeToTopic("RA_${appState.getCurrentUser.assignedCommunity}");
+    } else {
+      await FirebaseMessaging.instance.unsubscribeFromTopic("RA_${appState.getCurrentUser.assignedCommunity}");
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         backgroundColor: Colors.green,
@@ -113,9 +146,22 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const LoginScreen()));
   }
 
+  void initializeNotifications() async {
+    await SharedPreferences.getInstance().then((prefs) {
+      notificationSettings["MAB"] = prefs.getBool("setting_notifications_MAB") ?? true;
+      notificationSettings["LAC"] = prefs.getBool("setting_notifications_LAC") ?? true;
+      notificationSettings["RA"] = prefs.getBool("setting_notifications_RecentActivity") ?? true;
+    });
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
+
+    //* Get saved notifcation settings
+    initializeNotifications();
+
     //* Set the theme setting to the current theme
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       widget.currentTheme == defaultBlueTheme
@@ -324,6 +370,63 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                               ],
                             ),
                           ),
+                          //* Notification settings
+                          const SizedBox(height: 10),
+                          Text("Notification Settings", style: textTheme.displaySmall),
+                          const SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                  flex: 1,
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text("MAB", style: textTheme.displaySmall),
+                                          Checkbox(
+                                              value: notificationSettings["MAB"],
+                                              onChanged: (value) => setState(() {
+                                                    notificationSettings["MAB"] = !notificationSettings["MAB"]!;
+                                                  }))
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text("LAC", style: textTheme.displaySmall),
+                                          Checkbox(
+                                              value: notificationSettings["LAC"],
+                                              onChanged: (value) => setState(() {
+                                                    notificationSettings["LAC"] = !notificationSettings["LAC"]!;
+                                                  }))
+                                        ],
+                                      ),
+                                    ],
+                                  )),
+                              Flexible(
+                                  flex: 1,
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text("Recent Activity", style: textTheme.displaySmall),
+                                          Checkbox(
+                                              value: notificationSettings["RA"],
+                                              onChanged: (value) => setState(() {
+                                                    notificationSettings["RA"] = !notificationSettings["RA"]!;
+                                                  }))
+                                        ],
+                                      )
+                                    ],
+                                  ))
+                            ],
+                          )
                         ],
                       ),
                       //* Save button
