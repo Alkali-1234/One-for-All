@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 class FadeInTransition extends StatefulWidget {
-  const FadeInTransition({super.key, required this.child, this.yOffsetMultiplier, this.delayMilliseconds});
+  const FadeInTransition({super.key, required this.child, this.yOffsetMultiplier, this.delayMilliseconds, this.duration});
   final Widget child;
   final double? yOffsetMultiplier;
   final int? delayMilliseconds;
+  final int? duration;
 
   @override
   State<FadeInTransition> createState() => _FadeInTransitionState();
@@ -31,7 +32,7 @@ class _FadeInTransitionState extends State<FadeInTransition> {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder(
       tween: tween,
-      duration: const Duration(milliseconds: 500),
+      duration: Duration(milliseconds: widget.duration ?? 500),
       builder: (BuildContext context, double value, Widget? child) {
         return Transform.translate(
           offset: Offset(0, 1 - value * (widget.yOffsetMultiplier ?? 1)),

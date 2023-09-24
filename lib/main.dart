@@ -33,6 +33,12 @@ import 'screens/loading_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  //* Prevents the app from rotating
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown
+  ]);
+  //* Initialize
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // await FlutterDownloader.initialize(debug: true);
   await MobileAds.instance.initialize();
@@ -198,119 +204,123 @@ class _HomePageState extends State<HomePage> {
       debugPrint("Selected Screen: $selectedScreen");
     }
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      //Global key for the scaffold
-      key: _key,
-      //Sidebar
-      drawer: SidebarXWidget(controller: _sidebarController),
-      //Background
-      backgroundColor: theme.background,
-      //Main application
-      body: Container(
-        height: double.maxFinite,
-        width: double.maxFinite,
-        decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
-        child: Column(children: [
-          Hero(
-            tag: "topAppBar",
-            child: Container(
-              width: double.infinity,
-              color: theme.secondary,
-              //Top App Bar
-              child: SafeArea(
-                bottom: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap: () => {
-                          _key.currentState?.openDrawer(),
-                          debugPrint("e")
-                        },
-                        child: Icon(
-                          Icons.menu,
-                          color: theme.onPrimary,
-                          size: 30,
+    return WillPopScope(
+      //* Prevents the user from going back to the login screen/loading screen.
+      onWillPop: () async => false,
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        //Global key for the scaffold
+        key: _key,
+        //Sidebar
+        drawer: SidebarXWidget(controller: _sidebarController),
+        //Background
+        backgroundColor: theme.background,
+        //Main application
+        body: Container(
+          height: double.maxFinite,
+          width: double.maxFinite,
+          decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
+          child: Column(children: [
+            Hero(
+              tag: "topAppBar",
+              child: Container(
+                width: double.infinity,
+                color: theme.secondary,
+                //Top App Bar
+                child: SafeArea(
+                  bottom: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () => {
+                            _key.currentState?.openDrawer(),
+                            debugPrint("e")
+                          },
+                          child: Icon(
+                            Icons.menu,
+                            color: theme.onPrimary,
+                            size: 30,
+                          ),
                         ),
-                      ),
-                      Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
-                      Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: theme.onPrimary,
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: getPrimaryGradient,
-                        ),
-                        child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
-                      )
-                    ],
+                        Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
+                        Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: theme.onPrimary,
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: getPrimaryGradient,
+                          ),
+                          child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ), //END OF TOP APP BAR
-            ),
-          ),
-          //Main Content
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: PageTransitionSwitcher(
-                reverse: reverseTransition,
-                transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
-                  transitionType: SharedAxisTransitionType.horizontal,
-                  fillColor: Colors.transparent,
-                  animation: primaryAnimation,
-                  secondaryAnimation: secondaryAnimation,
-                  child: child,
-                ),
-                child: selectedScreen == 0
-                    ? const HomeScreen()
-                    : selectedScreen == 1
-                        ? const NavigationScreen()
-                        : selectedScreen == 2
-                            ? const ProfileScreen()
-                            : Container(),
+                ), //END OF TOP APP BAR
               ),
             ),
-          ),
-          //END OF MAIN CONTENT
+            //Main Content
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: PageTransitionSwitcher(
+                  reverse: reverseTransition,
+                  transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
+                    transitionType: SharedAxisTransitionType.horizontal,
+                    fillColor: Colors.transparent,
+                    animation: primaryAnimation,
+                    secondaryAnimation: secondaryAnimation,
+                    child: child,
+                  ),
+                  child: selectedScreen == 0
+                      ? const HomeScreen()
+                      : selectedScreen == 1
+                          ? const NavigationScreen()
+                          : selectedScreen == 2
+                              ? const ProfileScreen()
+                              : Container(),
+                ),
+              ),
+            ),
+            //END OF MAIN CONTENT
 
-          //Bottom Nav Bar
-          BottomNavigationBar(
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            backgroundColor: theme.secondary,
-            elevation: 0,
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(
-                  selectedScreen == 0 ? Icons.home_rounded : Icons.home_outlined,
-                  color: theme.onPrimary,
+            //Bottom Nav Bar
+            BottomNavigationBar(
+              showSelectedLabels: false,
+              showUnselectedLabels: false,
+              backgroundColor: theme.secondary,
+              elevation: 0,
+              items: [
+                BottomNavigationBarItem(
+                  icon: Icon(
+                    selectedScreen == 0 ? Icons.home_rounded : Icons.home_outlined,
+                    color: theme.onPrimary,
+                  ),
+                  label: "Home",
                 ),
-                label: "Home",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  selectedScreen == 1 ? Icons.grid_view_rounded : Icons.grid_view_outlined,
-                  color: theme.onPrimary,
+                BottomNavigationBarItem(
+                  icon: Icon(
+                    selectedScreen == 1 ? Icons.grid_view_rounded : Icons.grid_view_outlined,
+                    color: theme.onPrimary,
+                  ),
+                  label: "Navigation",
                 ),
-                label: "Navigation",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  selectedScreen == 2 ? Icons.person_rounded : Icons.person_outline,
-                  color: theme.onPrimary,
+                BottomNavigationBarItem(
+                  icon: Icon(
+                    selectedScreen == 2 ? Icons.person_rounded : Icons.person_outline,
+                    color: theme.onPrimary,
+                  ),
+                  label: "Profile",
                 ),
-                label: "Profile",
-              ),
-            ],
-            onTap: (index) => setSelectedScreen(index),
-            currentIndex: selectedScreen,
-          )
-        ]),
+              ],
+              onTap: (index) => setSelectedScreen(index),
+              currentIndex: selectedScreen,
+            )
+          ]),
+        ),
       ),
     );
   }
@@ -632,6 +642,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       subject: post["subject"])
                               ]);
                               return ListView.builder(
+                                padding: EdgeInsets.zero,
                                 itemCount: mabData.posts.length,
                                 itemBuilder: (context, index) {
                                   MabPost post = mabData.posts[index];

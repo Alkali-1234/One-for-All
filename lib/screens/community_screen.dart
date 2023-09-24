@@ -90,7 +90,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
     return Scaffold(
       bottomNavigationBar: const BannerAdWidget(),
       backgroundColor: appState.currentUserSelectedTheme.colorScheme.background,
-      body: SafeArea(child: Builder(builder: (context) {
+      body: Builder(builder: (context) {
         if (error != "") {
           return Center(
             child: Column(
@@ -126,13 +126,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
             Stack(children: [
               //Image
               Container(
-                height: 200,
+                height: 270,
                 width: double.infinity,
                 decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(appState.communityData["image"] ?? ""), fit: BoxFit.cover)),
               ),
               //Gradient
               Container(
-                height: 200,
+                height: 270,
                 width: double.infinity,
                 decoration: BoxDecoration(
                     gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
@@ -142,30 +142,33 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 ])),
               ),
               // Back button and settings button
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    //Back button
-                    IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(
-                          Icons.arrow_back,
-                          color: theme.onBackground,
-                        )),
-                    //Settings button
-                    IconButton(
-                        onPressed: () {
-                          showDialog(context: context, builder: (_) => const CommunitySettingsModal());
-                        },
-                        icon: Icon(
-                          Icons.settings,
-                          color: theme.onBackground,
-                        )),
-                  ],
+              SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      //Back button
+                      IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: Icon(
+                            Icons.arrow_back,
+                            color: theme.onBackground,
+                          )),
+                      //Settings button
+                      IconButton(
+                          onPressed: () {
+                            showDialog(context: context, builder: (_) => const CommunitySettingsModal());
+                          },
+                          icon: Icon(
+                            Icons.settings,
+                            color: theme.onBackground,
+                          )),
+                    ],
+                  ),
                 ),
               ),
             ]),
@@ -204,7 +207,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 "ID",
                 style: textTheme.displaySmall,
               ),
-              trailing: Text(
+              trailing: SelectableText(
                 appState.communityData["id"] ?? "",
                 style: textTheme.displaySmall,
               ),
@@ -223,6 +226,29 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 appState.communityData["members"]?.length.toString() ?? "0",
                 style: textTheme.displaySmall,
               ),
+            ),
+            //* Sharing
+            ListTile(
+              leading: Icon(Icons.share, color: theme.onBackground),
+              title: Text("Sharing", style: textTheme.displaySmall),
+              trailing: Text("0 Shared", style: textTheme.displaySmall),
+              splashColor: theme.onBackground.withOpacity(0.25),
+              onTap: () => showDialog(
+                  context: context,
+                  builder: (context) => Dialog(
+                      child: Container(
+                          decoration: BoxDecoration(color: theme.background, borderRadius: BorderRadius.circular(20)),
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text("Coming Soon", style: textTheme.displaySmall),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              TextButton(onPressed: () => Navigator.pop(context), child: Text("Close", style: textTheme.displaySmall))
+                            ],
+                          )))),
             ),
             //Sections
             ListTile(
@@ -243,6 +269,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             //* Sections list
             Expanded(
               child: ListView.builder(
+                  padding: EdgeInsets.zero,
                   itemCount: appState.communityData["_sections"]?.length ?? 0,
                   itemBuilder: (context, index) {
                     return ListTile(
@@ -267,7 +294,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             ),
           ],
         );
-      })),
+      }),
     );
   }
 }

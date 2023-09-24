@@ -41,6 +41,7 @@ android {
     namespace "com.example.oneforall"
     compileSdkVersion 33
     ndkVersion flutter.ndkVersion
+    android.buildFeatures.buildConfig true
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -81,6 +82,10 @@ android {
            signingConfig signingConfigs.release
        }
    }
+
+   buildFeatures {
+        buildConfig true       
+    }
 
 }
 

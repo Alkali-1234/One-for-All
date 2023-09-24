@@ -97,6 +97,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
                   )
                 : Expanded(
                     child: ListView.builder(
+                        padding: EdgeInsets.zero,
                         itemBuilder: (context, index) {
                           if (!appState.getQuizzes[index].title.toLowerCase().contains(_searchText.toLowerCase()) && !appState.getQuizzes[index].description.toLowerCase().contains(_searchText.toLowerCase())) return const SizedBox.shrink();
                           return ListItem(

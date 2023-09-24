@@ -1,9 +1,15 @@
+import 'dart:convert';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/components/animations/fade_in_transition.dart';
 import 'package:oneforall/main.dart';
 import 'package:oneforall/screens/login_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constants.dart';
+import '../data/user_data.dart';
+import '../models/quizzes_models.dart';
 import '../service/auth_service.dart';
 import 'package:email_validator/email_validator.dart';
 import '../service/community_service.dart';
@@ -467,6 +473,43 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
   bool isLoading = false;
   bool success = false;
 
+  void loginAsGuest(AppState appState) async {
+    try {
+      await FirebaseAuth.instance.signInAnonymously();
+    } catch (e) {
+      //continue
+    }
+    appState.setCurrentUser(UserData(uid: 0, exp: 0, streak: 0, posts: 0, flashCardSets: [], username: "Guest", email: "guest@guest.com", profilePicture: "https://picsum.photos/200", assignedCommunity: "0", assignedSection: "0"));
+    appState.setQuizzes([]);
+    //* Get quizzes data from shared preferences
+    await SharedPreferences.getInstance().then((value) {
+      if (value.containsKey("quizData")) {
+        appState.setQuizzes([]);
+        dynamic decodedObject = jsonDecode(value.getString("quizData")!);
+
+        //* Convert the decoded `dynamic` object back to your desired Dart object structure
+        List<QuizSet> quizzes = [];
+        for (var quiz in decodedObject['quizzes']) {
+          quizzes.add(
+            QuizSet(
+                title: quiz['title'],
+                description: quiz['description'],
+                questions: [
+                  for (int i = 0; i < quiz["questions"].length; i++) QuizQuestion(id: i, question: quiz["questions"][i]["question"], answers: List<String>.from(quiz["questions"][i]["answers"] as List), correctAnswer: List<int>.from(quiz["questions"][i]["correctAnswer"] as List), type: quiz["questions"][i]["type"] != null ? quizTypes.values[quiz["questions"][i]["type"]] : quizTypes.multipleChoice),
+                ],
+                settings: quiz["settings"] ?? {}),
+          );
+        }
+        //* Add the quizzes to the user data
+        for (QuizSet quiz in quizzes) {
+          appState.getQuizzes.add(quiz);
+        }
+      }
+      //* Push to home screen
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const HomePage()));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = widget.theme;
@@ -630,9 +673,9 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
             ),
           ),
           //Error text
-          const SizedBox(height: 5),
+          const SizedBox(height: 2.5),
           error != "" ? Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error)) : Container(),
-          const SizedBox(height: 5),
+          const SizedBox(height: 2.5),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -643,6 +686,22 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
               child: Text("I already have an account", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.normal)),
             ),
           ),
+          const SizedBox(height: 5),
+// Login as Guest
+          SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.secondary,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    side: BorderSide(color: theme.tertiary),
+                  ),
+                  onPressed: () => loginAsGuest(context.read<AppState>()),
+                  child: Text("Login as Guest", style: textTheme.displaySmall)))
         ],
       ),
     );
@@ -716,10 +775,10 @@ class WelcomeScreen extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
       ),
-      FadeInTransition(delayMilliseconds: 150 * 1, child: Text("Let's get you started.", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w400))),
+      FadeInTransition(delayMilliseconds: 500 * 1, child: Text("Let's get you started.", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w400))),
       const SizedBox(height: 20),
       FadeInTransition(
-        delayMilliseconds: 150 * 2,
+        delayMilliseconds: 500 * 2,
         child: Container(
           height: 200,
           width: 200,
@@ -755,7 +814,8 @@ class WelcomeScreen extends StatelessWidget {
         onTapInside: (event) => changeCurrentStep(1),
         onTapOutside: (event) => changeCurrentStep(1),
         child: FadeInTransition(
-            delayMilliseconds: 150 * 3 + 500,
+            delayMilliseconds: 500 * 3 + 500,
+            duration: 1000,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

@@ -41,42 +41,45 @@ class _QuizzesPlayScreenState extends State<QuizzesPlayScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: const BannerAdWidget(),
-      body: MainContainer(
-          onClose: () {
-            if (currentScreen == 0) {
-              Navigator.of(context).pop();
-            }
-            if (currentScreen == 1) {
-              showDialog(
-                  context: context,
-                  builder: (context) => OnCloseDialog(onCloseFunction: () {
-                        QuizzesFunctions().refreshQuizzesFromLocal(context.read<AppState>(), true);
-                        playScreenKey.currentState!.audioPlayer.stop();
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
-                      }));
-            }
-          },
-          child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: PageTransitionSwitcher(
-                reverse: reversed,
-                duration: const Duration(milliseconds: 200),
-                transitionBuilder: (child, animation, secondaryAnimation) => SharedAxisTransition(
-                  fillColor: Colors.transparent,
-                  animation: animation,
-                  secondaryAnimation: secondaryAnimation,
-                  transitionType: SharedAxisTransitionType.horizontal,
-                  child: child,
-                ),
-                child: currentScreen == 0
-                    ? PlayScreenConfirmation(changeScreenFunction: changeScreen)
-                    : currentScreen == 1
-                        ? PlayScreen(key: playScreenKey, quizSet: widget.quizSet)
-                        : const Placeholder(),
-              ))),
+    return WillPopScope(
+      onWillPop: () async => currentScreen == 0 ? true : false,
+      child: Scaffold(
+        bottomNavigationBar: const BannerAdWidget(),
+        body: MainContainer(
+            onClose: () {
+              if (currentScreen == 0) {
+                Navigator.of(context).pop();
+              }
+              if (currentScreen == 1) {
+                showDialog(
+                    context: context,
+                    builder: (context) => OnCloseDialog(onCloseFunction: () {
+                          QuizzesFunctions().refreshQuizzesFromLocal(context.read<AppState>(), true);
+                          playScreenKey.currentState!.audioPlayer.stop();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        }));
+              }
+            },
+            child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: PageTransitionSwitcher(
+                  reverse: reversed,
+                  duration: const Duration(milliseconds: 200),
+                  transitionBuilder: (child, animation, secondaryAnimation) => SharedAxisTransition(
+                    fillColor: Colors.transparent,
+                    animation: animation,
+                    secondaryAnimation: secondaryAnimation,
+                    transitionType: SharedAxisTransitionType.horizontal,
+                    child: child,
+                  ),
+                  child: currentScreen == 0
+                      ? PlayScreenConfirmation(changeScreenFunction: changeScreen)
+                      : currentScreen == 1
+                          ? PlayScreen(key: playScreenKey, quizSet: widget.quizSet)
+                          : const Placeholder(),
+                ))),
+      ),
     );
   }
 }
