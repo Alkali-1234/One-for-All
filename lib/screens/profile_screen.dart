@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:oneforall/screens/dev_screen.dart';
+import 'package:oneforall/screens/login_screen.dart';
 import 'package:oneforall/service/auth_service.dart';
 import 'package:provider/provider.dart';
 //Deprecated import
@@ -167,6 +167,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(height: 20),
                 Stack(
                   alignment: Alignment.bottomRight,
                   children: [
@@ -227,29 +228,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                       ),
                       const SizedBox(height: 10),
-                      TextButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                            padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const DevScreen()));
-                          },
-                          child: Text('Change Password (Dev)', style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.w500))),
+                      // TextButton(
+                      //     style: ButtonStyle(
+                      //       backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                      //       padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
+                      //     ),
+                      //     onPressed: () {
+                      //       Navigator.of(context).push(MaterialPageRoute(builder: (context) => const DevScreen()));
+                      //     },
+                      //     child: Text('Change Password (Dev)', style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.w500))),
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => _saveChanges(context.read<AppState>()),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.secondary,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                const Spacer(),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => _saveChanges(context.read<AppState>()),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.secondary,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
+                    child: Text('Save Changes', style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
                   ),
-                  child: Text('Save Changes', style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await logout();
+                      if (mounted) Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const LoginScreen()));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text('Logout', style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                  ),
                 ),
               ],
             ),

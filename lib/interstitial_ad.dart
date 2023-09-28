@@ -16,7 +16,7 @@ class _InterstitialAdWidgetState extends State<InterstitialAdWidget> {
   InterstitialAd? _interstitialAd;
 
   //TODO Replace with actual ad unit id
-  final adUnitId = Platform.isAndroid ? 'ca-app-pub-3940256099942544/1033173712' : 'ca-app-pub-3940256099942544/4411468910';
+  final adUnitId = Platform.isAndroid ? 'ca-app-pub-4869371288390264/4176414771' : 'ca-app-pub-3940256099942544/4411468910';
 
   void loadAd() {
     InterstitialAd.load(
