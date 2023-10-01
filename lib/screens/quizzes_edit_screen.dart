@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:oneforall/components/main_container.dart';
@@ -36,6 +37,23 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
   void initState() {
     super.initState();
     quizSet = context.read<AppState>().getQuizzes[widget.index];
+    listItems = List.generate(
+        quizSet.questions.length,
+        (index) => QueryListItem(
+            question: quizSet.questions[index],
+            index: index,
+            setQuizSet: setQuizSet,
+            quizIndex: widget.index,
+            duplicated: false,
+            remveListItem: (i) => setState(() => listItems.removeAt(i)),
+            addListItem: (QueryListItem item) async {
+              final key = GlobalKey<_QueryListItemState>();
+              setState(() {
+                listItems.insert(item.index + 1, QueryListItem(key: key, question: item.question, index: item.index + 1, setQuizSet: setQuizSet, quizIndex: item.quizIndex, duplicated: true, addListItem: item.addListItem, remveListItem: (i) => setState(() => listItems.removeAt(i))));
+              });
+              await Future.delayed(const Duration(milliseconds: 50));
+              key.currentState!.doColorAnim();
+            }));
   }
 
   void setQuizSet(QuizSet quizSet) {
@@ -103,6 +121,8 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
     });
     Navigator.pop(context);
   }
+
+  List<QueryListItem> listItems = [];
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +234,36 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                         foregroundColor: theme.onBackground,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
-                      onPressed: () => showDialog(context: context, builder: (context) => NewQuestionModal(quizSet: quizSet, setQuizSet: setQuizSet, listController: listController)),
+                      onPressed: () => showDialog(
+                          context: context,
+                          builder: (context) => NewQuestionModal(
+                              quizSet: quizSet,
+                              setQuizSet: setQuizSet,
+                              listController: listController,
+                              addQuestion: (question) async {
+                                final key = GlobalKey<_QueryListItemState>();
+                                setState(() {
+                                  listItems.add(QueryListItem(
+                                      key: key,
+                                      question: question,
+                                      index: listItems.length,
+                                      setQuizSet: setQuizSet,
+                                      quizIndex: widget.index,
+                                      duplicated: true,
+                                      remveListItem: (i) => setState(() => listItems.removeAt(i)),
+                                      addListItem: (QueryListItem item) async {
+                                        final key = GlobalKey<_QueryListItemState>();
+                                        setState(() {
+                                          listItems.insert(item.index + 1, QueryListItem(key: key, question: item.question, index: item.index + 1, setQuizSet: setQuizSet, quizIndex: item.quizIndex, duplicated: true, addListItem: item.addListItem, remveListItem: (i) => setState(() => listItems.removeAt(i))));
+                                        });
+                                        await Future.delayed(const Duration(milliseconds: 50));
+                                        key.currentState!.doColorAnim();
+                                      }));
+                                });
+                                await Future.delayed(const Duration(milliseconds: 50));
+                                await listController.animateTo(listController.position.maxScrollExtent, duration: const Duration(milliseconds: 200), curve: Curves.decelerate);
+                                key.currentState!.doColorAnim();
+                              })),
                       icon: const Icon(Icons.add),
                       label: const Text("Add Question")),
                 ),
@@ -229,9 +278,9 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                             padding: EdgeInsets.zero,
                             controller: listController,
                             itemBuilder: (context, index) {
-                              return QueryListItem(question: quizSet.questions[index], index: index, setQuizSet: setQuizSet, quizIndex: widget.index);
+                              return listItems[index];
                             },
-                            itemCount: quizSet.questions.length,
+                            itemCount: listItems.length,
                           )),
                       const SizedBox(height: 10),
                       Flexible(
@@ -256,6 +305,8 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                                   ),
                                   icon: Icon(Icons.save, color: theme.onBackground),
                                   onPressed: () async {
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(duration: Duration(milliseconds: 500), backgroundColor: Colors.green, content: Text("Saved!", style: TextStyle(color: Colors.white))));
+
                                     final prefs = await SharedPreferences.getInstance();
 // Save to prefs
 
@@ -284,7 +335,6 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                                     setState(() {
                                       appState.getQuizzes[widget.index] = quizSet;
                                     });
-                                    // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.green, content: Text("Saved", style: TextStyle(color: Colors.white))));
                                   },
                                   label: const Text("Save")),
                             ],
@@ -300,11 +350,14 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
 }
 
 class QueryListItem extends StatefulWidget {
-  const QueryListItem({super.key, required this.question, required this.index, required this.setQuizSet, required this.quizIndex});
+  const QueryListItem({super.key, required this.question, required this.index, required this.setQuizSet, required this.quizIndex, required this.duplicated, required this.addListItem, required this.remveListItem});
   final QuizQuestion question;
   final int index;
   final Function setQuizSet;
   final int quizIndex;
+  final bool duplicated;
+  final Function addListItem;
+  final Function remveListItem;
 
   @override
   State<QueryListItem> createState() => _QueryListItemState();
@@ -322,10 +375,42 @@ class _QueryListItemState extends State<QueryListItem> {
     }
 
     appState.getQuizzes[widget.quizIndex].questions.insert(widget.index, newQuestion);
-    widget.setQuizSet(appState.getQuizzes[widget.quizIndex]);
+    widget.addListItem(QueryListItem(
+      question: newQuestion,
+      index: widget.index,
+      setQuizSet: widget.setQuizSet,
+      quizIndex: widget.quizIndex,
+      duplicated: true,
+      addListItem: widget.addListItem,
+      remveListItem: widget.remveListItem,
+    ));
   }
 
   bool expandedView = false;
+  Tween<double> tween = Tween<double>(begin: 0, end: 1);
+  Tween<double> colorAnim = Tween<double>(begin: 0, end: 1);
+
+  void doColorAnim() async {
+    setState(() {
+      colorAnim = Tween<double>(begin: 0, end: 1);
+    });
+    await Future.delayed(const Duration(milliseconds: 250));
+    setState(() {
+      colorAnim = Tween<double>(begin: 1, end: 0);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.duplicated) {
+      doColorAnim();
+    } else {
+      colorAnim = Tween<double>(begin: 0, end: 0);
+    }
+  }
+
+  final key = GlobalKey<_EditQuestionModalState>();
 
   @override
   Widget build(BuildContext context) {
@@ -340,48 +425,108 @@ class _QueryListItemState extends State<QueryListItem> {
           decoration: BoxDecoration(
             border: Border.symmetric(horizontal: BorderSide(color: theme.onBackground.withOpacity(0.125), width: 0.5)),
           ),
-          child: ListTile(
-              splashColor: theme.onBackground.withOpacity(0.125),
-              onTap: () => setState(() {
-                    expandedView = !expandedView;
-                  }),
-              leading: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Transform.flip(flipY: expandedView, child: Icon(Icons.arrow_drop_down, color: theme.onBackground)),
-                ],
-              ),
-              title: Text(widget.question.question, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  //* Add button
-                  IconButton(
-                      onPressed: () {
-                        appState.getQuizzes[widget.quizIndex].questions.insert(
-                            widget.index,
-                            QuizQuestion(id: appState.getQuizzes[widget.quizIndex].questions.length + 1, question: "Question", answers: [
-                              "Answer 1",
-                              "Answer 2"
-                            ], correctAnswer: [
-                              0
-                            ]));
-                        widget.setQuizSet(appState.getQuizzes[widget.quizIndex]);
-                      },
-                      icon: const Icon(Icons.add, color: Colors.green)),
-                  //* Duplicate button
-                  IconButton(onPressed: () => duplicateQuestion(widget.question, appState), icon: Icon(Icons.copy, color: theme.onBackground)),
-                  //* Delete button
-                  IconButton(
-                      onPressed: () {
-                        appState.getQuizzes[widget.quizIndex].questions.removeAt(widget.index);
-                        widget.setQuizSet(appState.getQuizzes[widget.quizIndex]);
-                      },
-                      icon: const Icon(Icons.delete, color: Colors.red)),
-                ],
-              )),
+          child: TweenAnimationBuilder(
+              tween: colorAnim,
+              duration: const Duration(milliseconds: 250),
+              builder: (context, value, child) {
+                return ListTile(
+                    tileColor: theme.onBackground.withOpacity(0.25 * value),
+                    splashColor: theme.onBackground.withOpacity(0.125),
+                    onTap: () async {
+                      if (expandedView) {
+                        if (key.currentState!.validateQuestions(context.read<AppState>()) == false) return;
+                        setState(() {
+                          tween = Tween<double>(begin: 0, end: 1);
+                        });
+                        await Future.delayed(const Duration(milliseconds: 250));
+                        setState(() {
+                          expandedView = false;
+                        });
+                        return;
+                      } else {
+                        setState(() {
+                          tween = Tween<double>(begin: 1, end: 0);
+                        });
+                      }
+                      await Future.delayed(const Duration(milliseconds: 250));
+                      setState(() {
+                        expandedView = !expandedView;
+                      });
+                    },
+                    leading: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Transform.flip(flipY: expandedView, child: Icon(Icons.arrow_drop_down, color: theme.onBackground)),
+                      ],
+                    ),
+                    title: Text(widget.question.question, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        //* Add button
+                        IconButton(
+                            onPressed: () {
+                              appState.getQuizzes[widget.quizIndex].questions.insert(
+                                  widget.index,
+                                  QuizQuestion(id: appState.getQuizzes[widget.quizIndex].questions.length + 1, question: "Question", answers: [
+                                    "Answer 1",
+                                    "Answer 2"
+                                  ], correctAnswer: [
+                                    0
+                                  ]));
+                              widget.setQuizSet(appState.getQuizzes[widget.quizIndex]);
+                              widget.addListItem(QueryListItem(
+                                question: appState.getQuizzes[widget.quizIndex].questions[widget.index],
+                                index: widget.index,
+                                setQuizSet: widget.setQuizSet,
+                                quizIndex: widget.quizIndex,
+                                duplicated: true,
+                                addListItem: widget.addListItem,
+                                remveListItem: widget.remveListItem,
+                              ));
+                            },
+                            icon: const Icon(Icons.add, color: Colors.green)),
+                        //* Duplicate button
+                        IconButton(onPressed: () => duplicateQuestion(widget.question, appState), icon: Icon(Icons.copy, color: theme.onBackground)),
+                        //* Delete button
+                        IconButton(
+                            onPressed: () {
+                              appState.getQuizzes[widget.quizIndex].questions.removeAt(widget.index);
+                              widget.setQuizSet(appState.getQuizzes[widget.quizIndex]);
+                              widget.remveListItem(widget.index);
+                            },
+                            icon: const Icon(Icons.delete, color: Colors.red)),
+                      ],
+                    ));
+              }),
         ),
-        if (expandedView) Padding(padding: const EdgeInsets.only(left: 16.0), child: EditQuestionModal(index: widget.index, question: widget.question, setQuizSet: widget.setQuizSet, quizIndex: widget.quizIndex)),
+        if (expandedView)
+          TweenAnimationBuilder(
+            tween: tween,
+            duration: const Duration(milliseconds: 250),
+            builder: (context, value, child) => Transform.translate(
+              offset: Offset(0, 10 * -value),
+              child: child,
+            ),
+            child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: EditQuestionModal(
+                  key: key,
+                  index: widget.index,
+                  question: widget.question,
+                  setQuizSet: widget.setQuizSet,
+                  quizIndex: widget.quizIndex,
+                  onDone: () async {
+                    setState(() {
+                      tween = Tween<double>(begin: 1, end: 0);
+                    });
+                    await Future.delayed(const Duration(milliseconds: 250));
+                    setState(() {
+                      expandedView = false;
+                    });
+                  },
+                )),
+          ),
         //! Old design
         // ElevatedButton(
         //     style: ElevatedButton.styleFrom(
@@ -460,10 +605,11 @@ class _QueryListItemState extends State<QueryListItem> {
 
 ///New quesetion modal
 class NewQuestionModal extends StatefulWidget {
-  const NewQuestionModal({super.key, required this.quizSet, required this.setQuizSet, required this.listController});
+  const NewQuestionModal({super.key, required this.quizSet, required this.setQuizSet, required this.listController, required this.addQuestion});
   final QuizSet quizSet;
   final Function setQuizSet;
   final ScrollController listController;
+  final Function addQuestion;
 
   @override
   State<NewQuestionModal> createState() => _NewQuestionModalState();
@@ -547,6 +693,7 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
                         _ => null,
                       },
                       widget.setQuizSet(widget.quizSet),
+                      widget.addQuestion(widget.quizSet.questions.last),
                       //! FIXME fake
                       //** ------------ Update --------------- **
                       //* Should be real this time */
@@ -573,11 +720,12 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
 
 ///* Edit question modal
 class EditQuestionModal extends StatefulWidget {
-  const EditQuestionModal({super.key, required this.index, required this.question, required this.setQuizSet, required this.quizIndex});
+  const EditQuestionModal({super.key, required this.index, required this.question, required this.setQuizSet, required this.quizIndex, required this.onDone});
   final int index;
   final QuizQuestion question;
   final Function setQuizSet;
   final int quizIndex;
+  final Function onDone;
 
   @override
   State<EditQuestionModal> createState() => _EditQuestionModalState();
@@ -650,6 +798,62 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
     appState.getQuizzes[widget.quizIndex].questions[widget.index] = quizQuestion;
   }
 
+  bool validateQuestions(AppState appState) {
+    {
+      if (questionType == quizTypes.multipleChoice) {
+        if (question.question == "") {
+          setState(() {
+            error = "Question cannot be empty";
+          });
+          return false;
+        }
+        if (question.answers.length < 2) {
+          setState(() {
+            error = "There must be at least 2 answers";
+          });
+          return false;
+        }
+        if (question.correctAnswer.isEmpty) {
+          setState(() {
+            error = "There must be at least 1 correct answer";
+          });
+          return false;
+        }
+        //* check for duplicates
+        for (var answer in question.answers) {
+          if (question.answers.where((element) => element == answer).length > 1) {
+            setState(() {
+              error = "There cannot be duplicate answers";
+            });
+            return false;
+          }
+        }
+      }
+      if (questionType == quizTypes.dropdown) {
+        try {
+          validateDropdownQuestion(appState);
+        } on Exception catch (e) {
+          setState(() {
+            error = e.toString();
+          });
+          return false;
+        }
+      }
+      if (questionType == quizTypes.reorder) {
+        try {
+          validateReorderQuestion(appState);
+        } on Exception catch (e) {
+          setState(() {
+            error = e.toString();
+          });
+          return false;
+        }
+      }
+      widget.setQuizSet(appState.getQuizzes[widget.quizIndex]);
+      return true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -665,25 +869,26 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Edit Question ${widget.index + 1}", style: textTheme.displayMedium),
-              const SizedBox(height: 10),
               //* Question type (Multiple Choices, Dropdown, Drag an Drop) more will be added Soon™
-              DropdownButton(
-                  value: questionType,
-                  style: textTheme.displaySmall,
-                  items: [
-                    DropdownMenuItem(
-                        value: quizTypes.multipleChoice,
-                        child: Text(
-                          "Multiple Choice",
-                          style: textTheme.displaySmall,
-                        )),
-                    DropdownMenuItem(value: quizTypes.dropdown, child: Text("Dropdown", style: textTheme.displaySmall)),
-                    DropdownMenuItem(value: quizTypes.reorder, child: Text("Reorder", style: textTheme.displaySmall)),
-                  ],
-                  onChanged: (value) => setState(() {
-                        questionType = value as quizTypes;
-                      })),
+              SizedBox(
+                width: double.infinity,
+                child: DropdownButton(
+                    value: questionType,
+                    style: textTheme.displaySmall,
+                    items: [
+                      DropdownMenuItem(
+                          value: quizTypes.multipleChoice,
+                          child: Text(
+                            "Multiple Choice",
+                            style: textTheme.displaySmall,
+                          )),
+                      DropdownMenuItem(value: quizTypes.dropdown, child: Text("Dropdown", style: textTheme.displaySmall)),
+                      DropdownMenuItem(value: quizTypes.reorder, child: Text("Reorder", style: textTheme.displaySmall)),
+                    ],
+                    onChanged: (value) => setState(() {
+                          questionType = value as quizTypes;
+                        })),
+              ),
               const SizedBox(height: 10),
               //* Question
               questionType == quizTypes.multipleChoice
@@ -708,79 +913,81 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
 
                           //* Answers | Checklist (Answer)
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
                         //* Add answer
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
+                        Row(
                           children: [
-                            ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: theme.primaryContainer,
-                                  foregroundColor: theme.onBackground,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                ),
+                            IconButton(
                                 onPressed: () => setState(() {
                                       _textAnswerControllers.add(TextEditingController(text: "Answer ${question.answers.length + 1}"));
                                       question.answers.add("Answer ${question.answers.length + 1}");
                                     }),
-                                icon: const Icon(Icons.add),
-                                label: const Text("Add Answer")),
-                            ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: theme.primaryContainer,
-                                  foregroundColor: theme.onBackground,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                ),
-                                onPressed: () => setState(() {
-                                      question.answers.removeLast();
-                                      question.correctAnswer.removeLast();
-                                    }),
-                                icon: const Icon(Icons.delete),
-                                label: const Text("Delete Answer")),
+                                icon: const Icon(Icons.add, color: Colors.green)),
                           ],
                         ),
                         const SizedBox(height: 10),
                         SizedBox(
                           height: 200,
                           child: ListView.builder(
+                            padding: EdgeInsets.zero,
                             itemBuilder: (context, index) {
                               return Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: SizedBox(
-                                      width: 200,
-                                      child: TextField(
-                                        onTap: () => _textAnswerControllers[index].selection = TextSelection(baseOffset: 0, extentOffset: _textAnswerControllers[index].text.length),
-                                        controller: _textAnswerControllers[index],
-                                        style: textTheme.displaySmall,
-                                        cursorColor: theme.onBackground,
-                                        decoration: InputDecoration(
-                                          fillColor: theme.primary,
-                                          filled: true,
-                                          hintText: "Answer ${index + 1}",
-                                          hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.25), fontWeight: FontWeight.bold),
-                                          border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(10)),
-                                          focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: theme.onBackground, width: 1), borderRadius: BorderRadius.circular(10)),
+                                  Flexible(
+                                    flex: 5,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(bottom: 5),
+                                      child: SizedBox(
+                                        width: double.infinity,
+                                        child: TextField(
+                                          onTap: () => _textAnswerControllers[index].selection = TextSelection(baseOffset: 0, extentOffset: _textAnswerControllers[index].text.length),
+                                          controller: _textAnswerControllers[index],
+                                          style: textTheme.displaySmall,
+                                          cursorColor: theme.onBackground,
+                                          decoration: InputDecoration(
+                                            fillColor: theme.primary,
+                                            filled: true,
+                                            hintText: "Answer ${index + 1}",
+                                            hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.25), fontWeight: FontWeight.bold),
+                                            border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(10)),
+                                            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: theme.onBackground, width: 1), borderRadius: BorderRadius.circular(10)),
+                                          ),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              question.answers[index] = value;
+                                            });
+                                          },
                                         ),
-                                        onChanged: (value) {
-                                          setState(() {
-                                            question.answers[index] = value;
-                                          });
-                                        },
                                       ),
                                     ),
                                   ),
-                                  Checkbox(
-                                      checkColor: theme.onBackground,
-                                      value: question.correctAnswer.contains(index),
-                                      onChanged: (value) => setState(() {
-                                            if (value == null) return;
-                                            if (value) question.correctAnswer.add(index);
-                                            if (!value) question.correctAnswer.remove(index);
-                                            setState(() {});
-                                          }))
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Flexible(
+                                    flex: 2,
+                                    child: Row(
+                                      children: [
+                                        Checkbox(
+                                            checkColor: theme.onBackground,
+                                            value: question.correctAnswer.contains(index),
+                                            onChanged: (value) => setState(() {
+                                                  if (value == null) return;
+                                                  if (value) question.correctAnswer.add(index);
+                                                  if (!value) question.correctAnswer.remove(index);
+                                                  setState(() {});
+                                                })),
+                                        IconButton(
+                                            onPressed: () => setState(() {
+                                                  _textAnswerControllers.removeAt(index);
+                                                  question.answers.removeAt(index);
+                                                  question.correctAnswer.remove(index);
+                                                }),
+                                            icon: const Icon(Icons.delete, color: Colors.red)),
+                                      ],
+                                    ),
+                                  )
                                 ],
                               );
                             },
@@ -802,71 +1009,72 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
                             ),
               const SizedBox(height: 10),
               //* Done
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.primaryContainer,
-                        foregroundColor: theme.onBackground,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
-                      onPressed: () {
-                        if (questionType == quizTypes.multipleChoice) {
-                          if (question.question == "") {
-                            setState(() {
-                              error = "Question cannot be empty";
-                            });
-                            return;
-                          }
-                          if (question.answers.length < 2) {
-                            setState(() {
-                              error = "There must be at least 2 answers";
-                            });
-                            return;
-                          }
-                          if (question.correctAnswer.isEmpty) {
-                            setState(() {
-                              error = "There must be at least 1 correct answer";
-                            });
-                            return;
-                          }
-                          //* check for duplicates
-                          for (var answer in question.answers) {
-                            if (question.answers.where((element) => element == answer).length > 1) {
-                              setState(() {
-                                error = "There cannot be duplicate answers";
-                              });
-                              return;
-                            }
-                          }
-                        }
-                        if (questionType == quizTypes.dropdown) {
-                          try {
-                            validateDropdownQuestion(appState);
-                          } on Exception catch (e) {
-                            setState(() {
-                              error = e.toString();
-                            });
-                            return;
-                          }
-                        }
-                        if (questionType == quizTypes.reorder) {
-                          try {
-                            validateReorderQuestion(appState);
-                          } on Exception catch (e) {
-                            setState(() {
-                              error = e.toString();
-                            });
-                          }
-                        }
-                        Navigator.pop(context);
-                        widget.setQuizSet(appState.getQuizzes[widget.quizIndex]);
-                      },
-                      icon: const Icon(Icons.done),
-                      label: const Text("Done")),
-                ],
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     ElevatedButton.icon(
+              //         style: ElevatedButton.styleFrom(
+              //           backgroundColor: theme.primaryContainer,
+              //           foregroundColor: theme.onBackground,
+              //           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              //         ),
+              //         onPressed: () {
+              //           if (questionType == quizTypes.multipleChoice) {
+              //             if (question.question == "") {
+              //               setState(() {
+              //                 error = "Question cannot be empty";
+              //               });
+              //               return;
+              //             }
+              //             if (question.answers.length < 2) {
+              //               setState(() {
+              //                 error = "There must be at least 2 answers";
+              //               });
+              //               return;
+              //             }
+              //             if (question.correctAnswer.isEmpty) {
+              //               setState(() {
+              //                 error = "There must be at least 1 correct answer";
+              //               });
+              //               return;
+              //             }
+              //             //* check for duplicates
+              //             for (var answer in question.answers) {
+              //               if (question.answers.where((element) => element == answer).length > 1) {
+              //                 setState(() {
+              //                   error = "There cannot be duplicate answers";
+              //                 });
+              //                 return;
+              //               }
+              //             }
+              //           }
+              //           if (questionType == quizTypes.dropdown) {
+              //             try {
+              //               validateDropdownQuestion(appState);
+              //             } on Exception catch (e) {
+              //               setState(() {
+              //                 error = e.toString();
+              //               });
+              //               return;
+              //             }
+              //           }
+              //           if (questionType == quizTypes.reorder) {
+              //             try {
+              //               validateReorderQuestion(appState);
+              //             } on Exception catch (e) {
+              //               setState(() {
+              //                 error = e.toString();
+              //               });
+              //               return;
+              //             }
+              //           }
+              //           widget.setQuizSet(appState.getQuizzes[widget.quizIndex]);
+              //           widget.onDone();
+              //         },
+              //         icon: const Icon(Icons.done),
+              //         label: const Text("Done")),
+              //   ],
+              // ),
 
               error != "" ? Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error)) : const SizedBox(),
             ],

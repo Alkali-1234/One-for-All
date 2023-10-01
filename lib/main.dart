@@ -5,6 +5,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
+import 'package:oneforall/screens/calendar_screen.dart';
+import 'package:oneforall/screens/flashcards_screen.dart';
+import 'package:oneforall/screens/mab_lac_screen.dart';
+import 'package:oneforall/screens/premium_screen.dart';
+import 'package:oneforall/screens/quizzes_screen.dart';
+import 'package:oneforall/screens/settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'firebase_options.dart';
@@ -27,6 +33,7 @@ import 'data/community_data.dart';
 
 //Screens
 import 'models/quizzes_models.dart';
+import 'screens/community_screen.dart';
 import 'screens/navigation_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/loading_screen.dart';
@@ -179,7 +186,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   //The controller for the sidebar
-  final _sidebarController = SidebarXController(selectedIndex: 0);
+  // final _sidebarController = DrawerController(child: , alignment: DrawerAlignment.start);
   //Global key for the scaffold
   final _key = GlobalKey<ScaffoldState>();
   int selectedScreen = 0;
@@ -212,7 +219,7 @@ class _HomePageState extends State<HomePage> {
         //Global key for the scaffold
         key: _key,
         //Sidebar
-        drawer: SidebarXWidget(controller: _sidebarController),
+        drawer: const MenuSelection(),
         //Background
         backgroundColor: theme.background,
         //Main application
@@ -267,22 +274,19 @@ class _HomePageState extends State<HomePage> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: PageTransitionSwitcher(
-                  reverse: reverseTransition,
-                  transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
-                    transitionType: SharedAxisTransitionType.horizontal,
-                    fillColor: Colors.transparent,
-                    animation: primaryAnimation,
-                    secondaryAnimation: secondaryAnimation,
-                    child: child,
-                  ),
-                  child: selectedScreen == 0
-                      ? const HomeScreen()
-                      : selectedScreen == 1
-                          ? const NavigationScreen()
-                          : selectedScreen == 2
-                              ? const ProfileScreen()
-                              : Container(),
-                ),
+                    reverse: reverseTransition,
+                    transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
+                          transitionType: SharedAxisTransitionType.horizontal,
+                          fillColor: Colors.transparent,
+                          animation: primaryAnimation,
+                          secondaryAnimation: secondaryAnimation,
+                          child: child,
+                        ),
+                    child: selectedScreen == 0
+                        ? const HomeScreen()
+                        : selectedScreen == 1
+                            ? const ProfileScreen()
+                            : Container()),
               ),
             ),
             //END OF MAIN CONTENT
@@ -295,26 +299,26 @@ class _HomePageState extends State<HomePage> {
               elevation: 0,
               items: [
                 BottomNavigationBarItem(
-                  icon: Icon(
-                    selectedScreen == 0 ? Icons.home_rounded : Icons.home_outlined,
-                    color: theme.onPrimary,
-                  ),
-                  label: "Home",
-                ),
+                    icon: Icon(
+                      selectedScreen == 0 ? Icons.home_rounded : Icons.home_outlined,
+                      color: theme.onPrimary,
+                    ),
+                    label: "Home",
+                    tooltip: "Home"),
+                // BottomNavigationBarItem(
+                //   icon: Icon(
+                //     selectedScreen == 1 ? Icons.grid_view_rounded : Icons.grid_view_outlined,
+                //     color: theme.onPrimary,
+                //   ),
+                //   label: "Navigation",
+                // ),
                 BottomNavigationBarItem(
-                  icon: Icon(
-                    selectedScreen == 1 ? Icons.grid_view_rounded : Icons.grid_view_outlined,
-                    color: theme.onPrimary,
-                  ),
-                  label: "Navigation",
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    selectedScreen == 2 ? Icons.person_rounded : Icons.person_outline,
-                    color: theme.onPrimary,
-                  ),
-                  label: "Profile",
-                ),
+                    icon: Icon(
+                      selectedScreen == 1 ? Icons.person_rounded : Icons.person_outline,
+                      color: theme.onPrimary,
+                    ),
+                    label: "Profile",
+                    tooltip: "Profile"),
               ],
               onTap: (index) => setSelectedScreen(index),
               currentIndex: selectedScreen,
@@ -350,6 +354,156 @@ class SidebarXWidget extends StatelessWidget {
         SidebarXItem(icon: Icons.home, label: '  Home'),
       ],
       extendedTheme: const SidebarXTheme(width: 140),
+    );
+  }
+}
+
+//* Menu Selection
+class MenuSelection extends StatelessWidget {
+  const MenuSelection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    return Drawer(
+      backgroundColor: theme.background,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    IconButton(onPressed: () => Navigator.pop(context), icon: Icon(Icons.arrow_back, color: theme.onBackground)),
+                    const SizedBox(width: 10),
+                    Text("Navigate", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                //* Self development
+                Text("Self Development", style: textTheme.displaySmall),
+                const Divider(),
+                const SizedBox(height: 5),
+                DrawerItem(
+                  icon: Icons.article,
+                  title: "Summaries",
+                  onTap: () => null,
+                ),
+                DrawerItem(icon: Icons.calendar_month, title: "Refresher", onTap: () => null),
+                DrawerItem(
+                    icon: Icons.note,
+                    title: "Flashcards",
+                    onTap: () => {
+                          Navigator.pop(context),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const FlashcardsScreen(),
+                            ),
+                          )
+                        }),
+                DrawerItem(
+                    icon: Icons.extension,
+                    title: "Quizzes",
+                    onTap: () => {
+                          Navigator.pop(context),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const QuizzesScreen(),
+                            ),
+                          )
+                        }),
+                //* Tools
+                const SizedBox(height: 20),
+                Text("Tools", style: textTheme.displaySmall),
+                const Divider(),
+                const SizedBox(height: 5),
+
+                DrawerItem(
+                    icon: Icons.list,
+                    title: "Announcement Board",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const MABLACScreen()));
+                    }),
+                DrawerItem(
+                    icon: Icons.calendar_today,
+                    title: "Calendar",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const CalendarScreen()));
+                    }),
+                DrawerItem(icon: Icons.calculate, title: "Notes", onTap: () => null),
+                //* Commuity and other
+                const SizedBox(height: 20),
+                Text("Community & Other", style: textTheme.displaySmall),
+                const Divider(),
+                const SizedBox(height: 5),
+                DrawerItem(
+                    icon: Icons.people,
+                    title: "Community",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const CommunityScreen()));
+                    }),
+                DrawerItem(
+                    icon: Icons.forum,
+                    title: "Forums",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const CommunityScreen()));
+                    }),
+                DrawerItem(
+                    icon: Icons.diamond,
+                    title: "Premium",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const PremiumScreen(
+                                    totalSpent: 0,
+                                  )));
+                    }),
+                DrawerItem(
+                    icon: Icons.settings,
+                    title: "Settings",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SettingsScreen(
+                                    currentTheme: Theme.of(context),
+                                  )));
+                    }),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DrawerItem extends StatelessWidget {
+  const DrawerItem({super.key, required this.icon, required this.title, required this.onTap});
+  final IconData icon;
+  final String title;
+  final Function onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    return ListTile(
+      hoverColor: theme.onBackground.withOpacity(0.125),
+      leading: Icon(icon, color: theme.onBackground),
+      title: Text(title, style: textTheme.displaySmall),
+      onTap: () => onTap(),
     );
   }
 }
