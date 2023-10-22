@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'dart:math' as math;
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/components/quizzes_components/drag_and_drop_edit.dart';
 import 'package:oneforall/components/quizzes_components/drop_down_edit.dart';
@@ -26,6 +26,7 @@ class QuizzesEditScreen extends StatefulWidget {
 
 class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
   late QuizSet quizSet;
+  String searchQuery = "";
 
   //* Keys
   final settingsKey = GlobalKey<_QuizSettingsModalState>();
@@ -177,6 +178,12 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 10),
+                TextField(
+                  cursorColor: theme.onBackground,
+                  decoration: TextInputStyle(theme: theme, textTheme: textTheme).getTextInputStyle().copyWith(hintText: "Search", prefixIcon: const Icon(Icons.search), prefixIconColor: theme.onBackground),
+                  onChanged: (value) => setState(() => searchQuery = value),
+                ),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -230,6 +237,7 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
+                        elevation: 0,
                         backgroundColor: theme.primaryContainer,
                         foregroundColor: theme.onBackground,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -278,7 +286,11 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                             padding: EdgeInsets.zero,
                             controller: listController,
                             itemBuilder: (context, index) {
-                              return listItems[index];
+                              if (listItems[index].question.question.toLowerCase().contains(searchQuery.toLowerCase())) {
+                                return listItems[index];
+                              } else {
+                                return const SizedBox.shrink();
+                              }
                             },
                             itemCount: listItems.length,
                           )),
@@ -290,6 +302,7 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                             children: [
                               ElevatedButton.icon(
                                   style: ElevatedButton.styleFrom(
+                                    elevation: 0,
                                     backgroundColor: theme.primaryContainer,
                                     foregroundColor: theme.onBackground,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -299,6 +312,7 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                                   label: const Text("Save & Quit")),
                               ElevatedButton.icon(
                                   style: ElevatedButton.styleFrom(
+                                    elevation: 0,
                                     backgroundColor: theme.primaryContainer,
                                     foregroundColor: theme.onBackground,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -456,7 +470,7 @@ class _QueryListItemState extends State<QueryListItem> {
                     leading: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Transform.flip(flipY: expandedView, child: Icon(Icons.arrow_drop_down, color: theme.onBackground)),
+                        TweenAnimationBuilder(duration: const Duration(milliseconds: 150), tween: tween, builder: (context, value, child) => Transform.rotate(angle: math.pi * -value, child: Icon(Icons.arrow_drop_down, color: theme.onBackground))),
                       ],
                     ),
                     title: Text(widget.question.question, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),

@@ -19,11 +19,11 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStateMixin {
   // final _tabController = TabController(length: 3, vsync: TickerProvider());
-  static const List<Tab> _themes = [
-    Tab(text: "Great Default Blue"),
-    Tab(text: "Clean Dark"),
-    Tab(text: "Bright Light"),
-  ];
+  // static const List<Tab> _themes = [
+  //   Tab(text: "Great Default Blue"),
+  //   Tab(text: "Clean Dark"),
+  //   Tab(text: "Bright Light"),
+  // ];
 
   ThemeData? savedTheme;
 
@@ -45,6 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
     setState(() {
       currentLoading = 1;
     });
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(duration: Duration(hours: 1), content: Text("Saving settings...", style: TextStyle(color: Colors.white)), backgroundColor: Colors.black));
     var prefs = await SharedPreferences.getInstance();
     prefs.setInt("theme", selectedTheme);
     //* Theme
@@ -88,6 +89,8 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
       await FirebaseMessaging.instance.unsubscribeFromTopic("RA_${appState.getCurrentUser.assignedCommunity}");
     }
 
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         backgroundColor: Colors.green,
@@ -163,9 +166,9 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
     initializeNotifications();
 
     //* Set the theme setting to the current theme
-    widget.currentTheme == defaultBlueTheme
+    widget.currentTheme.colorScheme == defaultBlueTheme.colorScheme
         ? selectedTheme = 0
-        : widget.currentTheme == darkTheme
+        : widget.currentTheme.colorScheme == darkTheme.colorScheme
             ? selectedTheme = 1
             : selectedTheme = 2;
   }

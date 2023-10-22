@@ -11,6 +11,7 @@ import 'package:oneforall/main.dart';
 import 'package:oneforall/models/quizzes_models.dart';
 import 'package:oneforall/screens/interstitial_screen.dart';
 import 'package:provider/provider.dart';
+import '../components/quizzes_components/combo_counter.dart';
 import './flashcardsPlay_screen.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -26,7 +27,7 @@ class _QuizzesPlayScreenState extends State<QuizzesPlayScreen> {
   bool reversed = false;
   int currentScreen = 0;
 
-  final playScreenKey = GlobalKey<_PlayScreenState>();
+  final playScreenKey = GlobalKey<PlayScreenState>();
 
   void changeScreen(int screen) {
     setState(() {
@@ -149,10 +150,10 @@ class PlayScreen extends StatefulWidget {
   final QuizSet quizSet;
 
   @override
-  State<PlayScreen> createState() => _PlayScreenState();
+  State<PlayScreen> createState() => PlayScreenState();
 }
 
-class _PlayScreenState extends State<PlayScreen> {
+class PlayScreenState extends State<PlayScreen> {
   @override
   void initState() {
     super.initState();
@@ -170,6 +171,7 @@ class _PlayScreenState extends State<PlayScreen> {
     audioPlayer.setLoopMode(LoopMode.one);
     audioPlayer.play();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // comboCounterKey.currentState!.addComboCount();
       showDialog(context: context, builder: (context) => const ThreeTwoOneGoRibbon(), barrierDismissible: false);
     });
   }
@@ -187,6 +189,17 @@ class _PlayScreenState extends State<PlayScreen> {
   DateTime startTime = DateTime.now();
   int elapsedTime = 0;
   late Timer timer;
+
+  List<Color> gradientColors = [
+    Colors.transparent,
+    Colors.transparent,
+    Colors.transparent,
+    Colors.transparent,
+    Colors.transparent,
+    Colors.green
+  ];
+
+  bool showingAnswers = false;
 
   //* Audio
   final AudioPlayer audioPlayer = AudioPlayer();
@@ -236,7 +249,7 @@ class _PlayScreenState extends State<PlayScreen> {
   void doNextQuestionAnimations(int scoreBeingAdded) async {
     if (!mounted) return;
     setState(() {
-      this.scoreBeingAdded = scoreBeingAdded;
+      this.scoreBeingAdded = scoreBeingAdded * (comboCounterKey.currentState!.counter / 10 + 1).round();
     });
     await Future.delayed(const Duration(milliseconds: 250));
     if (!mounted) return;
@@ -255,22 +268,41 @@ class _PlayScreenState extends State<PlayScreen> {
     });
   }
 
+  //* Keys
   final reorderKey = GlobalKey<_ReorderQuestionState>();
   final dropdownKey = GlobalKey<_DropdownQuestionState>();
+  final multipleChoiceKey = GlobalKey<_MultipleChoiceState>();
+  final comboCounterKey = GlobalKey<ComboCounterState>();
 
-  void nextQuestion(bool correct, int score, QuizQuestion question) {
+  void nextQuestion(bool correct, int score, QuizQuestion question) async {
     if (!mounted) return;
+    if (correct) comboCounterKey.currentState!.pauseTimer();
+    await Future.delayed(Duration(milliseconds: 3000 - (comboCounterKey.currentState!.counter * 100).round()));
+    if (currentQuestion.type == quizTypes.multipleChoice) {
+      multipleChoiceKey.currentState!.showAnswers = false;
+      multipleChoiceKey.currentState!.selectedAnswers = [];
+    }
+    if (currentQuestion.type == quizTypes.dropdown) {
+      dropdownKey.currentState!.showAnswers = false;
+      dropdownKey.currentState!.selectedAnswers = [];
+    }
+    if (currentQuestion.type == quizTypes.reorder) {
+      reorderKey.currentState!.showAnswers = false;
+      reorderKey.currentState!.selectedAnswers = [];
+    }
+    if (correct) comboCounterKey.currentState!.addComboCount();
+    if (!correct) comboCounterKey.currentState!.resetComboCount();
     //* Check if quiz is finished
     if (quizSet.questions.indexOf(currentQuestion) + 1 > quizSet.questions.length - 1) {
       questionsDone++;
       if (correct) {
+        // comboCounterKey.currentState!.addComboCount();
         correctAnswers++;
         correctStreak++;
         if (correctStreak > highestStreak) {
           highestStreak = correctStreak;
         }
-        //TODO: Have streak affect the score
-        this.score += score;
+        this.score += score * (comboCounterKey.currentState!.counter / 10 + 1).round();
       } else {
         correctStreak = 0;
         redemptionSet.questions.add(question);
@@ -286,12 +318,13 @@ class _PlayScreenState extends State<PlayScreen> {
     }
     questionsDone++;
     if (correct) {
+      // comboCounterKey.currentState!.addComboCount();
       correctAnswers++;
       correctStreak++;
-      this.score += score;
+      this.score += scoreBeingAdded;
     } else {
       correctStreak = 0;
-      this.score += score * (correctStreak / 10.round() + 1).round();
+      this.score += scoreBeingAdded;
       redemptionSet.questions.add(question);
     }
 
@@ -348,75 +381,101 @@ class _PlayScreenState extends State<PlayScreen> {
   Widget build(BuildContext context) {
     // var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    return Column(
+    return Stack(
       children: [
-        //* Statistics
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Column(
           children: [
-            //* Score
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TweenAnimationBuilder(
-                  tween: scoreStatTween,
-                  duration: const Duration(milliseconds: 250),
-                  builder: (context, double value, child) {
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.star_rounded, color: Colors.yellow),
-                        const SizedBox(width: 5),
-                        Text(value.toInt().toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
-                        const SizedBox(width: 2.5),
-                        //* + <score add amount> Score animation. Shows when the score increases, goes from being faded from above, to being faded out to the bottom
-                        TweenAnimationBuilder(
-                          tween: scoreStatAddTween,
-                          duration: const Duration(milliseconds: 250),
-                          builder: (context, value, child) {
-                            return Opacity(opacity: 1 - value, child: Transform.translate(offset: Offset(0, -value), child: child));
-                          },
-                          child: Text("+${scoreBeingAdded.toString()}", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.green)),
-                        )
-                      ],
-                    );
-                  }),
+            //* Statistics
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                //* Score
+                Flexible(
+                  flex: 1,
+                  child: TweenAnimationBuilder(
+                      tween: scoreStatTween,
+                      duration: const Duration(milliseconds: 250),
+                      builder: (context, double value, child) {
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.star_rounded, color: Colors.yellow),
+                            const SizedBox(width: 5),
+                            Text(value.toInt().toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                            const SizedBox(width: 2.5),
+                            //* + <score add amount> Score animation. Shows when the score increases, goes from being faded from above, to being faded out to the bottom
+                            TweenAnimationBuilder(
+                              tween: scoreStatAddTween,
+                              duration: const Duration(milliseconds: 250),
+                              builder: (context, value, child) {
+                                return Opacity(opacity: 1 - value, child: Transform.translate(offset: Offset(0, -value), child: child));
+                              },
+                              child: Text("+${scoreBeingAdded.toString()}", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.green)),
+                            )
+                          ],
+                        );
+                      }),
+                ),
+                //* Time Elapsed
+                Flexible(
+                  flex: 1,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.timer_rounded, color: Colors.grey),
+                      const SizedBox(width: 5),
+                      Text(formatSeconds(elapsedTime), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+                //* Combo counter
+                Flexible(flex: 1, child: ComboCounter(key: comboCounterKey, theme: Theme.of(context).colorScheme)),
+              ],
             ),
-            //* Time Elapsed
-            Align(
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.timer_rounded, color: Colors.grey),
-                  const SizedBox(width: 5),
-                  Text(formatSeconds(elapsedTime), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
-                ],
-              ),
+            Expanded(
+              child: currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
+                  ? MultipleChoice(
+                      question: currentQuestion,
+                      nextQuestionFunction: nextQuestion,
+                      doAnimationFunction: doNextQuestionAnimations,
+                      key: multipleChoiceKey,
+                      toggleShowingAnswers: () => setState(
+                            () => showingAnswers = !showingAnswers,
+                          ))
+                  : currentQuestion.type == quizTypes.dropdown
+                      ? DropdownQuestion(
+                          key: dropdownKey,
+                          question: currentQuestion,
+                          nextQuestionFunction: nextQuestion,
+                          doAnimationFunction: doNextQuestionAnimations,
+                          toggleShowingAnswers: () => setState(
+                                () => showingAnswers = !showingAnswers,
+                              ))
+                      : currentQuestion.type == quizTypes.reorder
+                          ? ReorderQuestion(
+                              key: reorderKey,
+                              question: currentQuestion,
+                              nextQuestionFunction: nextQuestion,
+                              doAnimationFunction: doNextQuestionAnimations,
+                              toggleShowingAnswers: () => setState(
+                                    () => showingAnswers = !showingAnswers,
+                                  ))
+                          : const Placeholder(),
             ),
-            //* Streak
-            Align(
-              alignment: Alignment.centerRight,
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                const Icon(Icons.local_fire_department, color: Colors.orange),
-                const SizedBox(width: 5),
-                AnimatedSwitcher(duration: const Duration(milliseconds: 250), child: Text(correctStreak.toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold))),
-              ]),
-            )
           ],
         ),
-        Expanded(
-          child: currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
-              ? MultipleChoice(
-                  question: currentQuestion,
-                  nextQuestionFunction: nextQuestion,
-                  doAnimationFunction: doNextQuestionAnimations,
-                )
-              : currentQuestion.type == quizTypes.dropdown
-                  ? DropdownQuestion(key: dropdownKey, question: currentQuestion, nextQuestionFunction: nextQuestion, doAnimationFunction: doNextQuestionAnimations)
-                  : currentQuestion.type == quizTypes.reorder
-                      ? ReorderQuestion(key: reorderKey, question: currentQuestion, nextQuestionFunction: nextQuestion, doAnimationFunction: doNextQuestionAnimations)
-                      : const Placeholder(),
-        ),
+        //* Gradient showing green if correct and red if incorrect
+        // showingAnswers
+        //     ? Container(
+        //         decoration: BoxDecoration(
+        //             gradient: LinearGradient(
+        //           begin: Alignment.topCenter,
+        //           end: Alignment.bottomCenter,
+        //           colors: gradientColors,
+        //         )),
+        //       )
+        //     : const SizedBox.shrink()
       ],
     );
   }
@@ -424,10 +483,11 @@ class _PlayScreenState extends State<PlayScreen> {
 
 //* Multiple choice question
 class MultipleChoice extends StatefulWidget {
-  const MultipleChoice({super.key, required this.question, required this.nextQuestionFunction, required this.doAnimationFunction});
+  const MultipleChoice({super.key, required this.question, required this.nextQuestionFunction, required this.doAnimationFunction, required this.toggleShowingAnswers});
   final QuizQuestion question;
   final Function nextQuestionFunction;
   final Function doAnimationFunction;
+  final Function toggleShowingAnswers;
 
   @override
   State<MultipleChoice> createState() => _MultipleChoiceState();
@@ -448,17 +508,15 @@ class _MultipleChoiceState extends State<MultipleChoice> {
       await audioPlayer.setAsset("assets/audio/successSound.mp3");
       audioPlayer.play();
     }
+    widget.toggleShowingAnswers();
     setState(() {
       showAnswers = true;
     });
-    await Future.delayed(const Duration(milliseconds: 500));
+    //await Future.delayed(const Duration(milliseconds: 500));
     int calculatedScore = calculateScore(correctAnswers, widget.question.correctAnswer.length);
     widget.doAnimationFunction(calculatedScore);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() {
-      showAnswers = false;
-      selectedAnswers = [];
-    });
+    // await Future.delayed(const Duration(seconds: 2));
+    widget.toggleShowingAnswers();
     widget.nextQuestionFunction(
       (correctAnswers == widget.question.correctAnswer.length),
       calculatedScore,
@@ -586,10 +644,11 @@ class _MultipleChoiceState extends State<MultipleChoice> {
 
 //* Dropdown Question
 class DropdownQuestion extends StatefulWidget {
-  const DropdownQuestion({super.key, required this.question, required this.nextQuestionFunction, required this.doAnimationFunction});
+  const DropdownQuestion({super.key, required this.question, required this.nextQuestionFunction, required this.doAnimationFunction, required this.toggleShowingAnswers});
   final QuizQuestion question;
   final Function nextQuestionFunction;
   final Function doAnimationFunction;
+  final Function toggleShowingAnswers;
 
   @override
   State<DropdownQuestion> createState() => _DropdownQuestionState();
@@ -616,6 +675,7 @@ class _DropdownQuestionState extends State<DropdownQuestion> {
   }
 
   void validateAnswer() async {
+    widget.toggleShowingAnswers();
     setState(() {
       showAnswers = true;
     });
@@ -628,15 +688,8 @@ class _DropdownQuestionState extends State<DropdownQuestion> {
     await audioPlayer.setAsset("assets/audio/successSound.mp3");
     audioPlayer.play();
     widget.doAnimationFunction(correctAmount * 100 ~/ widget.question.correctAnswer.length);
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        showAnswers = false;
-        selectedAnswers = [
-          for (int i = 0; i < widget.question.correctAnswer.length; i++) 0
-        ];
-      });
-      widget.nextQuestionFunction((correctAmount == widget.question.correctAnswer.length), correctAmount * 100 ~/ widget.question.correctAnswer.length, widget.question);
-    });
+
+    widget.nextQuestionFunction((correctAmount == widget.question.correctAnswer.length), correctAmount * 100 ~/ widget.question.correctAnswer.length, widget.question);
   }
 
   int indexOfDropDown(int pos) {
@@ -738,10 +791,11 @@ class _DropdownQuestionState extends State<DropdownQuestion> {
 
 //* Reorder Question
 class ReorderQuestion extends StatefulWidget {
-  const ReorderQuestion({super.key, required this.question, required this.nextQuestionFunction, required this.doAnimationFunction});
+  const ReorderQuestion({super.key, required this.question, required this.nextQuestionFunction, required this.doAnimationFunction, required this.toggleShowingAnswers});
   final QuizQuestion question;
   final Function nextQuestionFunction;
   final Function doAnimationFunction;
+  final Function toggleShowingAnswers;
 
   @override
   State<ReorderQuestion> createState() => _ReorderQuestionState();
@@ -759,6 +813,7 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
   }
 
   void validateAnswers() async {
+    widget.toggleShowingAnswers();
     setState(() {
       showAnswers = true;
     });
@@ -771,12 +826,13 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
     await audioPlayer.setAsset("assets/audio/successSound.mp3");
     audioPlayer.play();
     widget.doAnimationFunction(100 * correctAnswers);
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        showAnswers = false;
-      });
-      widget.nextQuestionFunction((correctAnswers == widget.question.correctAnswer.length), 100 * correctAnswers, widget.question);
-    });
+    // Future.delayed(const Duration(seconds: 2), () {
+    //   widget.toggleShowingAnswers();
+    //   setState(() {
+    //     showAnswers = false;
+    //   });
+    widget.nextQuestionFunction((correctAnswers == widget.question.correctAnswer.length), 100 * correctAnswers, widget.question);
+    // });
   }
 
   @override

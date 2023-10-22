@@ -158,16 +158,7 @@ const initialLoadData = {
 };
 
 ThemeData defaultBlueTheme = ThemeData(
-  colorScheme: ColorScheme.fromSwatch().copyWith(
-    primary: const Color.fromRGBO(0, 0, 0, 0.25),
-    secondary: const Color.fromRGBO(255, 255, 255, 0.25),
-    tertiary: const Color.fromRGBO(255, 255, 255, 0.50),
-    primaryContainer: const Color.fromRGBO(255, 255, 255, 0.07),
-    onPrimary: const Color.fromRGBO(255, 255, 255, 1),
-    onSecondary: const Color.fromRGBO(255, 255, 255, 1),
-    background: const Color.fromRGBO(24, 4, 44, 1.0),
-    error: Colors.red,
-  ),
+  colorScheme: ColorScheme.fromSwatch().copyWith(primary: const Color.fromRGBO(0, 0, 0, 0.25), secondary: const Color.fromRGBO(255, 255, 255, 0.25), tertiary: const Color.fromRGBO(255, 255, 255, 0.50), primaryContainer: const Color.fromRGBO(255, 255, 255, 0.07), onPrimary: const Color.fromRGBO(255, 255, 255, 1), onSecondary: const Color.fromRGBO(255, 255, 255, 1), background: const Color.fromRGBO(24, 4, 44, 1.0), error: Colors.red, shadow: Colors.transparent),
   textTheme: const TextTheme(
     displayLarge: TextStyle(
       color: Color.fromRGBO(255, 255, 255, 1.0),

@@ -72,46 +72,41 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      Flexible(
-                        flex: 10,
-                        child: Column(
-                          children: [
-                            Text(
-                              "Free",
-                              style: tt.displayLarge,
-                            ),
-                            Text(
-                              "0\$",
-                              style: tt.displayMedium,
-                            ),
-                            const SizedBox(height: 20),
-                            //Features
-                            Expanded(
-                              child: ListView.builder(
-                                  itemCount: freeFeatures.length,
-                                  itemBuilder: (context, index) {
-                                    return ListTile(
-                                      leading: const Icon(Icons.check, color: Colors.green),
-                                      title: Text(freeFeatures[index], style: tt.displaySmall),
-                                    );
-                                  }),
-                            ),
-                          ],
-                        ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Free",
+                            style: tt.displayLarge,
+                          ),
+                          Text(
+                            "0\$",
+                            style: tt.displayMedium,
+                          ),
+                          const SizedBox(height: 20),
+                          //Features
+                          Expanded(
+                            child: ListView.builder(
+                                itemCount: freeFeatures.length,
+                                itemBuilder: (context, index) {
+                                  return ListTile(
+                                    leading: const Icon(Icons.check, color: Colors.green),
+                                    title: Text(freeFeatures[index], style: tt.displaySmall),
+                                  );
+                                }),
+                          ),
+                        ],
                       ),
-                      Flexible(
-                          flex: 1,
-                          child: SizedBox.expand(
-                            child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: t.primary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                onPressed: null,
-                                child: Text("Selected", style: tt.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: t.secondary))),
-                          )),
+                      const Spacer(),
+                      ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: t.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: null,
+                          child: Text("Selected", style: tt.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: t.secondary))),
                     ],
                   ),
                 ),

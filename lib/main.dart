@@ -500,6 +500,7 @@ class DrawerItem extends StatelessWidget {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     return ListTile(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       hoverColor: theme.onBackground.withOpacity(0.125),
       leading: Icon(icon, color: theme.onBackground),
       title: Text(title, style: textTheme.displaySmall),

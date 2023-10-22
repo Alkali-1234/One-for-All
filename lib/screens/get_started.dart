@@ -443,7 +443,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              showDialog(context: context, builder: (c) => const UnavalaibleItemDialog());
+              widget.changeStep(3);
             },
             style: ElevatedButton.styleFrom(backgroundColor: theme.secondary, shadowColor: Colors.transparent, elevation: 0, side: BorderSide(color: theme.tertiary, width: 1), padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),
             child: Text("I can do this later", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.normal)),

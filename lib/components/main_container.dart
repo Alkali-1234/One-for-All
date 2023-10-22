@@ -49,7 +49,7 @@ class _MainContainerState extends State<MainContainer> {
                           color: theme.onPrimary,
                         ),
                       ),
-                      Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
+                      Text(appState.getCurrentUser.username, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
                       Container(
                         width: 30,
                         height: 30,
