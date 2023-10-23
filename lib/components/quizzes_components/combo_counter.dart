@@ -17,6 +17,8 @@ class ComboCounterState extends State<ComboCounter> {
   int maxCombo = 0;
   int counter = 0;
 
+  Tween<double> counterTween = Tween<double>(begin: 0, end: 0);
+
   late StatefulWidget comboBarWidget;
 
   Tween<double> timeLeftTween = Tween<double>(begin: 1, end: 0);
@@ -55,6 +57,8 @@ class ComboCounterState extends State<ComboCounter> {
       if (counter > maxCombo) {
         maxCombo = counter;
       }
+
+      counterTween = Tween<double>(begin: counter.toDouble(), end: counter.toDouble());
       // comboBarWidget = TweenAnimationBuilder(
       //     key: UniqueKey(),
       //     tween: Tween<double>(begin: 1.0, end: 0.0),
@@ -68,7 +72,7 @@ class ComboCounterState extends State<ComboCounter> {
       //       );
       //     });
     });
-    startTimer();
+    // startTimer();
   }
 
   void pauseTimer() {
@@ -96,6 +100,7 @@ class ComboCounterState extends State<ComboCounter> {
     if (!mounted) return;
     var theme = widget.theme;
     setState(() {
+      counterTween = Tween<double>(begin: counter.toDouble(), end: 0);
       comboBarTween = Tween<double>(begin: 0.0, end: 0.0);
       counter = 0;
       comboBarWidget = TweenAnimationBuilder(
@@ -157,10 +162,16 @@ class ComboCounterState extends State<ComboCounter> {
       mainAxisSize: MainAxisSize.min,
       children: [
         //* Counter
-        Text(
-          "${counter}x",
-          style: textTheme.displayMedium,
-        ),
+        TweenAnimationBuilder(
+            tween: counterTween,
+            curve: Curves.decelerate,
+            duration: const Duration(milliseconds: 500),
+            builder: (context, value, child) {
+              return Text(
+                "${value.toInt()}x",
+                style: textTheme.displayMedium,
+              );
+            }),
         //* Bar
         comboBarWidget,
       ],

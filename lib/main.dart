@@ -367,6 +367,7 @@ class MenuSelection extends StatelessWidget {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     return Drawer(
+      surfaceTintColor: Colors.transparent,
       backgroundColor: theme.background,
       child: SafeArea(
         child: Padding(

@@ -85,28 +85,34 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           ),
                           const SizedBox(height: 20),
                           //Features
-                          Expanded(
-                            child: ListView.builder(
-                                itemCount: freeFeatures.length,
-                                itemBuilder: (context, index) {
-                                  return ListTile(
-                                    leading: const Icon(Icons.check, color: Colors.green),
-                                    title: Text(freeFeatures[index], style: tt.displaySmall),
-                                  );
-                                }),
-                          ),
+                          // ListView.builder(
+                          //     itemCount: freeFeatures.length,
+                          //     itemBuilder: (context, index) {
+                          //       return ListTile(
+                          //         leading: const Icon(Icons.check, color: Colors.green),
+                          //         title: Text(freeFeatures[index], style: tt.displaySmall),
+                          //       );
+                          //     }),
+                          for (var feature in freeFeatures)
+                            ListTile(
+                              leading: const Icon(Icons.check, color: Colors.green),
+                              title: Text(feature, style: tt.displaySmall),
+                            ),
                         ],
                       ),
                       const Spacer(),
-                      ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: t.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: t.primary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                          ),
-                          onPressed: null,
-                          child: Text("Selected", style: tt.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: t.secondary))),
+                            onPressed: null,
+                            child: Text("Selected", style: tt.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: t.secondary))),
+                      ),
                     ],
                   ),
                 ),

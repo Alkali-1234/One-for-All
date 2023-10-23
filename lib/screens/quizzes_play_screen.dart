@@ -5,6 +5,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/components/main_container.dart';
+import 'package:oneforall/components/quizzes_components/infinitymode_dialog.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/functions/quizzes_functions.dart';
 import 'package:oneforall/main.dart';
@@ -12,6 +13,7 @@ import 'package:oneforall/models/quizzes_models.dart';
 import 'package:oneforall/screens/interstitial_screen.dart';
 import 'package:provider/provider.dart';
 import '../components/quizzes_components/combo_counter.dart';
+import '../components/quizzes_components/combo_flash_modal.dart';
 import './flashcardsPlay_screen.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -276,8 +278,17 @@ class PlayScreenState extends State<PlayScreen> {
 
   void nextQuestion(bool correct, int score, QuizQuestion question) async {
     if (!mounted) return;
+    //* Pauses timer and adds combo count if correct, resets if wrong
     if (correct) comboCounterKey.currentState!.pauseTimer();
-    await Future.delayed(Duration(milliseconds: 3000 - (comboCounterKey.currentState!.counter * 100).round()));
+    if (correct) comboCounterKey.currentState!.addComboCount();
+    if (correct) audioPlayer.setSpeed(1 + (comboCounterKey.currentState!.counter / 30));
+    if (!correct) comboCounterKey.currentState!.resetComboCount();
+    if (!correct) audioPlayer.setSpeed(1);
+
+    //* If counter is not 0, and is a multiple of 10 or it is 5, flash combo
+    if (comboCounterKey.currentState!.counter != 0 && (comboCounterKey.currentState!.counter % 10 == 0 || comboCounterKey.currentState!.counter == 5)) await showDialog(context: context, builder: (context) => FlashComboModal(number: comboCounterKey.currentState!.counter), barrierDismissible: false);
+
+    await Future.delayed(Duration(milliseconds: correct ? (1500 - (comboCounterKey.currentState!.counter * 100).round()) : 3000));
     if (currentQuestion.type == quizTypes.multipleChoice) {
       multipleChoiceKey.currentState!.showAnswers = false;
       multipleChoiceKey.currentState!.selectedAnswers = [];
@@ -290,8 +301,8 @@ class PlayScreenState extends State<PlayScreen> {
       reorderKey.currentState!.showAnswers = false;
       reorderKey.currentState!.selectedAnswers = [];
     }
-    if (correct) comboCounterKey.currentState!.addComboCount();
-    if (!correct) comboCounterKey.currentState!.resetComboCount();
+    if (correct) comboCounterKey.currentState!.startTimer();
+    // if (!correct) comboCounterKey.currentState!.resetComboCount();
     //* Check if quiz is finished
     if (quizSet.questions.indexOf(currentQuestion) + 1 > quizSet.questions.length - 1) {
       questionsDone++;
@@ -356,15 +367,27 @@ class PlayScreenState extends State<PlayScreen> {
     return;
   }
 
+  bool? infinityMode;
+  bool showInfinityModeDialog = false;
+
   Future<void> endSequence() async {
+    comboCounterKey.currentState!.pauseTimer();
+    setState(() {
+      showInfinityModeDialog = true;
+    });
+    //* Wait until infinity mode is set (i think there is a more proper way to do this but i dont know it)
+    while (infinityMode == null) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
     timer.cancel();
     audioPlayer.stop();
+    if (!mounted) return;
     showDialog(
         context: context,
         builder: (c) => Container(
               color: Colors.black,
               width: double.infinity,
-              child: const Center(child: Text("All Done!", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 50))),
+              child: const Center(child: Text("Finished", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 48, fontStyle: FontStyle.italic))),
             ),
         barrierDismissible: false);
     await Future.delayed(const Duration(milliseconds: 2000));
@@ -434,34 +457,36 @@ class PlayScreenState extends State<PlayScreen> {
               ],
             ),
             Expanded(
-              child: currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
-                  ? MultipleChoice(
-                      question: currentQuestion,
-                      nextQuestionFunction: nextQuestion,
-                      doAnimationFunction: doNextQuestionAnimations,
-                      key: multipleChoiceKey,
-                      toggleShowingAnswers: () => setState(
-                            () => showingAnswers = !showingAnswers,
-                          ))
-                  : currentQuestion.type == quizTypes.dropdown
-                      ? DropdownQuestion(
-                          key: dropdownKey,
+              child: showInfinityModeDialog
+                  ? InfinityModeDialog(putResult: (value) => setState(() => infinityMode = value))
+                  : currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
+                      ? MultipleChoice(
                           question: currentQuestion,
                           nextQuestionFunction: nextQuestion,
                           doAnimationFunction: doNextQuestionAnimations,
+                          key: multipleChoiceKey,
                           toggleShowingAnswers: () => setState(
                                 () => showingAnswers = !showingAnswers,
                               ))
-                      : currentQuestion.type == quizTypes.reorder
-                          ? ReorderQuestion(
-                              key: reorderKey,
+                      : currentQuestion.type == quizTypes.dropdown
+                          ? DropdownQuestion(
+                              key: dropdownKey,
                               question: currentQuestion,
                               nextQuestionFunction: nextQuestion,
                               doAnimationFunction: doNextQuestionAnimations,
                               toggleShowingAnswers: () => setState(
                                     () => showingAnswers = !showingAnswers,
                                   ))
-                          : const Placeholder(),
+                          : currentQuestion.type == quizTypes.reorder
+                              ? ReorderQuestion(
+                                  key: reorderKey,
+                                  question: currentQuestion,
+                                  nextQuestionFunction: nextQuestion,
+                                  doAnimationFunction: doNextQuestionAnimations,
+                                  toggleShowingAnswers: () => setState(
+                                        () => showingAnswers = !showingAnswers,
+                                      ))
+                              : const Placeholder(),
             ),
           ],
         ),
