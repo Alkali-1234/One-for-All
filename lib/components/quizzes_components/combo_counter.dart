@@ -42,7 +42,7 @@ class ComboCounterState extends State<ComboCounter> {
             key: UniqueKey(),
             value: value,
             backgroundColor: theme.primary,
-            valueColor: AlwaysStoppedAnimation<Color>(theme.onBackground),
+            valueColor: AlwaysStoppedAnimation<Color>(value > 0.25 ? theme.onBackground : Colors.red),
           );
         });
   }
@@ -111,7 +111,7 @@ class ComboCounterState extends State<ComboCounter> {
           return LinearProgressIndicator(
             value: value,
             backgroundColor: theme.primary,
-            valueColor: AlwaysStoppedAnimation<Color>(theme.onBackground),
+            valueColor: AlwaysStoppedAnimation<Color>(value > 0.25 ? theme.onBackground : Colors.red),
           );
         },
       );
@@ -134,7 +134,7 @@ class ComboCounterState extends State<ComboCounter> {
               key: UniqueKey(),
               value: value,
               backgroundColor: theme.primary,
-              valueColor: AlwaysStoppedAnimation<Color>(theme.onBackground),
+              valueColor: AlwaysStoppedAnimation<Color>(value > 0.25 ? theme.onBackground : Colors.red),
             );
           });
       timeLeftTimer = Timer(Duration(milliseconds: totalMilliseconds), () {
@@ -173,7 +173,7 @@ class ComboCounterState extends State<ComboCounter> {
               );
             }),
         //* Bar
-        comboBarWidget,
+        ClipRRect(borderRadius: BorderRadius.circular(100), child: comboBarWidget),
       ],
     );
   }

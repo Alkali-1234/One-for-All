@@ -445,7 +445,7 @@ class _QueryListItemState extends State<QueryListItem> {
               builder: (context, value, child) {
                 return ListTile(
                     tileColor: theme.onBackground.withOpacity(0.25 * value),
-                    splashColor: theme.onBackground.withOpacity(0.125),
+                    splashColor: theme.onBackground.withOpacity(0.25),
                     onTap: () async {
                       if (expandedView) {
                         if (key.currentState!.validateQuestions(context.read<AppState>()) == false) return;

@@ -1,4 +1,5 @@
 import 'dart:async';
+// import 'dart:html';
 
 import 'package:animations/animations.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
@@ -209,7 +210,10 @@ class PlayScreenState extends State<PlayScreen> {
   //* Animation
   Tween<double> scoreStatTween = Tween<double>(begin: 0, end: 0);
   Tween<double> scoreStatAddTween = Tween<double>(begin: 1, end: 1);
+  Tween<double> questionTransitionTween = Tween<double>(begin: 4, end: 0);
   int scoreBeingAdded = 0;
+  int updaterNumber = 0;
+  bool totallyDifferentWidget = false;
 
   //* Redemption
   QuizSet redemptionSet = QuizSet(title: "Redemption", description: "Redemption", questions: [], settings: {});
@@ -281,14 +285,19 @@ class PlayScreenState extends State<PlayScreen> {
     //* Pauses timer and adds combo count if correct, resets if wrong
     if (correct) comboCounterKey.currentState!.pauseTimer();
     if (correct) comboCounterKey.currentState!.addComboCount();
-    if (correct) audioPlayer.setSpeed(1 + (comboCounterKey.currentState!.counter / 30));
+    // if (correct) audioPlayer.setSpeed(1 + (comboCounterKey.currentState!.counter / 30));
     if (!correct) comboCounterKey.currentState!.resetComboCount();
-    if (!correct) audioPlayer.setSpeed(1);
+    // if (!correct) audioPlayer.setSpeed(1);
 
     //* If counter is not 0, and is a multiple of 10 or it is 5, flash combo
     if (comboCounterKey.currentState!.counter != 0 && (comboCounterKey.currentState!.counter % 10 == 0 || comboCounterKey.currentState!.counter == 5)) await showDialog(context: context, builder: (context) => FlashComboModal(number: comboCounterKey.currentState!.counter), barrierDismissible: false);
 
     await Future.delayed(Duration(milliseconds: correct ? (1500 - (comboCounterKey.currentState!.counter * 100).round()) : 3000));
+    // setState(() {
+    updaterNumber++;
+    totallyDifferentWidget = !totallyDifferentWidget;
+    // });
+    // await Future.delayed(const Duration(milliseconds: 150));
     if (currentQuestion.type == quizTypes.multipleChoice) {
       multipleChoiceKey.currentState!.showAnswers = false;
       multipleChoiceKey.currentState!.selectedAnswers = [];
@@ -301,7 +310,6 @@ class PlayScreenState extends State<PlayScreen> {
       reorderKey.currentState!.showAnswers = false;
       reorderKey.currentState!.selectedAnswers = [];
     }
-    if (correct) comboCounterKey.currentState!.startTimer();
     // if (!correct) comboCounterKey.currentState!.resetComboCount();
     //* Check if quiz is finished
     if (quizSet.questions.indexOf(currentQuestion) + 1 > quizSet.questions.length - 1) {
@@ -324,10 +332,11 @@ class PlayScreenState extends State<PlayScreen> {
         initializeRedemption();
         return;
       }
-      endSequence();
+      endSequence(false);
       return;
     }
     questionsDone++;
+    comboCounterKey.currentState!.startTimer();
     if (correct) {
       // comboCounterKey.currentState!.addComboCount();
       correctAnswers++;
@@ -349,6 +358,7 @@ class PlayScreenState extends State<PlayScreen> {
       dropdownKey.currentState!.sentence = currentQuestion.question.split("<seperator />");
       dropdownKey.currentState!.selectedAnswers = List.generate(currentQuestion.correctAnswer.length, (index) => 0);
     }
+    // questionTransitionTween = Tween<double>(begin: 4, end: 0);
     setState(() {});
   }
 
@@ -370,14 +380,73 @@ class PlayScreenState extends State<PlayScreen> {
   bool? infinityMode;
   bool showInfinityModeDialog = false;
 
-  Future<void> endSequence() async {
-    comboCounterKey.currentState!.pauseTimer();
-    setState(() {
-      showInfinityModeDialog = true;
-    });
+  Future<void> endSequence(bool endInfiniteMode) async {
+    if (infinityMode == null) comboCounterKey.currentState!.pauseTimer();
+    if (endInfiniteMode == false && infinityMode == null) {
+      setState(() {
+        showInfinityModeDialog = true;
+        // questionTransitionTween = Tween<double>(begin: 4, end: 0);
+      });
+    }
     //* Wait until infinity mode is set (i think there is a more proper way to do this but i dont know it)
     while (infinityMode == null) {
       await Future.delayed(const Duration(milliseconds: 100));
+    }
+    if (infinityMode == true) {
+      if (showInfinityModeDialog == true) {
+        setState(() {
+          // questionTransitionTween = Tween<double>(begin: -4, end: 0);
+        });
+        // await Future.delayed(const Duration(milliseconds: 150));
+      }
+      //! FIXME : doesn't call the function for some reason ???????
+      comboCounterKey.currentState!.startTimer();
+      redemptionSet.questions = [];
+      quizSet.questions.shuffle();
+      QuizSet quiz = quizSet;
+      //literally copied from quizzes_screen.dart so ignore the ifs
+      QuizSet modifiedQuiz = QuizSet(title: quiz.title, description: quiz.description, questions: [], settings: {
+        "shuffleQuestions": false,
+        "shuffleAnswers": false,
+        "redemptionAmounts": 0,
+      });
+      if (quiz.questions.isEmpty) return;
+      if (true) {
+        modifiedQuiz.questions = quiz.questions.toList()..shuffle();
+      }
+      if (true) {
+        for (var question in modifiedQuiz.questions.where((element) => element.type == quizTypes.multipleChoice || element.type == quizTypes.reorder)) {
+          List<String> tempAns = question.answers.toList();
+          question.answers.shuffle();
+          question.correctAnswer = question.correctAnswer.map((e) => question.answers.indexOf(tempAns[e])).toList();
+        }
+        for (var question in modifiedQuiz.questions.where((element) => element.type == quizTypes.dropdown)) {
+          List<String> tempAns = question.answers.toList();
+          question.answers.shuffle();
+          question.correctAnswer = question.correctAnswer.map((e) => question.answers.indexOf(tempAns[e])).toList();
+          //* Change the correct answer in sentence
+          List<String> sentence = question.question.split("<seperator />");
+          int dropdownIndex = 0;
+          for (var i = 0; i < sentence.length; i++) {
+            if (sentence[i].contains("<dropdown ")) {
+              sentence[i] = "<dropdown answer=${question.correctAnswer[dropdownIndex]} />";
+              dropdownIndex++;
+            }
+          }
+        }
+      }
+      quizSet = modifiedQuiz;
+      currentQuestion = quizSet.questions[0];
+      if (showInfinityModeDialog == true) {
+        showInfinityModeDialog = false;
+        updaterNumber++;
+        totallyDifferentWidget = !totallyDifferentWidget;
+        await Future.delayed(const Duration(milliseconds: 150));
+      }
+      // questionTransitionTween = Tween<double>(begin: 4, end: 0);
+      setState(() {});
+      await Future.delayed(const Duration(milliseconds: 10));
+      return;
     }
     timer.cancel();
     audioPlayer.stop();
@@ -408,86 +477,140 @@ class PlayScreenState extends State<PlayScreen> {
       children: [
         Column(
           children: [
-            //* Statistics
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                //* Score
-                Flexible(
-                  flex: 1,
-                  child: TweenAnimationBuilder(
-                      tween: scoreStatTween,
-                      duration: const Duration(milliseconds: 250),
-                      builder: (context, double value, child) {
-                        return Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.star_rounded, color: Colors.yellow),
-                            const SizedBox(width: 5),
-                            Text(value.toInt().toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(width: 2.5),
-                            //* + <score add amount> Score animation. Shows when the score increases, goes from being faded from above, to being faded out to the bottom
-                            TweenAnimationBuilder(
-                              tween: scoreStatAddTween,
-                              duration: const Duration(milliseconds: 250),
-                              builder: (context, value, child) {
-                                return Opacity(opacity: 1 - value, child: Transform.translate(offset: Offset(0, -value), child: child));
-                              },
-                              child: Text("+${scoreBeingAdded.toString()}", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.green)),
-                            )
-                          ],
-                        );
-                      }),
-                ),
-                //* Time Elapsed
-                Flexible(
-                  flex: 1,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
+            Expanded(
+              flex: 12,
+              child: Column(
+                children: [
+                  //* Statistics
+                  Row(
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(Icons.timer_rounded, color: Colors.grey),
-                      const SizedBox(width: 5),
-                      Text(formatSeconds(elapsedTime), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                      //* Score
+                      Expanded(
+                        flex: 1,
+                        child: TweenAnimationBuilder(
+                            tween: scoreStatTween,
+                            duration: const Duration(milliseconds: 250),
+                            builder: (context, double value, child) {
+                              return Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.star_rounded, color: Colors.yellow),
+                                  const SizedBox(width: 5),
+                                  Text(value.toInt().toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                                  const SizedBox(width: 2.5),
+                                  //* + <score add amount> Score animation. Shows when the score increases, goes from being faded from above, to being faded out to the bottom
+                                  TweenAnimationBuilder(
+                                    tween: scoreStatAddTween,
+                                    duration: const Duration(milliseconds: 250),
+                                    builder: (context, value, child) {
+                                      return Opacity(opacity: 1 - value, child: Transform.translate(offset: Offset(0, -value), child: child));
+                                    },
+                                    child: Text("+${scoreBeingAdded.toString()}", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.green)),
+                                  )
+                                ],
+                              );
+                            }),
+                      ),
+                      //* Time Elapsed
+                      Expanded(
+                        flex: 1,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.timer_rounded, color: Colors.grey),
+                            const SizedBox(width: 5),
+                            Text(formatSeconds(elapsedTime), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                      //* Combo counter
+                      Flexible(flex: 1, child: ComboCounter(key: comboCounterKey, theme: Theme.of(context).colorScheme)),
                     ],
                   ),
-                ),
-                //* Combo counter
-                Flexible(flex: 1, child: ComboCounter(key: comboCounterKey, theme: Theme.of(context).colorScheme)),
-              ],
+                  Expanded(
+                    //* Animation
+                    child: PageTransitionSwitcher(
+                      transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(fillColor: Colors.transparent, animation: primaryAnimation, secondaryAnimation: secondaryAnimation, transitionType: SharedAxisTransitionType.horizontal, child: child),
+                      child: Container(
+                        key: ValueKey(updaterNumber),
+                        child: totallyDifferentWidget
+                            ? showInfinityModeDialog
+                                ? InfinityModeDialog(putResult: (value) => setState(() => infinityMode = value))
+                                : currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
+                                    ? MultipleChoice(
+                                        question: currentQuestion,
+                                        nextQuestionFunction: nextQuestion,
+                                        doAnimationFunction: doNextQuestionAnimations,
+                                        key: multipleChoiceKey,
+                                        toggleShowingAnswers: () => setState(
+                                              () => showingAnswers = !showingAnswers,
+                                            ))
+                                    : currentQuestion.type == quizTypes.dropdown
+                                        ? DropdownQuestion(
+                                            key: dropdownKey,
+                                            question: currentQuestion,
+                                            nextQuestionFunction: nextQuestion,
+                                            doAnimationFunction: doNextQuestionAnimations,
+                                            toggleShowingAnswers: () => setState(
+                                                  () => showingAnswers = !showingAnswers,
+                                                ))
+                                        : currentQuestion.type == quizTypes.reorder
+                                            ? ReorderQuestion(
+                                                key: reorderKey,
+                                                question: currentQuestion,
+                                                nextQuestionFunction: nextQuestion,
+                                                doAnimationFunction: doNextQuestionAnimations,
+                                                toggleShowingAnswers: () => setState(
+                                                      () => showingAnswers = !showingAnswers,
+                                                    ))
+                                            : const Placeholder()
+                            : showInfinityModeDialog
+                                ? InfinityModeDialog(putResult: (value) => setState(() => infinityMode = value))
+                                : currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
+                                    ? MultipleChoice(
+                                        question: currentQuestion,
+                                        nextQuestionFunction: nextQuestion,
+                                        doAnimationFunction: doNextQuestionAnimations,
+                                        key: multipleChoiceKey,
+                                        toggleShowingAnswers: () => setState(
+                                              () => showingAnswers = !showingAnswers,
+                                            ))
+                                    : currentQuestion.type == quizTypes.dropdown
+                                        ? DropdownQuestion(
+                                            key: dropdownKey,
+                                            question: currentQuestion,
+                                            nextQuestionFunction: nextQuestion,
+                                            doAnimationFunction: doNextQuestionAnimations,
+                                            toggleShowingAnswers: () => setState(
+                                                  () => showingAnswers = !showingAnswers,
+                                                ))
+                                        : currentQuestion.type == quizTypes.reorder
+                                            ? ReorderQuestion(
+                                                key: reorderKey,
+                                                question: currentQuestion,
+                                                nextQuestionFunction: nextQuestion,
+                                                doAnimationFunction: doNextQuestionAnimations,
+                                                toggleShowingAnswers: () => setState(
+                                                      () => showingAnswers = !showingAnswers,
+                                                    ))
+                                            : const Placeholder(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            Expanded(
-              child: showInfinityModeDialog
-                  ? InfinityModeDialog(putResult: (value) => setState(() => infinityMode = value))
-                  : currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
-                      ? MultipleChoice(
-                          question: currentQuestion,
-                          nextQuestionFunction: nextQuestion,
-                          doAnimationFunction: doNextQuestionAnimations,
-                          key: multipleChoiceKey,
-                          toggleShowingAnswers: () => setState(
-                                () => showingAnswers = !showingAnswers,
-                              ))
-                      : currentQuestion.type == quizTypes.dropdown
-                          ? DropdownQuestion(
-                              key: dropdownKey,
-                              question: currentQuestion,
-                              nextQuestionFunction: nextQuestion,
-                              doAnimationFunction: doNextQuestionAnimations,
-                              toggleShowingAnswers: () => setState(
-                                    () => showingAnswers = !showingAnswers,
-                                  ))
-                          : currentQuestion.type == quizTypes.reorder
-                              ? ReorderQuestion(
-                                  key: reorderKey,
-                                  question: currentQuestion,
-                                  nextQuestionFunction: nextQuestion,
-                                  doAnimationFunction: doNextQuestionAnimations,
-                                  toggleShowingAnswers: () => setState(
-                                        () => showingAnswers = !showingAnswers,
-                                      ))
-                              : const Placeholder(),
-            ),
+            infinityMode == true
+                ? ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red, elevation: 0, foregroundColor: Colors.white),
+                    onPressed: () => {
+                          setState(() => infinityMode = false),
+                          endSequence(true)
+                        },
+                    child: const Text("Finish"))
+                : const Expanded(flex: 0, child: SizedBox.shrink())
           ],
         ),
         //* Gradient showing green if correct and red if incorrect

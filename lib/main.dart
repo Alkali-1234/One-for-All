@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:oneforall/screens/calendar_screen.dart';
 import 'package:oneforall/screens/flashcards_screen.dart';
+import 'package:oneforall/screens/forum_screen.dart';
 import 'package:oneforall/screens/mab_lac_screen.dart';
 import 'package:oneforall/screens/premium_screen.dart';
 import 'package:oneforall/screens/quizzes_screen.dart';
@@ -34,7 +35,7 @@ import 'data/community_data.dart';
 //Screens
 import 'models/quizzes_models.dart';
 import 'screens/community_screen.dart';
-import 'screens/navigation_screen.dart';
+// import 'screens/navigation_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/loading_screen.dart';
 
@@ -455,7 +456,7 @@ class MenuSelection extends StatelessWidget {
                     title: "Forums",
                     onTap: () {
                       Navigator.pop(context);
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const CommunityScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const ForumScreen()));
                     }),
                 DrawerItem(
                     icon: Icons.diamond,
