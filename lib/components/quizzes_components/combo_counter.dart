@@ -26,7 +26,7 @@ class ComboCounterState extends State<ComboCounter> {
 
   Timer? timeLeftTimer;
 
-  Tween<double> comboBarTween = Tween<double>(begin: 1, end: 0);
+  Tween<double> comboBarTween = Tween<double>(begin: 0, end: 0);
 
   @override
   void initState() {

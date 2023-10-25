@@ -25,6 +25,8 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
   //   Tab(text: "Bright Light"),
   // ];
 
+  bool changedNotifSettings = false;
+
   ThemeData? savedTheme;
 
   int selectedTheme = 0;
@@ -71,22 +73,24 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
     var appState = context.read<AppState>();
 
     //* Subscribe and unsubscribe from topics
-    if (notificationSettings["MAB"]!) {
-      await FirebaseMessaging.instance.subscribeToTopic("MAB_${appState.getCurrentUser.assignedCommunity}");
-    } else {
-      await FirebaseMessaging.instance.unsubscribeFromTopic("MAB_${appState.getCurrentUser.assignedCommunity}");
-    }
+    if (changedNotifSettings) {
+      if (notificationSettings["MAB"]!) {
+        await FirebaseMessaging.instance.subscribeToTopic("MAB_${appState.getCurrentUser.assignedCommunity}");
+      } else {
+        await FirebaseMessaging.instance.unsubscribeFromTopic("MAB_${appState.getCurrentUser.assignedCommunity}");
+      }
 
-    if (notificationSettings["LAC"]!) {
-      await FirebaseMessaging.instance.subscribeToTopic("LAC_${appState.getCurrentUser.assignedCommunity}_${appState.getCurrentUser.assignedSection}");
-    } else {
-      await FirebaseMessaging.instance.unsubscribeFromTopic("LAC_${appState.getCurrentUser.assignedCommunity}_${appState.getCurrentUser.assignedSection}");
-    }
+      if (notificationSettings["LAC"]!) {
+        await FirebaseMessaging.instance.subscribeToTopic("LAC_${appState.getCurrentUser.assignedCommunity}_${appState.getCurrentUser.assignedSection}");
+      } else {
+        await FirebaseMessaging.instance.unsubscribeFromTopic("LAC_${appState.getCurrentUser.assignedCommunity}_${appState.getCurrentUser.assignedSection}");
+      }
 
-    if (notificationSettings["RA"]!) {
-      await FirebaseMessaging.instance.subscribeToTopic("RA_${appState.getCurrentUser.assignedCommunity}");
-    } else {
-      await FirebaseMessaging.instance.unsubscribeFromTopic("RA_${appState.getCurrentUser.assignedCommunity}");
+      if (notificationSettings["RA"]!) {
+        await FirebaseMessaging.instance.subscribeToTopic("RA_${appState.getCurrentUser.assignedCommunity}");
+      } else {
+        await FirebaseMessaging.instance.unsubscribeFromTopic("RA_${appState.getCurrentUser.assignedCommunity}");
+      }
     }
 
     if (!mounted) return;
@@ -503,7 +507,10 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                                           Text("MAB", style: textTheme.displaySmall),
                                           Switch(
                                             value: notificationSettings["MAB"]!,
-                                            onChanged: (value) => setState(() => notificationSettings["MAB"] = !notificationSettings["MAB"]!),
+                                            onChanged: (value) => setState(() {
+                                              notificationSettings["MAB"] = !notificationSettings["MAB"]!;
+                                              changedNotifSettings = true;
+                                            }),
                                             activeColor: Colors.green,
                                             activeTrackColor: Colors.white,
                                             inactiveThumbColor: Colors.red,
@@ -519,7 +526,10 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                                           Text("LAC", style: textTheme.displaySmall),
                                           Switch(
                                             value: notificationSettings["LAC"]!,
-                                            onChanged: (value) => setState(() => notificationSettings["LAC"] = !notificationSettings["LAC"]!),
+                                            onChanged: (value) => setState(() {
+                                              notificationSettings["LAC"] = !notificationSettings["LAC"]!;
+                                              changedNotifSettings = true;
+                                            }),
                                             activeColor: Colors.green,
                                             activeTrackColor: Colors.white,
                                             inactiveThumbColor: Colors.red,
@@ -540,7 +550,10 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                                           Text("Recent Activity", style: textTheme.displaySmall),
                                           Switch(
                                             value: notificationSettings["RA"]!,
-                                            onChanged: (value) => setState(() => notificationSettings["RA"] = !notificationSettings["RA"]!),
+                                            onChanged: (value) => setState(() {
+                                              notificationSettings["RA"] = !notificationSettings["RA"]!;
+                                              changedNotifSettings = true;
+                                            }),
                                             activeColor: Colors.green,
                                             activeTrackColor: Colors.white,
                                             inactiveThumbColor: Colors.red,

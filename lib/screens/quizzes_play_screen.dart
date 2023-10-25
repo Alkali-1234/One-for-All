@@ -5,8 +5,10 @@ import 'package:animations/animations.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/banner_ad.dart';
+import 'package:oneforall/components/animations/fade_in_transition_horizontal.dart';
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/components/quizzes_components/infinitymode_dialog.dart';
+import 'package:oneforall/components/quizzes_components/three_two_one_go_modal.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/functions/quizzes_functions.dart';
 import 'package:oneforall/main.dart';
@@ -175,7 +177,7 @@ class PlayScreenState extends State<PlayScreen> {
     audioPlayer.play();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // comboCounterKey.currentState!.addComboCount();
-      showDialog(context: context, builder: (context) => const ThreeTwoOneGoRibbon(), barrierDismissible: false);
+      showDialog(context: context, builder: (context) => const ThreeTwoOneGoModal(), barrierDismissible: false);
     });
   }
 
@@ -210,7 +212,7 @@ class PlayScreenState extends State<PlayScreen> {
   //* Animation
   Tween<double> scoreStatTween = Tween<double>(begin: 0, end: 0);
   Tween<double> scoreStatAddTween = Tween<double>(begin: 1, end: 1);
-  Tween<double> questionTransitionTween = Tween<double>(begin: 4, end: 0);
+  Tween<double> questionTransitionTween = Tween<double>(begin: 0, end: 1);
   int scoreBeingAdded = 0;
   int updaterNumber = 0;
   bool totallyDifferentWidget = false;
@@ -297,7 +299,10 @@ class PlayScreenState extends State<PlayScreen> {
     updaterNumber++;
     totallyDifferentWidget = !totallyDifferentWidget;
     // });
-    // await Future.delayed(const Duration(milliseconds: 150));
+    setState(() {
+      questionTransitionTween = Tween<double>(begin: 1, end: 0);
+    });
+    await Future.delayed(const Duration(milliseconds: 150));
     if (currentQuestion.type == quizTypes.multipleChoice) {
       multipleChoiceKey.currentState!.showAnswers = false;
       multipleChoiceKey.currentState!.selectedAnswers = [];
@@ -347,7 +352,7 @@ class PlayScreenState extends State<PlayScreen> {
       this.score += scoreBeingAdded;
       redemptionSet.questions.add(question);
     }
-
+    // updaterNumber++;
     currentQuestion = quizSet.questions[quizSet.questions.indexOf(currentQuestion) + 1];
     if (currentQuestion.type == quizTypes.reorder) {
       if (reorderKey.currentState == null) return;
@@ -358,7 +363,7 @@ class PlayScreenState extends State<PlayScreen> {
       dropdownKey.currentState!.sentence = currentQuestion.question.split("<seperator />");
       dropdownKey.currentState!.selectedAnswers = List.generate(currentQuestion.correctAnswer.length, (index) => 0);
     }
-    // questionTransitionTween = Tween<double>(begin: 4, end: 0);
+    questionTransitionTween = Tween<double>(begin: 0, end: 1);
     setState(() {});
   }
 
@@ -385,8 +390,10 @@ class PlayScreenState extends State<PlayScreen> {
     if (endInfiniteMode == false && infinityMode == null) {
       setState(() {
         showInfinityModeDialog = true;
-        // questionTransitionTween = Tween<double>(begin: 4, end: 0);
+
+        questionTransitionTween = Tween<double>(begin: 0, end: 1);
       });
+      await Future.delayed(const Duration(milliseconds: 150));
     }
     //* Wait until infinity mode is set (i think there is a more proper way to do this but i dont know it)
     while (infinityMode == null) {
@@ -395,12 +402,12 @@ class PlayScreenState extends State<PlayScreen> {
     if (infinityMode == true) {
       if (showInfinityModeDialog == true) {
         setState(() {
-          // questionTransitionTween = Tween<double>(begin: -4, end: 0);
+          questionTransitionTween = Tween<double>(begin: 1, end: 0);
         });
-        // await Future.delayed(const Duration(milliseconds: 150));
+        await Future.delayed(const Duration(milliseconds: 150));
       }
       //! FIXME : doesn't call the function for some reason ???????
-      comboCounterKey.currentState!.startTimer();
+      // comboCounterKey.currentState!.startTimer();
       redemptionSet.questions = [];
       quizSet.questions.shuffle();
       QuizSet quiz = quizSet;
@@ -435,30 +442,33 @@ class PlayScreenState extends State<PlayScreen> {
           }
         }
       }
-      quizSet = modifiedQuiz;
-      currentQuestion = quizSet.questions[0];
-      if (showInfinityModeDialog == true) {
-        showInfinityModeDialog = false;
-        updaterNumber++;
-        totallyDifferentWidget = !totallyDifferentWidget;
-        await Future.delayed(const Duration(milliseconds: 150));
-      }
-      // questionTransitionTween = Tween<double>(begin: 4, end: 0);
-      setState(() {});
-      await Future.delayed(const Duration(milliseconds: 10));
+
+      // if (showInfinityModeDialog == true) {
+      //   showInfinityModeDialog = false;
+      //   updaterNumber++;
+      //   totallyDifferentWidget = !totallyDifferentWidget;
+      //   setState(() {
+      //     questionTransitionTween = Tween<double>(begin: 1, end: 0);
+      //   });
+      //   await Future.delayed(const Duration(milliseconds: 150));
+      // }
+      setState(() {
+        if (showInfinityModeDialog == true) showInfinityModeDialog = false;
+        quizSet = modifiedQuiz;
+        currentQuestion = quizSet.questions[0];
+      });
+      // await Future.delayed(const Duration(milliseconds: 100));
+      setState(() {
+        questionTransitionTween = Tween<double>(begin: 0, end: 1);
+      });
+      await Future.delayed(const Duration(milliseconds: 150));
+      comboCounterKey.currentState!.startTimer();
       return;
     }
     timer.cancel();
     audioPlayer.stop();
     if (!mounted) return;
-    showDialog(
-        context: context,
-        builder: (c) => Container(
-              color: Colors.black,
-              width: double.infinity,
-              child: const Center(child: Text("Finished", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 48, fontStyle: FontStyle.italic))),
-            ),
-        barrierDismissible: false);
+    showDialog(context: context, builder: (c) => const FinishedRibbon(), barrierDismissible: false);
     await Future.delayed(const Duration(milliseconds: 2000));
     if (!mounted) return;
     Navigator.of(context).pop();
@@ -531,71 +541,45 @@ class PlayScreenState extends State<PlayScreen> {
                   ),
                   Expanded(
                     //* Animation
-                    child: PageTransitionSwitcher(
-                      transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(fillColor: Colors.transparent, animation: primaryAnimation, secondaryAnimation: secondaryAnimation, transitionType: SharedAxisTransitionType.horizontal, child: child),
-                      child: Container(
-                        key: ValueKey(updaterNumber),
-                        child: totallyDifferentWidget
-                            ? showInfinityModeDialog
-                                ? InfinityModeDialog(putResult: (value) => setState(() => infinityMode = value))
-                                : currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
-                                    ? MultipleChoice(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 250),
+                      transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+                      child: TweenAnimationBuilder(
+                        tween: questionTransitionTween,
+                        duration: const Duration(milliseconds: 150),
+                        builder: (context, double value, child) {
+                          return Opacity(opacity: value, child: child);
+                        },
+                        child: showInfinityModeDialog
+                            ? InfinityModeDialog(putResult: (value) => setState(() => infinityMode = value))
+                            : currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
+                                ? MultipleChoice(
+                                    question: currentQuestion,
+                                    nextQuestionFunction: nextQuestion,
+                                    doAnimationFunction: doNextQuestionAnimations,
+                                    key: multipleChoiceKey,
+                                    toggleShowingAnswers: () => setState(
+                                          () => showingAnswers = !showingAnswers,
+                                        ))
+                                : currentQuestion.type == quizTypes.dropdown
+                                    ? DropdownQuestion(
+                                        key: dropdownKey,
                                         question: currentQuestion,
                                         nextQuestionFunction: nextQuestion,
                                         doAnimationFunction: doNextQuestionAnimations,
-                                        key: multipleChoiceKey,
                                         toggleShowingAnswers: () => setState(
                                               () => showingAnswers = !showingAnswers,
                                             ))
-                                    : currentQuestion.type == quizTypes.dropdown
-                                        ? DropdownQuestion(
-                                            key: dropdownKey,
+                                    : currentQuestion.type == quizTypes.reorder
+                                        ? ReorderQuestion(
+                                            key: reorderKey,
                                             question: currentQuestion,
                                             nextQuestionFunction: nextQuestion,
                                             doAnimationFunction: doNextQuestionAnimations,
                                             toggleShowingAnswers: () => setState(
                                                   () => showingAnswers = !showingAnswers,
                                                 ))
-                                        : currentQuestion.type == quizTypes.reorder
-                                            ? ReorderQuestion(
-                                                key: reorderKey,
-                                                question: currentQuestion,
-                                                nextQuestionFunction: nextQuestion,
-                                                doAnimationFunction: doNextQuestionAnimations,
-                                                toggleShowingAnswers: () => setState(
-                                                      () => showingAnswers = !showingAnswers,
-                                                    ))
-                                            : const Placeholder()
-                            : showInfinityModeDialog
-                                ? InfinityModeDialog(putResult: (value) => setState(() => infinityMode = value))
-                                : currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
-                                    ? MultipleChoice(
-                                        question: currentQuestion,
-                                        nextQuestionFunction: nextQuestion,
-                                        doAnimationFunction: doNextQuestionAnimations,
-                                        key: multipleChoiceKey,
-                                        toggleShowingAnswers: () => setState(
-                                              () => showingAnswers = !showingAnswers,
-                                            ))
-                                    : currentQuestion.type == quizTypes.dropdown
-                                        ? DropdownQuestion(
-                                            key: dropdownKey,
-                                            question: currentQuestion,
-                                            nextQuestionFunction: nextQuestion,
-                                            doAnimationFunction: doNextQuestionAnimations,
-                                            toggleShowingAnswers: () => setState(
-                                                  () => showingAnswers = !showingAnswers,
-                                                ))
-                                        : currentQuestion.type == quizTypes.reorder
-                                            ? ReorderQuestion(
-                                                key: reorderKey,
-                                                question: currentQuestion,
-                                                nextQuestionFunction: nextQuestion,
-                                                doAnimationFunction: doNextQuestionAnimations,
-                                                toggleShowingAnswers: () => setState(
-                                                      () => showingAnswers = !showingAnswers,
-                                                    ))
-                                            : const Placeholder(),
+                                        : const Placeholder(),
                       ),
                     ),
                   ),
@@ -603,13 +587,16 @@ class PlayScreenState extends State<PlayScreen> {
               ),
             ),
             infinityMode == true
-                ? ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red, elevation: 0, foregroundColor: Colors.white),
-                    onPressed: () => {
-                          setState(() => infinityMode = false),
-                          endSequence(true)
-                        },
-                    child: const Text("Finish"))
+                ? SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red, elevation: 0, foregroundColor: Colors.white),
+                        onPressed: () => {
+                              setState(() => infinityMode = false),
+                              endSequence(true)
+                            },
+                        child: const Text("Finish")),
+                  )
                 : const Expanded(flex: 0, child: SizedBox.shrink())
           ],
         ),
@@ -625,6 +612,21 @@ class PlayScreenState extends State<PlayScreen> {
         //       )
         //     : const SizedBox.shrink()
       ],
+    );
+  }
+}
+
+class FinishedRibbon extends StatelessWidget {
+  const FinishedRibbon({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const Dialog(
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+      child: Center(child: FadeInTransitionHorizontal(child: Text("Finished", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24, fontStyle: FontStyle.italic)))),
     );
   }
 }
