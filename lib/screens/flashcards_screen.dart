@@ -42,7 +42,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                   backgroundColor: theme.secondary,
                   child: const Icon(Icons.add),
                 ),
-                bottomNavigationBar: const BannerAdWidget(),
+                // bottomNavigationBar: const BannerAdWidget(),
                 resizeToAvoidBottomInset: false,
                 backgroundColor: Colors.transparent,
                 body: Column(

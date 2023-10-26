@@ -50,7 +50,7 @@ class _FlashcardsPlayScreen extends State<FlashcardsPlayScreen> {
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
                 backgroundColor: Colors.transparent,
-                bottomNavigationBar: const BannerAdWidget(),
+                // bottomNavigationBar: const BannerAdWidget(),
                 body: Column(
                   children: [
                     //App Bar

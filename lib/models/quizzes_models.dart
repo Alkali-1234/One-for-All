@@ -21,6 +21,7 @@ class QuizQuestion {
     required this.answers,
     required this.correctAnswer,
     this.type,
+    required this.imagePath,
   });
   int id;
   String question;
@@ -28,4 +29,5 @@ class QuizQuestion {
   //Between 0 to length of answers
   List<int> correctAnswer;
   quizTypes? type;
+  String? imagePath;
 }

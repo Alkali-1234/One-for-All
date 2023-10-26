@@ -88,7 +88,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
     var theme = appState.currentUserSelectedTheme.colorScheme;
     var textTheme = appState.currentUserSelectedTheme.textTheme;
     return Scaffold(
-      bottomNavigationBar: const BannerAdWidget(),
+      // bottomNavigationBar: const BannerAdWidget(),
       backgroundColor: appState.currentUserSelectedTheme.colorScheme.background,
       body: Builder(builder: (context) {
         if (error != "") {

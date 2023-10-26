@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:math' as math;
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/components/quizzes_components/drag_and_drop_edit.dart';
@@ -10,6 +12,7 @@ import 'package:oneforall/functions/quizzes_functions.dart';
 import 'package:oneforall/models/quizzes_models.dart';
 import 'package:oneforall/screens/quizzes_screen.dart';
 import 'package:oneforall/styles/styles.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants.dart';
@@ -80,7 +83,8 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                   "question": question.question,
                   "answers": question.answers,
                   "correctAnswer": question.correctAnswer,
-                  "type": question.type?.index ?? quizTypes.multipleChoice.index
+                  "type": question.type?.index ?? quizTypes.multipleChoice.index,
+                  "imagePath": question.imagePath,
                 }
             ],
             "settings": quiz.settings
@@ -108,7 +112,8 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                   "question": question.question,
                   "answers": question.answers,
                   "correctAnswer": question.correctAnswer,
-                  "type": question.type?.index ?? quizTypes.multipleChoice.index
+                  "type": question.type?.index ?? quizTypes.multipleChoice.index,
+                  "imagePath": question.imagePath,
                 }
             ],
             "settings": quiz.settings
@@ -337,7 +342,8 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                                                   "question": question.question,
                                                   "answers": question.answers,
                                                   "correctAnswer": question.correctAnswer,
-                                                  "type": question.type?.index ?? quizTypes.multipleChoice.index
+                                                  "type": question.type?.index ?? quizTypes.multipleChoice.index,
+                                                  "imagePath": question.imagePath,
                                                 }
                                             ],
                                             "settings": quiz.settings
@@ -380,7 +386,7 @@ class QueryListItem extends StatefulWidget {
 class _QueryListItemState extends State<QueryListItem> {
   void duplicateQuestion(QuizQuestion question, AppState appState) {
     //* New Quizquestion in order to not point to the same object
-    QuizQuestion newQuestion = QuizQuestion(id: appState.getQuizzes[widget.quizIndex].questions.length, question: question.question, answers: [], correctAnswer: [], type: question.type);
+    QuizQuestion newQuestion = QuizQuestion(imagePath: question.imagePath, id: appState.getQuizzes[widget.quizIndex].questions.length, question: question.question, answers: [], correctAnswer: [], type: question.type);
     for (String answer in question.answers) {
       newQuestion.answers.add(answer);
     }
@@ -482,7 +488,7 @@ class _QueryListItemState extends State<QueryListItem> {
                             onPressed: () {
                               appState.getQuizzes[widget.quizIndex].questions.insert(
                                   widget.index,
-                                  QuizQuestion(id: appState.getQuizzes[widget.quizIndex].questions.length + 1, question: "Question", answers: [
+                                  QuizQuestion(imagePath: null, id: appState.getQuizzes[widget.quizIndex].questions.length + 1, question: "Question", answers: [
                                     "Answer 1",
                                     "Answer 2"
                                   ], correctAnswer: [
@@ -677,12 +683,14 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
                     ),
                     onPressed: () => {
                       switch (questionType) {
-                        quizTypes.multipleChoice => widget.quizSet.questions.add(QuizQuestion(id: widget.quizSet.questions.length + 1, question: "Question", answers: [
+                        quizTypes.multipleChoice => widget.quizSet.questions.add(QuizQuestion(imagePath: "", id: widget.quizSet.questions.length + 1, question: "Question", answers: [
                             "Answer 1"
+                                "Answer 2"
                           ], correctAnswer: [
                             0
                           ])),
                         quizTypes.reorder => widget.quizSet.questions.add(QuizQuestion(
+                            imagePath: "",
                             id: widget.quizSet.questions.length + 1,
                             question: "Question",
                             answers: [
@@ -695,6 +703,7 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
                             ],
                             type: quizTypes.reorder)),
                         quizTypes.dropdown => widget.quizSet.questions.add(QuizQuestion(
+                            imagePath: "",
                             id: widget.quizSet.questions.length + 1,
                             question: "Question <dropdown answer=0 />",
                             answers: [
@@ -783,6 +792,7 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
     }
 
     QuizQuestion quizQuestion = QuizQuestion(
+        imagePath: question.imagePath,
         id: widget.index,
         question: dropDownEditState.dropdownSentence.join("<seperator />"),
         answers: dropDownEditState.dropdownAnswers,
@@ -808,7 +818,7 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
         throw Exception("There cannot be duplicate drag items");
       }
     }
-    QuizQuestion quizQuestion = QuizQuestion(id: widget.index, question: reorderEditKey.currentState!.question, answers: reorderEditKey.currentState!.draggables, correctAnswer: reorderEditKey.currentState!.correctOrder, type: quizTypes.reorder);
+    QuizQuestion quizQuestion = QuizQuestion(imagePath: question.imagePath, id: widget.index, question: reorderEditKey.currentState!.question, answers: reorderEditKey.currentState!.draggables, correctAnswer: reorderEditKey.currentState!.correctOrder, type: quizTypes.reorder);
     appState.getQuizzes[widget.quizIndex].questions[widget.index] = quizQuestion;
   }
 
@@ -909,6 +919,63 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
                   ? Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        //* Add Image
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: theme.primaryContainer,
+                                  foregroundColor: theme.onBackground,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                                onPressed: () async {
+                                  final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                                  if (image == null) return;
+                                  Directory docsDir = await getApplicationDocumentsDirectory();
+                                  int imageID = math.Random().nextInt(999999);
+                                  File newImage = await File(image.path).copy("${docsDir.path}/quizImage${image.name}_$imageID.png");
+                                  setState(() {
+                                    question.imagePath = newImage.path;
+                                  });
+                                },
+                                icon: const Icon(Icons.add_a_photo),
+                                label: const Text("Add Image")),
+                            if (question.imagePath != "")
+                              ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: theme.primaryContainer,
+                                    foregroundColor: theme.onBackground,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      question.imagePath = "";
+                                    });
+                                  },
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  label: const Text("Remove Image")),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        //* Image if there is one
+                        if (question.imagePath != null && question.imagePath!.isNotEmpty)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: theme.onBackground, width: 2),
+                                ),
+                                height: 200,
+                                child: InkWell(splashColor: theme.onBackground.withOpacity(0.25), onTap: () => showDialog(context: context, builder: (context) => Dialog(child: Image.file(File(question.imagePath!), fit: BoxFit.cover))), child: ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.file(File(question.imagePath!)))),
+                              ),
+                            ],
+                          ),
+                        const SizedBox(
+                          height: 10,
+                        ),
                         TextField(
                           controller: _questionController,
                           style: textTheme.displaySmall,
@@ -1353,7 +1420,7 @@ class _ImportQuizModalState extends State<ImportQuizModal> {
               title: quiz['title'],
               description: quiz['description'],
               questions: [
-                for (int i = 0; i < quiz["questions"].length; i++) QuizQuestion(id: i, question: quiz["questions"][i]["question"], answers: List<String>.from(quiz["questions"][i]["answers"] as List), correctAnswer: List<int>.from(quiz["questions"][i]["correctAnswer"] as List), type: quiz["questions"][i]["type"] != null ? quizTypes.values[quiz["questions"][i]["type"]] : quizTypes.multipleChoice),
+                for (int i = 0; i < quiz["questions"].length; i++) QuizQuestion(imagePath: quiz["questions"][i]["imagePath"], id: i, question: quiz["questions"][i]["question"], answers: List<String>.from(quiz["questions"][i]["answers"] as List), correctAnswer: List<int>.from(quiz["questions"][i]["correctAnswer"] as List), type: quiz["questions"][i]["type"] != null ? quizTypes.values[quiz["questions"][i]["type"]] : quizTypes.multipleChoice),
               ],
               settings: quiz["settings"] ?? {}),
         );
@@ -1382,7 +1449,8 @@ class _ImportQuizModalState extends State<ImportQuizModal> {
                   "question": question.question,
                   "answers": question.answers,
                   "correctAnswer": question.correctAnswer,
-                  "type": question.type?.index ?? quizTypes.multipleChoice.index
+                  "type": question.type?.index ?? quizTypes.multipleChoice.index,
+                  "imagePath": question.imagePath
                 }
             ],
             "settings": quiz.settings

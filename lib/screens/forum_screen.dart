@@ -200,7 +200,7 @@ class _ForumScreenState extends State<ForumScreen> with TickerProviderStateMixin
             color: tm.onBackground,
           ),
         ),
-        bottomNavigationBar: const BannerAdWidget(),
+        // bottomNavigationBar: const BannerAdWidget(),
         backgroundColor: tm.background,
         body: Container(
             decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/purpwallpaper 2.png"), fit: BoxFit.cover)) : BoxDecoration(color: tm.background),

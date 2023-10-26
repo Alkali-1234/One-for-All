@@ -24,7 +24,7 @@ class _FadeInTransitionHorizontalState extends State<FadeInTransitionHorizontal>
   @override
   void initState() {
     if (widget.delayMilliseconds != null) startTween();
-    if (widget.delayMilliseconds == null) tween = Tween<double>(begin: 0, end: 1);
+    if (widget.delayMilliseconds == null) tween = Tween<double>(begin: 0, end: 20);
     super.initState();
   }
 

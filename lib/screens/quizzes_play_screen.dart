@@ -50,7 +50,7 @@ class _QuizzesPlayScreenState extends State<QuizzesPlayScreen> {
     return WillPopScope(
       onWillPop: () async => currentScreen == 0 ? true : false,
       child: Scaffold(
-        bottomNavigationBar: const BannerAdWidget(),
+        // bottomNavigationBar: const BannerAdWidget(),
         body: MainContainer(
             onClose: () {
               if (currentScreen == 0) {

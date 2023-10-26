@@ -33,7 +33,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
           },
           backgroundColor: theme.secondary,
           child: Icon(Icons.add, color: theme.onBackground)),
-      bottomNavigationBar: const BannerAdWidget(),
+      // bottomNavigationBar: const BannerAdWidget(),
       body: MainContainer(
           child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -522,7 +522,7 @@ class _ImportQuizModalState extends State<ImportQuizModal> {
               title: quiz['title'],
               description: quiz['description'],
               questions: [
-                for (int i = 0; i < quiz["questions"].length; i++) QuizQuestion(id: i, question: quiz["questions"][i]["question"], answers: List<String>.from(quiz["questions"][i]["answers"] as List), correctAnswer: List<int>.from(quiz["questions"][i]["correctAnswer"] as List), type: quiz["questions"][i]["type"] != null ? quizTypes.values[quiz["questions"][i]["type"]] : quizTypes.multipleChoice),
+                for (int i = 0; i < quiz["questions"].length; i++) QuizQuestion(imagePath: quiz["questions"][i]["imagePath"], id: i, question: quiz["questions"][i]["question"], answers: List<String>.from(quiz["questions"][i]["answers"] as List), correctAnswer: List<int>.from(quiz["questions"][i]["correctAnswer"] as List), type: quiz["questions"][i]["type"] != null ? quizTypes.values[quiz["questions"][i]["type"]] : quizTypes.multipleChoice),
               ],
               settings: quiz["settings"] ?? {}),
         );

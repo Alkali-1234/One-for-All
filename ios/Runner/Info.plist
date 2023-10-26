@@ -65,5 +65,7 @@
 	<integer>5</integer>
 	<key>FDAllFilesDownloadedMessage</key>
 	<string>All files have been downloaded</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>The photo library is being used for the users profile picture, and images used for quizzes that the user has set.</string>
 </dict>
 </plist>

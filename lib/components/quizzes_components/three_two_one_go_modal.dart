@@ -18,7 +18,7 @@ class _ThreeTwoOneGoModalState extends State<ThreeTwoOneGoModal> {
     super.initState();
     Timer.periodic(const Duration(seconds: 1), (timer) async {
       if (increment == 0) {
-        await Future.delayed(const Duration(milliseconds: 1000));
+        await Future.delayed(const Duration(milliseconds: 300));
         setState(() {
           peaceOutTween = Tween<double>(begin: 0, end: 1);
         });
@@ -38,22 +38,26 @@ class _ThreeTwoOneGoModalState extends State<ThreeTwoOneGoModal> {
   Widget build(BuildContext context) {
     // var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    return LayoutBuilder(builder: (context, constraints) {
-      return Center(
-        child: TweenAnimationBuilder(
-          tween: peaceOutTween,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeIn,
-          builder: (context, value, child) => Transform.translate(offset: Offset(value * constraints.maxWidth, 0), child: child),
-          child: AnimatedSwitcher(
-              transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
-              duration: const Duration(milliseconds: 200),
-              child: Text(
-                increment != 0 ? increment.toString() : "Go!",
-                style: textTheme.displayLarge!.copyWith(color: Colors.white, fontStyle: FontStyle.italic),
-              )),
-        ),
-      );
-    });
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+      child: LayoutBuilder(builder: (context, constraints) {
+        return Center(
+          child: TweenAnimationBuilder(
+            tween: peaceOutTween,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeIn,
+            builder: (context, value, child) => Transform.translate(offset: Offset(value * constraints.maxWidth, 0), child: child),
+            child: AnimatedSwitcher(
+                transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+                duration: const Duration(milliseconds: 200),
+                child: Text(
+                  increment != 0 ? increment.toString() : "Go!",
+                  style: textTheme.displayLarge!.copyWith(color: Colors.white, fontStyle: FontStyle.italic),
+                )),
+          ),
+        );
+      }),
+    );
   }
 }
