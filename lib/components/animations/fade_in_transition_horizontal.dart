@@ -24,10 +24,11 @@ class _FadeInTransitionHorizontalState extends State<FadeInTransitionHorizontal>
   @override
   void initState() {
     if (widget.delayMilliseconds != null) startTween();
-    if (widget.delayMilliseconds == null) tween = Tween<double>(begin: 0, end: 20);
+    if (widget.delayMilliseconds == null) tween = Tween<double>(begin: -20, end: 0);
     super.initState();
   }
 
+  //! FIXME i tink it borken
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder(
@@ -35,9 +36,13 @@ class _FadeInTransitionHorizontalState extends State<FadeInTransitionHorizontal>
       duration: Duration(milliseconds: widget.duration ?? 500),
       builder: (BuildContext context, double value, Widget? child) {
         return Transform.translate(
-          offset: Offset(1 - value * (widget.yOffsetMultiplier ?? 1), 0),
+          offset: Offset(value * (widget.yOffsetMultiplier ?? 1), 0),
           child: Opacity(
-            opacity: value,
+            opacity: value > 1
+                ? 1
+                : value < 0
+                    ? 0
+                    : value,
             child: child,
           ),
         );

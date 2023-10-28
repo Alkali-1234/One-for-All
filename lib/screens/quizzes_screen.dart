@@ -423,77 +423,100 @@ class _NewSetOptionsState extends State<NewSetOptions> {
     var textTheme = Theme.of(context).textTheme;
     // var appState = Provider.of<AppState>(context);
     return Dialog(
-      backgroundColor: theme.background,
-      child: Padding(
+        backgroundColor: theme.background,
+        surfaceTintColor: Colors.transparent,
+        child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            //* Create New
-            //Button style: Basically a square with an icon inside, and a text below it
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              InkWell(
+                highlightColor: Colors.transparent,
+                splashColor: theme.onBackground.withOpacity(0.125),
+                onTap: () => {
+                  Navigator.pop(context),
+                  showDialog(context: context, builder: (context) => const NewQuizModal())
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.primary,
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                      backgroundColor: theme.primary,
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
+                      padding: const EdgeInsets.all(16),
+                      child: Icon(Icons.add, color: theme.onBackground, size: 24),
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      showDialog(context: context, builder: (context) => const NewQuizModal());
-                    },
-                    icon: Icon(Icons.add, color: theme.onBackground),
-                    label: Text("Create New", style: textTheme.displaySmall!.copyWith(color: theme.onBackground))),
-              ],
-            ),
-            const SizedBox(height: 16),
-            //* Import
-            //Button style: Basically a square with an icon inside, and a text below it
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "Create",
+                      style: textTheme.displaySmall,
+                    )
+                  ],
+                ),
+              ),
+              InkWell(
+                highlightColor: Colors.transparent,
+                splashColor: theme.onBackground.withOpacity(0.125),
+                // onTap: () => showDialog(context: context, builder: (context) => const ImportQuizModal()),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.primary,
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                      backgroundColor: theme.primary,
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
+                      padding: const EdgeInsets.all(16),
+                      child: Icon(Icons.smart_toy, color: theme.onBackground, size: 24),
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      showDialog(context: context, builder: (context) => const ImportQuizModal());
-                    },
-                    icon: Icon(Icons.file_copy, color: theme.onBackground),
-                    label: Text("Import", style: textTheme.displaySmall!.copyWith(color: theme.onBackground))),
-              ],
-            ),
-            const SizedBox(height: 16),
-            //* Generate
-            //Button style: Basically a square with an icon inside, and a text below it
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "Generate",
+                      style: textTheme.displaySmall,
+                    )
+                  ],
+                ),
+              ),
+              InkWell(
+                highlightColor: Colors.transparent,
+                splashColor: theme.onBackground.withOpacity(0.125),
+                onTap: () => {
+                  Navigator.pop(context),
+                  showDialog(context: context, builder: (context) => const ImportQuizModal())
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.primary,
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                      backgroundColor: theme.primary,
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
+                      padding: const EdgeInsets.all(16),
+                      child: Icon(Icons.download, color: theme.onBackground, size: 24),
                     ),
-                    onPressed: () {},
-                    icon: Icon(Icons.smart_toy, color: theme.onBackground),
-                    label: Text("Generate", style: textTheme.displaySmall!.copyWith(color: theme.onBackground))),
-              ],
-            ),
-          ])),
-    );
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "Import",
+                      style: textTheme.displaySmall,
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ));
   }
 }
 

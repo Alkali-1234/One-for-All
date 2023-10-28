@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 // import 'dart:html';
 
 import 'package:animations/animations.dart';
@@ -14,6 +15,7 @@ import 'package:oneforall/functions/quizzes_functions.dart';
 import 'package:oneforall/main.dart';
 import 'package:oneforall/models/quizzes_models.dart';
 import 'package:oneforall/screens/interstitial_screen.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import '../components/quizzes_components/combo_counter.dart';
 import '../components/quizzes_components/combo_flash_modal.dart';
@@ -136,6 +138,7 @@ class PlayScreenConfirmation extends StatelessWidget {
                   backgroundColor: theme.primaryContainer,
                 ),
                 onPressed: () {
+                  QuizzesFunctions().refreshQuizzesFromLocal(context.read<AppState>(), false);
                   Navigator.pop(context);
                 },
                 child: Text(
@@ -539,6 +542,7 @@ class PlayScreenState extends State<PlayScreen> {
                       Flexible(flex: 1, child: ComboCounter(key: comboCounterKey, theme: Theme.of(context).colorScheme)),
                     ],
                   ),
+                  const SizedBox(height: 10),
                   Expanded(
                     //* Animation
                     child: AnimatedSwitcher(
@@ -550,36 +554,91 @@ class PlayScreenState extends State<PlayScreen> {
                         builder: (context, double value, child) {
                           return Opacity(opacity: value, child: child);
                         },
-                        child: showInfinityModeDialog
-                            ? InfinityModeDialog(putResult: (value) => setState(() => infinityMode = value))
-                            : currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
-                                ? MultipleChoice(
-                                    question: currentQuestion,
-                                    nextQuestionFunction: nextQuestion,
-                                    doAnimationFunction: doNextQuestionAnimations,
-                                    key: multipleChoiceKey,
-                                    toggleShowingAnswers: () => setState(
-                                          () => showingAnswers = !showingAnswers,
-                                        ))
-                                : currentQuestion.type == quizTypes.dropdown
-                                    ? DropdownQuestion(
-                                        key: dropdownKey,
-                                        question: currentQuestion,
-                                        nextQuestionFunction: nextQuestion,
-                                        doAnimationFunction: doNextQuestionAnimations,
-                                        toggleShowingAnswers: () => setState(
-                                              () => showingAnswers = !showingAnswers,
-                                            ))
-                                    : currentQuestion.type == quizTypes.reorder
-                                        ? ReorderQuestion(
-                                            key: reorderKey,
-                                            question: currentQuestion,
-                                            nextQuestionFunction: nextQuestion,
-                                            doAnimationFunction: doNextQuestionAnimations,
-                                            toggleShowingAnswers: () => setState(
-                                                  () => showingAnswers = !showingAnswers,
-                                                ))
-                                        : const Placeholder(),
+                        child: Column(
+                          children: [
+                            //* Question image
+                            currentQuestion.imagePath != null && currentQuestion.imagePath!.isNotEmpty
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: InkWell(
+                                      highlightColor: Colors.transparent,
+                                      splashColor: Theme.of(context).colorScheme.onBackground.withOpacity(0.125),
+                                      onTap: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) => Dialog(
+                                                  backgroundColor: Colors.transparent,
+                                                  surfaceTintColor: Colors.transparent,
+                                                  child: SizedBox(
+                                                    height: 300,
+                                                    child: PhotoView(
+                                                      backgroundDecoration: const BoxDecoration(
+                                                        color: Colors.transparent,
+                                                      ),
+                                                      imageProvider: FileImage(File(currentQuestion.imagePath!)),
+                                                      maxScale: PhotoViewComputedScale.covered * 2.0,
+                                                      minScale: PhotoViewComputedScale.contained * 0.8,
+                                                    ),
+                                                  ),
+                                                ));
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 3,
+                                            child: Container(
+                                              height: 200,
+                                              //width: Image.file(File(currentQuestion.imagePath!)). .width!.toDouble() / Image.file(File(currentQuestion.imagePath!)).height!.toDouble() * 200,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(10),
+                                                border: Border.all(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.25)),
+                                                image: DecorationImage(image: FileImage(File(currentQuestion.imagePath!)), fit: BoxFit.cover),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Expanded(flex: 1, child: Center(child: Text("Tap to view image", textAlign: TextAlign.center, style: textTheme.displaySmall))),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox.shrink(),
+                            Expanded(
+                              child: showInfinityModeDialog
+                                  ? InfinityModeDialog(putResult: (value) => setState(() => infinityMode = value))
+                                  : currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
+                                      ? MultipleChoice(
+                                          question: currentQuestion,
+                                          nextQuestionFunction: nextQuestion,
+                                          doAnimationFunction: doNextQuestionAnimations,
+                                          key: multipleChoiceKey,
+                                          toggleShowingAnswers: () => setState(
+                                                () => showingAnswers = !showingAnswers,
+                                              ))
+                                      : currentQuestion.type == quizTypes.dropdown
+                                          ? DropdownQuestion(
+                                              key: dropdownKey,
+                                              question: currentQuestion,
+                                              nextQuestionFunction: nextQuestion,
+                                              doAnimationFunction: doNextQuestionAnimations,
+                                              toggleShowingAnswers: () => setState(
+                                                    () => showingAnswers = !showingAnswers,
+                                                  ))
+                                          : currentQuestion.type == quizTypes.reorder
+                                              ? ReorderQuestion(
+                                                  key: reorderKey,
+                                                  question: currentQuestion,
+                                                  nextQuestionFunction: nextQuestion,
+                                                  doAnimationFunction: doNextQuestionAnimations,
+                                                  toggleShowingAnswers: () => setState(
+                                                        () => showingAnswers = !showingAnswers,
+                                                      ))
+                                              : const Placeholder(),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -626,7 +685,7 @@ class FinishedRibbon extends StatelessWidget {
     return const Dialog(
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
-      child: Center(child: FadeInTransitionHorizontal(child: Text("Finished", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24, fontStyle: FontStyle.italic)))),
+      child: Center(child: Text("Finished", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24, fontStyle: FontStyle.italic))),
     );
   }
 }

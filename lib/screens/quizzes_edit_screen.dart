@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:math' as math;
 import 'package:oneforall/components/main_container.dart';
@@ -13,6 +14,7 @@ import 'package:oneforall/models/quizzes_models.dart';
 import 'package:oneforall/screens/quizzes_screen.dart';
 import 'package:oneforall/styles/styles.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants.dart';
@@ -914,65 +916,138 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
                         })),
               ),
               const SizedBox(height: 10),
+              //* Add Image
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        backgroundColor: theme.primaryContainer,
+                        foregroundColor: theme.onBackground,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      onPressed: () async {
+                        Directory docsDir = await getApplicationDocumentsDirectory();
+                        late bool previouslyHasImage = false;
+                        String previousImagePath = "";
+                        if (question.imagePath != null && question.imagePath!.isNotEmpty) {
+                          previouslyHasImage = true;
+                          previousImagePath = question.imagePath!;
+                        }
+                        final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                        if (image == null) return;
+                        int imageID = math.Random().nextInt(999999);
+                        //* Check if directory exists
+                        await Directory("${docsDir.path}/quizzesAssets/${appState.getQuizzes[widget.quizIndex].title}").exists().then((value) async {
+                          if (value == false) {
+                            await Directory("${docsDir.path}/quizzesAssets/${appState.getQuizzes[widget.quizIndex].title}").create(recursive: true);
+                          }
+                        });
+                        File newImage = await File(image.path).copy("${docsDir.path}/quizzesAssets/${appState.getQuizzes[widget.quizIndex].title}/quizImage${image.name}_$imageID.png");
+                        setState(() {
+                          question.imagePath = newImage.path;
+                        });
+                        //! Previously has image not tested
+                        if (previouslyHasImage) {
+                          //* Check if any other question has the same image
+                          for (var question in appState.getQuizzes[widget.quizIndex].questions) {
+                            if (question.imagePath == previousImagePath) {
+                              return;
+                            }
+                          }
+                          await File.fromUri(Uri.file(previousImagePath)).delete();
+                        }
+                      },
+                      icon: const Icon(Icons.add_a_photo),
+                      label: const Text("Add Image")),
+                  if (question.imagePath != "")
+                    ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: theme.primaryContainer,
+                          foregroundColor: theme.onBackground,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        onPressed: () async {
+                          await File.fromUri(Uri.file(question.imagePath!)).delete();
+                          //Remove the image path for any other question that has the same one
+                          for (var question in appState.getQuizzes[widget.quizIndex].questions) {
+                            if (question.imagePath == this.question.imagePath) {
+                              question.imagePath = "";
+                            }
+                          }
+                          appState.thisNotifyListeners();
+                        },
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        label: const Text("Remove Image")),
+                ],
+              ),
+              const SizedBox(height: 10),
+              //* Image if there is one
+              question.imagePath != null && question.imagePath!.isNotEmpty
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: theme.onBackground, width: 2),
+                          ),
+                          height: 200,
+                          child: InkWell(
+                              splashColor: theme.onBackground.withOpacity(0.25),
+                              onTap: () => showDialog(
+                                  context: context,
+                                  builder: (context) => Dialog(
+                                      backgroundColor: Colors.transparent,
+                                      surfaceTintColor: Colors.transparent,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SizedBox(
+                                            height: 300,
+                                            child: PhotoView(
+                                              backgroundDecoration: const BoxDecoration(color: Colors.transparent),
+                                              maxScale: PhotoViewComputedScale.covered * 2,
+                                              minScale: PhotoViewComputedScale.contained * 0.8,
+                                              imageProvider: FileImage(File(question.imagePath!)),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
+                                          Row(
+                                            children: [
+                                              TextButton(onPressed: () => Clipboard.setData(ClipboardData(text: question.imagePath!)), child: Text("Copy Image Path", style: textTheme.displaySmall)),
+                                            ],
+                                          )
+                                        ],
+                                      ))),
+                              child: ClipRRect(borderRadius: BorderRadius.circular(10), child: Hero(tag: "image", child: Image.file(File(question.imagePath!))))),
+                        ),
+                      ],
+                    )
+                  : Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: theme.primary),
+                      child: Center(
+                        child: Text(
+                          "No Image",
+                          style: textTheme.displaySmall,
+                        ),
+                      ),
+                    ),
+              const SizedBox(
+                height: 10,
+              ),
               //* Question
               questionType == quizTypes.multipleChoice
                   ? Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        //* Add Image
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: theme.primaryContainer,
-                                  foregroundColor: theme.onBackground,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                ),
-                                onPressed: () async {
-                                  final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-                                  if (image == null) return;
-                                  Directory docsDir = await getApplicationDocumentsDirectory();
-                                  int imageID = math.Random().nextInt(999999);
-                                  File newImage = await File(image.path).copy("${docsDir.path}/quizImage${image.name}_$imageID.png");
-                                  setState(() {
-                                    question.imagePath = newImage.path;
-                                  });
-                                },
-                                icon: const Icon(Icons.add_a_photo),
-                                label: const Text("Add Image")),
-                            if (question.imagePath != "")
-                              ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: theme.primaryContainer,
-                                    foregroundColor: theme.onBackground,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      question.imagePath = "";
-                                    });
-                                  },
-                                  icon: const Icon(Icons.delete, color: Colors.red),
-                                  label: const Text("Remove Image")),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        //* Image if there is one
-                        if (question.imagePath != null && question.imagePath!.isNotEmpty)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: theme.onBackground, width: 2),
-                                ),
-                                height: 200,
-                                child: InkWell(splashColor: theme.onBackground.withOpacity(0.25), onTap: () => showDialog(context: context, builder: (context) => Dialog(child: Image.file(File(question.imagePath!), fit: BoxFit.cover))), child: ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.file(File(question.imagePath!)))),
-                              ),
-                            ],
-                          ),
                         const SizedBox(
                           height: 10,
                         ),
