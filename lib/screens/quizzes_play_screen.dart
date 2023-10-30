@@ -564,23 +564,7 @@ class PlayScreenState extends State<PlayScreen> {
                                       highlightColor: Colors.transparent,
                                       splashColor: Theme.of(context).colorScheme.onBackground.withOpacity(0.125),
                                       onTap: () {
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) => Dialog(
-                                                  backgroundColor: Colors.transparent,
-                                                  surfaceTintColor: Colors.transparent,
-                                                  child: SizedBox(
-                                                    height: 300,
-                                                    child: PhotoView(
-                                                      backgroundDecoration: const BoxDecoration(
-                                                        color: Colors.transparent,
-                                                      ),
-                                                      imageProvider: FileImage(File(currentQuestion.imagePath!)),
-                                                      maxScale: PhotoViewComputedScale.covered * 2.0,
-                                                      minScale: PhotoViewComputedScale.contained * 0.8,
-                                                    ),
-                                                  ),
-                                                ));
+                                        showDialog(context: context, builder: (context) => ViewImageDialog(currentQuestion: currentQuestion, textTheme: textTheme));
                                       },
                                       child: Row(
                                         children: [
@@ -671,6 +655,75 @@ class PlayScreenState extends State<PlayScreen> {
         //       )
         //     : const SizedBox.shrink()
       ],
+    );
+  }
+}
+
+class ViewImageDialog extends StatefulWidget {
+  const ViewImageDialog({
+    super.key,
+    required this.currentQuestion,
+    required this.textTheme,
+  });
+
+  final QuizQuestion currentQuestion;
+  final TextTheme textTheme;
+
+  @override
+  State<ViewImageDialog> createState() => _ViewImageDialogState();
+}
+
+class _ViewImageDialogState extends State<ViewImageDialog> {
+  bool showHintText = true;
+
+  late Timer timer;
+
+  @override
+  void initState() {
+    super.initState();
+    timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        showHintText = !showHintText;
+        timer.cancel();
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 300,
+            child: PhotoView(
+              backgroundDecoration: const BoxDecoration(
+                color: Colors.transparent,
+              ),
+              imageProvider: FileImage(File(widget.currentQuestion.imagePath!)),
+              maxScale: PhotoViewComputedScale.covered * 2.0,
+              minScale: PhotoViewComputedScale.contained * 0.8,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Text("Use two fingers to zoom in and out", style: widget.textTheme.displaySmall),
+              const SizedBox(
+                width: 5,
+              ),
+              Icon(Icons.pinch, size: 14, color: Theme.of(context).colorScheme.onBackground)
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

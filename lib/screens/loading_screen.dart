@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/community_data.dart';
@@ -48,13 +50,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
     // I SWEAR TO GOD IF THIS WORKS
     // I WILL BE SO HAPPY
     setState(() {
-      verbose = "Initializing...";
+      verbose = "Initializing";
     });
     final prefs = await SharedPreferences.getInstance();
     //If first time opening app, go to getstarted page
     if (!prefs.containsKey("hasOpenedBefore")) {
       setState(() {
-        verbose = "First time opening app. Going to get started page...";
+        verbose = "First time opening app. Going to get started page";
       });
       // await Future.delayed(const Duration(seconds: 3));
       pushToPage(const GetStartedScreen());
@@ -63,7 +65,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     //* Check for saved credentials
     if (prefs.containsKey("theme")) {
       setState(() {
-        verbose = "Setting theme...";
+        verbose = "Setting theme";
       });
       int theme = prefs.getInt("theme") ?? 0;
       // pass the theme in myapp
@@ -84,7 +86,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     }
     if (prefs.containsKey("language")) {
       setState(() {
-        verbose = "Setting language...";
+        verbose = "Setting language";
       });
       String language = prefs.getString("language") ?? "en";
       // pass the language in myapp
@@ -96,12 +98,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
     }
     debugPrint("Has opened before");
     setState(() {
-      verbose = "Checking for saved credentials...";
+      verbose = "Checking for saved credentials";
     });
     //If none, go to login page
     if (!prefs.containsKey("email") || !prefs.containsKey("password")) {
       setState(() {
-        verbose = "No saved credentials found. Going to login page...";
+        verbose = "No saved credentials found. Going to login page";
       });
       await Future.delayed(const Duration(seconds: 3));
       pushToPage(const LoginScreen());
@@ -117,7 +119,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       await login(email, password, true, appState);
     } catch (e) {
       setState(() {
-        verbose = "Error logging in. Going to login page... \n $e";
+        verbose = "Error logging in. Going to login page \n $e";
       });
       await Future.delayed(const Duration(seconds: 3));
       pushToPage(const LoginScreen());
@@ -133,6 +135,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
+    loadingScreenAnimation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       initializeApp(context.read<AppState>());
     });
@@ -144,30 +147,65 @@ class _LoadingScreenState extends State<LoadingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.black,
+        decoration: const BoxDecoration(
+          image: DecorationImage(image: AssetImage("assets/images/logbg.png"), fit: BoxFit.cover),
+        ),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Stack(
             children: [
-              const BannerAdWidget(),
+              //* Blur background
+              SizedBox.expand(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                ),
+              ),
+
               Column(
                 children: [
-                  Text(
-                    'Loading $loadingDots',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
+                  // const BannerAdWidget(),
+                  Expanded(flex: 1, child: Container()),
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          "assets/images/logo.png",
+                          width: 200,
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          "One for All",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '$verbose$loadingDots',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Text(
-                    verbose,
-                    style: const TextStyle(color: Colors.white, fontSize: 20),
-                    textAlign: TextAlign.center,
-                  ),
-                  Text("Build: $buildNumber", style: const TextStyle(color: Colors.white, fontSize: 10)),
+                  const Expanded(
+                      flex: 1,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            "v0.0.4-pre1",
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
+                          SizedBox(height: 10),
+                        ],
+                      )),
+                  // const BannerAdWidget(),
                 ],
               ),
-              const BannerAdWidget(),
             ],
           ),
         ),
