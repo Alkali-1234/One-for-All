@@ -12,6 +12,7 @@ import 'package:oneforall/screens/mab_lac_screen.dart';
 import 'package:oneforall/screens/premium_screen.dart';
 import 'package:oneforall/screens/quizzes_screen.dart';
 import 'package:oneforall/screens/settings_screen.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'firebase_options.dart';
@@ -1338,6 +1339,7 @@ class MABModal extends StatelessWidget {
   final String title, description;
   final List<String> attatchements;
   final String? image;
+
   String extractFilenameFromUrl(String url) {
     RegExp regExp = RegExp(r'(?<=cache%2F)[^?]+');
     Match? match = regExp.firstMatch(url);
@@ -1387,13 +1389,32 @@ class MABModal extends StatelessWidget {
                 width: double.infinity,
                 height: 250,
                 decoration: BoxDecoration(color: theme.primaryContainer, borderRadius: const BorderRadius.all(Radius.circular(10)), border: Border.all(color: theme.secondary, width: 1)),
-                child: Center(
-                  child: image == null || image == ""
-                      ? Text(
-                          "No Image",
-                          style: textTheme.displaySmall,
-                        )
-                      : Image.network(image!),
+                child: InkWell(
+                  splashColor: image == null || image == "" ? Colors.transparent : theme.secondary.withOpacity(0.5),
+                  highlightColor: image == null || image == "" ? Colors.transparent : theme.secondary.withOpacity(0.5),
+                  onTap: () => {
+                    if (image != null && image != "")
+                      showDialog(
+                          context: context,
+                          builder: (context) => Dialog(
+                                backgroundColor: Colors.transparent,
+                                surfaceTintColor: Colors.transparent,
+                                child: SizedBox(
+                                    height: 300,
+                                    child: PhotoView(
+                                      backgroundDecoration: const BoxDecoration(color: Colors.transparent),
+                                      imageProvider: NetworkImage(image!),
+                                    )),
+                              ))
+                  },
+                  child: Center(
+                    child: image == null || image == ""
+                        ? Text(
+                            "No Image",
+                            style: textTheme.displaySmall,
+                          )
+                        : Image.network(image!),
+                  ),
                 )),
 
             const SizedBox(height: 16),
@@ -1435,14 +1456,20 @@ class MABModal extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             //Replace with actual name
-                            Text(
-                              extractFilenameFromUrl(attatchements[index]),
-                              style: textTheme.displaySmall,
-                              overflow: TextOverflow.ellipsis,
+                            Flexible(
+                              flex: 3,
+                              child: Text(
+                                extractFilenameFromUrl(attatchements[index]),
+                                style: textTheme.displaySmall,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                            Icon(
-                              Icons.download_sharp,
-                              color: theme.onSecondary,
+                            Flexible(
+                              flex: 1,
+                              child: Icon(
+                                Icons.download_sharp,
+                                color: theme.onSecondary,
+                              ),
                             ),
                           ],
                         ),

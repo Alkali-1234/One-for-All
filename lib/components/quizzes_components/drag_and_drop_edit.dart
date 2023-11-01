@@ -31,6 +31,7 @@ class ReorderEditState extends State<ReorderEdit> {
   late TextEditingController currentlyEditingController;
 
   int currentlyEditing = -1;
+  bool dragging = false;
 
   @override
   void initState() {
@@ -120,6 +121,12 @@ class ReorderEditState extends State<ReorderEdit> {
                     height: 50,
                     child: LayoutBuilder(builder: (context, constraints) {
                       return Draggable<int>(
+                          onDragStarted: () => setState(() {
+                                dragging = true;
+                              }),
+                          onDragEnd: (details) => setState(() {
+                                dragging = false;
+                              }),
                           data: i,
                           feedback: Container(
                             height: constraints.maxHeight,
@@ -226,15 +233,20 @@ class ReorderEditState extends State<ReorderEdit> {
                         // }
                         return Stack(
                           children: [
-                            Container(
-                              decoration: BoxDecoration(color: (correctOrder.length >= i && correctOrder[i] != -1) ? theme.primaryContainer : theme.primary, borderRadius: BorderRadius.circular(10)),
-                              child: Center(
-                                child: (correctOrder.length >= i && correctOrder[i] != -1)
-                                    ? Text(
-                                        draggables[correctOrder[i]],
-                                        style: textTheme.displaySmall,
-                                      )
-                                    : Text("Order #${i + 1}", style: textTheme.displaySmall),
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: dragging ? const EdgeInsets.all(4) : const EdgeInsets.all(5),
+                              decoration: BoxDecoration(border: dragging ? Border.all(color: theme.onBackground.withOpacity(0.5)) : null, color: Colors.transparent, borderRadius: BorderRadius.circular(10)),
+                              child: Container(
+                                decoration: BoxDecoration(color: (correctOrder.length >= i && correctOrder[i] != -1) ? theme.primaryContainer : theme.primary, borderRadius: BorderRadius.circular(10)),
+                                child: Center(
+                                  child: (correctOrder.length >= i && correctOrder[i] != -1)
+                                      ? Text(
+                                          draggables[correctOrder[i]],
+                                          style: textTheme.displaySmall,
+                                        )
+                                      : Text("Order #${i + 1}", style: textTheme.displaySmall),
+                                ),
                               ),
                             ),
                             Align(

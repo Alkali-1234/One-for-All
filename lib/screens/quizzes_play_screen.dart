@@ -1110,6 +1110,8 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
     // });
   }
 
+  bool dragging = false;
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -1162,6 +1164,12 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
               children: [
                 for (var answer in widget.question.answers) ...[
                   Draggable<int>(
+                    onDragStarted: () => setState(() {
+                      dragging = true;
+                    }),
+                    onDragEnd: (details) => setState(() {
+                      dragging = false;
+                    }),
                     data: widget.question.answers.indexOf(answer),
                     feedback: Container(
                       decoration: BoxDecoration(
@@ -1209,23 +1217,32 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
                       const SizedBox(height: 10),
                       DragTarget<int>(
                         builder: (context, candidateData, rejectedData) {
-                          return Container(
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            padding: dragging ? const EdgeInsets.all(4) : const EdgeInsets.all(5),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: !showAnswers
-                                  ? theme.primaryContainer
-                                  : widget.question.correctAnswer[i] == selectedAnswers[i]
-                                      ? Colors.green
-                                      : Colors.red,
+                              borderRadius: BorderRadius.circular(15),
+                              color: Colors.transparent,
+                              border: dragging ? Border.all(color: theme.onBackground.withOpacity(0.25), width: 1) : null,
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                              child: selectedAnswers.length > i && selectedAnswers[i] != -1
-                                  ? Text(
-                                      widget.question.answers[selectedAnswers[i]],
-                                      style: textTheme.displaySmall,
-                                    )
-                                  : Text("Order #${i + 1}", style: textTheme.displaySmall),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: !showAnswers
+                                    ? theme.primaryContainer
+                                    : widget.question.correctAnswer[i] == selectedAnswers[i]
+                                        ? Colors.green
+                                        : Colors.red,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                                child: selectedAnswers.length > i && selectedAnswers[i] != -1
+                                    ? Text(
+                                        widget.question.answers[selectedAnswers[i]],
+                                        style: textTheme.displaySmall,
+                                      )
+                                    : Text("Order #${i + 1}", style: textTheme.displaySmall),
+                              ),
                             ),
                           );
                         },
