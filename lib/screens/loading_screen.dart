@@ -126,7 +126,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       return;
     }
     setState(() {
-      verbose = "Finished!";
+      verbose = "Finished";
     });
     await Future.delayed(const Duration(seconds: 1));
     pushToPage(const HomePage());
@@ -196,9 +196,18 @@ class _LoadingScreenState extends State<LoadingScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text(
-                            "v0.0.4-pre1",
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          SafeArea(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "v0.0.4-pre2",
+                                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                           SizedBox(height: 10),
                         ],

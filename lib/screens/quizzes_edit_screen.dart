@@ -481,7 +481,12 @@ class _QueryListItemState extends State<QueryListItem> {
                         TweenAnimationBuilder(duration: const Duration(milliseconds: 150), tween: tween, builder: (context, value, child) => Transform.rotate(angle: math.pi * -value, child: Icon(Icons.arrow_drop_down, color: theme.onBackground))),
                       ],
                     ),
-                    title: Text(widget.question.question, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                    title: Text(
+                      widget.question.question,
+                      style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

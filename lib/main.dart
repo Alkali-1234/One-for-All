@@ -1435,7 +1435,11 @@ class MABModal extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             //Replace with actual name
-                            Text(extractFilenameFromUrl(attatchements[index]), style: textTheme.displaySmall),
+                            Text(
+                              extractFilenameFromUrl(attatchements[index]),
+                              style: textTheme.displaySmall,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                             Icon(
                               Icons.download_sharp,
                               color: theme.onSecondary,

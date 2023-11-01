@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 // import 'dart:html';
+import 'package:flutter_shakemywidget/flutter_shakemywidget.dart';
 
 import 'package:animations/animations.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
@@ -284,6 +285,7 @@ class PlayScreenState extends State<PlayScreen> {
   final dropdownKey = GlobalKey<_DropdownQuestionState>();
   final multipleChoiceKey = GlobalKey<_MultipleChoiceState>();
   final comboCounterKey = GlobalKey<ComboCounterState>();
+  final shakeKey = GlobalKey<ShakeWidgetState>();
 
   void nextQuestion(bool correct, int score, QuizQuestion question) async {
     if (!mounted) return;
@@ -293,6 +295,9 @@ class PlayScreenState extends State<PlayScreen> {
     // if (correct) audioPlayer.setSpeed(1 + (comboCounterKey.currentState!.counter / 30));
     if (!correct) comboCounterKey.currentState!.resetComboCount();
     // if (!correct) audioPlayer.setSpeed(1);
+
+    //* shake if right
+    if (correct && comboCounterKey.currentState!.counter >= 5) shakeKey.currentState!.shake();
 
     //* If counter is not 0, and is a multiple of 10 or it is 5, flash combo
     if (comboCounterKey.currentState!.counter != 0 && (comboCounterKey.currentState!.counter % 10 == 0 || comboCounterKey.currentState!.counter == 5)) await showDialog(context: context, builder: (context) => FlashComboModal(number: comboCounterKey.currentState!.counter), barrierDismissible: false);
@@ -486,175 +491,181 @@ class PlayScreenState extends State<PlayScreen> {
   Widget build(BuildContext context) {
     // var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    return Stack(
-      children: [
-        Column(
-          children: [
-            Expanded(
-              flex: 12,
-              child: Column(
-                children: [
-                  //* Statistics
-                  Row(
-                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      //* Score
-                      Expanded(
-                        flex: 1,
-                        child: TweenAnimationBuilder(
-                            tween: scoreStatTween,
-                            duration: const Duration(milliseconds: 250),
-                            builder: (context, double value, child) {
-                              return Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.star_rounded, color: Colors.yellow),
-                                  const SizedBox(width: 5),
-                                  Text(value.toInt().toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
-                                  const SizedBox(width: 2.5),
-                                  //* + <score add amount> Score animation. Shows when the score increases, goes from being faded from above, to being faded out to the bottom
-                                  TweenAnimationBuilder(
-                                    tween: scoreStatAddTween,
-                                    duration: const Duration(milliseconds: 250),
-                                    builder: (context, value, child) {
-                                      return Opacity(opacity: 1 - value, child: Transform.translate(offset: Offset(0, -value), child: child));
-                                    },
-                                    child: Text("+${scoreBeingAdded.toString()}", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.green)),
-                                  )
-                                ],
-                              );
-                            }),
-                      ),
-                      //* Time Elapsed
-                      Expanded(
-                        flex: 1,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.timer_rounded, color: Colors.grey),
-                            const SizedBox(width: 5),
-                            Text(formatSeconds(elapsedTime), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      ),
-                      //* Combo counter
-                      Flexible(flex: 1, child: ComboCounter(key: comboCounterKey, theme: Theme.of(context).colorScheme)),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    //* Animation
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
-                      transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
-                      child: TweenAnimationBuilder(
-                        tween: questionTransitionTween,
-                        duration: const Duration(milliseconds: 150),
-                        builder: (context, double value, child) {
-                          return Opacity(opacity: value, child: child);
-                        },
-                        child: Column(
-                          children: [
-                            //* Question image
-                            currentQuestion.imagePath != null && currentQuestion.imagePath!.isNotEmpty
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: InkWell(
-                                      highlightColor: Colors.transparent,
-                                      splashColor: Theme.of(context).colorScheme.onBackground.withOpacity(0.125),
-                                      onTap: () {
-                                        showDialog(context: context, builder: (context) => ViewImageDialog(currentQuestion: currentQuestion, textTheme: textTheme));
+    return ShakeMe(
+      key: shakeKey,
+      shakeOffset: 10,
+      shakeCount: 3,
+      shakeDuration: const Duration(milliseconds: 200),
+      child: Stack(
+        children: [
+          Column(
+            children: [
+              Expanded(
+                flex: 12,
+                child: Column(
+                  children: [
+                    //* Statistics
+                    Row(
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        //* Score
+                        Expanded(
+                          flex: 1,
+                          child: TweenAnimationBuilder(
+                              tween: scoreStatTween,
+                              duration: const Duration(milliseconds: 250),
+                              builder: (context, double value, child) {
+                                return Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.star_rounded, color: Colors.yellow),
+                                    const SizedBox(width: 5),
+                                    Text(value.toInt().toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                                    const SizedBox(width: 2.5),
+                                    //* + <score add amount> Score animation. Shows when the score increases, goes from being faded from above, to being faded out to the bottom
+                                    TweenAnimationBuilder(
+                                      tween: scoreStatAddTween,
+                                      duration: const Duration(milliseconds: 250),
+                                      builder: (context, value, child) {
+                                        return Opacity(opacity: 1 - value, child: Transform.translate(offset: Offset(0, -value), child: child));
                                       },
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 3,
-                                            child: Container(
-                                              height: 200,
-                                              //width: Image.file(File(currentQuestion.imagePath!)). .width!.toDouble() / Image.file(File(currentQuestion.imagePath!)).height!.toDouble() * 200,
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(10),
-                                                border: Border.all(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.25)),
-                                                image: DecorationImage(image: FileImage(File(currentQuestion.imagePath!)), fit: BoxFit.cover),
+                                      child: Text("+${scoreBeingAdded.toString()}", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.green)),
+                                    )
+                                  ],
+                                );
+                              }),
+                        ),
+                        //* Time Elapsed
+                        Expanded(
+                          flex: 1,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.timer_rounded, color: Colors.grey),
+                              const SizedBox(width: 5),
+                              Text(formatSeconds(elapsedTime), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                        //* Combo counter
+                        Flexible(flex: 1, child: ComboCounter(key: comboCounterKey, theme: Theme.of(context).colorScheme)),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      //* Animation
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+                        child: TweenAnimationBuilder(
+                          tween: questionTransitionTween,
+                          duration: const Duration(milliseconds: 150),
+                          builder: (context, double value, child) {
+                            return Opacity(opacity: value, child: child);
+                          },
+                          child: Column(
+                            children: [
+                              //* Question image
+                              currentQuestion.imagePath != null && currentQuestion.imagePath!.isNotEmpty
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: InkWell(
+                                        highlightColor: Colors.transparent,
+                                        splashColor: Theme.of(context).colorScheme.onBackground.withOpacity(0.125),
+                                        onTap: () {
+                                          showDialog(context: context, builder: (context) => ViewImageDialog(currentQuestion: currentQuestion, textTheme: textTheme));
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 3,
+                                              child: Container(
+                                                height: 200,
+                                                //width: Image.file(File(currentQuestion.imagePath!)). .width!.toDouble() / Image.file(File(currentQuestion.imagePath!)).height!.toDouble() * 200,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  border: Border.all(color: Theme.of(context).colorScheme.onBackground.withOpacity(0.25)),
+                                                  image: DecorationImage(image: FileImage(File(currentQuestion.imagePath!)), fit: BoxFit.cover),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          Expanded(flex: 1, child: Center(child: Text("Tap to view image", textAlign: TextAlign.center, style: textTheme.displaySmall))),
-                                        ],
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Expanded(flex: 1, child: Center(child: Text("Tap to view image", textAlign: TextAlign.center, style: textTheme.displaySmall))),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                : const SizedBox.shrink(),
-                            Expanded(
-                              child: showInfinityModeDialog
-                                  ? InfinityModeDialog(putResult: (value) => setState(() => infinityMode = value))
-                                  : currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
-                                      ? MultipleChoice(
-                                          question: currentQuestion,
-                                          nextQuestionFunction: nextQuestion,
-                                          doAnimationFunction: doNextQuestionAnimations,
-                                          key: multipleChoiceKey,
-                                          toggleShowingAnswers: () => setState(
-                                                () => showingAnswers = !showingAnswers,
-                                              ))
-                                      : currentQuestion.type == quizTypes.dropdown
-                                          ? DropdownQuestion(
-                                              key: dropdownKey,
-                                              question: currentQuestion,
-                                              nextQuestionFunction: nextQuestion,
-                                              doAnimationFunction: doNextQuestionAnimations,
-                                              toggleShowingAnswers: () => setState(
-                                                    () => showingAnswers = !showingAnswers,
-                                                  ))
-                                          : currentQuestion.type == quizTypes.reorder
-                                              ? ReorderQuestion(
-                                                  key: reorderKey,
-                                                  question: currentQuestion,
-                                                  nextQuestionFunction: nextQuestion,
-                                                  doAnimationFunction: doNextQuestionAnimations,
-                                                  toggleShowingAnswers: () => setState(
-                                                        () => showingAnswers = !showingAnswers,
-                                                      ))
-                                              : const Placeholder(),
-                            ),
-                          ],
+                                    )
+                                  : const SizedBox.shrink(),
+                              Expanded(
+                                child: showInfinityModeDialog
+                                    ? InfinityModeDialog(putResult: (value) => setState(() => infinityMode = value))
+                                    : currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
+                                        ? MultipleChoice(
+                                            question: currentQuestion,
+                                            nextQuestionFunction: nextQuestion,
+                                            doAnimationFunction: doNextQuestionAnimations,
+                                            key: multipleChoiceKey,
+                                            toggleShowingAnswers: () => setState(
+                                                  () => showingAnswers = !showingAnswers,
+                                                ))
+                                        : currentQuestion.type == quizTypes.dropdown
+                                            ? DropdownQuestion(
+                                                key: dropdownKey,
+                                                question: currentQuestion,
+                                                nextQuestionFunction: nextQuestion,
+                                                doAnimationFunction: doNextQuestionAnimations,
+                                                toggleShowingAnswers: () => setState(
+                                                      () => showingAnswers = !showingAnswers,
+                                                    ))
+                                            : currentQuestion.type == quizTypes.reorder
+                                                ? ReorderQuestion(
+                                                    key: reorderKey,
+                                                    question: currentQuestion,
+                                                    nextQuestionFunction: nextQuestion,
+                                                    doAnimationFunction: doNextQuestionAnimations,
+                                                    toggleShowingAnswers: () => setState(
+                                                          () => showingAnswers = !showingAnswers,
+                                                        ))
+                                                : const Placeholder(),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            infinityMode == true
-                ? SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red, elevation: 0, foregroundColor: Colors.white),
-                        onPressed: () => {
-                              setState(() => infinityMode = false),
-                              endSequence(true)
-                            },
-                        child: const Text("Finish")),
-                  )
-                : const Expanded(flex: 0, child: SizedBox.shrink())
-          ],
-        ),
-        //* Gradient showing green if correct and red if incorrect
-        // showingAnswers
-        //     ? Container(
-        //         decoration: BoxDecoration(
-        //             gradient: LinearGradient(
-        //           begin: Alignment.topCenter,
-        //           end: Alignment.bottomCenter,
-        //           colors: gradientColors,
-        //         )),
-        //       )
-        //     : const SizedBox.shrink()
-      ],
+              infinityMode == true
+                  ? SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red, elevation: 0, foregroundColor: Colors.white),
+                          onPressed: () => {
+                                setState(() => infinityMode = false),
+                                endSequence(true)
+                              },
+                          child: const Text("Finish")),
+                    )
+                  : const Expanded(flex: 0, child: SizedBox.shrink())
+            ],
+          ),
+          //* Gradient showing green if correct and red if incorrect
+          // showingAnswers
+          //     ? Container(
+          //         decoration: BoxDecoration(
+          //             gradient: LinearGradient(
+          //           begin: Alignment.topCenter,
+          //           end: Alignment.bottomCenter,
+          //           colors: gradientColors,
+          //         )),
+          //       )
+          //     : const SizedBox.shrink()
+        ],
+      ),
     );
   }
 }
@@ -681,7 +692,7 @@ class _ViewImageDialogState extends State<ViewImageDialog> {
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 2), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
@@ -713,15 +724,17 @@ class _ViewImageDialogState extends State<ViewImageDialog> {
             ),
           ),
           const SizedBox(height: 10),
-          Row(
-            children: [
-              Text("Use two fingers to zoom in and out", style: widget.textTheme.displaySmall),
-              const SizedBox(
-                width: 5,
-              ),
-              Icon(Icons.pinch, size: 14, color: Theme.of(context).colorScheme.onBackground)
-            ],
-          ),
+          showHintText
+              ? Row(
+                  children: [
+                    Text("Use two fingers to zoom in and out", style: widget.textTheme.displaySmall),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Icon(Icons.pinch, size: 14, color: Theme.of(context).colorScheme.onBackground)
+                  ],
+                )
+              : const SizedBox.shrink(),
         ],
       ),
     );
