@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:oneforall/screens/calendar_screen.dart';
 import 'package:oneforall/screens/flashcards_screen.dart';
 import 'package:oneforall/screens/forum_screen.dart';
+import 'package:oneforall/screens/information_screen.dart';
 import 'package:oneforall/screens/mab_lac_screen.dart';
 import 'package:oneforall/screens/premium_screen.dart';
 import 'package:oneforall/screens/quizzes_screen.dart';
@@ -483,6 +484,13 @@ class MenuSelection extends StatelessWidget {
                                     currentTheme: Theme.of(context),
                                   )));
                     }),
+                DrawerItem(
+                    icon: Icons.info,
+                    title: "Information",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const InformationScreen()));
+                    })
               ],
             ),
           ),
