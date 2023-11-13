@@ -261,9 +261,12 @@ Future joinCommunity(String communityID, String password) async {
   if (getUserAuth == null) {
     throw Exception("User is not authenticated");
   }
+  //* User
+  User user = FirebaseAuth.instance.currentUser!;
+
   FirebaseFirestore.instance.collection("communities").doc(communityID).update({
     "members": FieldValue.arrayUnion([
-      getUserAuth.uid
+      user.uid
     ])
   });
 

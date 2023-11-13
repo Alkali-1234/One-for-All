@@ -295,36 +295,45 @@ class _HomePageState extends State<HomePage> {
             //END OF MAIN CONTENT
 
             //Bottom Nav Bar
-            BottomNavigationBar(
-              showSelectedLabels: false,
-              showUnselectedLabels: false,
-              backgroundColor: theme.secondary,
-              elevation: 0,
-              items: [
-                BottomNavigationBarItem(
-                    icon: Icon(
-                      selectedScreen == 0 ? Icons.home_rounded : Icons.home_outlined,
-                      color: theme.onPrimary,
-                    ),
-                    label: "Home",
-                    tooltip: "Home"),
-                // BottomNavigationBarItem(
-                //   icon: Icon(
-                //     selectedScreen == 1 ? Icons.grid_view_rounded : Icons.grid_view_outlined,
-                //     color: theme.onPrimary,
-                //   ),
-                //   label: "Navigation",
-                // ),
-                BottomNavigationBarItem(
-                    icon: Icon(
-                      selectedScreen == 1 ? Icons.person_rounded : Icons.person_outline,
-                      color: theme.onPrimary,
-                    ),
-                    label: "Profile",
-                    tooltip: "Profile"),
-              ],
-              onTap: (index) => setSelectedScreen(index),
-              currentIndex: selectedScreen,
+            SafeArea(
+              top: false,
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  child: BottomNavigationBar(
+                    showSelectedLabels: false,
+                    showUnselectedLabels: false,
+                    backgroundColor: theme.secondary,
+                    elevation: 0,
+                    items: [
+                      BottomNavigationBarItem(
+                          icon: Icon(
+                            selectedScreen == 0 ? Icons.home_rounded : Icons.home_outlined,
+                            color: theme.onPrimary,
+                          ),
+                          label: "Home",
+                          tooltip: "Home"),
+                      // BottomNavigationBarItem(
+                      //   icon: Icon(
+                      //     selectedScreen == 1 ? Icons.grid_view_rounded : Icons.grid_view_outlined,
+                      //     color: theme.onPrimary,
+                      //   ),
+                      //   label: "Navigation",
+                      // ),
+                      BottomNavigationBarItem(
+                          icon: Icon(
+                            selectedScreen == 1 ? Icons.person_rounded : Icons.person_outline,
+                            color: theme.onPrimary,
+                          ),
+                          label: "Profile",
+                          tooltip: "Profile"),
+                    ],
+                    onTap: (index) => setSelectedScreen(index),
+                    currentIndex: selectedScreen,
+                  ),
+                ),
+              ),
             )
           ]),
         ),
@@ -611,279 +620,280 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 8),
               //Widget Content
-              Container(
-                decoration: BoxDecoration(
-                    color: theme.primaryContainer,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: theme.secondary,
-                      width: 1,
-                    )),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      //Filters
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          //Filter 1 (ALL)
-                          Column(
-                            children: [
-                              Container(
-                                height: 38,
-                                width: MediaQuery.of(context).size.width * 0.29,
-                                decoration: BoxDecoration(
-                                    //Bit spaghetti but it works
-                                    //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
-                                    borderRadius: BorderRadius.circular(10),
-                                    gradient: MABSelectedFilter == 0 ? getPrimaryGradient : null,
-                                    boxShadow: MABSelectedFilter == 0
-                                        ? [
-                                            const BoxShadow(
-                                              color: Colors.black,
-                                              blurRadius: 2,
-                                              offset: Offset(0, 2),
-                                            )
-                                          ]
-                                        : null,
-                                    color: MABSelectedFilter == 0 ? null : theme.secondary),
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      shadowColor: Colors.transparent,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                    onPressed: () => {
-                                          setMABSelectedFilter(0)
-                                        },
-                                    child: FittedBox(
-                                      child: Text(
-                                        "All",
-                                        style: textTheme.displaySmall!.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    )),
-                              ),
-                              SizedBox(height: MABSelectedFilter == 0 ? 2 : 0),
-                            ],
-                          ),
-                          //Filter 2 (Announcements)
-                          Column(
-                            children: [
-                              Container(
-                                height: 38,
-                                width: MediaQuery.of(context).size.width * 0.29,
-                                decoration: BoxDecoration(
-                                    //Bit spaghetti but it works
-                                    //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
-                                    borderRadius: BorderRadius.circular(10),
-                                    gradient: MABSelectedFilter == 1 ? getPrimaryGradient : null,
-                                    boxShadow: MABSelectedFilter == 1
-                                        ? [
-                                            const BoxShadow(
-                                              color: Colors.black,
-                                              blurRadius: 2,
-                                              offset: Offset(0, 2),
-                                            )
-                                          ]
-                                        : null,
-                                    color: MABSelectedFilter == 1 ? null : theme.secondary),
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: theme.primaryContainer,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: theme.secondary,
+                        width: 1,
+                      )),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        //Filters
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            //Filter 1 (ALL)
+                            Column(
+                              children: [
+                                Container(
+                                  height: 38,
+                                  width: MediaQuery.of(context).size.width * 0.29,
+                                  decoration: BoxDecoration(
+                                      //Bit spaghetti but it works
+                                      //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
+                                      borderRadius: BorderRadius.circular(10),
+                                      gradient: MABSelectedFilter == 0 ? getPrimaryGradient : null,
+                                      boxShadow: MABSelectedFilter == 0
+                                          ? [
+                                              const BoxShadow(
+                                                color: Colors.black,
+                                                blurRadius: 2,
+                                                offset: Offset(0, 2),
+                                              )
+                                            ]
+                                          : null,
+                                      color: MABSelectedFilter == 0 ? null : theme.secondary),
+                                  child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.transparent,
-                                        foregroundColor: theme.onSecondary,
                                         shadowColor: Colors.transparent,
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(10),
-                                        )),
-                                    onPressed: () => setMABSelectedFilter(1),
-                                    child: FittedBox(
-                                      child: Text(
-                                        "Announces",
-                                        style: textTheme.displaySmall!.copyWith(
-                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                    )),
-                              ),
-                              SizedBox(height: MABSelectedFilter == 1 ? 2 : 0),
-                            ],
-                          ),
-
-                          Column(
-                            children: [
-                              Container(
-                                height: 38,
-                                width: MediaQuery.of(context).size.width * 0.29,
-                                decoration: BoxDecoration(
-                                    //Bit spaghetti but it works
-                                    //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
-                                    borderRadius: BorderRadius.circular(10),
-                                    gradient: MABSelectedFilter == 2 ? getPrimaryGradient : null,
-                                    boxShadow: MABSelectedFilter == 2
-                                        ? [
-                                            const BoxShadow(
-                                              color: Colors.black,
-                                              blurRadius: 2,
-                                              offset: Offset(0, 2),
-                                            )
-                                          ]
-                                        : null,
-                                    color: MABSelectedFilter == 2 ? null : theme.secondary),
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        foregroundColor: theme.onSecondary,
-                                        shadowColor: Colors.transparent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        )),
-                                    onPressed: () => setMABSelectedFilter(2),
-                                    child: FittedBox(
-                                      child: Text(
-                                        "Tasks",
-                                        style: textTheme.displaySmall!.copyWith(
-                                          fontWeight: FontWeight.bold,
+                                      onPressed: () => {
+                                            setMABSelectedFilter(0)
+                                          },
+                                      child: FittedBox(
+                                        child: Text(
+                                          "All",
+                                          style: textTheme.displaySmall!.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                      ),
-                                    )),
-                              ),
-                              SizedBox(height: MABSelectedFilter == 2 ? 2 : 0),
-                            ],
-                          ),
-                        ],
-                      ),
+                                      )),
+                                ),
+                                SizedBox(height: MABSelectedFilter == 0 ? 2 : 0),
+                              ],
+                            ),
+                            //Filter 2 (Announcements)
+                            Column(
+                              children: [
+                                Container(
+                                  height: 38,
+                                  width: MediaQuery.of(context).size.width * 0.29,
+                                  decoration: BoxDecoration(
+                                      //Bit spaghetti but it works
+                                      //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
+                                      borderRadius: BorderRadius.circular(10),
+                                      gradient: MABSelectedFilter == 1 ? getPrimaryGradient : null,
+                                      boxShadow: MABSelectedFilter == 1
+                                          ? [
+                                              const BoxShadow(
+                                                color: Colors.black,
+                                                blurRadius: 2,
+                                                offset: Offset(0, 2),
+                                              )
+                                            ]
+                                          : null,
+                                      color: MABSelectedFilter == 1 ? null : theme.secondary),
+                                  child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          foregroundColor: theme.onSecondary,
+                                          shadowColor: Colors.transparent,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          )),
+                                      onPressed: () => setMABSelectedFilter(1),
+                                      child: FittedBox(
+                                        child: Text(
+                                          "Announces",
+                                          style: textTheme.displaySmall!.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      )),
+                                ),
+                                SizedBox(height: MABSelectedFilter == 1 ? 2 : 0),
+                              ],
+                            ),
 
-                      Divider(
-                        color: theme.onPrimary,
-                        thickness: 1,
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.17,
-                        child: StreamBuilder(
-                            initialData: null,
-                            stream: mabDataStream,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return Center(
-                                  child: Text("Loading MAB data...", style: textTheme.displaySmall!),
-                                );
-                              }
+                            Column(
+                              children: [
+                                Container(
+                                  height: 38,
+                                  width: MediaQuery.of(context).size.width * 0.29,
+                                  decoration: BoxDecoration(
+                                      //Bit spaghetti but it works
+                                      //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
+                                      borderRadius: BorderRadius.circular(10),
+                                      gradient: MABSelectedFilter == 2 ? getPrimaryGradient : null,
+                                      boxShadow: MABSelectedFilter == 2
+                                          ? [
+                                              const BoxShadow(
+                                                color: Colors.black,
+                                                blurRadius: 2,
+                                                offset: Offset(0, 2),
+                                              )
+                                            ]
+                                          : null,
+                                      color: MABSelectedFilter == 2 ? null : theme.secondary),
+                                  child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          foregroundColor: theme.onSecondary,
+                                          shadowColor: Colors.transparent,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          )),
+                                      onPressed: () => setMABSelectedFilter(2),
+                                      child: FittedBox(
+                                        child: Text(
+                                          "Tasks",
+                                          style: textTheme.displaySmall!.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      )),
+                                ),
+                                SizedBox(height: MABSelectedFilter == 2 ? 2 : 0),
+                              ],
+                            ),
+                          ],
+                        ),
 
-                              if (snapshot.hasError) {
-                                return Center(
-                                  child: Text(
-                                    "Error loading MAB data ${snapshot.error}",
-                                    style: textTheme.displaySmall!.copyWith(color: theme.error),
-                                  ),
-                                );
-                              }
+                        Divider(
+                          color: theme.onPrimary,
+                          thickness: 1,
+                        ),
+                        Expanded(
+                          child: StreamBuilder(
+                              initialData: null,
+                              stream: mabDataStream,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Center(
+                                    child: Text("Loading MAB data...", style: textTheme.displaySmall!),
+                                  );
+                                }
 
-                              if (!snapshot.hasData) {
-                                return Center(
-                                  child: Text(
-                                    "No MAB data",
-                                    style: textTheme.displaySmall!.copyWith(color: theme.error),
-                                  ),
-                                );
-                              }
-                              MabData mabData = MabData(uid: 0, posts: [
-                                for (var post in snapshot.data!.docs)
-                                  MabPost(
-                                      uid: 0,
-                                      title: post["title"],
-                                      description: post["description"],
-                                      date: DateTime.parse(post["date"].toDate().toString()),
-                                      authorUID: 0,
-                                      image: post["image"] ?? "",
-                                      fileAttatchments: [
-                                        for (String file in post["files"]) file
-                                      ],
-                                      dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
-                                      type: post["type"],
-                                      subject: post["subject"])
-                              ]);
-                              return ListView.builder(
-                                padding: EdgeInsets.zero,
-                                itemCount: mabData.posts.length,
-                                itemBuilder: (context, index) {
-                                  MabPost post = mabData.posts[index];
-                                  return AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 100),
-                                    transitionBuilder: (child, animation) => FadeTransition(
-                                      opacity: animation,
-                                      child: child,
+                                if (snapshot.hasError) {
+                                  return Center(
+                                    child: Text(
+                                      "Error loading MAB data ${snapshot.error}",
+                                      style: textTheme.displaySmall!.copyWith(color: theme.error),
                                     ),
-                                    child: MABSelectedFilter == 0 || post.type == MABSelectedFilter
-                                        ? Padding(
-                                            padding: const EdgeInsets.only(bottom: 5.0),
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                side: BorderSide(color: theme.secondary, width: 1),
-                                                padding: const EdgeInsets.all(8),
-                                                backgroundColor: theme.secondary,
-                                                foregroundColor: theme.onSecondary,
-                                                shadowColor: Colors.black,
-                                                elevation: 0,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(10),
+                                  );
+                                }
+
+                                if (!snapshot.hasData) {
+                                  return Center(
+                                    child: Text(
+                                      "No MAB data",
+                                      style: textTheme.displaySmall!.copyWith(color: theme.error),
+                                    ),
+                                  );
+                                }
+                                MabData mabData = MabData(uid: 0, posts: [
+                                  for (var post in snapshot.data!.docs)
+                                    MabPost(
+                                        uid: 0,
+                                        title: post["title"],
+                                        description: post["description"],
+                                        date: DateTime.parse(post["date"].toDate().toString()),
+                                        authorUID: 0,
+                                        image: post["image"] ?? "",
+                                        fileAttatchments: [
+                                          for (String file in post["files"]) file
+                                        ],
+                                        dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
+                                        type: post["type"],
+                                        subject: post["subject"])
+                                ]);
+                                return ListView.builder(
+                                  padding: EdgeInsets.zero,
+                                  itemCount: mabData.posts.length,
+                                  itemBuilder: (context, index) {
+                                    MabPost post = mabData.posts[index];
+                                    return AnimatedSwitcher(
+                                      duration: const Duration(milliseconds: 100),
+                                      transitionBuilder: (child, animation) => FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      ),
+                                      child: MABSelectedFilter == 0 || post.type == MABSelectedFilter
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(bottom: 5.0),
+                                              child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  side: BorderSide(color: theme.secondary, width: 1),
+                                                  padding: const EdgeInsets.all(8),
+                                                  backgroundColor: theme.secondary,
+                                                  foregroundColor: theme.onSecondary,
+                                                  shadowColor: Colors.black,
+                                                  elevation: 0,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                  ),
+                                                ),
+                                                onPressed: () => {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (context) => MABModal(
+                                                            title: post.title,
+                                                            description: post.description,
+                                                            image: post.image,
+                                                            attatchements: post.fileAttatchments,
+                                                          ))
+                                                },
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    SizedBox(
+                                                      width: MediaQuery.of(context).size.width * 0.5,
+                                                      height: 30,
+                                                      child: FittedBox(
+                                                        child: Text(
+                                                          post.title,
+                                                          style: textTheme.displaySmall!.copyWith(
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                          textAlign: TextAlign.left,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    ClipRRect(
+                                                      borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                                                      child: Container(
+                                                        color: theme.secondary,
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.all(6.0),
+                                                          child: Text(
+                                                            //days left due, and the day it is due
+                                                            "${post.dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(post.dueDate)})",
+                                                            style: textTheme.displaySmall,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
                                                 ),
                                               ),
-                                              onPressed: () => {
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (context) => MABModal(
-                                                          title: post.title,
-                                                          description: post.description,
-                                                          image: post.image,
-                                                          attatchements: post.fileAttatchments,
-                                                        ))
-                                              },
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  SizedBox(
-                                                    width: MediaQuery.of(context).size.width * 0.5,
-                                                    height: 30,
-                                                    child: FittedBox(
-                                                      child: Text(
-                                                        post.title,
-                                                        style: textTheme.displaySmall!.copyWith(
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
-                                                        textAlign: TextAlign.left,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  ClipRRect(
-                                                    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                                                    child: Container(
-                                                      color: theme.secondary,
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.all(6.0),
-                                                        child: Text(
-                                                          //days left due, and the day it is due
-                                                          "${post.dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(post.dueDate)})",
-                                                          style: textTheme.displaySmall,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          )
-                                        : const SizedBox.shrink(),
-                                  );
-                                },
-                              );
-                            }),
-                      ),
-                    ],
+                                            )
+                                          : const SizedBox.shrink(),
+                                    );
+                                  },
+                                );
+                              }),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

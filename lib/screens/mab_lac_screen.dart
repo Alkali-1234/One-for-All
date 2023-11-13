@@ -897,7 +897,7 @@ class ListItem extends StatelessWidget {
       children: [
         ListTile(
           onTap: () => showBottomSheet(context: context, builder: (context) => MABModal(title: title, description: description, image: image, attatchements: attatchements)),
-          leading: Icon(type == 0 ? Icons.announcement_rounded : Icons.task, color: theme.onBackground),
+          leading: Icon(type == 1 ? Icons.announcement_rounded : Icons.task, color: theme.onBackground),
           title: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -964,6 +964,9 @@ class _MABModalState extends State<MABModal> with SingleTickerProviderStateMixin
     }
 
     return BottomSheet(
+      showDragHandle: true,
+      dragHandleColor: theme.secondary,
+      constraints: BoxConstraints.expand(height: MediaQuery.of(context).size.height * 0.9),
       enableDrag: true,
       animationController: BottomSheet.createAnimationController(this),
       backgroundColor: theme.background,
@@ -1071,7 +1074,7 @@ class _MABModalState extends State<MABModal> with SingleTickerProviderStateMixin
                       ),
                     );
                   }),
-              const SizedBox(height: 16),
+              const Spacer(),
               //Back button
               Container(
                 height: 40,

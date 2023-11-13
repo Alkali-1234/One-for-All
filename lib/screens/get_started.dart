@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -93,28 +94,398 @@ class SettingsConfigurationScreen extends StatefulWidget {
 }
 
 class _SettingsConfigurationScreenState extends State<SettingsConfigurationScreen> {
+  int selectedTheme = 0;
+
+  bool changedNotifSettings = false;
+  Map<String, bool> notificationSettings = {
+    "MAB": true,
+    "LAC": true,
+    "RA": true,
+  };
+
+  Future<void> saveSettings() async {
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setInt("theme", selectedTheme);
+    prefs.setBool("notification_settings_MAB", notificationSettings["MAB"]!);
+    prefs.setBool("notification_settings_LAC", notificationSettings["LAC"]!);
+    prefs.setBool("notification_settings_RA", notificationSettings["RA"]!);
+  }
+
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<AppState>();
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     return SafeArea(
         child: Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          children: [
-            Row(children: [
-              Text("3. Configure your settings.", style: textTheme.displayMedium)
-            ]),
-            const SizedBox(height: 50),
-            Container(
-                width: double.infinity,
-                height: 200,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), border: Border.all(color: theme.tertiary, width: 1), color: theme.primary),
-                child: Center(
-                  child: Text("Currently unavailable cuz im too lazy to code it in rn :P You can configure settings later in the settings after setup is complete.", style: textTheme.displaySmall),
-                )),
-          ],
+        Text(
+          "3. Configure your settings.",
+          style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w400),
+        ),
+        SafeArea(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  //* Back button
+                  Column(
+                    children: [
+                      // Row(
+                      //   children: [
+                      //     IconButton(
+                      //       onPressed: () {
+                      //         if (currentLoading != 0) return;
+                      //         if (Theme.of(context) != passedUserTheme) {
+                      //           appState.currentUserSelectedTheme = passedUserTheme;
+                      //         }
+                      //         Navigator.pop(context);
+                      //       },
+                      //       icon: Icon(
+                      //         Icons.arrow_back,
+                      //         color: theme.onBackground,
+                      //       ),
+                      //     ),
+                      //     Text(
+                      //       "Settings",
+                      //       style: textTheme.displayMedium,
+                      //     ),
+                      //   ],
+                      // )
+                      // //* User info card
+                      // Card(
+                      //   color: theme.secondary,
+                      //   elevation: 0,
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.all(16.0),
+                      //     child: Row(
+                      //       mainAxisSize: MainAxisSize.max,
+                      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //       children: [
+                      //         CircleAvatar(
+                      //             radius: 30,
+                      //             backgroundImage: NetworkImage(
+                      //               appState.getCurrentUser.profilePicture == "" ? "https://picsum.photos/200" : appState.getCurrentUser.profilePicture,
+                      //             )),
+                      //         const SizedBox(width: 16.0),
+                      //         Column(
+                      //           mainAxisSize: MainAxisSize.min,
+                      //           children: [
+                      //             Text(
+                      //               appState.getCurrentUser.username,
+                      //               style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+                      //               textAlign: TextAlign.end,
+                      //             ),
+                      //             Text(
+                      //               appState.getCurrentUser.email,
+                      //               style: textTheme.displaySmall,
+                      //               textAlign: TextAlign.end,
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
+
+                      const SizedBox(height: 10),
+                      Text("Theme", style: textTheme.displaySmall),
+                      const SizedBox(height: 10),
+                      //* Theme switch (Great Default Blue, Clean Dark, Bright Light)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedTheme = 0;
+                              });
+                              //* change theme
+                              appState.currentUserSelectedTheme = defaultBlueTheme;
+                            },
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 150),
+                                  height: 50,
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(25),
+                                    border: selectedTheme == 0 ? Border.all(color: theme.onBackground, width: 1) : null,
+                                    gradient: const LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Color.fromRGBO(0, 0, 128, 1.0),
+                                        Color.fromRGBO(0, 11, 53, 1.0)
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text("Blue", style: textTheme.displaySmall!.copyWith(fontWeight: selectedTheme == 0 ? FontWeight.bold : FontWeight.normal)),
+                              ],
+                            ),
+                          ),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedTheme = 1;
+                                  });
+                                  //* change theme
+                                  appState.currentUserSelectedTheme = darkTheme;
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 150),
+                                  height: 50,
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(25),
+                                    border: selectedTheme == 1 ? Border.all(color: theme.onBackground, width: 1) : null,
+                                    gradient: const LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Color.fromRGBO(61, 61, 61, 1.0),
+                                        Color.fromRGBO(2, 2, 2, 1.0)
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text("Dark", style: textTheme.displaySmall!.copyWith(fontWeight: selectedTheme == 1 ? FontWeight.bold : FontWeight.normal)),
+                            ],
+                          ),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedTheme = 2;
+                                  });
+                                  //* change theme
+                                  appState.currentUserSelectedTheme = lightTheme;
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 150),
+                                  height: 50,
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(25),
+                                    border: selectedTheme == 2 ? Border.all(color: theme.onBackground, width: 1) : null,
+                                    gradient: const LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Color.fromRGBO(255, 255, 255, 1.0),
+                                        Color.fromRGBO(103, 103, 103, 1.0)
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text("Light", style: textTheme.displaySmall!.copyWith(fontWeight: selectedTheme == 2 ? FontWeight.bold : FontWeight.normal)),
+                            ],
+                          ),
+                        ],
+                      ),
+
+                      // SizedBox(
+                      //   height: 50,
+                      //   width: double.infinity,
+                      //   child: DefaultTabController(
+                      //     length: _themes.length,
+                      //     child: Builder(builder: (context) {
+                      //       _tabController = DefaultTabController.of(context);
+                      //       _tabController.addListener(() {
+                      //         debugPrint("Selected Index: ${_tabController.index}");
+                      //         if (!_tabController.indexIsChanging) {
+                      //           setState(() {
+                      //             selectedTheme = _tabController.index;
+                      //           });
+                      //           //* change theme
+                      //           switch (_tabController.index) {
+                      //             case 0:
+                      //               setState(() {
+                      //                 appState.currentUserSelectedTheme = defaultBlueTheme;
+                      //               });
+                      //               break;
+                      //             case 1:
+                      //               setState(() {
+                      //                 appState.currentUserSelectedTheme = darkTheme;
+                      //               });
+                      //               break;
+                      //             case 2:
+                      //               setState(() {
+                      //                 appState.currentUserSelectedTheme = lightTheme;
+                      //               });
+                      //               break;
+                      //             default:
+                      //               debugPrint("Invalid theme index");
+                      //           }
+                      //         }
+                      //       });
+                      //       return TabBarView(
+                      //         controller: _tabController,
+                      //         children: _themes
+                      //             .map((Tab tab) => Padding(
+                      //                   padding: const EdgeInsets.symmetric(horizontal: 5),
+                      //                   child: Container(
+                      //                     decoration: BoxDecoration(
+                      //                       color: theme.secondary,
+                      //                       borderRadius: BorderRadius.circular(10),
+                      //                     ),
+                      //                     child: Center(
+                      //                         child: Text(
+                      //                       tab.text!,
+                      //                       style: textTheme.displaySmall,
+                      //                     )),
+                      //                   ),
+                      //                 ))
+                      //             .toList(),
+                      //       );
+                      //     }),
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 5),
+                      // //* Current theme three dots indicator
+                      // SizedBox(
+                      //   height: 10,
+                      //   width: 50,
+                      //   child: Row(
+                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //     children: [
+                      //       Container(
+                      //         height: 10,
+                      //         width: 10,
+                      //         decoration: BoxDecoration(
+                      //           color: selectedTheme == 0 ? theme.onBackground : theme.primaryContainer,
+                      //           borderRadius: BorderRadius.circular(10),
+                      //         ),
+                      //       ),
+                      //       Container(
+                      //         height: 10,
+                      //         width: 10,
+                      //         decoration: BoxDecoration(
+                      //           color: selectedTheme == 1 ? theme.onBackground : theme.primaryContainer,
+                      //           borderRadius: BorderRadius.circular(10),
+                      //         ),
+                      //       ),
+                      //       Container(
+                      //         height: 10,
+                      //         width: 10,
+                      //         decoration: BoxDecoration(
+                      //           color: selectedTheme == 2 ? theme.onBackground : theme.primaryContainer,
+                      //           borderRadius: BorderRadius.circular(10),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      //* Notification settings
+                      const SizedBox(height: 25),
+                      Text("Notification Settings", style: textTheme.displaySmall),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                              flex: 1,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("MAB", style: textTheme.displaySmall),
+                                      Switch(
+                                        value: notificationSettings["MAB"]!,
+                                        onChanged: (value) => setState(() {
+                                          notificationSettings["MAB"] = !notificationSettings["MAB"]!;
+                                          changedNotifSettings = true;
+                                        }),
+                                        activeColor: Colors.green,
+                                        activeTrackColor: Colors.white,
+                                        inactiveThumbColor: Colors.red,
+                                      )
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("LAC", style: textTheme.displaySmall),
+                                      Switch(
+                                        value: notificationSettings["LAC"]!,
+                                        onChanged: (value) => setState(() {
+                                          notificationSettings["LAC"] = !notificationSettings["LAC"]!;
+                                          changedNotifSettings = true;
+                                        }),
+                                        activeColor: Colors.green,
+                                        activeTrackColor: Colors.white,
+                                        inactiveThumbColor: Colors.red,
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              )),
+                          const SizedBox(width: 15),
+                          Flexible(
+                              flex: 1,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Recent Activity", style: textTheme.displaySmall),
+                                      Switch(
+                                        value: notificationSettings["RA"]!,
+                                        onChanged: (value) => setState(() {
+                                          notificationSettings["RA"] = !notificationSettings["RA"]!;
+                                          changedNotifSettings = true;
+                                        }),
+                                        activeColor: Colors.green,
+                                        activeTrackColor: Colors.white,
+                                        inactiveThumbColor: Colors.red,
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Placeholder", style: textTheme.displaySmall),
+                                      Switch(
+                                        value: true,
+                                        onChanged: (value) {},
+                                        activeColor: Colors.green,
+                                        activeTrackColor: Colors.white,
+                                        inactiveThumbColor: Colors.red,
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ))
+                        ],
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
         //* Done button
         Container(
@@ -122,7 +493,8 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
           width: double.infinity,
           decoration: BoxDecoration(gradient: defaultBluePrimaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
           child: ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              await saveSettings();
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, elevation: 0, padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),
