@@ -16,6 +16,7 @@ class FlashcardsEditScreen extends StatefulWidget {
 }
 
 class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
+  //! FIXME when you delete a flashcard, the list is not updated correctly
   Object questionQuery = {
     "queries": []
   };
@@ -74,6 +75,8 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
         "question": "",
         "answer": ""
       });
+      moreOptionsTweens.add(Tween<double>(begin: 0.8, end: 0.1));
+      showMoreOptions.add(false);
     });
   }
 
@@ -82,7 +85,12 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
     super.initState();
     var set = context.read<AppState>().getCurrentUser.flashCardSets[widget.setIndex];
     initializeQueries(set);
+    moreOptionsTweens = List.generate(set.flashcards.length, (index) => Tween<double>(begin: 0.8, end: 0.1));
+    showMoreOptions = List.generate(set.flashcards.length, (index) => false);
   }
+
+  late List<Tween<double>> moreOptionsTweens;
+  late List<bool> showMoreOptions;
 
   @override
   Widget build(BuildContext context) {
@@ -165,102 +173,138 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                     ),
                                   ],
                                 )),
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.65,
+                            Expanded(
                               child: ListView.builder(
                                   physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                                   itemCount: getQuestionQuery["queries"].length,
                                   itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.transparent,
-                                            borderRadius: BorderRadius.circular(10),
-                                            border: Border.all(color: theme.tertiary, width: 1),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Row(
+                                    return LayoutBuilder(builder: (context, consntraints) {
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          color: index % 2 == 0 ? theme.primary : theme.secondary,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            TweenAnimationBuilder<double>(
+                                              tween: moreOptionsTweens[index],
+                                              duration: const Duration(milliseconds: 500),
+                                              builder: (context, value, child) => SizedBox(
+                                                width: consntraints.maxWidth * value,
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
-                                                    Text(
-                                                      "Q",
-                                                      style: textTheme.displayMedium,
-                                                    ),
                                                     const SizedBox(width: 10),
-                                                    //Text Input for question
-                                                    Expanded(
-                                                      child: TextFormField(
-                                                        cursorColor: theme.onPrimary,
-                                                        textAlign: TextAlign.center,
-                                                        initialValue: getQuestionQuery["queries"][index]["question"],
-                                                        decoration: InputDecoration(
-                                                          focusedBorder: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(10),
-                                                            borderSide: BorderSide(color: theme.onBackground, width: 1),
-                                                          ),
-                                                          border: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(10),
-                                                            borderSide: const BorderSide(width: 0, style: BorderStyle.none),
-                                                          ),
-                                                          contentPadding: const EdgeInsets.all(0),
-                                                          hintText: "Enter Question",
-                                                          hintStyle: textTheme.displaySmall,
-                                                          fillColor: theme.primary,
-                                                          filled: true,
-                                                        ),
-                                                        style: textTheme.displaySmall,
-                                                        onChanged: (value) {
-                                                          getQuestionQuery["queries"][index]["question"] = value;
-                                                        },
-                                                      ),
+                                                    AnimatedOpacity(
+                                                      duration: const Duration(milliseconds: 500),
+                                                      opacity: moreOptionsTweens[index].end == 1 ? 1 : 0,
+                                                      child: showMoreOptions[index]
+                                                          ? Column(
+                                                              mainAxisSize: MainAxisSize.min,
+                                                              children: [
+                                                                ElevatedButton.icon(
+                                                                    label: Text("Delete", style: textTheme.displaySmall),
+                                                                    style: ElevatedButton.styleFrom(
+                                                                      backgroundColor: theme.secondary,
+                                                                      shadowColor: Colors.transparent,
+                                                                      elevation: 0,
+                                                                      side: BorderSide(color: theme.tertiary, width: 1),
+                                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                                    ),
+                                                                    onPressed: () => {
+                                                                          setState(
+                                                                            () {
+                                                                              getQuestionQuery["queries"].removeAt(index);
+                                                                              moreOptionsTweens.removeAt(index);
+                                                                              showMoreOptions.removeAt(index);
+                                                                            },
+                                                                          ),
+                                                                        },
+                                                                    icon: const Icon(Icons.delete, color: Colors.red)),
+                                                              ],
+                                                            )
+                                                          : const SizedBox.shrink(),
                                                     ),
+                                                    InkWell(
+                                                      onTap: () async {
+                                                        setState(() {
+                                                          moreOptionsTweens[index].end == 0.1 ? moreOptionsTweens[index] = Tween<double>(begin: 0.1, end: 1) : moreOptionsTweens[index] = Tween<double>(begin: 1, end: 0.1);
+                                                        });
+                                                        if (showMoreOptions[index] == true) {
+                                                          await Future.delayed(const Duration(milliseconds: 500));
+                                                          setState(() {
+                                                            showMoreOptions[index] = false;
+                                                          });
+                                                        } else {
+                                                          setState(() {
+                                                            showMoreOptions[index] = true;
+                                                          });
+                                                        }
+                                                      },
+                                                      child: Transform.flip(flipX: showMoreOptions[index], child: Icon(Icons.chevron_right, color: theme.onBackground)),
+                                                    )
                                                   ],
                                                 ),
-                                                const SizedBox(height: 10),
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "A",
-                                                      style: textTheme.displayMedium,
-                                                    ),
-                                                    const SizedBox(width: 10),
-                                                    Expanded(
-                                                      child: TextFormField(
-                                                        cursorColor: theme.onPrimary,
-                                                        textAlign: TextAlign.center,
-                                                        initialValue: getQuestionQuery["queries"][index]["answer"],
-                                                        decoration: InputDecoration(
-                                                          border: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(10),
-                                                            borderSide: const BorderSide(width: 0, style: BorderStyle.none),
-                                                          ),
-                                                          focusedBorder: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.circular(10),
-                                                            borderSide: BorderSide(color: theme.onBackground, width: 1),
-                                                          ),
-                                                          contentPadding: const EdgeInsets.all(0),
-                                                          hintText: "Enter Question",
-                                                          hintStyle: textTheme.displaySmall,
-                                                          fillColor: theme.primary,
-                                                          filled: true,
-                                                        ),
-                                                        style: textTheme.displaySmall,
-                                                        onChanged: (value) {
-                                                          getQuestionQuery["queries"][index]["answer"] = value;
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
+                                              ),
                                             ),
-                                          )),
-                                    );
+                                            Expanded(
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  TextFormField(
+                                                    cursorColor: theme.onPrimary,
+                                                    textAlign: TextAlign.center,
+                                                    initialValue: getQuestionQuery["queries"][index]["question"],
+                                                    decoration: InputDecoration(
+                                                      focusedBorder: OutlineInputBorder(
+                                                        borderRadius: BorderRadius.zero,
+                                                        borderSide: BorderSide(color: theme.onBackground, width: 1),
+                                                      ),
+                                                      border: OutlineInputBorder(
+                                                        borderRadius: BorderRadius.zero,
+                                                        borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+                                                      ),
+                                                      contentPadding: const EdgeInsets.all(0),
+                                                      hintText: "Question ${index + 1}",
+                                                      hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                                                      // filled: true,
+                                                    ),
+                                                    style: textTheme.displaySmall,
+                                                    onChanged: (value) {
+                                                      getQuestionQuery["queries"][index]["question"] = value;
+                                                    },
+                                                  ),
+                                                  TextFormField(
+                                                    cursorColor: theme.onPrimary,
+                                                    textAlign: TextAlign.center,
+                                                    initialValue: getQuestionQuery["queries"][index]["answer"],
+                                                    decoration: InputDecoration(
+                                                      border: OutlineInputBorder(
+                                                        borderRadius: BorderRadius.zero,
+                                                        borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+                                                      ),
+                                                      focusedBorder: OutlineInputBorder(
+                                                        borderRadius: BorderRadius.zero,
+                                                        borderSide: BorderSide(color: theme.onBackground, width: 1),
+                                                      ),
+                                                      contentPadding: const EdgeInsets.all(0),
+                                                      hintText: "Answer ${index + 1}",
+                                                      hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                                                      // fillColor: theme.primary,
+                                                      // filled: true,
+                                                    ),
+                                                    style: textTheme.displaySmall,
+                                                    onChanged: (value) {
+                                                      getQuestionQuery["queries"][index]["answer"] = value;
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    });
                                   }),
                             ),
                             const Divider(),

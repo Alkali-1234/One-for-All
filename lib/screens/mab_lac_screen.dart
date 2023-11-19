@@ -937,7 +937,7 @@ class MABModal extends StatefulWidget {
   State<MABModal> createState() => _MABModalState();
 }
 
-class _MABModalState extends State<MABModal> with SingleTickerProviderStateMixin {
+class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
   String extractFilenameFromUrl(String url) {
     RegExp regExp = RegExp(r'(?<=cache%2F)[^?]+');
     Match? match = regExp.firstMatch(url);

@@ -613,6 +613,10 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
     return;
   }
 
+  Future<void> setCommunityAsNull(AppState appState) async {
+    widget.changeStep(3);
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -814,9 +818,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () {
-              widget.changeStep(3);
-            },
+            onPressed: () => setCommunityAsNull(context.read<AppState>()),
             style: ElevatedButton.styleFrom(backgroundColor: theme.secondary, shadowColor: Colors.transparent, elevation: 0, side: BorderSide(color: theme.tertiary, width: 1), padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),
             child: Text("I can do this later", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.normal)),
           ),
