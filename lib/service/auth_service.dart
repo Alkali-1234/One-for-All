@@ -15,6 +15,7 @@ import '../data/user_data.dart';
 //ignore: unused_import
 import '../models/quizzes_models.dart';
 import 'community_service.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 get getUserAuth => FirebaseAuth.instance;
 
@@ -171,7 +172,7 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
   final assignedSection = appState.getCurrentUser.assignedSection != "0" ? appState.getCurrentUser.assignedSection![0] : "";
 
   //* initialize FCM
-  await initializeFCM(assignedCommunity, assignedSection);
+  if (kIsWeb == false) await initializeFCM(assignedCommunity, assignedSection);
   //* hasOpenedBefore = true
   prefs.setBool("hasOpenedBefore", true);
   return true;

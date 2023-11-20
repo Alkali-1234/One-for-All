@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -19,6 +19,11 @@ class _InterstitialAdWidgetState extends State<InterstitialAdWidget> {
   final adUnitId = Platform.isAndroid ? 'ca-app-pub-4869371288390264/4176414771' : 'ca-app-pub-3940256099942544/4411468910';
 
   void loadAd() {
+    if (kIsWeb) {
+      widget.onClosed!();
+      return;
+    }
+
     InterstitialAd.load(
         adUnitId: adUnitId,
         request: const AdRequest(),

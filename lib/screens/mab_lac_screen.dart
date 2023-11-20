@@ -103,7 +103,6 @@ class _MABLACScreenState extends State<MABLACScreen> {
               backgroundColor: theme.secondary,
               child: const Icon(Icons.add),
             ),
-            resizeToAvoidBottomInset: false,
             backgroundColor: Colors.transparent,
             body: MainContainer(
               child: Column(
@@ -490,9 +489,6 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                         )),
                                   ]),
                                 ))),
-                        // End of main body
-                        //Ad
-                        const Flexible(flex: 2, child: Center(child: BannerAdWidget())),
                       ]),
                     ),
                   ),

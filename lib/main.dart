@@ -40,6 +40,7 @@ import 'screens/community_screen.dart';
 // import 'screens/navigation_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/loading_screen.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,7 +52,8 @@ void main() async {
   //* Initialize
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // await FlutterDownloader.initialize(debug: true);
-  await MobileAds.instance.initialize();
+  //Init ads if platform is not web
+  if (!kIsWeb) await MobileAds.instance.initialize();
   debugPrint(
     "Initialized app! : ${Firebase.app().options.projectId}",
   );

@@ -16,16 +16,13 @@ class FlashcardsEditScreen extends StatefulWidget {
 }
 
 class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
-  //! FIXME when you delete a flashcard, the list is not updated correctly
-  Object questionQuery = {
+  Map<String, dynamic> questionQuery = {
     "queries": []
   };
 
-  get getQuestionQuery => questionQuery;
-
   void initializeQueries(FlashcardSet set) {
     for (var i = 0; i < set.flashcards.length; i++) {
-      getQuestionQuery["queries"].add({
+      questionQuery["queries"].add({
         "id": set.flashcards[i].id,
         "question": set.flashcards[i].question,
         "answer": set.flashcards[i].answer
@@ -42,7 +39,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
     //* Set the flashcard set to the new flashcard set
     setState(() {
       appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards = List<Flashcard>.empty(growable: true);
-      for (var i in getQuestionQuery["queries"]) {
+      for (var i in questionQuery["queries"]) {
         appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards.add(Flashcard(id: i["id"], question: i["question"], answer: i["answer"]));
       }
     });
@@ -70,8 +67,8 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
 
   void addCard() {
     setState(() {
-      getQuestionQuery["queries"].add({
-        "id": getQuestionQuery["queries"].length,
+      questionQuery["queries"].add({
+        "id": questionQuery["queries"].length,
         "question": "",
         "answer": ""
       });
@@ -91,6 +88,23 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
 
   late List<Tween<double>> moreOptionsTweens;
   late List<bool> showMoreOptions;
+  Future<void> removeQuestion(int index) async {
+    Map<String, dynamic> newQuestionQuery = {
+      "queries": [
+        for (var i = 0; i < questionQuery["queries"].length; i++)
+          if (i != index) questionQuery["queries"][i]
+      ]
+    };
+    setState(() {
+      questionQuery.clear();
+    });
+    await Future.delayed(const Duration(milliseconds: 200));
+    setState(() {
+      questionQuery = newQuestionQuery;
+      moreOptionsTweens.removeAt(index);
+      showMoreOptions.removeAt(index);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +162,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text("Edit Set", style: textTheme.displayMedium),
-                                Text("${getQuestionQuery["queries"].length} Questions", style: textTheme.displayMedium)
+                                Text("${questionQuery["queries"]?.length ?? 0} Questions", style: textTheme.displayMedium)
                               ],
                             ),
                             const SizedBox(height: 10),
@@ -174,138 +188,140 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                   ],
                                 )),
                             Expanded(
-                              child: ListView.builder(
-                                  physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                                  itemCount: getQuestionQuery["queries"].length,
-                                  itemBuilder: (context, index) {
-                                    return LayoutBuilder(builder: (context, consntraints) {
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                          color: index % 2 == 0 ? theme.primary : theme.secondary,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            TweenAnimationBuilder<double>(
-                                              tween: moreOptionsTweens[index],
-                                              duration: const Duration(milliseconds: 500),
-                                              builder: (context, value, child) => SizedBox(
-                                                width: consntraints.maxWidth * value,
-                                                child: Row(
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 100),
+                                transitionBuilder: (Widget child, Animation<double> animation) {
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  );
+                                },
+                                child: ListView.builder(
+                                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                                    itemCount: questionQuery["queries"]?.length ?? 0,
+                                    itemBuilder: (context, index) {
+                                      return LayoutBuilder(builder: (context, consntraints) {
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            color: index % 2 == 0 ? theme.primary : theme.secondary,
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              TweenAnimationBuilder<double>(
+                                                curve: Curves.easeIn,
+                                                tween: moreOptionsTweens[index],
+                                                duration: const Duration(milliseconds: 200),
+                                                builder: (context, value, child) => SizedBox(
+                                                  width: consntraints.maxWidth * value,
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      const SizedBox(width: 10),
+                                                      AnimatedOpacity(
+                                                        duration: const Duration(milliseconds: 200),
+                                                        opacity: moreOptionsTweens[index].end == 1 ? 1 : 0,
+                                                        child: showMoreOptions[index]
+                                                            ? Column(
+                                                                mainAxisSize: MainAxisSize.min,
+                                                                children: [
+                                                                  ElevatedButton.icon(
+                                                                      label: Text("Delete", style: textTheme.displaySmall),
+                                                                      style: ElevatedButton.styleFrom(
+                                                                        backgroundColor: theme.secondary,
+                                                                        shadowColor: Colors.transparent,
+                                                                        elevation: 0,
+                                                                        side: BorderSide(color: theme.tertiary, width: 1),
+                                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                                      ),
+                                                                      onPressed: () => removeQuestion(index),
+                                                                      icon: const Icon(Icons.delete, color: Colors.red)),
+                                                                ],
+                                                              )
+                                                            : const SizedBox.shrink(),
+                                                      ),
+                                                      InkWell(
+                                                        onTap: () async {
+                                                          setState(() {
+                                                            moreOptionsTweens[index].end == 0.1 ? moreOptionsTweens[index] = Tween<double>(begin: 0.1, end: 1) : moreOptionsTweens[index] = Tween<double>(begin: 1, end: 0.1);
+                                                          });
+                                                          if (showMoreOptions[index] == true) {
+                                                            await Future.delayed(const Duration(milliseconds: 200));
+                                                            setState(() {
+                                                              showMoreOptions[index] = false;
+                                                            });
+                                                          } else {
+                                                            setState(() {
+                                                              showMoreOptions[index] = true;
+                                                            });
+                                                          }
+                                                        },
+                                                        child: Transform.flip(flipX: showMoreOptions[index], child: Icon(Icons.chevron_right, color: theme.onBackground)),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Column(
                                                   mainAxisSize: MainAxisSize.min,
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
-                                                    const SizedBox(width: 10),
-                                                    AnimatedOpacity(
-                                                      duration: const Duration(milliseconds: 500),
-                                                      opacity: moreOptionsTweens[index].end == 1 ? 1 : 0,
-                                                      child: showMoreOptions[index]
-                                                          ? Column(
-                                                              mainAxisSize: MainAxisSize.min,
-                                                              children: [
-                                                                ElevatedButton.icon(
-                                                                    label: Text("Delete", style: textTheme.displaySmall),
-                                                                    style: ElevatedButton.styleFrom(
-                                                                      backgroundColor: theme.secondary,
-                                                                      shadowColor: Colors.transparent,
-                                                                      elevation: 0,
-                                                                      side: BorderSide(color: theme.tertiary, width: 1),
-                                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                                                    ),
-                                                                    onPressed: () => {
-                                                                          setState(
-                                                                            () {
-                                                                              getQuestionQuery["queries"].removeAt(index);
-                                                                              moreOptionsTweens.removeAt(index);
-                                                                              showMoreOptions.removeAt(index);
-                                                                            },
-                                                                          ),
-                                                                        },
-                                                                    icon: const Icon(Icons.delete, color: Colors.red)),
-                                                              ],
-                                                            )
-                                                          : const SizedBox.shrink(),
-                                                    ),
-                                                    InkWell(
-                                                      onTap: () async {
-                                                        setState(() {
-                                                          moreOptionsTweens[index].end == 0.1 ? moreOptionsTweens[index] = Tween<double>(begin: 0.1, end: 1) : moreOptionsTweens[index] = Tween<double>(begin: 1, end: 0.1);
-                                                        });
-                                                        if (showMoreOptions[index] == true) {
-                                                          await Future.delayed(const Duration(milliseconds: 500));
-                                                          setState(() {
-                                                            showMoreOptions[index] = false;
-                                                          });
-                                                        } else {
-                                                          setState(() {
-                                                            showMoreOptions[index] = true;
-                                                          });
-                                                        }
+                                                    TextFormField(
+                                                      cursorColor: theme.onPrimary,
+                                                      textAlign: TextAlign.center,
+                                                      initialValue: questionQuery["queries"][index]["question"],
+                                                      decoration: InputDecoration(
+                                                        focusedBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.zero,
+                                                          borderSide: BorderSide(color: theme.onBackground, width: 1),
+                                                        ),
+                                                        border: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.zero,
+                                                          borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+                                                        ),
+                                                        contentPadding: const EdgeInsets.all(0),
+                                                        hintText: "Question ${index + 1}",
+                                                        hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                                                        // filled: true,
+                                                      ),
+                                                      style: textTheme.displaySmall,
+                                                      onChanged: (value) {
+                                                        questionQuery["queries"][index]["question"] = value;
                                                       },
-                                                      child: Transform.flip(flipX: showMoreOptions[index], child: Icon(Icons.chevron_right, color: theme.onBackground)),
-                                                    )
+                                                    ),
+                                                    TextFormField(
+                                                      cursorColor: theme.onPrimary,
+                                                      textAlign: TextAlign.center,
+                                                      initialValue: questionQuery["queries"][index]["answer"],
+                                                      decoration: InputDecoration(
+                                                        border: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.zero,
+                                                          borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+                                                        ),
+                                                        focusedBorder: OutlineInputBorder(
+                                                          borderRadius: BorderRadius.zero,
+                                                          borderSide: BorderSide(color: theme.onBackground, width: 1),
+                                                        ),
+                                                        contentPadding: const EdgeInsets.all(0),
+                                                        hintText: "Answer ${index + 1}",
+                                                        hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                                                        // fillColor: theme.primary,
+                                                        // filled: true,
+                                                      ),
+                                                      style: textTheme.displaySmall,
+                                                      onChanged: (value) {
+                                                        questionQuery["queries"][index]["answer"] = value;
+                                                      },
+                                                    ),
                                                   ],
                                                 ),
                                               ),
-                                            ),
-                                            Expanded(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  TextFormField(
-                                                    cursorColor: theme.onPrimary,
-                                                    textAlign: TextAlign.center,
-                                                    initialValue: getQuestionQuery["queries"][index]["question"],
-                                                    decoration: InputDecoration(
-                                                      focusedBorder: OutlineInputBorder(
-                                                        borderRadius: BorderRadius.zero,
-                                                        borderSide: BorderSide(color: theme.onBackground, width: 1),
-                                                      ),
-                                                      border: OutlineInputBorder(
-                                                        borderRadius: BorderRadius.zero,
-                                                        borderSide: const BorderSide(width: 0, style: BorderStyle.none),
-                                                      ),
-                                                      contentPadding: const EdgeInsets.all(0),
-                                                      hintText: "Question ${index + 1}",
-                                                      hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
-                                                      // filled: true,
-                                                    ),
-                                                    style: textTheme.displaySmall,
-                                                    onChanged: (value) {
-                                                      getQuestionQuery["queries"][index]["question"] = value;
-                                                    },
-                                                  ),
-                                                  TextFormField(
-                                                    cursorColor: theme.onPrimary,
-                                                    textAlign: TextAlign.center,
-                                                    initialValue: getQuestionQuery["queries"][index]["answer"],
-                                                    decoration: InputDecoration(
-                                                      border: OutlineInputBorder(
-                                                        borderRadius: BorderRadius.zero,
-                                                        borderSide: const BorderSide(width: 0, style: BorderStyle.none),
-                                                      ),
-                                                      focusedBorder: OutlineInputBorder(
-                                                        borderRadius: BorderRadius.zero,
-                                                        borderSide: BorderSide(color: theme.onBackground, width: 1),
-                                                      ),
-                                                      contentPadding: const EdgeInsets.all(0),
-                                                      hintText: "Answer ${index + 1}",
-                                                      hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
-                                                      // fillColor: theme.primary,
-                                                      // filled: true,
-                                                    ),
-                                                    style: textTheme.displaySmall,
-                                                    onChanged: (value) {
-                                                      getQuestionQuery["queries"][index]["answer"] = value;
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    });
-                                  }),
+                                            ],
+                                          ),
+                                        );
+                                      });
+                                    }),
+                              ),
                             ),
                             const Divider(),
                             //Save and Cancel Buttons
