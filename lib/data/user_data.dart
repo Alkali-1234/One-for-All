@@ -6,17 +6,7 @@ import '../constants.dart';
 ThemeData passedUserTheme = defaultBlueTheme;
 
 class UserData {
-  UserData(
-      {required this.uid,
-      required this.exp,
-      required this.streak,
-      required this.posts,
-      required this.flashCardSets,
-      required this.username,
-      required this.email,
-      required this.profilePicture,
-      required this.assignedCommunity,
-      required this.assignedSection});
+  UserData({required this.uid, required this.exp, required this.streak, required this.posts, required this.flashCardSets, required this.username, required this.email, required this.profilePicture, required this.assignedCommunity, required this.assignedSection});
 
   final int uid;
   int exp;
@@ -34,12 +24,9 @@ class UserData {
   set setPosts(int posts) => this.posts = posts;
   set setUsername(String username) => this.username = username;
   set setEmail(String email) => this.email = email;
-  set setProfilePicture(String profilePicture) =>
-      this.profilePicture = profilePicture;
-  set setFlashCardSets(List<FlashcardSet> flashCardSets) =>
-      this.flashCardSets = flashCardSets;
-  set addFlashCardSet(FlashcardSet flashCardSet) =>
-      flashCardSets.add(flashCardSet);
+  set setProfilePicture(String profilePicture) => this.profilePicture = profilePicture;
+  set setFlashCardSets(List<FlashcardSet> flashCardSets) => this.flashCardSets = flashCardSets;
+  set addFlashCardSet(FlashcardSet flashCardSet) => flashCardSets.add(flashCardSet);
 }
 
 UserData? userData;
@@ -51,11 +38,7 @@ void setUserData(UserData data) => userData = data;
 get getUserData => userData!;
 
 class FlashcardSet {
-  FlashcardSet(
-      {required this.id,
-      required this.title,
-      required this.description,
-      required this.flashcards});
+  FlashcardSet({required this.id, required this.title, required this.description, required this.flashcards});
 
   final int id;
   String title;
@@ -68,11 +51,13 @@ class Flashcard {
     required this.id,
     required this.question,
     required this.answer,
+    required this.image,
   });
 
   final int id;
   String question;
   String answer;
+  String? image;
 }
 
 //! check if this still throws an error
@@ -86,17 +71,9 @@ Future reloadFlashcards() async {
       //* Convert the decoded `dynamic` object back to your desired Dart object structure
       List<FlashcardSet> flashcardSets = [];
       for (var set in decodedObject['sets']) {
-        flashcardSets.add(FlashcardSet(
-            id: decodedObject['sets'].indexOf(set),
-            title: set["title"],
-            description: "description_unavailable",
-            flashcards: [
-              for (var flashcard in set['questions'])
-                Flashcard(
-                    id: set['questions'].indexOf(flashcard),
-                    question: flashcard['question'],
-                    answer: flashcard['answer'])
-            ]));
+        flashcardSets.add(FlashcardSet(id: decodedObject['sets'].indexOf(set), title: set["title"], description: "description_unavailable", flashcards: [
+          for (var flashcard in set['questions']) Flashcard(id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'], image: flashcard['image']),
+        ]));
       }
 
       //* Empty the flashcard sets

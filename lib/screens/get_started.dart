@@ -848,11 +848,11 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
   bool success = false;
 
   void loginAsGuest(AppState appState) async {
-    try {
-      await FirebaseAuth.instance.signInAnonymously();
-    } catch (e) {
-      //continue
-    }
+    // try {
+    //   await FirebaseAuth.instance.signInAnonymously();
+    // } catch (e) {
+    //   //continue
+    // }
     appState.setCurrentUser(UserData(uid: 0, exp: 0, streak: 0, posts: 0, flashCardSets: [], username: "Guest", email: "guest@guest.com", profilePicture: "https://picsum.photos/200", assignedCommunity: "0", assignedSection: "0"));
     appState.setQuizzes([]);
     //* Get quizzes data from shared preferences

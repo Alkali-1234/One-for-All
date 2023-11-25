@@ -102,8 +102,8 @@ class _LoginScreenState extends State<LoginScreen> {
         //* Convert the decoded `dynamic` object back to your desired Dart object structure
         List<FlashcardSet> flashcardSets = [];
         for (var set in decodedObject['sets']) {
-          flashcardSets.add(FlashcardSet(id: decodedObject['sets'].indexOf(set), title: "${set["title"]} (Local)", description: "description_unavailable", flashcards: [
-            for (var flashcard in set['questions']) Flashcard(id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'])
+          flashcardSets.add(FlashcardSet(id: decodedObject['sets'].indexOf(set), title: "${set["title"]}", description: "description_unavailable", flashcards: [
+            for (var flashcard in set['questions']) Flashcard(image: flashcard['image'], id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'])
           ]));
         }
 

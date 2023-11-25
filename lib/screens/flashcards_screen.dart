@@ -1,6 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/main.dart';
 import 'package:provider/provider.dart';
@@ -142,7 +142,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                                           showDialog(
                                                               context: context,
                                                               builder: (context) => SelectedSetModal(
-                                                                    flashcardSet: appState.getCurrentUser.flashCardSets[index],
+                                                                    flashcardSet: appState.getCurrentUser.flashCardSets.length - 1 >= index ? appState.getCurrentUser.flashCardSets[index] : FlashcardSet(id: 0, flashcards: [], title: "", description: ""),
                                                                     index: index,
                                                                   ));
                                                         },
@@ -410,7 +410,7 @@ class _GenerateFlashcardsModalState extends State<GenerateFlashcardsModal> {
                     //TODO support all question types
                     appState.getCurrentUser.flashCardSets.add(FlashcardSet(id: appState.getCurrentUser.flashCardSets.length + 1, title: appState.getQuizzes[selectedQuiz!].title, description: appState.getQuizzes[selectedQuiz!].description, flashcards: [
                       for (int i = 0; i < appState.getQuizzes[selectedQuiz!].questions.length; i++) ...[
-                        Flashcard(id: i, question: appState.getQuizzes[selectedQuiz!].questions[i].type == quizTypes.multipleChoice ? appState.getQuizzes[selectedQuiz!].questions[i].question : "not supported", answer: appState.getQuizzes[selectedQuiz!].questions[i].type == quizTypes.multipleChoice ? List<String>.generate(appState.getQuizzes[selectedQuiz!].questions[i].correctAnswer.length, (index) => appState.getQuizzes[selectedQuiz!].questions[i].answers[index]).join(", ") : "not supported")
+                        Flashcard(id: i, image: appState.getQuizzes[selectedQuiz!].questions[i].imagePath, question: appState.getQuizzes[selectedQuiz!].questions[i].type == quizTypes.multipleChoice ? appState.getQuizzes[selectedQuiz!].questions[i].question : "not supported", answer: appState.getQuizzes[selectedQuiz!].questions[i].type == quizTypes.multipleChoice ? List<String>.generate(appState.getQuizzes[selectedQuiz!].questions[i].correctAnswer.length, (index) => appState.getQuizzes[selectedQuiz!].questions[i].answers[index]).join(", ") : "not supported")
                       ]
                     ]));
                   },
@@ -458,7 +458,7 @@ class _NewSetModalState extends State<NewSetModal> {
         //* Convert the decoded `dynamic` object back to your desired Dart object structure
         for (var set in decodedObject['sets']) {
           flashcardSets.add(FlashcardSet(id: decodedObject['sets'].indexOf(set), title: set["title"], description: "description_unavailable", flashcards: [
-            for (var flashcard in set['questions']) Flashcard(id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'])
+            for (var flashcard in set['questions']) Flashcard(id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'], image: flashcard['image'])
           ]));
         }
       }
@@ -628,7 +628,56 @@ class SelectedSetModal extends StatelessWidget {
               //Top
               Column(
                 children: [
-                  Text(flashcardSet.title, style: textTheme.displayLarge),
+                  Row(
+                    children: [
+                      Expanded(child: Text(flashcardSet.title, style: textTheme.displayLarge)),
+                      //* More options
+                      PopupMenuButton(
+                          color: theme.background,
+                          itemBuilder: (context) => <PopupMenuEntry>[
+                                PopupMenuItem(
+                                  child: Text(
+                                    "Delete",
+                                    style: textTheme.displaySmall,
+                                  ),
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    context.read<AppState>().getCurrentUser.flashCardSets.removeAt(index);
+                                    context.read<AppState>().thisNotifyListeners();
+                                    //* Delete images
+                                    for (var flashcard in flashcardSet.flashcards.where((element) => element.image != null)) {
+                                      //* Delete the image
+                                      File(flashcard.image!).delete();
+                                    }
+                                    //* Convert flashcard sets to json
+                                    List<FlashcardSet> flashcardSets = context.read<AppState>().getCurrentUser.flashCardSets;
+                                    Object flashcardSetsObject = {
+                                      "sets": [
+                                        for (FlashcardSet set in flashcardSets)
+                                          {
+                                            "title": set.title,
+                                            "description": set.description,
+                                            "questions": [
+                                              for (Flashcard flashcard in set.flashcards)
+                                                {
+                                                  "question": flashcard.question,
+                                                  "answer": flashcard.answer,
+                                                  "image": flashcard.image
+                                                }
+                                            ]
+                                          }
+                                      ],
+                                    };
+                                    SharedPreferences.getInstance().then((value) async {
+                                      await value.setString("flashcardSets", jsonEncode(flashcardSetsObject));
+                                    });
+                                  },
+                                ),
+                              ],
+                          icon: Icon(Icons.more_vert, color: theme.onBackground),
+                          onSelected: (value) {}),
+                    ],
+                  ),
                   const SizedBox(height: 10),
                   const Divider(),
                   const SizedBox(height: 10),
