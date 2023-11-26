@@ -1097,7 +1097,8 @@ class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-              )
+              ),
+              const SizedBox(height: 8),
             ],
           ),
         ),
