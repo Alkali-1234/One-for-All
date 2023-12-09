@@ -1,13 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../quizzes_components/quizzes_combo_anim_components.dart';
 
 class ComboCounter extends StatefulWidget {
   const ComboCounter({
     super.key,
     required this.theme,
+    required this.incrementScore,
   });
   final ColorScheme theme;
+  final Function incrementScore;
 
   @override
   State<ComboCounter> createState() => ComboCounterState();
@@ -72,6 +75,9 @@ class ComboCounterState extends State<ComboCounter> {
       //       );
       //     });
     });
+    if (counter >= 5) {
+      QuizzesComboAnimComponentsFunctions.run(context, widget.incrementScore, counter ^ 2);
+    }
     // startTimer();
   }
 

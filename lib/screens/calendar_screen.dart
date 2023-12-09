@@ -1,7 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/community_data.dart';
 // import 'package:oneforall/service/community_service.dart';
@@ -150,7 +149,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 ),
                               )),
                           const SizedBox(height: 10),
-                          const Flexible(flex: 2, child: Center(child: BannerAdWidget())),
                         ],
                       ),
                     ))

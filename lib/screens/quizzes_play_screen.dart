@@ -549,7 +549,16 @@ class PlayScreenState extends State<PlayScreen> {
                           ),
                         ),
                         //* Combo counter
-                        Flexible(flex: 1, child: ComboCounter(key: comboCounterKey, theme: Theme.of(context).colorScheme)),
+                        Flexible(
+                            flex: 1,
+                            child: ComboCounter(
+                              key: comboCounterKey,
+                              theme: Theme.of(context).colorScheme,
+                              incrementScore: () => setState(() => {
+                                    scoreStatTween = Tween<double>(begin: score.toDouble(), end: score.toDouble() + 1),
+                                    score++
+                                  }),
+                            )),
                       ],
                     ),
                     const SizedBox(height: 10),

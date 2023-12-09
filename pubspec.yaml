@@ -38,6 +38,9 @@ dependencies:
   just_audio: ^0.9.35
   photo_view: ^0.14.0
   flutter_shakemywidget: ^1.0.5+1
+  flame: ^1.9.1
+  flame_forge2d: ^0.15.0+1
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:
