@@ -115,56 +115,83 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                 children: [
                                   Row(
                                     children: [
+                                      Icon(Icons.library_books, color: theme.onBackground, size: 50),
+                                      const SizedBox(width: 10),
                                       Text("Library", style: textTheme.displayLarge),
                                     ],
                                   ),
                                   const SizedBox(height: 20),
-                                  Expanded(
-                                    child: ListView.builder(
-                                        scrollDirection: Axis.vertical,
-                                        itemCount: appState.getCurrentUser.flashCardSets.length,
-                                        itemBuilder: (context, index) {
-                                          return isItemValid(appState.getCurrentUser.flashCardSets[index].title)
-                                              ? Padding(
-                                                  padding: const EdgeInsets.only(bottom: 8),
-                                                  child: Container(
-                                                    height: MediaQuery.of(context).size.height * 0.1,
-                                                    width: double.infinity,
-                                                    decoration: BoxDecoration(
-                                                      color: theme.secondary,
-                                                      borderRadius: BorderRadius.circular(10),
-                                                      border: Border.all(
-                                                        color: theme.tertiary,
-                                                      ),
-                                                    ),
-                                                    child: ElevatedButton(
-                                                        onPressed: () {
-                                                          showDialog(
-                                                              context: context,
-                                                              builder: (context) => SelectedSetModal(
-                                                                    flashcardSet: appState.getCurrentUser.flashCardSets.length - 1 >= index ? appState.getCurrentUser.flashCardSets[index] : FlashcardSet(id: 0, flashcards: [], title: "", description: ""),
-                                                                    index: index,
-                                                                  ));
-                                                        },
-                                                        style: ElevatedButton.styleFrom(
-                                                          elevation: 0,
-                                                          backgroundColor: Colors.transparent,
-                                                          shadowColor: Colors.transparent,
-                                                          foregroundColor: theme.onPrimary,
-                                                          shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(10),
-                                                          ),
+                                  if (appState.getCurrentUser.flashCardSets.isEmpty)
+                                    Expanded(
+                                      child: Center(
+                                          child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text("You don't have any Flashcards", style: textTheme.displayMedium),
+                                          const SizedBox(height: 10),
+                                          ElevatedButton.icon(
+                                              icon: const Icon(Icons.add),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: theme.secondary,
+                                                foregroundColor: theme.onPrimary,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                showDialog(context: context, builder: (context) => const NewSetOptions());
+                                              },
+                                              label: const Text("Create Flashcard")),
+                                        ],
+                                      )),
+                                    ),
+                                  if (appState.getCurrentUser.flashCardSets.isNotEmpty)
+                                    Expanded(
+                                      child: ListView.builder(
+                                          scrollDirection: Axis.vertical,
+                                          itemCount: appState.getCurrentUser.flashCardSets.length,
+                                          itemBuilder: (context, index) {
+                                            return isItemValid(appState.getCurrentUser.flashCardSets[index].title)
+                                                ? Padding(
+                                                    padding: const EdgeInsets.only(bottom: 8),
+                                                    child: Container(
+                                                      height: MediaQuery.of(context).size.height * 0.1,
+                                                      width: double.infinity,
+                                                      decoration: BoxDecoration(
+                                                        color: theme.secondary,
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        border: Border.all(
+                                                          color: theme.tertiary,
                                                         ),
-                                                        child: Center(
-                                                            child: Text(
-                                                          appState.getCurrentUser.flashCardSets[index].title,
-                                                          style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
-                                                        ))),
-                                                  ),
-                                                )
-                                              : Container();
-                                        }),
-                                  ),
+                                                      ),
+                                                      child: ElevatedButton(
+                                                          onPressed: () {
+                                                            showDialog(
+                                                                context: context,
+                                                                builder: (context) => SelectedSetModal(
+                                                                      flashcardSet: appState.getCurrentUser.flashCardSets.length - 1 >= index ? appState.getCurrentUser.flashCardSets[index] : FlashcardSet(id: 0, flashcards: [], title: "", description: ""),
+                                                                      index: index,
+                                                                    ));
+                                                          },
+                                                          style: ElevatedButton.styleFrom(
+                                                            elevation: 0,
+                                                            backgroundColor: Colors.transparent,
+                                                            shadowColor: Colors.transparent,
+                                                            foregroundColor: theme.onPrimary,
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                            ),
+                                                          ),
+                                                          child: Center(
+                                                              child: Text(
+                                                            appState.getCurrentUser.flashCardSets[index].title,
+                                                            style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
+                                                          ))),
+                                                    ),
+                                                  )
+                                                : Container();
+                                          }),
+                                    ),
                                 ],
                               ),
                             ),
