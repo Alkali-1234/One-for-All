@@ -556,7 +556,7 @@ class _NewSetModalState extends State<NewSetModal> {
                     cursorColor: theme.onPrimary,
                     style: textTheme.displaySmall!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
                     decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.all(0),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
                         filled: true,
                         fillColor: theme.primary,
                         border: OutlineInputBorder(
