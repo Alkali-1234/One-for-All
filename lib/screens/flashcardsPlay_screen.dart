@@ -277,7 +277,7 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
   late AnimationController _cardAnimationController;
   late Animation<double> _cardAnimation;
   DateTime startingTime = DateTime.now();
-  Flashcard currentCard = Flashcard(image: null, id: 0, question: "If this card shows up, something went wrong.", answer: "If this card shows up, something went wrong. (backside)");
+  Flashcard currentCard = Flashcard(image: null, id: 0, question: "If this card shows up, something went wrong.", answer: "If this card shows up, something went wrong. (backside)", hints: []);
   Object flashcardWeights = {
     "weights": []
   };
@@ -426,6 +426,7 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
                                 onTap: () => showDialog(
                                     context: context,
                                     builder: (c) => Dialog(
+                                          surfaceTintColor: Colors.transparent,
                                           backgroundColor: Colors.transparent,
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,

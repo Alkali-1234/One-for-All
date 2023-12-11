@@ -52,12 +52,14 @@ class Flashcard {
     required this.question,
     required this.answer,
     required this.image,
+    required this.hints,
   });
 
   final int id;
   String question;
   String answer;
   String? image;
+  List<dynamic> hints;
 }
 
 //! check if this still throws an error
@@ -72,7 +74,7 @@ Future reloadFlashcards() async {
       List<FlashcardSet> flashcardSets = [];
       for (var set in decodedObject['sets']) {
         flashcardSets.add(FlashcardSet(id: decodedObject['sets'].indexOf(set), title: set["title"], description: "description_unavailable", flashcards: [
-          for (var flashcard in set['questions']) Flashcard(id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'], image: flashcard['image']),
+          for (var flashcard in set['questions']) Flashcard(id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'], image: flashcard['image'], hints: flashcard['hints']),
         ]));
       }
 

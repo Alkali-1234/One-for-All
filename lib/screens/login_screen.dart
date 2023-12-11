@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
         List<FlashcardSet> flashcardSets = [];
         for (var set in decodedObject['sets']) {
           flashcardSets.add(FlashcardSet(id: decodedObject['sets'].indexOf(set), title: "${set["title"]}", description: "description_unavailable", flashcards: [
-            for (var flashcard in set['questions']) Flashcard(image: flashcard['image'], id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'])
+            for (var flashcard in set['questions']) Flashcard(image: flashcard['image'], id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'], hints: flashcard['hints'] ?? [])
           ]));
         }
 

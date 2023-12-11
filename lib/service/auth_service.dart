@@ -48,7 +48,7 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
         flashcardSets.add(FlashcardSet(
             id: i,
             flashcards: [
-              for (var j = 0; j < value.data()!["flashcardSets"][i]["questions"].length; j++) Flashcard(image: null, id: j, question: value.data()!["flashcardSets"][i]["questions"][j]["question"], answer: value.data()!["flashcardSets"][i]["questions"][j]["answer"])
+              for (var j = 0; j < value.data()!["flashcardSets"][i]["questions"].length; j++) Flashcard(image: null, id: j, question: value.data()!["flashcardSets"][i]["questions"][j]["question"], answer: value.data()!["flashcardSets"][i]["questions"][j]["answer"], hints: [])
             ],
             title: "${value.data()!["flashcardSets"][i]["title"]} (Cloud)",
             description: value.data()!["flashcardSets"][i]["description"]));
@@ -126,7 +126,7 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
       List<FlashcardSet> flashcardSets = [];
       for (var set in decodedObject['sets']) {
         flashcardSets.add(FlashcardSet(id: decodedObject['sets'].indexOf(set), title: "${set["title"]}", description: "description_unavailable", flashcards: [
-          for (var flashcard in set['questions']) Flashcard(image: flashcard['image'], id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'])
+          for (var flashcard in set['questions']) Flashcard(image: flashcard['image'], id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'], hints: flashcard['hints'])
         ]));
       }
 

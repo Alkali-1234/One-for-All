@@ -437,7 +437,7 @@ class _GenerateFlashcardsModalState extends State<GenerateFlashcardsModal> {
                     //TODO support all question types
                     appState.getCurrentUser.flashCardSets.add(FlashcardSet(id: appState.getCurrentUser.flashCardSets.length + 1, title: appState.getQuizzes[selectedQuiz!].title, description: appState.getQuizzes[selectedQuiz!].description, flashcards: [
                       for (int i = 0; i < appState.getQuizzes[selectedQuiz!].questions.length; i++) ...[
-                        Flashcard(id: i, image: appState.getQuizzes[selectedQuiz!].questions[i].imagePath, question: appState.getQuizzes[selectedQuiz!].questions[i].type == quizTypes.multipleChoice ? appState.getQuizzes[selectedQuiz!].questions[i].question : "not supported", answer: appState.getQuizzes[selectedQuiz!].questions[i].type == quizTypes.multipleChoice ? List<String>.generate(appState.getQuizzes[selectedQuiz!].questions[i].correctAnswer.length, (index) => appState.getQuizzes[selectedQuiz!].questions[i].answers[index]).join(", ") : "not supported")
+                        Flashcard(hints: [], id: i, image: appState.getQuizzes[selectedQuiz!].questions[i].imagePath, question: appState.getQuizzes[selectedQuiz!].questions[i].type == quizTypes.multipleChoice ? appState.getQuizzes[selectedQuiz!].questions[i].question : "not supported", answer: appState.getQuizzes[selectedQuiz!].questions[i].type == quizTypes.multipleChoice ? List<String>.generate(appState.getQuizzes[selectedQuiz!].questions[i].correctAnswer.length, (index) => appState.getQuizzes[selectedQuiz!].questions[i].answers[index]).join(", ") : "not supported")
                       ]
                     ]));
                   },
@@ -485,7 +485,7 @@ class _NewSetModalState extends State<NewSetModal> {
         //* Convert the decoded `dynamic` object back to your desired Dart object structure
         for (var set in decodedObject['sets']) {
           flashcardSets.add(FlashcardSet(id: decodedObject['sets'].indexOf(set), title: set["title"], description: "description_unavailable", flashcards: [
-            for (var flashcard in set['questions']) Flashcard(id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'], image: flashcard['image'])
+            for (var flashcard in set['questions']) Flashcard(id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'], image: flashcard['image'], hints: flashcard['hints'] ?? [])
           ]));
         }
       }
@@ -502,7 +502,9 @@ class _NewSetModalState extends State<NewSetModal> {
               for (Flashcard flashcard in set.flashcards)
                 {
                   "question": flashcard.question,
-                  "answer": flashcard.answer
+                  "answer": flashcard.answer,
+                  "image": flashcard.image,
+                  "hints": flashcard.hints
                 }
             ]
           }

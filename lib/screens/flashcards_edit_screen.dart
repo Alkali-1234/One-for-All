@@ -31,7 +31,8 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
         "id": set.flashcards[i].id,
         "question": set.flashcards[i].question,
         "answer": set.flashcards[i].answer,
-        "image": set.flashcards[i].image
+        "image": set.flashcards[i].image,
+        "hints": set.flashcards[i].hints
       });
     }
   }
@@ -46,7 +47,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
     setState(() {
       appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards = List<Flashcard>.empty(growable: true);
       for (var i in questionQuery["queries"]) {
-        appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards.add(Flashcard(image: i['image'], id: i["id"], question: i["question"], answer: i["answer"]));
+        appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards.add(Flashcard(image: i['image'], id: i["id"], question: i["question"], answer: i["answer"], hints: i["hints"] ?? []));
       }
     });
     Object objectifiedFlashcardSets = {
@@ -60,7 +61,8 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                 {
                   "question": flashcard.question,
                   "answer": flashcard.answer,
-                  "image": flashcard.image
+                  "image": flashcard.image,
+                  "hints": flashcard.hints
                 }
             ]
           }
@@ -77,7 +79,9 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
       questionQuery["queries"].add({
         "id": questionQuery["queries"].length,
         "question": "",
-        "answer": ""
+        "answer": "",
+        "image": null,
+        "hints": []
       });
       moreOptionsTweens.add(Tween<double>(begin: 0.8, end: 0.1));
       showMoreOptions.add(false);
@@ -246,9 +250,26 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                                           duration: const Duration(milliseconds: 200),
                                                           opacity: moreOptionsTweens[index].end == 1 ? 1 : 0,
                                                           child: showMoreOptions[index]
-                                                              ? Column(
+                                                              ? Row(
                                                                   mainAxisSize: MainAxisSize.min,
                                                                   children: [
+                                                                    ElevatedButton.icon(
+                                                                        style: ElevatedButton.styleFrom(
+                                                                          foregroundColor: theme.onBackground,
+                                                                          backgroundColor: theme.secondary,
+                                                                          shadowColor: Colors.transparent,
+                                                                          elevation: 0,
+                                                                          side: BorderSide(color: theme.tertiary, width: 1),
+                                                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                                        ),
+                                                                        onPressed: () => showDialog(
+                                                                            context: context,
+                                                                            builder: (context) => HintsDialog(
+                                                                                  questionQuery: questionQuery["queries"][index],
+                                                                                )),
+                                                                        icon: const Icon(Icons.edit),
+                                                                        label: const Text("Hints")),
+                                                                    const SizedBox(width: 10),
                                                                     ElevatedButton.icon(
                                                                         label: Text("Delete", style: textTheme.displaySmall),
                                                                         style: ElevatedButton.styleFrom(
@@ -539,6 +560,134 @@ class _ImageSelectorState extends State<ImageSelector> {
             ],
           )
       ],
+    );
+  }
+}
+
+class HintsDialog extends StatefulWidget {
+  const HintsDialog({super.key, required this.questionQuery});
+
+  final Map<dynamic, dynamic> questionQuery;
+
+  @override
+  State<HintsDialog> createState() => _HintsDialogState();
+}
+
+class _HintsDialogState extends State<HintsDialog> {
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var textTheme = Theme.of(context).textTheme;
+    return Dialog(
+      backgroundColor: theme.background,
+      surfaceTintColor: Colors.transparent,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text("Hints", style: textTheme.displayMedium),
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: ListView.builder(
+                itemCount: widget.questionQuery["hints"]?.length ?? 0,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            cursorColor: theme.onPrimary,
+                            textAlign: TextAlign.center,
+                            initialValue: widget.questionQuery["hints"][index],
+                            decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.zero,
+                                borderSide: BorderSide(color: theme.onBackground, width: 1),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.zero,
+                                borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+                              ),
+                              contentPadding: const EdgeInsets.all(0),
+                              hintText: "Hint ${index + 1}",
+                              hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                              // filled: true,
+                            ),
+                            style: textTheme.displaySmall,
+                            onChanged: (value) {
+                              widget.questionQuery["hints"][index] = value;
+                            },
+                          ),
+                        ),
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                widget.questionQuery["hints"].removeAt(index);
+                              });
+                            },
+                            icon: const Icon(Icons.delete, color: Colors.red))
+                      ],
+                    ),
+                  );
+                }),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    widget.questionQuery["hints"].add("");
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.secondary,
+                  shadowColor: Colors.transparent,
+                  elevation: 0,
+                  side: BorderSide(color: theme.tertiary, width: 1),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add, color: theme.onPrimary),
+                    const SizedBox(width: 10),
+                    Text(
+                      "New Hint",
+                      style: textTheme.displaySmall,
+                    ),
+                  ],
+                )),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.secondary,
+                  shadowColor: Colors.transparent,
+                  elevation: 0,
+                  side: BorderSide(color: theme.tertiary, width: 1),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.done, color: theme.onPrimary),
+                    const SizedBox(width: 10),
+                    Text(
+                      "Done",
+                      style: textTheme.displaySmall,
+                    ),
+                  ],
+                )),
+          ),
+        ],
+      ),
     );
   }
 }
