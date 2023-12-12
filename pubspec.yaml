@@ -60,6 +60,7 @@ flutter:
     - assets/audio/successSound.mp3
     - assets/images/logo.png
     - assets/images/builtwithflutter.png
+    - assets/audio/boop.mp3
   fonts:
     - family: MyFlutterApp
       fonts: 

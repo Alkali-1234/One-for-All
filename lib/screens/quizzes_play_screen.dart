@@ -554,10 +554,15 @@ class PlayScreenState extends State<PlayScreen> {
                             child: ComboCounter(
                               key: comboCounterKey,
                               theme: Theme.of(context).colorScheme,
-                              incrementScore: () => setState(() => {
-                                    scoreStatTween = Tween<double>(begin: score.toDouble(), end: score.toDouble() + 1),
-                                    score++
-                                  }),
+                              incrementScore: () {
+                                setState(() => {
+                                      scoreStatTween = Tween<double>(begin: score.toDouble(), end: score.toDouble() + 1),
+                                      score++
+                                    });
+                                AudioPlayer audioPlayer = AudioPlayer();
+                                audioPlayer.setAsset("assets/audio/boop.mp3");
+                                audioPlayer.play();
+                              },
                             )),
                       ],
                     ),
@@ -1432,9 +1437,24 @@ class _NumberAddingAnimationState extends State<NumberAddingAnimation> {
 
   void startAnimation() async {
     await Future.delayed(Duration(milliseconds: 1200 * widget.index));
+    animationSound();
     setState(() {
       tween = Tween<double>(begin: 0, end: widget.value.toDouble());
     });
+  }
+
+  void animationSound() async {
+    bool stop = false;
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      stop = true;
+      timer.cancel();
+    });
+    while (!stop) {
+      await Future.delayed(const Duration(milliseconds: 50));
+      AudioPlayer audioPlayer = AudioPlayer();
+      audioPlayer.setAsset("assets/audio/boop.mp3");
+      audioPlayer.play();
+    }
   }
 
   @override

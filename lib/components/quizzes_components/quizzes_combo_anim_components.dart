@@ -10,7 +10,18 @@ import 'dart:math';
 abstract class QuizzesComboAnimComponentsFunctions {
   static Future<void> run(BuildContext context, Function incrementFunction, int amount) async {
     OverlayEntry overlayEntry = OverlayEntry(builder: (context) {
-      return IgnorePointer(ignoring: true, child: GameWidget.controlled(gameFactory: () => GameWorld(incrementFunc: incrementFunction, amount: amount)));
+      return IgnorePointer(
+          ignoring: true,
+          child: Column(
+            children: [
+              const SafeArea(
+                child: SizedBox(
+                  height: 30,
+                ),
+              ),
+              Expanded(child: GameWidget.controlled(gameFactory: () => GameWorld(incrementFunc: incrementFunction, amount: amount))),
+            ],
+          ));
     });
     Overlay.of(context).insert(overlayEntry);
     await Future.delayed(const Duration(seconds: 3, milliseconds: 500));
