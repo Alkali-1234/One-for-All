@@ -295,11 +295,17 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
     changeCurrentCard(getFlashcardWeights["weights"][0]["card"]);
   }
 
-  void nextQuestion(int weightDifference) {
+  late List<GlobalKey<_HintItemState>> hintItemKeys;
+
+  void nextQuestion(int weightDifference) async {
     setState(() {
       questionNumber++;
       flipped = false;
+      for (var element in hintItemKeys) {
+        element.currentState!.controller.reverse();
+      }
     });
+    await Future.delayed(const Duration(milliseconds: 150));
     //Change the weight of the current card
     //Look for the card in the weights list
     int index = getFlashcardWeights["weights"].indexWhere((element) => element["card"] == currentCard);
@@ -383,6 +389,7 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     initializeWeights();
+    hintItemKeys = List.generate(currentCard.hints.length, (index) => GlobalKey<_HintItemState>());
     _cardAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 150),
@@ -455,49 +462,64 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
                 const SizedBox(height: 10),
                 Expanded(
                   flex: 1,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: AnimatedBuilder(
-                        animation: _cardAnimation,
-                        builder: (context, child) {
-                          return Transform.scale(
-                            //Y stays the same, X changes
-                            scaleY: 1,
-                            scaleX: _cardAnimation.value,
-                            child: ElevatedButton(
-                                onPressed: () async {
-                                  //* Forward then back
-                                  await _cardAnimationController.forward();
-                                  setState(() {
-                                    flipped = !flipped;
-                                  });
-                                  await _cardAnimationController.reverse();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: theme.secondary.withOpacity(0.115),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  shadowColor: Colors.transparent,
-                                  // height: MediaQuery.of(context).size.height * 0.25,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const SizedBox.shrink(),
-                                      Text(
-                                        !flipped ? currentCard.question : currentCard.answer,
-                                        style: textTheme.displayMedium,
-                                        textAlign: TextAlign.center,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: AnimatedBuilder(
+                              animation: _cardAnimation,
+                              builder: (context, child) {
+                                return Transform.scale(
+                                  //Y stays the same, X changes
+                                  scaleY: 1,
+                                  scaleX: _cardAnimation.value,
+                                  child: ElevatedButton(
+                                      onPressed: () async {
+                                        //* Forward then back
+                                        await _cardAnimationController.forward();
+                                        setState(() {
+                                          flipped = !flipped;
+                                        });
+                                        await _cardAnimationController.reverse();
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: theme.secondary.withOpacity(0.115),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        shadowColor: Colors.transparent,
+                                        // height: MediaQuery.of(context).size.height * 0.25,
                                       ),
-                                      Icon(Icons.rotate_left, color: theme.onBackground),
-                                    ],
-                                  ),
-                                )),
-                          );
-                        }),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            const SizedBox.shrink(),
+                                            Text(
+                                              !flipped ? currentCard.question : currentCard.answer,
+                                              style: textTheme.displayMedium,
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            Icon(Icons.rotate_left, color: theme.onBackground),
+                                          ],
+                                        ),
+                                      )),
+                                );
+                              }),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      if (currentCard.hints.isNotEmpty)
+                        Expanded(
+                            flex: 2,
+                            child: ListView.builder(
+                              itemBuilder: (context, i) => HintItem(key: hintItemKeys[i], currentCard: currentCard, textTheme: textTheme, i: i),
+                              itemCount: currentCard.hints.length,
+                            ))
+                    ],
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -573,6 +595,79 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
               ))
         ],
       ),
+    );
+  }
+}
+
+class HintItem extends StatefulWidget {
+  const HintItem({
+    super.key,
+    required this.currentCard,
+    required this.textTheme,
+    required this.i,
+  });
+
+  final Flashcard currentCard;
+  final TextTheme textTheme;
+  final int i;
+
+  @override
+  State<HintItem> createState() => _HintItemState();
+}
+
+class _HintItemState extends State<HintItem> with SingleTickerProviderStateMixin {
+  ///* Card Flipping Animation
+//* Animation
+  late AnimationController controller;
+  late Animation animation;
+  AnimationStatus animationStatus = AnimationStatus.dismissed;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(duration: const Duration(milliseconds: 150), vsync: this);
+    animation = Tween<double>(begin: 0, end: 1).animate(controller)
+      ..addListener(() {
+        setState(() {});
+      })
+      ..addStatusListener((status) {
+        animationStatus = status;
+      });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform(
+      alignment: FractionalOffset.center,
+      transform: Matrix4.identity()
+        ..setEntry(2, 1, 0.0015)
+        ..rotateY(pi * animation.value),
+      child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.115),
+            shadowColor: Colors.transparent,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          onPressed: () => {
+                if (animationStatus == AnimationStatus.dismissed)
+                  {
+                    controller.forward(),
+                  }
+                else
+                  {
+                    controller.reverse(),
+                  }
+              },
+          child: Transform.flip(
+            flipX: animation.value > 0.5,
+            child: Text(
+              animation.value <= 0.5 ? "Hint ${widget.i + 1}" : widget.currentCard.hints[widget.i],
+              style: widget.textTheme.displaySmall,
+            ),
+          )),
     );
   }
 }
