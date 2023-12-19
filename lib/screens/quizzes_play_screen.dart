@@ -246,6 +246,7 @@ class PlayScreenState extends State<PlayScreen> {
       dropdownKey.currentState!.sentence = currentQuestion.question.split("<seperator />");
       dropdownKey.currentState!.selectedAnswers = List.generate(currentQuestion.correctAnswer.length, (index) => 0);
     }
+    questionTransitionTween = Tween<double>(begin: 0, end: 1);
     setState(() {});
     // currentQuestion = quizSet.questions[quizSet.questions.indexOf(currentQuestion) + 1];
   }
