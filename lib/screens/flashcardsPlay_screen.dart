@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/interstitial_ad.dart';
 import 'package:photo_view/photo_view.dart';
@@ -10,7 +9,7 @@ import 'package:provider/provider.dart';
 import '../data/user_data.dart';
 import 'dart:math';
 import 'package:animations/animations.dart';
-
+import '../components/animations/flaschards_increment_animation.dart';
 import '../main.dart';
 
 class FlashcardsPlayScreen extends StatefulWidget {
@@ -284,6 +283,7 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
   get getFlashcardWeights => flashcardWeights;
   int questionNumber = 1;
   bool flipped = false;
+  GlobalKey<FlashcardsAnimationWidgetState> incrementAnimationKey = GlobalKey<FlashcardsAnimationWidgetState>();
   void initializeWeights() {
     for (var i = 0; i < widget.set.flashcards.length; i++) {
       getFlashcardWeights["weights"].add({
@@ -359,6 +359,8 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
     //Calculate time spent
     DateTime currentTime = DateTime.now();
     Duration timeSpent = startingTime.difference(currentTime);
+    //* Clear overlays
+    entry.remove();
     //Replace current screen with finished screen
     Navigator.pushReplacement(
         context,
@@ -385,6 +387,7 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
     });
   }
 
+  late OverlayEntry entry;
   @override
   void initState() {
     super.initState();
@@ -397,8 +400,13 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
     _cardAnimation = Tween<double>(begin: 1, end: 0).animate(_cardAnimationController);
     _player.setAsset("assets/audio/quizAudio.mp3");
     _player.play();
+    //* Add overlay
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      var theme = Theme.of(context).colorScheme;
       showDialog(barrierDismissible: false, context: context, builder: (_) => const ThreeTwoOneGoRibbon());
+
+      entry = OverlayEntry(builder: (context) => IgnorePointer(child: FlashcardsAnimationWidget(key: incrementAnimationKey, theme: theme)));
+      Overlay.of(context).insert(entry);
     });
   }
 
