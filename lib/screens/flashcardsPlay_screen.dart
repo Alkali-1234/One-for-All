@@ -283,6 +283,7 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
   get getFlashcardWeights => flashcardWeights;
   int questionNumber = 1;
   bool flipped = false;
+  bool hideCard = false;
   GlobalKey<FlashcardsAnimationWidgetState> incrementAnimationKey = GlobalKey<FlashcardsAnimationWidgetState>();
   void initializeWeights() {
     for (var i = 0; i < widget.set.flashcards.length; i++) {
@@ -304,7 +305,11 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
       for (var element in hintItemKeys) {
         element.currentState!.controller.reverse();
       }
+      hideCard = true;
     });
+    //*Increment animation
+    incrementAnimationKey.currentState!.increment(Theme.of(context).colorScheme);
+
     await Future.delayed(const Duration(milliseconds: 150));
     //Change the weight of the current card
     //Look for the card in the weights list
@@ -320,11 +325,15 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
       if (getFlashcardWeights["weights"][i]["weight"] == null) {
         getFlashcardWeights["weights"][i]["weight"] = 500;
       }
+      //* Check if negative
+      if (getFlashcardWeights["weights"][i]["weight"] < 0) {
+        getFlashcardWeights["weights"][i]["weight"] = 0;
+      }
       totalWeight += getFlashcardWeights["weights"][i]["weight"] as int;
     }
     debugPrint("Total Weight: $totalWeight");
     //Get a random number between 0 and totalWeight
-    int randomNumber = Random().nextInt(totalWeight);
+    int randomNumber = totalWeight > 0 ? Random().nextInt(totalWeight) : 0;
     debugPrint("Random Number: $randomNumber");
     //Get the card that corresponds to the random number
     int currentWeight = 0;
@@ -340,6 +349,10 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
       changeWeights(i, getFlashcardWeights["weights"][i]["weight"] + 10);
     }
     debugPrint("Weights: $getFlashcardWeights");
+    await Future.delayed(const Duration(milliseconds: 150));
+    setState(() {
+      hideCard = false;
+    });
   }
 
   void finishPlaying() {
@@ -388,6 +401,9 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
   }
 
   late OverlayEntry entry;
+
+  late double mCardWidth;
+  late double mCardHeight;
   @override
   void initState() {
     super.initState();
@@ -395,7 +411,7 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
     hintItemKeys = List.generate(currentCard.hints.length, (index) => GlobalKey<_HintItemState>());
     _cardAnimationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 150),
+      duration: const Duration(milliseconds: 200),
     );
     _cardAnimation = Tween<double>(begin: 1, end: 0).animate(_cardAnimationController);
     _player.setAsset("assets/audio/quizAudio.mp3");
@@ -405,7 +421,7 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
       var theme = Theme.of(context).colorScheme;
       showDialog(barrierDismissible: false, context: context, builder: (_) => const ThreeTwoOneGoRibbon());
 
-      entry = OverlayEntry(builder: (context) => IgnorePointer(child: FlashcardsAnimationWidget(key: incrementAnimationKey, theme: theme)));
+      entry = OverlayEntry(builder: (context) => IgnorePointer(child: FlashcardsAnimationWidget(key: incrementAnimationKey, theme: theme, mCardHeight: mCardHeight, mCardWidth: mCardWidth)));
       Overlay.of(context).insert(entry);
     });
   }
@@ -474,58 +490,68 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
                     children: [
                       Expanded(
                         flex: 2,
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: AnimatedBuilder(
-                              animation: _cardAnimation,
-                              builder: (context, child) {
-                                return Transform.scale(
-                                  //Y stays the same, X changes
-                                  scaleY: 1,
-                                  scaleX: _cardAnimation.value,
-                                  child: ElevatedButton(
-                                      onPressed: () async {
-                                        //* Forward then back
-                                        await _cardAnimationController.forward();
-                                        setState(() {
-                                          flipped = !flipped;
-                                        });
-                                        await _cardAnimationController.reverse();
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: theme.secondary.withOpacity(0.115),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        shadowColor: Colors.transparent,
-                                        // height: MediaQuery.of(context).size.height * 0.25,
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(12.0),
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const SizedBox.shrink(),
-                                            Text(
-                                              !flipped ? currentCard.question : currentCard.answer,
-                                              style: textTheme.displayMedium,
-                                              textAlign: TextAlign.center,
+                        child: LayoutBuilder(builder: (context, constraints) {
+                          mCardWidth = constraints.maxWidth;
+                          mCardHeight = constraints.maxHeight;
+                          return Opacity(
+                            opacity: hideCard ? 0 : 1,
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: AnimatedBuilder(
+                                  animation: _cardAnimation,
+                                  builder: (context, child) {
+                                    return Transform.scale(
+                                      //Y stays the same, X changes
+                                      scaleY: 1,
+                                      scaleX: _cardAnimation.value,
+                                      child: ElevatedButton(
+                                          onPressed: () async {
+                                            //* Forward then back
+                                            await _cardAnimationController.forward();
+                                            setState(() {
+                                              flipped = !flipped;
+                                            });
+                                            await _cardAnimationController.reverse();
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            surfaceTintColor: Colors.transparent,
+                                            backgroundColor: theme.secondary.withOpacity(0.115),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10),
                                             ),
-                                            Icon(Icons.rotate_left, color: theme.onBackground),
-                                          ],
-                                        ),
-                                      )),
-                                );
-                              }),
-                        ),
+                                            shadowColor: Colors.transparent,
+                                            // height: MediaQuery.of(context).size.height * 0.25,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                const SizedBox.shrink(),
+                                                Text(
+                                                  !flipped ? currentCard.question : currentCard.answer,
+                                                  style: textTheme.displayMedium,
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                Icon(Icons.rotate_left, color: theme.onBackground),
+                                              ],
+                                            ),
+                                          )),
+                                    );
+                                  }),
+                            ),
+                          );
+                        }),
                       ),
-                      const SizedBox(width: 10),
                       if (currentCard.hints.isNotEmpty)
                         Expanded(
                             flex: 2,
-                            child: ListView.builder(
-                              itemBuilder: (context, i) => HintItem(key: hintItemKeys[i], currentCard: currentCard, textTheme: textTheme, i: i),
-                              itemCount: currentCard.hints.length,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: ListView.builder(
+                                itemBuilder: (context, i) => HintItem(key: hintItemKeys[i], currentCard: currentCard, textTheme: textTheme, i: i),
+                                itemCount: currentCard.hints.length,
+                              ),
                             ))
                     ],
                   ),
@@ -604,6 +630,14 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _player.stop();
+    _cardAnimationController.dispose();
+    entry.remove();
+    super.dispose();
   }
 }
 

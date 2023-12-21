@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:local_hero/local_hero.dart';
 
 class FlashcardsAnimationWidget extends StatefulWidget {
-  const FlashcardsAnimationWidget({required super.key, required this.theme});
+  const FlashcardsAnimationWidget({required super.key, required this.theme, required this.mCardWidth, required this.mCardHeight});
   final ColorScheme theme;
+  final double mCardWidth;
+  final double mCardHeight;
 
   @override
   State<FlashcardsAnimationWidget> createState() => FlashcardsAnimationWidgetState();
@@ -41,7 +43,7 @@ class FlashcardsAnimationWidgetState extends State<FlashcardsAnimationWidget> {
               borderRadius: BorderRadius.circular(10),
             )),
       ),
-      LocalHero(key: UniqueKey(), tag: "box$box2Num", child: Container(width: 200, height: 50, color: Colors.transparent)),
+      LocalHero(key: UniqueKey(), tag: "box$box2Num", child: Container(width: widget.mCardWidth, height: widget.mCardHeight, color: Colors.transparent)),
       LocalHero(
         key: UniqueKey(),
         tag: 'box$box3Num',
@@ -78,7 +80,7 @@ class FlashcardsAnimationWidgetState extends State<FlashcardsAnimationWidget> {
                 )),
           ),
         ),
-        LocalHero(key: UniqueKey(), tag: "box$box2Num", child: Container(width: 200, height: 50, color: Colors.transparent)),
+        LocalHero(key: UniqueKey(), tag: "box$box2Num", child: Container(width: widget.mCardWidth, height: widget.mCardHeight, color: Colors.transparent)),
         LocalHero(
           key: UniqueKey(),
           tag: 'box$box3Num',
@@ -103,7 +105,8 @@ class FlashcardsAnimationWidgetState extends State<FlashcardsAnimationWidget> {
       backgroundColor: Colors.transparent,
       body: Center(
         child: LocalHeroScope(
-          duration: const Duration(milliseconds: 1000),
+          curve: Curves.ease,
+          duration: const Duration(milliseconds: 300),
           onlyAnimateRemount: false,
           child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: children),
         ),
@@ -122,8 +125,8 @@ class ExtraOverlay extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Transform.translate(offset: const Offset(0, -25), child: Container(width: 150, height: 50, decoration: BoxDecoration(border: Border.all(color: theme.onBackground), borderRadius: BorderRadius.circular(10)))),
-          Transform.translate(offset: const Offset(0, 25), child: Container(width: 150, height: 50, decoration: BoxDecoration(border: Border.all(color: theme.onBackground), borderRadius: BorderRadius.circular(10)))),
+          Transform.translate(offset: const Offset(0, -25), child: Container(width: 150, height: 50, decoration: BoxDecoration(color: theme.secondary, border: Border.all(color: theme.onBackground), borderRadius: BorderRadius.circular(10)))),
+          Transform.translate(offset: const Offset(0, 25), child: Container(width: 150, height: 50, decoration: BoxDecoration(color: theme.secondary, border: Border.all(color: theme.onBackground), borderRadius: BorderRadius.circular(10)))),
         ],
       ),
     );
