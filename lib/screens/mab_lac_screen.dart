@@ -892,7 +892,7 @@ class ListItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         ListTile(
-          onTap: () => showBottomSheet(context: context, builder: (context) => MABModal(title: title, description: description, image: image, attatchements: attatchements)),
+          onTap: () => showDialog(context: context, builder: (context) => MABModal(title: title, description: description, image: image, attatchements: attatchements)),
           leading: Icon(type == 1 ? Icons.announcement_rounded : Icons.task, color: theme.onBackground),
           title: Row(
             mainAxisSize: MainAxisSize.min,
@@ -959,15 +959,15 @@ class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
       await launch(downloadURL);
     }
 
-    return BottomSheet(
-      showDragHandle: true,
-      dragHandleColor: theme.secondary,
-      constraints: BoxConstraints.expand(height: MediaQuery.of(context).size.height * 0.9),
-      enableDrag: true,
-      animationController: BottomSheet.createAnimationController(this),
+    return Dialog.fullscreen(
+      // showDragHandle: true,
+      // dragHandleColor: theme.secondary,
+      // constraints: BoxConstraints.expand(height: MediaQuery.of(context).size.height * 0.9),
+      // enableDrag: true,
+      // animationController: BottomSheet.createAnimationController(this),
       backgroundColor: theme.background,
-      onClosing: () {},
-      builder: (context) => SafeArea(
+      // onClosing: () {},
+      child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -975,10 +975,27 @@ class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
             children: [
               const SizedBox(height: 8),
               //Main header
-              Text(
-                widget.title,
-                style: textTheme.displayMedium,
-                textAlign: TextAlign.center,
+              Row(
+                children: [
+                  Expanded(
+                      child: Row(
+                    children: [
+                      IconButton(onPressed: () => Navigator.pop(context), icon: Icon(Icons.close, color: theme.onBackground.withOpacity(0.5))),
+                    ],
+                  )),
+                  Expanded(
+                    child: Center(
+                      child: FittedBox(
+                        child: Text(
+                          widget.title,
+                          style: textTheme.displayMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(child: Container())
+                ],
               ),
               const SizedBox(height: 8),
               //Sub header
@@ -1029,76 +1046,48 @@ class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
                   ),
                 ],
               ),
-              ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: widget.attatchements.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: ElevatedButton(
-                        onPressed: () => {
-                          downloadFile(widget.attatchements[index]),
-                        },
-                        style: ElevatedButton.styleFrom(
-                          side: BorderSide(color: theme.secondary, width: 1),
-                          padding: const EdgeInsets.all(0),
-                          backgroundColor: theme.secondary,
-                          foregroundColor: theme.onSecondary,
-                          shadowColor: Colors.black,
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+              Expanded(
+                child: ListView.builder(
+                    itemCount: widget.attatchements.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: ElevatedButton(
+                          onPressed: () => {
+                            downloadFile(widget.attatchements[index]),
+                          },
+                          style: ElevatedButton.styleFrom(
+                            side: BorderSide(color: theme.secondary, width: 1),
+                            padding: const EdgeInsets.all(0),
+                            backgroundColor: theme.secondary,
+                            foregroundColor: theme.onSecondary,
+                            shadowColor: Colors.black,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              //Replace with actual name
-                              Flexible(flex: 3, child: Text(extractFilenameFromUrl(widget.attatchements[index]), style: textTheme.displaySmall)),
-                              Flexible(
-                                flex: 1,
-                                child: Icon(
-                                  Icons.download_sharp,
-                                  color: theme.onSecondary,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                //Replace with actual name
+                                Flexible(flex: 3, child: Text(extractFilenameFromUrl(widget.attatchements[index]), style: textTheme.displaySmall)),
+                                Flexible(
+                                  flex: 1,
+                                  child: Icon(
+                                    Icons.download_sharp,
+                                    color: theme.onSecondary,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
-              const Spacer(),
-              //Back button
-              Container(
-                height: 40,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: getPrimaryGradient,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: () => {
-                    Navigator.pop(context)
-                  },
-                  child: Text(
-                    "Close",
-                    style: textTheme.displaySmall!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                      );
+                    }),
               ),
-              const SizedBox(height: 8),
             ],
           ),
         ),
