@@ -172,7 +172,7 @@ class _ForumScreenState extends State<ForumScreen> with TickerProviderStateMixin
             "Forums",
             style: ttm.displayMedium,
           ),
-          backgroundColor: tm.background,
+          backgroundColor: Colors.transparent,
           foregroundColor: tm.onBackground,
           elevation: 0,
           leading: IconButton(

@@ -75,7 +75,7 @@ class ComboCounterState extends State<ComboCounter> {
       //       );
       //     });
     });
-    if (counter >= 5) {
+    if (counter >= 3) {
       QuizzesComboAnimComponentsFunctions.run(context, widget.incrementScore, counter ^ 2);
     }
     // startTimer();

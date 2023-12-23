@@ -288,7 +288,34 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                           //     ),
                           //   ),
                           // ),
-
+                          // //* Page number and changer (inconsistent, to be fixed)
+                          // Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          //   SizedBox(
+                          //     width: 30,
+                          //     child: IconButton(
+                          //       icon: Icon(
+                          //         Icons.arrow_back_ios,
+                          //         color: theme.onBackground,
+                          //       ),
+                          //       onPressed: null,
+                          //     ),
+                          //   ),
+                          //   Text(
+                          //     "1",
+                          //     style: textTheme.displayMedium,
+                          //     textAlign: TextAlign.center,
+                          //   ),
+                          //   SizedBox(
+                          //     width: 30,
+                          //     child: IconButton(
+                          //       icon: Icon(
+                          //         Icons.arrow_forward_ios,
+                          //         color: theme.onBackground,
+                          //       ),
+                          //       onPressed: null,
+                          //     ),
+                          //   ),
+                          // ]),
                           const SizedBox(height: 10),
                           Text("Theme", style: textTheme.displaySmall),
                           const SizedBox(height: 10),

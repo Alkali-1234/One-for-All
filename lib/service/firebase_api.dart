@@ -27,6 +27,8 @@ Future backgroundHandler(RemoteMessage message) async {
 Future initializeFCM(String assignedCommunity, String assignedSection) async {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
+  final prefs = await SharedPreferences.getInstance();
+
   NotificationSettings settings = await _firebaseMessaging.requestPermission(
     alert: true,
     announcement: false,
@@ -36,51 +38,62 @@ Future initializeFCM(String assignedCommunity, String assignedSection) async {
     provisional: false,
     sound: true,
   );
+
+  //* Get notification permissions, and change settings accordingly
   if (settings.authorizationStatus == AuthorizationStatus.denied || settings.authorizationStatus == AuthorizationStatus.notDetermined) {
     print("Notifications not enabled");
-    throw Exception("Notifications are required! You may disable notifications later in settings.");
+    await prefs.setBool("setting_notifications_MAB", false);
+    await prefs.setBool("setting_notifications_LAC", false);
+    await prefs.setBool("setting_notifications_RecentActivity", false);
+  } else {
+    print("Notifications enabled");
+    await prefs.setBool("setting_notifications_MAB", true);
+    await prefs.setBool("setting_notifications_LAC", true);
+    await prefs.setBool("setting_notifications_RecentActivity", true);
   }
   final fcmToken = await _firebaseMessaging.getToken();
   print('Initialized FCM with token: $fcmToken');
-  if (fcmToken != null) {
-    await saveFCMToken(fcmToken);
-  }
+  //! FCM Token currently not needed
+  // if (fcmToken != null) {
+  //   await saveFCMToken(fcmToken);
+  // }
 
   if (assignedCommunity == "") return;
   //* Subscribe to the topic
 
-  final prefs = await SharedPreferences.getInstance();
-  if (prefs.containsKey("setting_notifications_MAB")) {
-    if (prefs.getBool("setting_notifications_MAB")!) {
+  if (prefs.containsKey("hasOpenedBefore") == false) {
+    if (prefs.containsKey("setting_notifications_MAB")) {
+      if (prefs.getBool("setting_notifications_MAB")!) {
+        await _firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
+      } else {
+        await _firebaseMessaging.unsubscribeFromTopic("MAB_$assignedCommunity");
+      }
+    } else {
       await _firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
-    } else {
-      await _firebaseMessaging.unsubscribeFromTopic("MAB_$assignedCommunity");
     }
-  } else {
-    await _firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
-  }
-  if (prefs.containsKey("setting_notifications_LAC")) {
-    if (prefs.getBool("setting_notifications_LAC")!) {
-      await _firebaseMessaging.subscribeToTopic("LAC_${assignedCommunity}_$assignedSection");
+    if (prefs.containsKey("setting_notifications_LAC")) {
+      if (prefs.getBool("setting_notifications_LAC")!) {
+        await _firebaseMessaging.subscribeToTopic("LAC_${assignedCommunity}_$assignedSection");
+      } else {
+        await _firebaseMessaging.unsubscribeFromTopic("LAC_${assignedCommunity}_$assignedSection");
+      }
     } else {
-      await _firebaseMessaging.unsubscribeFromTopic("LAC_${assignedCommunity}_$assignedSection");
+      await _firebaseMessaging.subscribeToTopic("LAC_$assignedCommunity");
     }
-  } else {
-    await _firebaseMessaging.subscribeToTopic("LAC_$assignedCommunity");
-  }
-  if (prefs.containsKey("setting_notifications_RecentActivity")) {
-    if (prefs.getBool("setting_notifications_RecentActivity")!) {
+    if (prefs.containsKey("setting_notifications_RecentActivity")) {
+      if (prefs.getBool("setting_notifications_RecentActivity")!) {
+        await _firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
+      } else {
+        await _firebaseMessaging.unsubscribeFromTopic("Recent_Activity_$assignedCommunity");
+      }
+    } else {
       await _firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
-    } else {
-      await _firebaseMessaging.unsubscribeFromTopic("Recent_Activity_$assignedCommunity");
     }
-  } else {
+
+    await _firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
+    if (assignedSection != "") await _firebaseMessaging.subscribeToTopic("LAC_${assignedCommunity}_$assignedSection");
     await _firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
   }
-
-  await _firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
-  if (assignedSection != "") await _firebaseMessaging.subscribeToTopic("LAC_${assignedCommunity}_$assignedSection");
-  await _firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
 
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {

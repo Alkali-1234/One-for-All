@@ -372,8 +372,6 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
     //Calculate time spent
     DateTime currentTime = DateTime.now();
     Duration timeSpent = startingTime.difference(currentTime);
-    //* Clear overlays
-    entry.remove();
     //Replace current screen with finished screen
     Navigator.pushReplacement(
         context,

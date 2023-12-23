@@ -856,7 +856,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
     appState.setCurrentUser(UserData(uid: 0, exp: 0, streak: 0, posts: 0, flashCardSets: [], username: "Guest", email: "guest@guest.com", profilePicture: "https://picsum.photos/200", assignedCommunity: "0", assignedSection: "0"));
     appState.setQuizzes([]);
     //* Get quizzes data from shared preferences
-    await SharedPreferences.getInstance().then((value) {
+    await SharedPreferences.getInstance().then((value) async {
       if (value.containsKey("quizData")) {
         appState.setQuizzes([]);
         dynamic decodedObject = jsonDecode(value.getString("quizData")!);
@@ -879,6 +879,65 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
           appState.getQuizzes.add(quiz);
         }
       }
+//* Get flashcard sets from shared preferences
+      await SharedPreferences.getInstance().then((value) {
+        if (value.containsKey("flashcardSets")) {
+          dynamic decodedObject = jsonDecode(value.getString("flashcardSets")!);
+
+          //* Convert the decoded `dynamic` object back to your desired Dart object structure
+          List<FlashcardSet> flashcardSets = [];
+          for (var set in decodedObject['sets']) {
+            flashcardSets.add(FlashcardSet(id: decodedObject['sets'].indexOf(set), title: "${set["title"]}", description: "description_unavailable", flashcards: [
+              for (var flashcard in set['questions']) Flashcard(image: flashcard['image'], id: set['questions'].indexOf(flashcard), question: flashcard['question'], answer: flashcard['answer'], hints: flashcard['hints'] ?? [])
+            ]));
+          }
+
+          //* Add the flashcard sets to the user data
+          for (FlashcardSet set in flashcardSets) {
+            // getUserData.flashCardSets.add(set);
+            appState.getCurrentUser.flashCardSets.add(set);
+          }
+        }
+      });
+
+      //* Set community data
+      // ! No longer needed
+      // if (assignedCommunity != null) {
+      //   await getCommunityData(assignedCommunity).then((value) {
+      //     return;
+      //   }).catchError((error, stackTrace) {
+      //     throw error;
+      //   });
+      // } else {
+      //   throw Exception("user_not_assigned_to_community");
+      // }
+
+      // if (assignedCommunity is! String) {
+      //   throw Exception("assigned_community_not_string");
+      // }
+
+      //* Notifications
+      final prefs = await SharedPreferences.getInstance();
+      if (!prefs.containsKey("setting_notifications_MAB")) {
+        prefs.setBool("setting_notifications_MAB", true);
+      }
+      if (!prefs.containsKey("setting_notifications_LAC")) {
+        prefs.setBool("setting_notifications_LAC", true);
+      }
+      if (!prefs.containsKey("setting_notifications_RecentActivity")) {
+        prefs.setBool("setting_notifications_RecentActivity", true);
+      }
+
+      //if my hypothesis is correct, this should be null
+      // print(appState.getMabData?.posts);
+
+      // final assignedSection = appState.getCurrentUser.assignedSection != "0" ? appState.getCurrentUser.assignedSection![0] : "";
+
+      //* initialize FCM
+      // await initializeFCM(assignedCommunity, assignedSection);
+      //* hasOpenedBefore = true
+      prefs.setBool("hasOpenedBefore", true);
+
       //* Push to home screen
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const HomePage()));
     });

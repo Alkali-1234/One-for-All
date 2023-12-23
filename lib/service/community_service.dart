@@ -160,7 +160,7 @@ Future createUserData(String uid) async {
       "streak": 0,
       "posts": 0,
       "flashCardSets": [],
-      "assignedCommunity": null,
+      "assignedCommunity": "",
       "sections": [],
     }).catchError((error, stackTrace) {
       throw error;

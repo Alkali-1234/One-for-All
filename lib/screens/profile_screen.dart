@@ -76,6 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           await changeUserName(username);
           appState.getCurrentUser.username = username;
         } on Exception catch (e) {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error changing username! $e', style: TextStyle(color: Colors.white)),
@@ -90,6 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         try {
           await changeUserEmail(email);
         } on Exception catch (e) {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error changing email! $e', style: TextStyle(color: Colors.white)),
@@ -100,6 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
       }
       debugPrint('Changes saved!');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Changes saved!', style: TextStyle(color: Colors.white)),

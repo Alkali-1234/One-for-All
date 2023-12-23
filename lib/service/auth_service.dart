@@ -37,30 +37,70 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
   var auth = FirebaseAuth.instance;
   //Set user data
   final assignedCommunity = await getValue("users", auth.currentUser!.uid, "assignedCommunity") ?? "";
-  await getDocument("users", auth.currentUser!.uid).then((value) {
+  await getDocument("users", auth.currentUser!.uid).then((value) async {
     //set flashcard sets for setUserData
     //* Initialize an empty list of flashcard sets
     debugPrint(value.data()!["flashcardSets"].toString());
     List<FlashcardSet> flashcardSets = [];
-    if (value.data()!["flashcardSets"] != null) {
-      //* Add flashcard sets to the list
-      for (var i = 0; i < value.data()!["flashcardSets"].length; i++) {
-        flashcardSets.add(FlashcardSet(
-            id: i,
-            flashcards: [
-              for (var j = 0; j < value.data()!["flashcardSets"][i]["questions"].length; j++) Flashcard(image: null, id: j, question: value.data()!["flashcardSets"][i]["questions"][j]["question"], answer: value.data()!["flashcardSets"][i]["questions"][j]["answer"], hints: [])
-            ],
-            title: "${value.data()!["flashcardSets"][i]["title"]} (Cloud)",
-            description: value.data()!["flashcardSets"][i]["description"]));
-      }
+    //! Temporarily unused
+    // // if (value.data()!["flashcardSets"] != null) {
+    // //   //* Add flashcard sets to the list
+    // //   for (var i = 0; i < value.data()!["flashcardSets"].length; i++) {
+    // //     flashcardSets.add(FlashcardSet(
+    // //         id: i,
+    // //         flashcards: [
+    // //           for (var j = 0; j < value.data()!["flashcardSets"][i]["questions"].length; j++) Flashcard(image: null, id: j, question: value.data()!["flashcardSets"][i]["questions"][j]["question"], answer: value.data()!["flashcardSets"][i]["questions"][j]["answer"], hints: [])
+    // //         ],
+    // //         title: "${value.data()!["flashcardSets"][i]["title"]} (Cloud)",
+    // //         description: value.data()!["flashcardSets"][i]["description"]));
+    // //   }
+    // // }
+
+    List<String> incompleteData = [];
+    //* Check if user data is incomplete
+    if (value.data()!["exp"] == null) {
+      incompleteData.add("exp");
+    }
+    if (value.data()!["streak"] == null) {
+      incompleteData.add("streak");
+    }
+    if (value.data()!["posts"] == null) {
+      incompleteData.add("posts");
+    }
+    if (value.data()!["sections"] == null) {
+      incompleteData.add("sections");
+    }
+    //! Temporarily unused
+    // if (value.data()!["flashcardSets"] == null) {
+    //   incompleteData.add("flashcardSets");
+    // }
+    if (value.data()!["assignedCommunity"] == null) {
+      incompleteData.add("assignedCommunity");
+    }
+    if (value.data()!["sections"] == null) {
+      incompleteData.add("sections");
+    }
+
+    //* Set missing data
+    if (incompleteData.isNotEmpty) {
+      await FirebaseFirestore.instance.collection("users").doc(auth.currentUser!.uid).update({
+        for (var data in incompleteData)
+          data: data == "flashcardSets"
+              ? []
+              : data == "sections"
+                  ? []
+                  : data == assignedCommunity
+                      ? ""
+                      : 0
+      });
     }
 
     //* New Method
     appState.setCurrentUser(UserData(
       uid: int.tryParse(auth.currentUser!.uid) ?? 0,
-      exp: value.data()!["exp"],
-      streak: value.data()!["streak"],
-      posts: value.data()!["posts"],
+      exp: value.data()!["exp"] ?? 0,
+      streak: value.data()!["streak"] ?? 0,
+      posts: value.data()!["posts"] ?? 0,
       flashCardSets: flashcardSets,
       username: auth.currentUser!.displayName ?? "Invalid Username!",
       email: auth.currentUser!.email ?? "Invalid Email!",
@@ -171,7 +211,7 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
 
   final assignedSection = appState.getCurrentUser.assignedSection != "0" ? appState.getCurrentUser.assignedSection![0] : "";
 
-  //* initialize FCM
+  //* Initialize FCM
   if (kIsWeb == false) await initializeFCM(assignedCommunity, assignedSection);
   //* hasOpenedBefore = true
   prefs.setBool("hasOpenedBefore", true);

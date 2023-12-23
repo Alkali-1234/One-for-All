@@ -16,6 +16,7 @@ class _FadeInTransitionState extends State<FadeInTransition> {
 
   void startTween() async {
     await Future.delayed(Duration(milliseconds: widget.delayMilliseconds ?? 0));
+    if (!mounted) return;
     setState(() {
       tween = Tween<double>(begin: 0, end: 1);
     });
