@@ -5,7 +5,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:googleapis_auth/googleapis_auth.dart';
 import 'package:http/http.dart' as http;
-import 'package:oneforall/service/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'dart:convert';
@@ -25,11 +24,11 @@ Future backgroundHandler(RemoteMessage message) async {
 }
 
 Future initializeFCM(String assignedCommunity, String assignedSection) async {
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   final prefs = await SharedPreferences.getInstance();
 
-  NotificationSettings settings = await _firebaseMessaging.requestPermission(
+  NotificationSettings settings = await firebaseMessaging.requestPermission(
     alert: true,
     announcement: false,
     badge: true,
@@ -51,7 +50,7 @@ Future initializeFCM(String assignedCommunity, String assignedSection) async {
     await prefs.setBool("setting_notifications_LAC", true);
     await prefs.setBool("setting_notifications_RecentActivity", true);
   }
-  final fcmToken = await _firebaseMessaging.getToken();
+  final fcmToken = await firebaseMessaging.getToken();
   print('Initialized FCM with token: $fcmToken');
   //! FCM Token currently not needed
   // if (fcmToken != null) {
@@ -64,35 +63,35 @@ Future initializeFCM(String assignedCommunity, String assignedSection) async {
   if (prefs.containsKey("hasOpenedBefore") == false) {
     if (prefs.containsKey("setting_notifications_MAB")) {
       if (prefs.getBool("setting_notifications_MAB")!) {
-        await _firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
+        await firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
       } else {
-        await _firebaseMessaging.unsubscribeFromTopic("MAB_$assignedCommunity");
+        await firebaseMessaging.unsubscribeFromTopic("MAB_$assignedCommunity");
       }
     } else {
-      await _firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
+      await firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
     }
     if (prefs.containsKey("setting_notifications_LAC")) {
       if (prefs.getBool("setting_notifications_LAC")!) {
-        await _firebaseMessaging.subscribeToTopic("LAC_${assignedCommunity}_$assignedSection");
+        await firebaseMessaging.subscribeToTopic("LAC_${assignedCommunity}_$assignedSection");
       } else {
-        await _firebaseMessaging.unsubscribeFromTopic("LAC_${assignedCommunity}_$assignedSection");
+        await firebaseMessaging.unsubscribeFromTopic("LAC_${assignedCommunity}_$assignedSection");
       }
     } else {
-      await _firebaseMessaging.subscribeToTopic("LAC_$assignedCommunity");
+      await firebaseMessaging.subscribeToTopic("LAC_$assignedCommunity");
     }
     if (prefs.containsKey("setting_notifications_RecentActivity")) {
       if (prefs.getBool("setting_notifications_RecentActivity")!) {
-        await _firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
+        await firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
       } else {
-        await _firebaseMessaging.unsubscribeFromTopic("Recent_Activity_$assignedCommunity");
+        await firebaseMessaging.unsubscribeFromTopic("Recent_Activity_$assignedCommunity");
       }
     } else {
-      await _firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
+      await firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
     }
 
-    await _firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
-    if (assignedSection != "") await _firebaseMessaging.subscribeToTopic("LAC_${assignedCommunity}_$assignedSection");
-    await _firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
+    await firebaseMessaging.subscribeToTopic("MAB_$assignedCommunity");
+    if (assignedSection != "") await firebaseMessaging.subscribeToTopic("LAC_${assignedCommunity}_$assignedSection");
+    await firebaseMessaging.subscribeToTopic("Recent_Activity_$assignedCommunity");
   }
 
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
@@ -211,7 +210,7 @@ Future<String> getAccessToken() async {
   final Directory currentDirectory = Directory.current;
   print(currentDirectory.path);
   // final String email = env.Env.notificationClientEmail;
-  final String privateKey = "0";
+  const String privateKey = "0";
   // final String clientId = env.Env.notificationClientId;
   //wait 1 second
   await Future.delayed(const Duration(seconds: 1));

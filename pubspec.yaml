@@ -33,7 +33,6 @@ dependencies:
   google_sign_in: ^6.1.4
   googleapis_auth: ^1.4.1
   async: ^2.11.0
-  envied: ^0.3.0+3
   google_mobile_ads: ^3.0.0
   just_audio: ^0.9.35
   photo_view: ^0.14.0
@@ -47,7 +46,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
-  envied_generator: ^0.3.0+3
   build_runner: ^2.4.6
 
 # The following section is specific to Flutter packages.

@@ -10,7 +10,6 @@ import '../main.dart';
 import 'login_screen.dart';
 import 'get_started.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../banner_ad.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key, required this.appstate});
@@ -202,7 +201,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                               child: Row(
                                 children: [
                                   Text(
-                                    "v0.0.4-pre2",
+                                    "v0.0.4",
                                     style: TextStyle(color: Colors.grey, fontSize: 12),
                                   ),
                                 ],

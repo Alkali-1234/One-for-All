@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/styles/styles.dart';
 import 'package:shared_preferences/shared_preferences.dart';

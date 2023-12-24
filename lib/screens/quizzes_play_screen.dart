@@ -6,8 +6,6 @@ import 'package:flutter_shakemywidget/flutter_shakemywidget.dart';
 import 'package:animations/animations.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:oneforall/banner_ad.dart';
-import 'package:oneforall/components/animations/fade_in_transition_horizontal.dart';
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/components/quizzes_components/infinitymode_dialog.dart';
 import 'package:oneforall/components/quizzes_components/three_two_one_go_modal.dart';
@@ -20,7 +18,6 @@ import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import '../components/quizzes_components/combo_counter.dart';
 import '../components/quizzes_components/combo_flash_modal.dart';
-import './flashcardsPlay_screen.dart';
 import 'package:just_audio/just_audio.dart';
 
 class QuizzesPlayScreen extends StatefulWidget {
@@ -483,8 +480,8 @@ class PlayScreenState extends State<PlayScreen> {
     Navigator.of(context).pop();
     Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => InterstitialScreen(
-              onClosed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EndScreen(score: this.score, correctAnswers: correctAnswers, totalQuestions: questionsDone, redemptionAmount: redemptionAmount, timeSpent: DateTime.now().difference(startTime), highestStreak: highestStreak))),
-              onFailed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EndScreen(score: this.score, correctAnswers: correctAnswers, totalQuestions: questionsDone, redemptionAmount: redemptionAmount, timeSpent: DateTime.now().difference(startTime), highestStreak: highestStreak))),
+              onClosed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EndScreen(score: score, correctAnswers: correctAnswers, totalQuestions: questionsDone, redemptionAmount: redemptionAmount, timeSpent: DateTime.now().difference(startTime), highestStreak: highestStreak))),
+              onFailed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EndScreen(score: score, correctAnswers: correctAnswers, totalQuestions: questionsDone, redemptionAmount: redemptionAmount, timeSpent: DateTime.now().difference(startTime), highestStreak: highestStreak))),
             )));
   }
 

@@ -384,7 +384,7 @@ class GenerateFlashcardsModal extends StatefulWidget {
 }
 
 class _GenerateFlashcardsModalState extends State<GenerateFlashcardsModal> {
-  int? selectedQuiz = null;
+  int? selectedQuiz;
 
   @override
   Widget build(BuildContext context) {

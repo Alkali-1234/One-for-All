@@ -215,7 +215,7 @@ Future getDocument(String collection, String document) async {
 Future getCommunity(String communityID) async {
   //* Get the community document
   CollectionReference communityCollection = FirebaseFirestore.instance.collection("communities");
-  var document;
+  DocumentSnapshot<Object?>? document;
   try {
     await communityCollection.doc(communityID).get().then((value) {
       // debugPrint(value.toString());
@@ -313,7 +313,8 @@ Future joinSection(String communityID, String sectionID) async {
 Future getCommunityData(String communityID) async {
   //* Get the community document
   CollectionReference communityCollection = FirebaseFirestore.instance.collection("communities");
-  var document;
+  DocumentSnapshot<Object?>? document;
+
   try {
     await communityCollection.doc(communityID).get().then((value) {
       // }

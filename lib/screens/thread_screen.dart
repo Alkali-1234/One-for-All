@@ -208,7 +208,7 @@ class _ThreadBodyState extends State<ThreadBody> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Unsubscribed from thread', style: TextStyle(color: Colors.white)),
-          duration: const Duration(seconds: 1),
+          duration: Duration(seconds: 1),
           backgroundColor: Colors.red,
         ),
       );
@@ -218,7 +218,7 @@ class _ThreadBodyState extends State<ThreadBody> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Subscribed to thread', style: TextStyle(color: Colors.white)),
-          duration: const Duration(seconds: 1),
+          duration: Duration(seconds: 1),
           backgroundColor: Colors.green,
         ),
       );

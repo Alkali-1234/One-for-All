@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/constants.dart';
 import 'package:photo_view/photo_view.dart';

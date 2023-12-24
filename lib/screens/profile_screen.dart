@@ -79,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error changing username! $e', style: TextStyle(color: Colors.white)),
+              content: Text('Error changing username! $e', style: const TextStyle(color: Colors.white)),
               backgroundColor: Colors.red,
             ),
           );
@@ -94,7 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error changing email! $e', style: TextStyle(color: Colors.white)),
+              content: Text('Error changing email! $e', style: const TextStyle(color: Colors.white)),
               backgroundColor: Colors.red,
             ),
           );

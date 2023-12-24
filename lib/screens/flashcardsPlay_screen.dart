@@ -1015,7 +1015,7 @@ class _FinishedScreenState extends State<FinishedScreen> with TickerProviderStat
   Widget _buildAnimatedWidget(int index, Widget child) {
     const delayInterval = 20; // Adjust the delay between each widget animation
     final startDelay = index * delayInterval;
-    final animationStartDelay = Duration(milliseconds: startDelay) + Duration(milliseconds: 500);
+    final animationStartDelay = Duration(milliseconds: startDelay) + const Duration(milliseconds: 500);
 
     // Create a separate AnimationController for each widget
     final widgetController = AnimationController(

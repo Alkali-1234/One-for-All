@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'dart:ui';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/components/animations/fade_in_transition.dart';
 import 'package:oneforall/main.dart';
@@ -491,7 +489,7 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
         Container(
           height: 40,
           width: double.infinity,
-          decoration: BoxDecoration(gradient: defaultBluePrimaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
+          decoration: const BoxDecoration(gradient: defaultBluePrimaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
           child: ElevatedButton(
             onPressed: () async {
               await saveSettings();
@@ -793,7 +791,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
         Container(
           height: 40,
           width: double.infinity,
-          decoration: BoxDecoration(gradient: defaultBluePrimaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
+          decoration: const BoxDecoration(gradient: defaultBluePrimaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
           child: ElevatedButton(
             onPressed: () => {
               joinCommunityWithValidation(),
@@ -1082,7 +1080,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
           Container(
             height: 40,
             width: double.infinity,
-            decoration: BoxDecoration(gradient: defaultBluePrimaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
+            decoration: const BoxDecoration(gradient: defaultBluePrimaryGradient, borderRadius: BorderRadius.all(Radius.circular(100))),
             child: ElevatedButton(
               onPressed: () {
                 createAccountValidation();

@@ -320,9 +320,9 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                                             borderRadius: BorderRadius.zero,
                                                             borderSide: BorderSide(color: theme.onBackground, width: 1),
                                                           ),
-                                                          border: OutlineInputBorder(
+                                                          border: const OutlineInputBorder(
                                                             borderRadius: BorderRadius.zero,
-                                                            borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+                                                            borderSide: BorderSide(width: 0, style: BorderStyle.none),
                                                           ),
                                                           contentPadding: const EdgeInsets.all(0),
                                                           hintText: "Question ${index + 1}",
@@ -339,9 +339,9 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                                         textAlign: TextAlign.center,
                                                         initialValue: questionQuery["queries"][index]["answer"],
                                                         decoration: InputDecoration(
-                                                          border: OutlineInputBorder(
+                                                          border: const OutlineInputBorder(
                                                             borderRadius: BorderRadius.zero,
-                                                            borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+                                                            borderSide: BorderSide(width: 0, style: BorderStyle.none),
                                                           ),
                                                           focusedBorder: OutlineInputBorder(
                                                             borderRadius: BorderRadius.zero,
@@ -607,9 +607,9 @@ class _HintsDialogState extends State<HintsDialog> {
                                 borderRadius: BorderRadius.zero,
                                 borderSide: BorderSide(color: theme.onBackground, width: 1),
                               ),
-                              border: OutlineInputBorder(
+                              border: const OutlineInputBorder(
                                 borderRadius: BorderRadius.zero,
-                                borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+                                borderSide: BorderSide(width: 0, style: BorderStyle.none),
                               ),
                               contentPadding: const EdgeInsets.all(0),
                               hintText: "Hint ${index + 1}",

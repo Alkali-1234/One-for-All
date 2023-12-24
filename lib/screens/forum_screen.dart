@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 // import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:oneforall/banner_ad.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/screens/thread_screen.dart';
 import 'package:provider/provider.dart';
@@ -675,15 +674,15 @@ class _NewThreadWidgetState extends State<NewThreadWidget> {
   void createThread(AppState appState) async {
     if (isLoading) return;
     if (titleController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Title cannot be empty")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Title cannot be empty")));
       return;
     }
     if (descriptionController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Description cannot be empty")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Description cannot be empty")));
       return;
     }
     if (target == "") {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please select a target")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select a target")));
       return;
     }
 

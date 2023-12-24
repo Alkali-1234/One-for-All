@@ -43,7 +43,7 @@ class InformationScreen extends StatelessWidget {
                   title: "Version",
                   subtitle: "v0.0.4",
                 ),
-                ListItem(textTheme: textTheme, title: "Build Number", subtitle: "000000"),
+                ListItem(textTheme: textTheme, title: "Build Number", subtitle: "f789123"),
                 ListItem(textTheme: textTheme, title: "Branch", subtitle: "main/stable"),
                 ListItem(textTheme: textTheme, title: "Flutter SDK Version", subtitle: "3.13.2"),
                 ListItem(textTheme: textTheme, title: "Dart Version", subtitle: "3.1.0"),
