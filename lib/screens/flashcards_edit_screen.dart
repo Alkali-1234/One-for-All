@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/main.dart';
 import 'package:path_provider/path_provider.dart';
@@ -126,316 +127,275 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
     var theme = passedUserTheme.colorScheme;
     var textTheme = passedUserTheme.textTheme;
     var appState = context.watch<AppState>();
-    return Container(
-        decoration: passedUserTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: passedUserTheme.colorScheme.background),
-        child: SafeArea(
-            child: Scaffold(
-                resizeToAvoidBottomInset: true,
-                backgroundColor: Colors.transparent,
-                body: Column(
+    return Scaffold(
+      body: MainContainer(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                    child: RichText(
+                        text: TextSpan(text: "Editing", style: textTheme.displayMedium, children: [
+                          TextSpan(text: " ${appState.getCurrentUser.flashCardSets[widget.setIndex].title}", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+                        ]),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis)),
+                Text("${questionQuery["queries"]?.length ?? 0} Questions", style: textTheme.displayMedium)
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          //New Question button
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+                onPressed: () => addCard(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.secondary,
+                  shadowColor: Colors.transparent,
+                  elevation: 0,
+                  side: BorderSide(color: theme.tertiary, width: 1),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    //App Bar
-                    Container(
-                      color: theme.secondary,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: Icon(
-                                Icons.arrow_back,
-                                color: theme.onPrimary,
-                              ),
-                            ),
-                            Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
-                            Container(
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                color: theme.onPrimary,
-                                borderRadius: BorderRadius.circular(20),
-                                gradient: getPrimaryGradient,
-                              ),
-                              child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
-                            ),
-                          ],
-                        ),
-                      ),
+                    Icon(Icons.add, color: theme.onPrimary),
+                    const SizedBox(width: 10),
+                    Text(
+                      "New Question",
+                      style: textTheme.displaySmall,
                     ),
-                    //End of App Bar
-                    //Body
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                    child: RichText(
-                                        text: TextSpan(text: "Editing", style: textTheme.displayMedium, children: [
-                                          TextSpan(text: " ${appState.getCurrentUser.flashCardSets[widget.setIndex].title}", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
-                                        ]),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis)),
-                                Text("${questionQuery["queries"]?.length ?? 0} Questions", style: textTheme.displayMedium)
-                              ],
+                  ],
+                )),
+          ),
+          Expanded(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 100),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+              },
+              child: ListView.builder(
+                  key: ValueKey<int>(questionQuery["queries"]?.length ?? 0),
+                  padding: EdgeInsets.zero,
+                  physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                  itemCount: questionQuery["queries"]?.length ?? 0,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: LayoutBuilder(builder: (context, consntraints) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: index % 2 == 0 ? theme.primary : theme.secondary,
                             ),
-                          ),
-                          const SizedBox(height: 10),
-                          //New Question button
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ElevatedButton(
-                                onPressed: () => addCard(),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: theme.secondary,
-                                  shadowColor: Colors.transparent,
-                                  elevation: 0,
-                                  side: BorderSide(color: theme.tertiary, width: 1),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
                                   children: [
-                                    Icon(Icons.add, color: theme.onPrimary),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      "New Question",
-                                      style: textTheme.displaySmall,
-                                    ),
-                                  ],
-                                )),
-                          ),
-                          Expanded(
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 100),
-                              transitionBuilder: (Widget child, Animation<double> animation) {
-                                return FadeTransition(
-                                  opacity: animation,
-                                  child: child,
-                                );
-                              },
-                              child: ListView.builder(
-                                  physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                                  itemCount: questionQuery["queries"]?.length ?? 0,
-                                  itemBuilder: (context, index) {
-                                    return LayoutBuilder(builder: (context, consntraints) {
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                          color: index % 2 == 0 ? theme.primary : theme.secondary,
-                                        ),
-                                        child: Column(
+                                    TweenAnimationBuilder<double>(
+                                      curve: Curves.easeIn,
+                                      tween: moreOptionsTweens[index],
+                                      duration: const Duration(milliseconds: 200),
+                                      builder: (context, value, child) => SizedBox(
+                                        width: consntraints.maxWidth * value,
+                                        child: Row(
                                           mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Row(
-                                              children: [
-                                                TweenAnimationBuilder<double>(
-                                                  curve: Curves.easeIn,
-                                                  tween: moreOptionsTweens[index],
-                                                  duration: const Duration(milliseconds: 200),
-                                                  builder: (context, value, child) => SizedBox(
-                                                    width: consntraints.maxWidth * value,
-                                                    child: Row(
+                                            const SizedBox(width: 10),
+                                            AnimatedOpacity(
+                                              duration: const Duration(milliseconds: 200),
+                                              opacity: moreOptionsTweens[index].end == 1 ? 1 : 0,
+                                              child: showMoreOptions[index]
+                                                  ? Row(
                                                       mainAxisSize: MainAxisSize.min,
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
+                                                        ElevatedButton.icon(
+                                                            style: ElevatedButton.styleFrom(
+                                                              foregroundColor: theme.onBackground,
+                                                              backgroundColor: theme.secondary,
+                                                              shadowColor: Colors.transparent,
+                                                              elevation: 0,
+                                                              side: BorderSide(color: theme.tertiary, width: 1),
+                                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                            ),
+                                                            onPressed: () => showDialog(
+                                                                context: context,
+                                                                builder: (context) => HintsDialog(
+                                                                      questionQuery: questionQuery["queries"][index],
+                                                                    )),
+                                                            icon: const Icon(Icons.edit),
+                                                            label: const Text("Hints")),
                                                         const SizedBox(width: 10),
-                                                        AnimatedOpacity(
-                                                          duration: const Duration(milliseconds: 200),
-                                                          opacity: moreOptionsTweens[index].end == 1 ? 1 : 0,
-                                                          child: showMoreOptions[index]
-                                                              ? Row(
-                                                                  mainAxisSize: MainAxisSize.min,
-                                                                  children: [
-                                                                    ElevatedButton.icon(
-                                                                        style: ElevatedButton.styleFrom(
-                                                                          foregroundColor: theme.onBackground,
-                                                                          backgroundColor: theme.secondary,
-                                                                          shadowColor: Colors.transparent,
-                                                                          elevation: 0,
-                                                                          side: BorderSide(color: theme.tertiary, width: 1),
-                                                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                                                        ),
-                                                                        onPressed: () => showDialog(
-                                                                            context: context,
-                                                                            builder: (context) => HintsDialog(
-                                                                                  questionQuery: questionQuery["queries"][index],
-                                                                                )),
-                                                                        icon: const Icon(Icons.edit),
-                                                                        label: const Text("Hints")),
-                                                                    const SizedBox(width: 10),
-                                                                    ElevatedButton.icon(
-                                                                        label: Text("Delete", style: textTheme.displaySmall),
-                                                                        style: ElevatedButton.styleFrom(
-                                                                          backgroundColor: theme.secondary,
-                                                                          shadowColor: Colors.transparent,
-                                                                          elevation: 0,
-                                                                          side: BorderSide(color: theme.tertiary, width: 1),
-                                                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                                                        ),
-                                                                        onPressed: () => removeQuestion(index),
-                                                                        icon: const Icon(Icons.delete, color: Colors.red)),
-                                                                  ],
-                                                                )
-                                                              : const SizedBox.shrink(),
-                                                        ),
-                                                        InkWell(
-                                                          onTap: () async {
-                                                            setState(() {
-                                                              moreOptionsTweens[index].end == 0.1 ? moreOptionsTweens[index] = Tween<double>(begin: 0.1, end: 1) : moreOptionsTweens[index] = Tween<double>(begin: 1, end: 0.1);
-                                                            });
-                                                            if (showMoreOptions[index] == true) {
-                                                              await Future.delayed(const Duration(milliseconds: 200));
-                                                              setState(() {
-                                                                showMoreOptions[index] = false;
-                                                              });
-                                                            } else {
-                                                              setState(() {
-                                                                showMoreOptions[index] = true;
-                                                              });
-                                                            }
-                                                          },
-                                                          child: Transform.flip(flipX: showMoreOptions[index], child: Icon(Icons.chevron_right, color: theme.onBackground)),
-                                                        )
+                                                        ElevatedButton.icon(
+                                                            label: Text("Delete", style: textTheme.displaySmall),
+                                                            style: ElevatedButton.styleFrom(
+                                                              backgroundColor: theme.secondary,
+                                                              shadowColor: Colors.transparent,
+                                                              elevation: 0,
+                                                              side: BorderSide(color: theme.tertiary, width: 1),
+                                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                            ),
+                                                            onPressed: () => removeQuestion(index),
+                                                            icon: const Icon(Icons.delete, color: Colors.red)),
                                                       ],
-                                                    ),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Column(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      TextFormField(
-                                                        cursorColor: theme.onPrimary,
-                                                        textAlign: TextAlign.center,
-                                                        initialValue: questionQuery["queries"][index]["question"],
-                                                        decoration: InputDecoration(
-                                                          focusedBorder: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.zero,
-                                                            borderSide: BorderSide(color: theme.onBackground, width: 1),
-                                                          ),
-                                                          border: const OutlineInputBorder(
-                                                            borderRadius: BorderRadius.zero,
-                                                            borderSide: BorderSide(width: 0, style: BorderStyle.none),
-                                                          ),
-                                                          contentPadding: const EdgeInsets.all(0),
-                                                          hintText: "Question ${index + 1}",
-                                                          hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
-                                                          // filled: true,
-                                                        ),
-                                                        style: textTheme.displaySmall,
-                                                        onChanged: (value) {
-                                                          questionQuery["queries"][index]["question"] = value;
-                                                        },
-                                                      ),
-                                                      TextFormField(
-                                                        cursorColor: theme.onPrimary,
-                                                        textAlign: TextAlign.center,
-                                                        initialValue: questionQuery["queries"][index]["answer"],
-                                                        decoration: InputDecoration(
-                                                          border: const OutlineInputBorder(
-                                                            borderRadius: BorderRadius.zero,
-                                                            borderSide: BorderSide(width: 0, style: BorderStyle.none),
-                                                          ),
-                                                          focusedBorder: OutlineInputBorder(
-                                                            borderRadius: BorderRadius.zero,
-                                                            borderSide: BorderSide(color: theme.onBackground, width: 1),
-                                                          ),
-                                                          contentPadding: const EdgeInsets.all(0),
-                                                          hintText: "Answer ${index + 1}",
-                                                          hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
-                                                          // fillColor: theme.primary,
-                                                          // filled: true,
-                                                        ),
-                                                        style: textTheme.displaySmall,
-                                                        onChanged: (value) {
-                                                          questionQuery["queries"][index]["answer"] = value;
-                                                        },
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
+                                                    )
+                                                  : const SizedBox.shrink(),
                                             ),
-                                            //* image
-                                            ImageSelector(
-                                                image: questionQuery["queries"][index]["image"],
-                                                onImageSelected: (image) {
+                                            InkWell(
+                                              onTap: () async {
+                                                setState(() {
+                                                  moreOptionsTweens[index].end == 0.1 ? moreOptionsTweens[index] = Tween<double>(begin: 0.1, end: 1) : moreOptionsTweens[index] = Tween<double>(begin: 1, end: 0.1);
+                                                });
+                                                if (showMoreOptions[index] == true) {
+                                                  await Future.delayed(const Duration(milliseconds: 200));
                                                   setState(() {
-                                                    questionQuery["queries"][index]["image"] = image;
+                                                    showMoreOptions[index] = false;
                                                   });
-                                                }),
+                                                } else {
+                                                  setState(() {
+                                                    showMoreOptions[index] = true;
+                                                  });
+                                                }
+                                              },
+                                              child: Transform.flip(flipX: showMoreOptions[index], child: Icon(Icons.chevron_right, color: theme.onBackground)),
+                                            )
                                           ],
                                         ),
-                                      );
-                                    });
-                                  }),
-                            ),
-                          ),
-                          //Save and Cancel Buttons
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                ElevatedButton(
-                                    onPressed: () {
-                                      saveFlashcards(context.read<AppState>());
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: theme.secondary,
-                                      shadowColor: Colors.transparent,
-                                      elevation: 0,
-                                      side: BorderSide(color: theme.tertiary, width: 1),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      ),
                                     ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.save, color: theme.onPrimary),
-                                        const SizedBox(width: 10),
-                                        Text(
-                                          "Save",
-                                          style: textTheme.displaySmall,
-                                        ),
-                                      ],
-                                    )),
-                                ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: theme.secondary,
-                                      shadowColor: Colors.transparent,
-                                      elevation: 0,
-                                      side: BorderSide(color: theme.tertiary, width: 1),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          TextFormField(
+                                            cursorColor: theme.onPrimary,
+                                            textAlign: TextAlign.center,
+                                            initialValue: questionQuery["queries"][index]["question"],
+                                            decoration: InputDecoration(
+                                              border: const OutlineInputBorder(
+                                                borderRadius: BorderRadius.zero,
+                                                borderSide: BorderSide(width: 0, style: BorderStyle.none),
+                                              ),
+                                              contentPadding: const EdgeInsets.all(0),
+                                              hintText: "Question ${index + 1}",
+                                              hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                                              // filled: true,
+                                            ),
+                                            style: textTheme.displaySmall,
+                                            onChanged: (value) {
+                                              questionQuery["queries"][index]["question"] = value;
+                                            },
+                                          ),
+                                          TextFormField(
+                                            cursorColor: theme.onPrimary,
+                                            textAlign: TextAlign.center,
+                                            initialValue: questionQuery["queries"][index]["answer"],
+                                            decoration: InputDecoration(
+                                              border: const OutlineInputBorder(
+                                                borderRadius: BorderRadius.zero,
+                                                borderSide: BorderSide(width: 0, style: BorderStyle.none),
+                                              ),
+
+                                              contentPadding: const EdgeInsets.all(0),
+                                              hintText: "Answer ${index + 1}",
+                                              hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                                              // fillColor: theme.primary,
+                                              // filled: true,
+                                            ),
+                                            style: textTheme.displaySmall,
+                                            onChanged: (value) {
+                                              questionQuery["queries"][index]["answer"] = value;
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.cancel, color: theme.onPrimary),
-                                        const SizedBox(width: 10),
-                                        Text(
-                                          "Cancel",
-                                          style: textTheme.displaySmall,
-                                        ),
-                                      ],
-                                    )),
+                                  ],
+                                ),
+                                //* image
+                                ImageSelector(
+                                    image: questionQuery["queries"][index]["image"],
+                                    onImageSelected: (image) {
+                                      setState(() {
+                                        questionQuery["queries"][index]["image"] = image;
+                                      });
+                                    }),
                               ],
                             ),
-                          )
-                        ],
+                          );
+                        }),
                       ),
-                    )
-                  ],
-                ))));
+                    );
+                  }),
+            ),
+          ),
+          //Save and Cancel Buttons
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                    onPressed: () {
+                      saveFlashcards(context.read<AppState>());
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.secondary,
+                      shadowColor: Colors.transparent,
+                      elevation: 0,
+                      side: BorderSide(color: theme.tertiary, width: 1),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.save, color: theme.onPrimary),
+                        const SizedBox(width: 10),
+                        Text(
+                          "Save",
+                          style: textTheme.displaySmall,
+                        ),
+                      ],
+                    )),
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.secondary,
+                      shadowColor: Colors.transparent,
+                      elevation: 0,
+                      side: BorderSide(color: theme.tertiary, width: 1),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.cancel, color: theme.onPrimary),
+                        const SizedBox(width: 10),
+                        Text(
+                          "Cancel",
+                          style: textTheme.displaySmall,
+                        ),
+                      ],
+                    )),
+              ],
+            ),
+          )
+        ],
+      )),
+    );
   }
 }
 
