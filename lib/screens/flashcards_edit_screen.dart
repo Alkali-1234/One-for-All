@@ -1,17 +1,23 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:oneforall/components/main_container.dart';
-import 'package:oneforall/constants.dart';
 import 'package:oneforall/main.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/user_data.dart';
+
+class FCQuery {
+  FCQuery({required this.question, required this.answer, this.image, this.hints});
+  String question;
+  String answer;
+  String? image;
+  List<dynamic>? hints;
+}
 
 class FlashcardsEditScreen extends StatefulWidget {
   const FlashcardsEditScreen({super.key, required this.setIndex});
@@ -22,19 +28,11 @@ class FlashcardsEditScreen extends StatefulWidget {
 }
 
 class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
-  Map<String, dynamic> questionQuery = {
-    "queries": []
-  };
+  List<FCQuery> questionQuery = [];
 
   void initializeQueries(FlashcardSet set) {
     for (var i = 0; i < set.flashcards.length; i++) {
-      questionQuery["queries"].add({
-        "id": set.flashcards[i].id,
-        "question": set.flashcards[i].question,
-        "answer": set.flashcards[i].answer,
-        "image": set.flashcards[i].image,
-        "hints": set.flashcards[i].hints
-      });
+      questionQuery.add(FCQuery(question: set.flashcards[i].question, answer: set.flashcards[i].answer, image: set.flashcards[i].image, hints: set.flashcards[i].hints));
     }
   }
 
@@ -47,8 +45,8 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
     //* Set the flashcard set to the new flashcard set
     setState(() {
       appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards = List<Flashcard>.empty(growable: true);
-      for (var i in questionQuery["queries"]) {
-        appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards.add(Flashcard(image: i['image'], id: i["id"], question: i["question"], answer: i["answer"], hints: i["hints"] ?? []));
+      for (var i in questionQuery) {
+        appState.getCurrentUser.flashCardSets[widget.setIndex].flashcards.add(Flashcard(image: i.image, id: 0, question: i.question, answer: i.answer, hints: i.hints ?? []));
       }
     });
     Object objectifiedFlashcardSets = {
@@ -77,13 +75,9 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
 
   void addCard() {
     setState(() {
-      questionQuery["queries"].add({
-        "id": questionQuery["queries"].length,
-        "question": "",
-        "answer": "",
-        "image": null,
-        "hints": []
-      });
+      questionQuery.add(
+        FCQuery(question: "", answer: "", image: null, hints: []),
+      );
       moreOptionsTweens.add(Tween<double>(begin: 0.8, end: 0.1));
       showMoreOptions.add(false);
     });
@@ -100,27 +94,6 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
 
   late List<Tween<double>> moreOptionsTweens;
   late List<bool> showMoreOptions;
-  Future<void> removeQuestion(int index) async {
-    String? image = questionQuery["queries"][index]["image"];
-    Map<String, dynamic> newQuestionQuery = {
-      "queries": [
-        for (var i = 0; i < questionQuery["queries"].length; i++)
-          if (i != index) questionQuery["queries"][i]
-      ]
-    };
-    setState(() {
-      questionQuery.clear();
-    });
-    await Future.delayed(const Duration(milliseconds: 50));
-    setState(() {
-      questionQuery = newQuestionQuery;
-      moreOptionsTweens.removeAt(index);
-      showMoreOptions.removeAt(index);
-    });
-    if (image != null) {
-      await File(image).delete();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +117,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                         ]),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis)),
-                Text("${questionQuery["queries"]?.length ?? 0} Questions", style: textTheme.displayMedium)
+                Text("${questionQuery.length} Questions", style: textTheme.displayMedium)
               ],
             ),
           ),
@@ -182,162 +155,166 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                   child: child,
                 );
               },
-              child: ListView.builder(
-                  key: ValueKey<int>(questionQuery["queries"]?.length ?? 0),
+              child: ListView(
+                  key: Key(questionQuery.length.toString()),
                   padding: EdgeInsets.zero,
                   physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                  itemCount: questionQuery["queries"]?.length ?? 0,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: LayoutBuilder(builder: (context, consntraints) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: index % 2 == 0 ? theme.primary : theme.secondary,
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  children: [
-                                    TweenAnimationBuilder<double>(
-                                      curve: Curves.easeIn,
-                                      tween: moreOptionsTweens[index],
-                                      duration: const Duration(milliseconds: 200),
-                                      builder: (context, value, child) => SizedBox(
-                                        width: consntraints.maxWidth * value,
-                                        child: Row(
+                  // itemCount: questionQuery.length,
+                  children: [
+                    for (int index = 0; index < questionQuery.length; index++) ...{
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: LayoutBuilder(builder: (context, consntraints) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: index % 2 == 0 ? theme.primary : theme.secondary,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    children: [
+                                      TweenAnimationBuilder<double>(
+                                        curve: Curves.easeIn,
+                                        tween: moreOptionsTweens[index],
+                                        duration: const Duration(milliseconds: 200),
+                                        builder: (context, value, child) => SizedBox(
+                                          width: consntraints.maxWidth * value,
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const SizedBox(width: 10),
+                                              AnimatedOpacity(
+                                                duration: const Duration(milliseconds: 200),
+                                                opacity: moreOptionsTweens[index].end == 1 ? 1 : 0,
+                                                child: showMoreOptions[index]
+                                                    ? Row(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          ElevatedButton.icon(
+                                                              style: ElevatedButton.styleFrom(
+                                                                foregroundColor: theme.onBackground,
+                                                                backgroundColor: theme.secondary,
+                                                                shadowColor: Colors.transparent,
+                                                                elevation: 0,
+                                                                side: BorderSide(color: theme.tertiary, width: 1),
+                                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                              ),
+                                                              onPressed: () => showDialog(
+                                                                  context: context,
+                                                                  builder: (context) => HintsDialog(
+                                                                        questionQuery: questionQuery[index],
+                                                                      )),
+                                                              icon: const Icon(Icons.edit),
+                                                              label: const Text("Hints")),
+                                                          const SizedBox(width: 10),
+                                                          ElevatedButton.icon(
+                                                              label: Text("Delete", style: textTheme.displaySmall),
+                                                              style: ElevatedButton.styleFrom(
+                                                                backgroundColor: theme.secondary,
+                                                                shadowColor: Colors.transparent,
+                                                                elevation: 0,
+                                                                side: BorderSide(color: theme.tertiary, width: 1),
+                                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                              ),
+                                                              onPressed: () => setState(() {
+                                                                    questionQuery.removeAt(index);
+                                                                  }),
+                                                              icon: const Icon(Icons.delete, color: Colors.red)),
+                                                        ],
+                                                      )
+                                                    : const SizedBox.shrink(),
+                                              ),
+                                              InkWell(
+                                                onTap: () async {
+                                                  setState(() {
+                                                    moreOptionsTweens[index].end == 0.1 ? moreOptionsTweens[index] = Tween<double>(begin: 0.1, end: 1) : moreOptionsTweens[index] = Tween<double>(begin: 1, end: 0.1);
+                                                  });
+                                                  if (showMoreOptions[index] == true) {
+                                                    await Future.delayed(const Duration(milliseconds: 200));
+                                                    setState(() {
+                                                      showMoreOptions[index] = false;
+                                                    });
+                                                  } else {
+                                                    setState(() {
+                                                      showMoreOptions[index] = true;
+                                                    });
+                                                  }
+                                                },
+                                                child: Transform.flip(flipX: showMoreOptions[index], child: Icon(Icons.chevron_right, color: theme.onBackground)),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Column(
                                           mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            const SizedBox(width: 10),
-                                            AnimatedOpacity(
-                                              duration: const Duration(milliseconds: 200),
-                                              opacity: moreOptionsTweens[index].end == 1 ? 1 : 0,
-                                              child: showMoreOptions[index]
-                                                  ? Row(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: [
-                                                        ElevatedButton.icon(
-                                                            style: ElevatedButton.styleFrom(
-                                                              foregroundColor: theme.onBackground,
-                                                              backgroundColor: theme.secondary,
-                                                              shadowColor: Colors.transparent,
-                                                              elevation: 0,
-                                                              side: BorderSide(color: theme.tertiary, width: 1),
-                                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                                            ),
-                                                            onPressed: () => showDialog(
-                                                                context: context,
-                                                                builder: (context) => HintsDialog(
-                                                                      questionQuery: questionQuery["queries"][index],
-                                                                    )),
-                                                            icon: const Icon(Icons.edit),
-                                                            label: const Text("Hints")),
-                                                        const SizedBox(width: 10),
-                                                        ElevatedButton.icon(
-                                                            label: Text("Delete", style: textTheme.displaySmall),
-                                                            style: ElevatedButton.styleFrom(
-                                                              backgroundColor: theme.secondary,
-                                                              shadowColor: Colors.transparent,
-                                                              elevation: 0,
-                                                              side: BorderSide(color: theme.tertiary, width: 1),
-                                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                                            ),
-                                                            onPressed: () => removeQuestion(index),
-                                                            icon: const Icon(Icons.delete, color: Colors.red)),
-                                                      ],
-                                                    )
-                                                  : const SizedBox.shrink(),
-                                            ),
-                                            InkWell(
-                                              onTap: () async {
-                                                setState(() {
-                                                  moreOptionsTweens[index].end == 0.1 ? moreOptionsTweens[index] = Tween<double>(begin: 0.1, end: 1) : moreOptionsTweens[index] = Tween<double>(begin: 1, end: 0.1);
-                                                });
-                                                if (showMoreOptions[index] == true) {
-                                                  await Future.delayed(const Duration(milliseconds: 200));
-                                                  setState(() {
-                                                    showMoreOptions[index] = false;
-                                                  });
-                                                } else {
-                                                  setState(() {
-                                                    showMoreOptions[index] = true;
-                                                  });
-                                                }
+                                            TextFormField(
+                                              cursorColor: theme.onPrimary,
+                                              textAlign: TextAlign.center,
+                                              initialValue: questionQuery[index].question,
+                                              decoration: InputDecoration(
+                                                border: const OutlineInputBorder(
+                                                  borderRadius: BorderRadius.zero,
+                                                  borderSide: BorderSide(width: 0, style: BorderStyle.none),
+                                                ),
+                                                contentPadding: const EdgeInsets.all(0),
+                                                hintText: "Question ${index + 1}",
+                                                hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                                                // filled: true,
+                                              ),
+                                              style: textTheme.displaySmall,
+                                              onChanged: (value) {
+                                                questionQuery[index].question = value;
                                               },
-                                              child: Transform.flip(flipX: showMoreOptions[index], child: Icon(Icons.chevron_right, color: theme.onBackground)),
-                                            )
+                                            ),
+                                            TextFormField(
+                                              cursorColor: theme.onPrimary,
+                                              textAlign: TextAlign.center,
+                                              initialValue: questionQuery[index].answer,
+                                              decoration: InputDecoration(
+                                                border: const OutlineInputBorder(
+                                                  borderRadius: BorderRadius.zero,
+                                                  borderSide: BorderSide(width: 0, style: BorderStyle.none),
+                                                ),
+
+                                                contentPadding: const EdgeInsets.all(0),
+                                                hintText: "Answer ${index + 1}",
+                                                hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                                                // fillColor: theme.primary,
+                                                // filled: true,
+                                              ),
+                                              style: textTheme.displaySmall,
+                                              onChanged: (value) {
+                                                questionQuery[index].question = value;
+                                              },
+                                            ),
                                           ],
                                         ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          TextFormField(
-                                            cursorColor: theme.onPrimary,
-                                            textAlign: TextAlign.center,
-                                            initialValue: questionQuery["queries"][index]["question"],
-                                            decoration: InputDecoration(
-                                              border: const OutlineInputBorder(
-                                                borderRadius: BorderRadius.zero,
-                                                borderSide: BorderSide(width: 0, style: BorderStyle.none),
-                                              ),
-                                              contentPadding: const EdgeInsets.all(0),
-                                              hintText: "Question ${index + 1}",
-                                              hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
-                                              // filled: true,
-                                            ),
-                                            style: textTheme.displaySmall,
-                                            onChanged: (value) {
-                                              questionQuery["queries"][index]["question"] = value;
-                                            },
-                                          ),
-                                          TextFormField(
-                                            cursorColor: theme.onPrimary,
-                                            textAlign: TextAlign.center,
-                                            initialValue: questionQuery["queries"][index]["answer"],
-                                            decoration: InputDecoration(
-                                              border: const OutlineInputBorder(
-                                                borderRadius: BorderRadius.zero,
-                                                borderSide: BorderSide(width: 0, style: BorderStyle.none),
-                                              ),
-
-                                              contentPadding: const EdgeInsets.all(0),
-                                              hintText: "Answer ${index + 1}",
-                                              hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
-                                              // fillColor: theme.primary,
-                                              // filled: true,
-                                            ),
-                                            style: textTheme.displaySmall,
-                                            onChanged: (value) {
-                                              questionQuery["queries"][index]["answer"] = value;
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                //* image
-                                ImageSelector(
-                                    image: questionQuery["queries"][index]["image"],
-                                    onImageSelected: (image) {
-                                      setState(() {
-                                        questionQuery["queries"][index]["image"] = image;
-                                      });
-                                    }),
-                              ],
-                            ),
-                          );
-                        }),
-                      ),
-                    );
-                  }),
+                                    ],
+                                  ),
+                                  //* image
+                                  ImageSelector(
+                                      image: questionQuery[index].image,
+                                      onImageSelected: (image) {
+                                        setState(() {
+                                          questionQuery[index].image = image;
+                                        });
+                                      }),
+                                ],
+                              ),
+                            );
+                          }),
+                        ),
+                      )
+                    }
+                  ]),
             ),
           ),
           //Save and Cancel Buttons
@@ -527,7 +504,7 @@ class _ImageSelectorState extends State<ImageSelector> {
 class HintsDialog extends StatefulWidget {
   const HintsDialog({super.key, required this.questionQuery});
 
-  final Map<dynamic, dynamic> questionQuery;
+  final FCQuery questionQuery;
 
   @override
   State<HintsDialog> createState() => _HintsDialogState();
@@ -544,107 +521,85 @@ class _HintsDialogState extends State<HintsDialog> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text("Hints", style: textTheme.displayMedium),
-          ),
+          const SizedBox(height: 10),
+          Text("Hints for ${widget.questionQuery.question}", style: textTheme.displayMedium),
           const SizedBox(height: 10),
           Expanded(
-            child: ListView.builder(
-                itemCount: widget.questionQuery["hints"]?.length ?? 0,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            cursorColor: theme.onPrimary,
-                            textAlign: TextAlign.center,
-                            initialValue: widget.questionQuery["hints"][index],
-                            decoration: InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.zero,
-                                borderSide: BorderSide(color: theme.onBackground, width: 1),
+            child: SingleChildScrollView(
+              child: Column(
+                key: Key(widget.questionQuery.hints?.length.toString() ?? "0"),
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (int index = 0; index < (widget.questionQuery.hints?.length ?? 0); index++)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              cursorColor: theme.onPrimary,
+                              textAlign: TextAlign.center,
+                              initialValue: widget.questionQuery.hints?[index] ?? [],
+                              decoration: InputDecoration(
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: theme.onBackground, width: 0.5),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+                                ),
+                                contentPadding: EdgeInsets.zero,
+                                hintText: "Hint ${index + 1}",
+                                hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                                filled: true,
+                                fillColor: theme.primary,
                               ),
-                              border: const OutlineInputBorder(
-                                borderRadius: BorderRadius.zero,
-                                borderSide: BorderSide(width: 0, style: BorderStyle.none),
-                              ),
-                              contentPadding: const EdgeInsets.all(0),
-                              hintText: "Hint ${index + 1}",
-                              hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
-                              // filled: true,
+                              style: textTheme.displaySmall,
+                              onChanged: (value) {
+                                widget.questionQuery.hints?[index] = value;
+                              },
                             ),
-                            style: textTheme.displaySmall,
-                            onChanged: (value) {
-                              widget.questionQuery["hints"][index] = value;
-                            },
                           ),
-                        ),
-                        IconButton(
-                            onPressed: () {
-                              setState(() {
-                                widget.questionQuery["hints"].removeAt(index);
-                              });
-                            },
-                            icon: const Icon(Icons.delete, color: Colors.red))
-                      ],
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  widget.questionQuery.hints?.removeAt(index);
+                                });
+                              },
+                              icon: const Icon(Icons.delete, color: Colors.red))
+                        ],
+                      ),
                     ),
-                  );
-                }),
+                ],
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    widget.questionQuery["hints"].add("");
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.secondary,
-                  shadowColor: Colors.transparent,
-                  elevation: 0,
-                  side: BorderSide(color: theme.tertiary, width: 1),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      widget.questionQuery.hints?.add("");
+                    });
+                  },
+                  icon: const Icon(Icons.add),
+                  color: theme.onBackground,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.add, color: theme.onPrimary),
-                    const SizedBox(width: 10),
-                    Text(
-                      "New Hint",
-                      style: textTheme.displaySmall,
-                    ),
-                  ],
-                )),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.secondary,
-                  shadowColor: Colors.transparent,
-                  elevation: 0,
-                  side: BorderSide(color: theme.tertiary, width: 1),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.done, color: theme.onPrimary),
-                    const SizedBox(width: 10),
-                    Text(
-                      "Done",
-                      style: textTheme.displaySmall,
-                    ),
-                  ],
-                )),
+                IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.done,
+                      color: Colors.green,
+                    )),
+              ],
+            ),
           ),
         ],
       ),
