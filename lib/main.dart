@@ -3,8 +3,10 @@
 //Firebase
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
+import 'package:oneforall/components/profile_viewer.dart';
 import 'package:oneforall/screens/calendar_screen.dart';
 import 'package:oneforall/screens/flashcards_screen.dart';
 import 'package:oneforall/screens/forum_screen.dart';
@@ -258,15 +260,18 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
-                        Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: theme.onPrimary,
-                            borderRadius: BorderRadius.circular(20),
-                            gradient: getPrimaryGradient,
+                        GestureDetector(
+                          onTap: () => showModalBottomSheet(context: context, builder: (c) => ProfileViewer(uid: FirebaseAuth.instance.currentUser!.uid)),
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: theme.onPrimary,
+                              borderRadius: BorderRadius.circular(20),
+                              gradient: getPrimaryGradient,
+                            ),
+                            child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
                           ),
-                          child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
                         )
                       ],
                     ),

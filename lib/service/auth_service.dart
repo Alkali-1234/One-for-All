@@ -80,6 +80,15 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
     if (value.data()!["sections"] == null) {
       incompleteData.add("sections");
     }
+    if (value.data()!["username"] == null) {
+      incompleteData.add("username");
+    }
+    if (value.data()!["profilePicture"] == null) {
+      incompleteData.add("profilePicture");
+    }
+    if (value.data()!["community"] == null) {
+      incompleteData.add("community");
+    }
 
     //* Set missing data
     if (incompleteData.isNotEmpty) {
@@ -89,9 +98,13 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
               ? []
               : data == "sections"
                   ? []
-                  : data == assignedCommunity
-                      ? ""
-                      : 0
+                  : data == "community"
+                      ? assignedCommunity ?? ""
+                      : data == "username"
+                          ? auth.currentUser!.displayName
+                          : data == "profilePicture"
+                              ? auth.currentUser!.photoURL
+                              : 0
       });
     }
 

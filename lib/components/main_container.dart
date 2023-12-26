@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:oneforall/components/profile_viewer.dart';
 import 'package:oneforall/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -58,15 +60,26 @@ class _MainContainerState extends State<MainContainer> {
                           ),
                         ),
                         Text(appState.getCurrentUser.username, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-                        Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: theme.onPrimary,
-                            borderRadius: BorderRadius.circular(20),
-                            gradient: getPrimaryGradient,
+                        GestureDetector(
+                          onTap: () {
+                            if (FirebaseAuth.instance.currentUser != null) {
+                              showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return ProfileViewer(uid: FirebaseAuth.instance.currentUser!.uid);
+                                  });
+                            }
+                          },
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: theme.onPrimary,
+                              borderRadius: BorderRadius.circular(20),
+                              gradient: getPrimaryGradient,
+                            ),
+                            child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
                           ),
-                          child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
                         )
                       ],
                     ),
