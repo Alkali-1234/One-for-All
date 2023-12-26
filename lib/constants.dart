@@ -293,7 +293,7 @@ const lightPrimaryGradient = LinearGradient(colors: [
 
 get getLightPrimaryGradient => lightPrimaryGradient;
 
-enum quizTypes {
+enum QuizTypes {
   multipleChoice,
   trueFalse,
   dropdown,

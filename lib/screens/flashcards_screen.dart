@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/main.dart';
 import 'package:provider/provider.dart';
@@ -31,176 +32,137 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     var appState = Provider.of<AppState>(context);
-    return Container(
-        decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
-        child: SafeArea(
-            child: Scaffold(
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () {
-                    showDialog(context: context, builder: (context) => const NewSetOptions());
-                  },
-                  backgroundColor: theme.secondary,
-                  child: const Icon(Icons.add),
-                ),
-                // bottomNavigationBar: const BannerAdWidget(),
-                resizeToAvoidBottomInset: false,
-                backgroundColor: Colors.transparent,
-                body: Column(
-                  children: [
-                    //App Bar
-                    Container(
-                      color: theme.secondary,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: Icon(
-                                Icons.arrow_back,
-                                color: theme.onPrimary,
-                              ),
-                            ),
-                            Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
-                            Container(
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                color: theme.onPrimary,
-                                borderRadius: BorderRadius.circular(20),
-                                gradient: getPrimaryGradient,
-                              ),
-                              child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
-                            )
-                          ],
+    return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showDialog(context: context, builder: (context) => const NewSetOptions());
+          },
+          backgroundColor: theme.secondary,
+          child: const Icon(Icons.add),
+        ),
+        // bottomNavigationBar: const BannerAdWidget(),
+        resizeToAvoidBottomInset: false,
+        body: MainContainer(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Flexible(
+                  flex: 3,
+                  child: TextField(
+                    onChanged: (value) => setState(() {
+                      searchQuery = value;
+                    }),
+                    keyboardAppearance: Brightness.dark,
+                    cursorColor: theme.onPrimary,
+                    style: textTheme.displayMedium!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
+                    decoration: InputDecoration(
+                        filled: true,
+                        fillColor: theme.primary,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(
+                            width: 0,
+                            style: BorderStyle.none,
+                          ),
                         ),
+                        hintText: 'Search',
+                        suffixIcon: Icon(Icons.search, color: theme.onPrimary, size: 50),
+                        hintStyle: textTheme.displayMedium!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Flexible(
+                  flex: 10,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.library_books, color: theme.onBackground, size: 50),
+                          const SizedBox(width: 10),
+                          Text("Library", style: textTheme.displayLarge),
+                        ],
                       ),
-                    ),
-                    //End of App Bar
-                    //Body
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Flexible(
-                              flex: 3,
-                              child: TextField(
-                                onChanged: (value) => setState(() {
-                                  searchQuery = value;
-                                }),
-                                keyboardAppearance: Brightness.dark,
-                                cursorColor: theme.onPrimary,
-                                style: textTheme.displayMedium!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
-                                decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: theme.primary,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: const BorderSide(
-                                        width: 0,
-                                        style: BorderStyle.none,
-                                      ),
-                                    ),
-                                    hintText: 'Search',
-                                    suffixIcon: Icon(Icons.search, color: theme.onPrimary, size: 50),
-                                    hintStyle: textTheme.displayMedium!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Flexible(
-                              flex: 10,
+                      const SizedBox(height: 20),
+                      if (appState.getCurrentUser.flashCardSets.isEmpty)
+                        Expanded(
+                          child: Center(
                               child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.library_books, color: theme.onBackground, size: 50),
-                                      const SizedBox(width: 10),
-                                      Text("Library", style: textTheme.displayLarge),
-                                    ],
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("You don't have any Flashcards", style: textTheme.displayMedium),
+                              const SizedBox(height: 10),
+                              ElevatedButton.icon(
+                                  icon: const Icon(Icons.add),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: theme.secondary,
+                                    foregroundColor: theme.onPrimary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
-                                  const SizedBox(height: 20),
-                                  if (appState.getCurrentUser.flashCardSets.isEmpty)
-                                    Expanded(
-                                      child: Center(
-                                          child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text("You don't have any Flashcards", style: textTheme.displayMedium),
-                                          const SizedBox(height: 10),
-                                          ElevatedButton.icon(
-                                              icon: const Icon(Icons.add),
+                                  onPressed: () {
+                                    showDialog(context: context, builder: (context) => const NewSetOptions());
+                                  },
+                                  label: const Text("Create Flashcard")),
+                            ],
+                          )),
+                        ),
+                      if (appState.getCurrentUser.flashCardSets.isNotEmpty)
+                        Expanded(
+                          child: ListView.builder(
+                              padding: EdgeInsets.zero,
+                              scrollDirection: Axis.vertical,
+                              itemCount: appState.getCurrentUser.flashCardSets.length,
+                              itemBuilder: (context, index) {
+                                return isItemValid(appState.getCurrentUser.flashCardSets[index].title)
+                                    ? Padding(
+                                        padding: const EdgeInsets.only(bottom: 8),
+                                        child: Container(
+                                          height: MediaQuery.of(context).size.height * 0.1,
+                                          width: double.infinity,
+                                          decoration: BoxDecoration(
+                                            color: theme.secondary,
+                                            borderRadius: BorderRadius.circular(10),
+                                            border: Border.all(
+                                              color: theme.tertiary,
+                                            ),
+                                          ),
+                                          child: ElevatedButton(
+                                              onPressed: () {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) => SelectedSetModal(
+                                                          flashcardSet: appState.getCurrentUser.flashCardSets.length - 1 >= index ? appState.getCurrentUser.flashCardSets[index] : FlashcardSet(id: 0, flashcards: [], title: "", description: ""),
+                                                          index: index,
+                                                        ));
+                                              },
                                               style: ElevatedButton.styleFrom(
-                                                backgroundColor: theme.secondary,
+                                                elevation: 0,
+                                                backgroundColor: Colors.transparent,
+                                                shadowColor: Colors.transparent,
                                                 foregroundColor: theme.onPrimary,
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius: BorderRadius.circular(10),
                                                 ),
                                               ),
-                                              onPressed: () {
-                                                showDialog(context: context, builder: (context) => const NewSetOptions());
-                                              },
-                                              label: const Text("Create Flashcard")),
-                                        ],
-                                      )),
-                                    ),
-                                  if (appState.getCurrentUser.flashCardSets.isNotEmpty)
-                                    Expanded(
-                                      child: ListView.builder(
-                                          scrollDirection: Axis.vertical,
-                                          itemCount: appState.getCurrentUser.flashCardSets.length,
-                                          itemBuilder: (context, index) {
-                                            return isItemValid(appState.getCurrentUser.flashCardSets[index].title)
-                                                ? Padding(
-                                                    padding: const EdgeInsets.only(bottom: 8),
-                                                    child: Container(
-                                                      height: MediaQuery.of(context).size.height * 0.1,
-                                                      width: double.infinity,
-                                                      decoration: BoxDecoration(
-                                                        color: theme.secondary,
-                                                        borderRadius: BorderRadius.circular(10),
-                                                        border: Border.all(
-                                                          color: theme.tertiary,
-                                                        ),
-                                                      ),
-                                                      child: ElevatedButton(
-                                                          onPressed: () {
-                                                            showDialog(
-                                                                context: context,
-                                                                builder: (context) => SelectedSetModal(
-                                                                      flashcardSet: appState.getCurrentUser.flashCardSets.length - 1 >= index ? appState.getCurrentUser.flashCardSets[index] : FlashcardSet(id: 0, flashcards: [], title: "", description: ""),
-                                                                      index: index,
-                                                                    ));
-                                                          },
-                                                          style: ElevatedButton.styleFrom(
-                                                            elevation: 0,
-                                                            backgroundColor: Colors.transparent,
-                                                            shadowColor: Colors.transparent,
-                                                            foregroundColor: theme.onPrimary,
-                                                            shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.circular(10),
-                                                            ),
-                                                          ),
-                                                          child: Center(
-                                                              child: Text(
-                                                            appState.getCurrentUser.flashCardSets[index].title,
-                                                            style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
-                                                          ))),
-                                                    ),
-                                                  )
-                                                : Container();
-                                          }),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
+                                              child: Center(
+                                                  child: Text(
+                                                appState.getCurrentUser.flashCardSets[index].title,
+                                                style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
+                                              ))),
+                                        ),
+                                      )
+                                    : Container();
+                              }),
                         ),
-                      ),
-                    ),
-                  ],
-                ))));
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ));
   }
 }
 
@@ -437,7 +399,7 @@ class _GenerateFlashcardsModalState extends State<GenerateFlashcardsModal> {
                     //TODO support all question types
                     appState.getCurrentUser.flashCardSets.add(FlashcardSet(id: appState.getCurrentUser.flashCardSets.length + 1, title: appState.getQuizzes[selectedQuiz!].title, description: appState.getQuizzes[selectedQuiz!].description, flashcards: [
                       for (int i = 0; i < appState.getQuizzes[selectedQuiz!].questions.length; i++) ...[
-                        Flashcard(hints: [], id: i, image: appState.getQuizzes[selectedQuiz!].questions[i].imagePath, question: appState.getQuizzes[selectedQuiz!].questions[i].type == quizTypes.multipleChoice ? appState.getQuizzes[selectedQuiz!].questions[i].question : "not supported", answer: appState.getQuizzes[selectedQuiz!].questions[i].type == quizTypes.multipleChoice ? List<String>.generate(appState.getQuizzes[selectedQuiz!].questions[i].correctAnswer.length, (index) => appState.getQuizzes[selectedQuiz!].questions[i].answers[index]).join(", ") : "not supported")
+                        Flashcard(hints: [], id: i, image: appState.getQuizzes[selectedQuiz!].questions[i].imagePath, question: appState.getQuizzes[selectedQuiz!].questions[i].type == QuizTypes.multipleChoice ? appState.getQuizzes[selectedQuiz!].questions[i].question : "not supported", answer: appState.getQuizzes[selectedQuiz!].questions[i].type == QuizTypes.multipleChoice ? List<String>.generate(appState.getQuizzes[selectedQuiz!].questions[i].correctAnswer.length, (index) => appState.getQuizzes[selectedQuiz!].questions[i].answers[index]).join(", ") : "not supported")
                       ]
                     ]));
                   },

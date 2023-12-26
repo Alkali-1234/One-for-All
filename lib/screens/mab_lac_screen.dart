@@ -564,6 +564,7 @@ class _NewEventModalState extends State<NewEventModal> {
       });
 
       await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
       Navigator.pop(context);
     }
 
@@ -885,7 +886,6 @@ class ListItem extends StatelessWidget {
     String image = post.image;
     List<String> attatchements = post.fileAttatchments;
     int type = post.type;
-    int subject = post.subject;
     DateTime due = post.dueDate;
     return Column(
       mainAxisSize: MainAxisSize.min,

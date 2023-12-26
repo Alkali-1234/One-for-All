@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/community_data.dart';
 // import 'package:oneforall/service/community_service.dart';
@@ -19,141 +20,100 @@ class _CalendarScreenState extends State<CalendarScreen> {
   int selectedYear = DateTime.now().year.toInt();
   int selectedMonth = DateTime.now().month.toInt();
   bool reversed = false;
+  GlobalKey<_CalendarState> calendarKey = GlobalKey<_CalendarState>();
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     var appState = context.watch<AppState>();
-    return Container(
-        decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
-        child: SafeArea(
-            child: Scaffold(
-                resizeToAvoidBottomInset: false,
-                backgroundColor: Colors.transparent,
-                body: Column(
-                  children: [
-                    //App Bar
-                    Hero(
-                      tag: "topAppBar",
-                      child: Container(
-                        color: theme.secondary,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GestureDetector(
-                                onTap: () => Navigator.pop(context),
-                                child: Icon(
-                                  Icons.arrow_back,
-                                  color: theme.onPrimary,
-                                ),
-                              ),
-                              Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
-                              Container(
-                                width: 30,
-                                height: 30,
-                                decoration: BoxDecoration(
-                                  color: theme.onPrimary,
-                                  borderRadius: BorderRadius.circular(20),
-                                  gradient: getPrimaryGradient,
-                                ),
-                                child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
-                              )
-                            ],
+    return Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: MainContainer(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                //Month and year
+                Flexible(
+                    flex: 1,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 150),
+                          transitionBuilder: (child, animation) => FadeTransition(
+                            opacity: animation,
+                            child: child,
                           ),
+                          child: Text(selectedYear.toString(), style: textTheme.displaySmall),
                         ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  reversed = true;
+                                  if (selectedMonth - 1 == 0) {
+                                    selectedMonth = 13;
+                                    selectedYear--;
+                                  }
+                                  selectedMonth--;
+                                });
+                                calendarKey.currentState!.initializeCalendarEvents(appState);
+                              },
+                              child: Icon(
+                                Icons.arrow_left_rounded,
+                                color: theme.onPrimary,
+                                size: 48,
+                              ),
+                            ),
+                            Text(getMonthsOfTheYear[selectedMonth], style: textTheme.displayLarge),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  reversed = false;
+                                  if (selectedMonth + 1 == 13) {
+                                    selectedMonth = 0;
+                                    selectedYear++;
+                                  }
+                                  selectedMonth++;
+                                });
+                              },
+                              child: Icon(
+                                Icons.arrow_right_rounded,
+                                color: theme.onPrimary,
+                                size: 48,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    )),
+                const SizedBox(height: 15),
+                Flexible(
+                    flex: 5,
+                    //not working
+                    child: PageTransitionSwitcher(
+                      transitionBuilder: (child, animation, secondaryAnimation) => SharedAxisTransition(
+                        fillColor: Colors.transparent,
+                        transitionType: SharedAxisTransitionType.horizontal,
+                        animation: animation,
+                        secondaryAnimation: secondaryAnimation,
+                        child: child,
                       ),
-                    ),
-                    //End of App Bar
-                    //Body
-                    Expanded(
-                        child:
-                            //Calendar
-                            Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          //Month and year
-                          Flexible(
-                              flex: 1,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 150),
-                                    transitionBuilder: (child, animation) => FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    ),
-                                    child: Text(selectedYear.toString(), style: textTheme.displaySmall),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            reversed = true;
-                                            if (selectedMonth - 1 == 0) {
-                                              selectedMonth = 13;
-                                              selectedYear--;
-                                            }
-                                            selectedMonth--;
-                                          });
-                                        },
-                                        child: Icon(
-                                          Icons.arrow_left_rounded,
-                                          color: theme.onPrimary,
-                                          size: 48,
-                                        ),
-                                      ),
-                                      Text(getMonthsOfTheYear[selectedMonth], style: textTheme.displayLarge),
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            reversed = false;
-                                            if (selectedMonth + 1 == 13) {
-                                              selectedMonth = 0;
-                                              selectedYear++;
-                                            }
-                                            selectedMonth++;
-                                          });
-                                        },
-                                        child: Icon(
-                                          Icons.arrow_right_rounded,
-                                          color: theme.onPrimary,
-                                          size: 48,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              )),
-                          const SizedBox(height: 15),
-                          Flexible(
-                              flex: 5,
-                              //not working
-                              child: PageTransitionSwitcher(
-                                transitionBuilder: (child, animation, secondaryAnimation) => SharedAxisTransition(
-                                  fillColor: Colors.transparent,
-                                  transitionType: SharedAxisTransitionType.horizontal,
-                                  animation: animation,
-                                  secondaryAnimation: secondaryAnimation,
-                                  child: child,
-                                ),
-                                duration: const Duration(milliseconds: 150),
-                                child: Calendar(
-                                  selectedMonth: selectedMonth,
-                                  selectedYear: selectedYear,
-                                ),
-                              )),
-                          const SizedBox(height: 10),
-                        ],
+                      duration: const Duration(milliseconds: 150),
+                      child: Calendar(
+                        key: calendarKey,
+                        selectedMonth: selectedMonth,
+                        selectedYear: selectedYear,
                       ),
-                    ))
-                  ],
-                ))));
+                    )),
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
+        ));
   }
 }
 
@@ -519,14 +479,19 @@ class _CalendarState extends State<Calendar> {
   @override
   void initState() {
     super.initState();
-    initializeCalendar(DateTime(widget.selectedYear, widget.selectedMonth, 1).weekday, DateTime(widget.selectedYear, widget.selectedMonth + 1, 0).day, context.read<AppState>());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        initializeCalendar(DateTime(widget.selectedYear, widget.selectedMonth, 1).weekday, DateTime(widget.selectedYear, widget.selectedMonth + 1, 0).day, context.read<AppState>());
+
+        initializeCalendarEvents(context.read<AppState>());
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    initializeCalendarEvents(context.read<AppState>());
 
     Color getDateColor(int date) {
       //1 Event = 0xFF00FFA3

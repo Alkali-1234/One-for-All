@@ -384,6 +384,7 @@ class _SelectedSectionState extends State<SelectedSection> {
     setState(() {
       loading = false;
     });
+    if (!mounted) return;
     //* Show snackbar
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.green,

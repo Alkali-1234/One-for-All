@@ -70,6 +70,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
     //* Save the flashcard set to the local storage
     final prefs = await SharedPreferences.getInstance();
     prefs.setString("flashcardSets", jsonEncode(objectifiedFlashcardSets));
+    if (!mounted) return;
     Navigator.pop(context);
   }
 

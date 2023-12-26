@@ -15,8 +15,6 @@ import 'package:flutter/services.dart' show rootBundle;
 // import '../data/user_data.dart';
 
 Future backgroundHandler(RemoteMessage message) async {
-  print(message.data.toString());
-  print(message.notification!.title);
   //* Get notification name
   //Name format:
   // "{notificationtype} {notificationid}"
@@ -204,7 +202,6 @@ Future<String> getFileContents(String path) async {
 
 Future<String> getAccessToken() async {
   return "null";
-  //! FIXME privateKey is somehow invalid
   //Get the service account credentials
   //ignore: dead_code
   final Directory currentDirectory = Directory.current;

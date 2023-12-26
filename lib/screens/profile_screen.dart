@@ -61,6 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           String newLink = await changeUserProfilePicture(profilePicture, previousProfilePicture);
           appState.getCurrentUser.profilePicture = newLink;
         } catch (e) {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error changing profile picture! $e', style: const TextStyle(color: Colors.white)),

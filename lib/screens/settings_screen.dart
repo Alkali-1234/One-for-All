@@ -70,6 +70,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
     prefs.setBool("setting_notifications_LAC", notificationSettings["LAC"]!);
     prefs.setBool("setting_notifications_RecentActivity", notificationSettings["RA"]!);
 
+    if (!mounted) return;
     var appState = context.read<AppState>();
 
     //* Subscribe and unsubscribe from topics

@@ -158,7 +158,7 @@ class SelectedQuizModal extends StatelessWidget {
                 "question": question.question,
                 "answers": question.answers,
                 "correctAnswer": question.correctAnswer,
-                "type": question.type?.index ?? quizTypes.multipleChoice.index
+                "type": question.type?.index ?? QuizTypes.multipleChoice.index
               }
           ],
           "settings": quiz.settings
@@ -237,12 +237,12 @@ class SelectedQuizModal extends StatelessWidget {
                             modifiedQuiz.questions = quiz.questions.toList();
                           }
                           if (quiz.settings["shuffleAnswers"] != null && quiz.settings["shuffleAnswers"] == true) {
-                            for (var question in modifiedQuiz.questions.where((element) => element.type == quizTypes.multipleChoice || element.type == quizTypes.reorder)) {
+                            for (var question in modifiedQuiz.questions.where((element) => element.type == QuizTypes.multipleChoice || element.type == QuizTypes.reorder)) {
                               List<String> tempAns = question.answers.toList();
                               question.answers.shuffle();
                               question.correctAnswer = question.correctAnswer.map((e) => question.answers.indexOf(tempAns[e])).toList();
                             }
-                            for (var question in modifiedQuiz.questions.where((element) => element.type == quizTypes.dropdown)) {
+                            for (var question in modifiedQuiz.questions.where((element) => element.type == QuizTypes.dropdown)) {
                               List<String> tempAns = question.answers.toList();
                               question.answers.shuffle();
                               question.correctAnswer = question.correctAnswer.map((e) => question.answers.indexOf(tempAns[e])).toList();
@@ -544,7 +544,7 @@ class _ImportQuizModalState extends State<ImportQuizModal> {
               title: quiz['title'],
               description: quiz['description'],
               questions: [
-                for (int i = 0; i < quiz["questions"].length; i++) QuizQuestion(imagePath: quiz["questions"][i]["imagePath"], id: i, question: quiz["questions"][i]["question"], answers: List<String>.from(quiz["questions"][i]["answers"] as List), correctAnswer: List<int>.from(quiz["questions"][i]["correctAnswer"] as List), type: quiz["questions"][i]["type"] != null ? quizTypes.values[quiz["questions"][i]["type"]] : quizTypes.multipleChoice),
+                for (int i = 0; i < quiz["questions"].length; i++) QuizQuestion(imagePath: quiz["questions"][i]["imagePath"], id: i, question: quiz["questions"][i]["question"], answers: List<String>.from(quiz["questions"][i]["answers"] as List), correctAnswer: List<int>.from(quiz["questions"][i]["correctAnswer"] as List), type: quiz["questions"][i]["type"] != null ? QuizTypes.values[quiz["questions"][i]["type"]] : QuizTypes.multipleChoice),
               ],
               settings: quiz["settings"] ?? {}),
         );
@@ -574,7 +574,7 @@ class _ImportQuizModalState extends State<ImportQuizModal> {
                   "question": question.question,
                   "answers": question.answers,
                   "correctAnswer": question.correctAnswer,
-                  "type": question.type?.index ?? quizTypes.multipleChoice.index
+                  "type": question.type?.index ?? QuizTypes.multipleChoice.index
                 }
             ],
             "settings": quiz.settings
@@ -583,6 +583,7 @@ class _ImportQuizModalState extends State<ImportQuizModal> {
     };
     //Save to prefs
     await prefs.setString("quizData", jsonEncode(quizData));
+    if (!mounted) return;
     Navigator.of(context).pop();
   }
 

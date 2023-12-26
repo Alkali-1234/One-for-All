@@ -84,7 +84,7 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                   "question": question.question,
                   "answers": question.answers,
                   "correctAnswer": question.correctAnswer,
-                  "type": question.type?.index ?? quizTypes.multipleChoice.index,
+                  "type": question.type?.index ?? QuizTypes.multipleChoice.index,
                   "imagePath": question.imagePath,
                 }
             ],
@@ -113,7 +113,7 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                   "question": question.question,
                   "answers": question.answers,
                   "correctAnswer": question.correctAnswer,
-                  "type": question.type?.index ?? quizTypes.multipleChoice.index,
+                  "type": question.type?.index ?? QuizTypes.multipleChoice.index,
                   "imagePath": question.imagePath,
                 }
             ],
@@ -126,6 +126,7 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
     setState(() {
       appState.getQuizzes[widget.index] = quizSet;
     });
+    if (!mounted) return;
     Navigator.pop(context);
   }
 
@@ -344,7 +345,7 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                                                   "question": question.question,
                                                   "answers": question.answers,
                                                   "correctAnswer": question.correctAnswer,
-                                                  "type": question.type?.index ?? quizTypes.multipleChoice.index,
+                                                  "type": question.type?.index ?? QuizTypes.multipleChoice.index,
                                                   "imagePath": question.imagePath,
                                                 }
                                             ],
@@ -643,7 +644,7 @@ class NewQuestionModal extends StatefulWidget {
 }
 
 class _NewQuestionModalState extends State<NewQuestionModal> {
-  quizTypes questionType = quizTypes.multipleChoice;
+  QuizTypes questionType = QuizTypes.multipleChoice;
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -666,16 +667,16 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
                   style: textTheme.displaySmall,
                   items: [
                     DropdownMenuItem(
-                        value: quizTypes.multipleChoice,
+                        value: QuizTypes.multipleChoice,
                         child: Text(
                           "Multiple Choice",
                           style: textTheme.displaySmall,
                         )),
-                    DropdownMenuItem(value: quizTypes.reorder, child: Text("Reorder", style: textTheme.displaySmall)),
-                    DropdownMenuItem(value: quizTypes.dropdown, child: Text("Dropdown", style: textTheme.displaySmall)),
+                    DropdownMenuItem(value: QuizTypes.reorder, child: Text("Reorder", style: textTheme.displaySmall)),
+                    DropdownMenuItem(value: QuizTypes.dropdown, child: Text("Dropdown", style: textTheme.displaySmall)),
                   ],
                   onChanged: (value) => setState(() {
-                        questionType = value as quizTypes;
+                        questionType = value as QuizTypes;
                       })),
               const SizedBox(height: 10),
               //* Create and Cancel
@@ -690,13 +691,13 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
                     ),
                     onPressed: () => {
                       switch (questionType) {
-                        quizTypes.multipleChoice => widget.quizSet.questions.add(QuizQuestion(imagePath: "", id: widget.quizSet.questions.length + 1, question: "Question", answers: [
+                        QuizTypes.multipleChoice => widget.quizSet.questions.add(QuizQuestion(imagePath: "", id: widget.quizSet.questions.length + 1, question: "Question", answers: [
                             "Answer 1"
                                 "Answer 2"
                           ], correctAnswer: [
                             0
                           ])),
-                        quizTypes.reorder => widget.quizSet.questions.add(QuizQuestion(
+                        QuizTypes.reorder => widget.quizSet.questions.add(QuizQuestion(
                             imagePath: "",
                             id: widget.quizSet.questions.length + 1,
                             question: "Question",
@@ -708,8 +709,8 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
                               0,
                               1
                             ],
-                            type: quizTypes.reorder)),
-                        quizTypes.dropdown => widget.quizSet.questions.add(QuizQuestion(
+                            type: QuizTypes.reorder)),
+                        QuizTypes.dropdown => widget.quizSet.questions.add(QuizQuestion(
                             imagePath: "",
                             id: widget.quizSet.questions.length + 1,
                             question: "Question <dropdown answer=0 />",
@@ -719,7 +720,7 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
                             correctAnswer: [
                               0
                             ],
-                            type: quizTypes.dropdown)),
+                            type: QuizTypes.dropdown)),
                         _ => null,
                       },
                       widget.setQuizSet(widget.quizSet),
@@ -762,7 +763,7 @@ class EditQuestionModal extends StatefulWidget {
 }
 
 class _EditQuestionModalState extends State<EditQuestionModal> {
-  late quizTypes questionType;
+  late QuizTypes questionType;
   late QuizQuestion question;
   final TextEditingController _questionController = TextEditingController();
 
@@ -771,9 +772,9 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
   void initState() {
     super.initState();
     question = widget.question;
-    questionType = question.type ?? quizTypes.multipleChoice;
-    if (questionType == quizTypes.multipleChoice) _questionController.text = question.question;
-    if (questionType == quizTypes.multipleChoice) _textAnswerControllers = List.generate(question.answers.length, (index) => TextEditingController(text: question.answers[index]));
+    questionType = question.type ?? QuizTypes.multipleChoice;
+    if (questionType == QuizTypes.multipleChoice) _questionController.text = question.question;
+    if (questionType == QuizTypes.multipleChoice) _textAnswerControllers = List.generate(question.answers.length, (index) => TextEditingController(text: question.answers[index]));
   }
 
   String error = "";
@@ -807,7 +808,7 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
           for (var sentence in dropDownEditState.dropdownSentence)
             if (sentence.contains("<dropdown answer=")) int.parse(sentence.split("=")[1].split(" ")[0]),
         ],
-        type: quizTypes.dropdown);
+        type: QuizTypes.dropdown);
     appState.getQuizzes[widget.quizIndex].questions[widget.index] = quizQuestion;
   }
 
@@ -825,13 +826,13 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
         throw Exception("There cannot be duplicate drag items");
       }
     }
-    QuizQuestion quizQuestion = QuizQuestion(imagePath: question.imagePath, id: widget.index, question: reorderEditKey.currentState!.question, answers: reorderEditKey.currentState!.draggables, correctAnswer: reorderEditKey.currentState!.correctOrder, type: quizTypes.reorder);
+    QuizQuestion quizQuestion = QuizQuestion(imagePath: question.imagePath, id: widget.index, question: reorderEditKey.currentState!.question, answers: reorderEditKey.currentState!.draggables, correctAnswer: reorderEditKey.currentState!.correctOrder, type: QuizTypes.reorder);
     appState.getQuizzes[widget.quizIndex].questions[widget.index] = quizQuestion;
   }
 
   bool validateQuestions(AppState appState) {
     {
-      if (questionType == quizTypes.multipleChoice) {
+      if (questionType == QuizTypes.multipleChoice) {
         if (question.question == "") {
           setState(() {
             error = "Question cannot be empty";
@@ -860,7 +861,7 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
           }
         }
       }
-      if (questionType == quizTypes.dropdown) {
+      if (questionType == QuizTypes.dropdown) {
         try {
           validateDropdownQuestion(appState);
         } on Exception catch (e) {
@@ -870,7 +871,7 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
           return false;
         }
       }
-      if (questionType == quizTypes.reorder) {
+      if (questionType == QuizTypes.reorder) {
         try {
           validateReorderQuestion(appState);
         } on Exception catch (e) {
@@ -908,16 +909,16 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
                     style: textTheme.displaySmall,
                     items: [
                       DropdownMenuItem(
-                          value: quizTypes.multipleChoice,
+                          value: QuizTypes.multipleChoice,
                           child: Text(
                             "Multiple Choice",
                             style: textTheme.displaySmall,
                           )),
-                      DropdownMenuItem(value: quizTypes.dropdown, child: Text("Dropdown", style: textTheme.displaySmall)),
-                      DropdownMenuItem(value: quizTypes.reorder, child: Text("Reorder", style: textTheme.displaySmall)),
+                      DropdownMenuItem(value: QuizTypes.dropdown, child: Text("Dropdown", style: textTheme.displaySmall)),
+                      DropdownMenuItem(value: QuizTypes.reorder, child: Text("Reorder", style: textTheme.displaySmall)),
                     ],
                     onChanged: (value) => setState(() {
-                          questionType = value as quizTypes;
+                          questionType = value as QuizTypes;
                         })),
               ),
               const SizedBox(height: 10),
@@ -1049,7 +1050,7 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
                 height: 10,
               ),
               //* Question
-              questionType == quizTypes.multipleChoice
+              questionType == QuizTypes.multipleChoice
                   ? Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -1157,13 +1158,13 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
                         ),
                       ],
                     )
-                  : questionType == quizTypes.dropdown
+                  : questionType == QuizTypes.dropdown
                       ? DropDownEdit(
                           key: dropDownEditKey,
                           question: question,
                         )
-                      : questionType == quizTypes.reorder
-                          ? ReorderEdit(key: reorderEditKey, question: widget.question.type == quizTypes.reorder ? question : null)
+                      : questionType == QuizTypes.reorder
+                          ? ReorderEdit(key: reorderEditKey, question: widget.question.type == QuizTypes.reorder ? question : null)
                           : Text(
                               "how tf (frick) did you get here",
                               style: textTheme.displaySmall,
@@ -1500,7 +1501,7 @@ class _ImportQuizModalState extends State<ImportQuizModal> {
               title: quiz['title'],
               description: quiz['description'],
               questions: [
-                for (int i = 0; i < quiz["questions"].length; i++) QuizQuestion(imagePath: quiz["questions"][i]["imagePath"], id: i, question: quiz["questions"][i]["question"], answers: List<String>.from(quiz["questions"][i]["answers"] as List), correctAnswer: List<int>.from(quiz["questions"][i]["correctAnswer"] as List), type: quiz["questions"][i]["type"] != null ? quizTypes.values[quiz["questions"][i]["type"]] : quizTypes.multipleChoice),
+                for (int i = 0; i < quiz["questions"].length; i++) QuizQuestion(imagePath: quiz["questions"][i]["imagePath"], id: i, question: quiz["questions"][i]["question"], answers: List<String>.from(quiz["questions"][i]["answers"] as List), correctAnswer: List<int>.from(quiz["questions"][i]["correctAnswer"] as List), type: quiz["questions"][i]["type"] != null ? QuizTypes.values[quiz["questions"][i]["type"]] : QuizTypes.multipleChoice),
               ],
               settings: quiz["settings"] ?? {}),
         );
@@ -1529,7 +1530,7 @@ class _ImportQuizModalState extends State<ImportQuizModal> {
                   "question": question.question,
                   "answers": question.answers,
                   "correctAnswer": question.correctAnswer,
-                  "type": question.type?.index ?? quizTypes.multipleChoice.index,
+                  "type": question.type?.index ?? QuizTypes.multipleChoice.index,
                   "imagePath": question.imagePath
                 }
             ],

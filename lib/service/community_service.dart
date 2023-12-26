@@ -173,7 +173,7 @@ Future createUserData(String uid) async {
 Future getValue(String collection, String document, String field) async {
   //* Get the collection
   CollectionReference communityCollection = FirebaseFirestore.instance.collection(collection);
-  var val;
+  dynamic val;
   try {
     await communityCollection.doc(document).get().then((value) {
       if (value.data() == null) {
@@ -242,7 +242,7 @@ Future getCommunity(String communityID) async {
 
 Future joinCommunity(String communityID, String password) async {
   //* Attempt to join community
-  var communityDocument;
+  DocumentSnapshot<Object?>? communityDocument;
   //* Get the community document
   try {
     communityDocument = await getCommunity(communityID);

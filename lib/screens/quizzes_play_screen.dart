@@ -233,12 +233,12 @@ class PlayScreenState extends State<PlayScreen> {
     currentQuestion = quizSet.questions[0];
     redemptionSet = QuizSet(title: "Redemption", description: "Redemption", questions: [], settings: quizSet.settings);
     redemptionAmount++;
-    if (currentQuestion.type == quizTypes.reorder) {
+    if (currentQuestion.type == QuizTypes.reorder) {
       if (reorderKey.currentState == null) return;
       reorderKey.currentState!.selectedAnswers = List.generate(currentQuestion.answers.length, (index) => -1);
     }
 
-    if (currentQuestion.type == quizTypes.dropdown) {
+    if (currentQuestion.type == QuizTypes.dropdown) {
       if (dropdownKey.currentState == null) return;
       dropdownKey.currentState!.sentence = currentQuestion.question.split("<seperator />");
       dropdownKey.currentState!.selectedAnswers = List.generate(currentQuestion.correctAnswer.length, (index) => 0);
@@ -309,15 +309,15 @@ class PlayScreenState extends State<PlayScreen> {
       questionTransitionTween = Tween<double>(begin: 1, end: 0);
     });
     await Future.delayed(const Duration(milliseconds: 150));
-    if (currentQuestion.type == quizTypes.multipleChoice) {
+    if (currentQuestion.type == QuizTypes.multipleChoice) {
       multipleChoiceKey.currentState!.showAnswers = false;
       multipleChoiceKey.currentState!.selectedAnswers = [];
     }
-    if (currentQuestion.type == quizTypes.dropdown) {
+    if (currentQuestion.type == QuizTypes.dropdown) {
       dropdownKey.currentState!.showAnswers = false;
       dropdownKey.currentState!.selectedAnswers = [];
     }
-    if (currentQuestion.type == quizTypes.reorder) {
+    if (currentQuestion.type == QuizTypes.reorder) {
       reorderKey.currentState!.showAnswers = false;
       reorderKey.currentState!.selectedAnswers = [];
     }
@@ -360,11 +360,11 @@ class PlayScreenState extends State<PlayScreen> {
     }
     // updaterNumber++;
     currentQuestion = quizSet.questions[quizSet.questions.indexOf(currentQuestion) + 1];
-    if (currentQuestion.type == quizTypes.reorder) {
+    if (currentQuestion.type == QuizTypes.reorder) {
       if (reorderKey.currentState == null) return;
       reorderKey.currentState!.selectedAnswers = List.generate(currentQuestion.answers.length, (index) => -1);
     }
-    if (currentQuestion.type == quizTypes.dropdown) {
+    if (currentQuestion.type == QuizTypes.dropdown) {
       if (dropdownKey.currentState == null) return;
       dropdownKey.currentState!.sentence = currentQuestion.question.split("<seperator />");
       dropdownKey.currentState!.selectedAnswers = List.generate(currentQuestion.correctAnswer.length, (index) => 0);
@@ -428,12 +428,12 @@ class PlayScreenState extends State<PlayScreen> {
         modifiedQuiz.questions = quiz.questions.toList()..shuffle();
       }
       if (true) {
-        for (var question in modifiedQuiz.questions.where((element) => element.type == quizTypes.multipleChoice || element.type == quizTypes.reorder)) {
+        for (var question in modifiedQuiz.questions.where((element) => element.type == QuizTypes.multipleChoice || element.type == QuizTypes.reorder)) {
           List<String> tempAns = question.answers.toList();
           question.answers.shuffle();
           question.correctAnswer = question.correctAnswer.map((e) => question.answers.indexOf(tempAns[e])).toList();
         }
-        for (var question in modifiedQuiz.questions.where((element) => element.type == quizTypes.dropdown)) {
+        for (var question in modifiedQuiz.questions.where((element) => element.type == QuizTypes.dropdown)) {
           List<String> tempAns = question.answers.toList();
           question.answers.shuffle();
           question.correctAnswer = question.correctAnswer.map((e) => question.answers.indexOf(tempAns[e])).toList();
@@ -614,7 +614,7 @@ class PlayScreenState extends State<PlayScreen> {
                               Expanded(
                                 child: showInfinityModeDialog
                                     ? InfinityModeDialog(putResult: (value) => setState(() => infinityMode = value))
-                                    : currentQuestion.type == quizTypes.multipleChoice || currentQuestion.type == null
+                                    : currentQuestion.type == QuizTypes.multipleChoice || currentQuestion.type == null
                                         ? MultipleChoice(
                                             question: currentQuestion,
                                             nextQuestionFunction: nextQuestion,
@@ -623,7 +623,7 @@ class PlayScreenState extends State<PlayScreen> {
                                             toggleShowingAnswers: () => setState(
                                                   () => showingAnswers = !showingAnswers,
                                                 ))
-                                        : currentQuestion.type == quizTypes.dropdown
+                                        : currentQuestion.type == QuizTypes.dropdown
                                             ? DropdownQuestion(
                                                 key: dropdownKey,
                                                 question: currentQuestion,
@@ -632,7 +632,7 @@ class PlayScreenState extends State<PlayScreen> {
                                                 toggleShowingAnswers: () => setState(
                                                       () => showingAnswers = !showingAnswers,
                                                     ))
-                                            : currentQuestion.type == quizTypes.reorder
+                                            : currentQuestion.type == QuizTypes.reorder
                                                 ? ReorderQuestion(
                                                     key: reorderKey,
                                                     question: currentQuestion,

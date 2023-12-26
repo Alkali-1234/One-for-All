@@ -37,30 +37,39 @@ class _MainContainerState extends State<MainContainer> {
               color: theme.secondary,
               child: SafeArea(
                 bottom: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap: widget.onClose != null ? () => widget.onClose!() : () => Navigator.pop(context),
-                        child: Icon(
-                          Icons.arrow_back,
-                          color: theme.onPrimary,
+                child: SizedBox(
+                  height: 60,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            if (widget.onClose != null) {
+                              widget.onClose!();
+                            } else {
+                              Navigator.pop(context);
+                            }
+                          },
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: theme.onPrimary,
+                          ),
                         ),
-                      ),
-                      Text(appState.getCurrentUser.username, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-                      Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: theme.onPrimary,
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: getPrimaryGradient,
-                        ),
-                        child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
-                      )
-                    ],
+                        Text(appState.getCurrentUser.username, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                        Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: theme.onPrimary,
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: getPrimaryGradient,
+                          ),
+                          child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),

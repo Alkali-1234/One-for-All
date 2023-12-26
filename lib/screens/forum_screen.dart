@@ -613,6 +613,7 @@ class _StreamBodyState extends State<StreamBody> {
                         subscribed = false;
                       }
 
+                      if (!mounted) return;
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -703,6 +704,8 @@ class _NewThreadWidgetState extends State<NewThreadWidget> {
         final prefs = await SharedPreferences.getInstance();
         prefs.setBool("forum_${appState.getCurrentUser.assignedCommunity}_${value.id}", true);
         FirebaseMessaging.instance.subscribeToTopic("forum_${appState.getCurrentUser.assignedCommunity}_${value.id}");
+
+        if (!mounted) return;
         Navigator.pop(context);
       });
     } else {
@@ -720,6 +723,8 @@ class _NewThreadWidgetState extends State<NewThreadWidget> {
         final prefs = await SharedPreferences.getInstance();
         prefs.setBool("forum_${appState.getCurrentUser.assignedCommunity}_${value.id}", true);
         FirebaseMessaging.instance.subscribeToTopic("forum_${appState.getCurrentUser.assignedCommunity}_${value.id}");
+
+        if (!mounted) return;
         Navigator.pop(context);
       });
     }

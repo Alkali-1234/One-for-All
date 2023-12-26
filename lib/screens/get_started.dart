@@ -493,6 +493,8 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
           child: ElevatedButton(
             onPressed: () async {
               await saveSettings();
+
+              if (!mounted) return;
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, elevation: 0, padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),
@@ -867,7 +869,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
                 title: quiz['title'],
                 description: quiz['description'],
                 questions: [
-                  for (int i = 0; i < quiz["questions"].length; i++) QuizQuestion(imagePath: quiz["questions"][i]["imagePath"], id: i, question: quiz["questions"][i]["question"], answers: List<String>.from(quiz["questions"][i]["answers"] as List), correctAnswer: List<int>.from(quiz["questions"][i]["correctAnswer"] as List), type: quiz["questions"][i]["type"] != null ? quizTypes.values[quiz["questions"][i]["type"]] : quizTypes.multipleChoice),
+                  for (int i = 0; i < quiz["questions"].length; i++) QuizQuestion(imagePath: quiz["questions"][i]["imagePath"], id: i, question: quiz["questions"][i]["question"], answers: List<String>.from(quiz["questions"][i]["answers"] as List), correctAnswer: List<int>.from(quiz["questions"][i]["correctAnswer"] as List), type: quiz["questions"][i]["type"] != null ? QuizTypes.values[quiz["questions"][i]["type"]] : QuizTypes.multipleChoice),
                 ],
                 settings: quiz["settings"] ?? {}),
           );
@@ -937,6 +939,8 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
       prefs.setBool("hasOpenedBefore", true);
 
       //* Push to home screen
+
+      if (!mounted) return;
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const HomePage()));
     });
   }

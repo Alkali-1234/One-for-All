@@ -1206,6 +1206,7 @@ class _ThreeTwoOneGoRibbonState extends State<ThreeTwoOneGoRibbon> {
         text = "Go!";
       });
       await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
       Navigator.pop(context);
     }
   }

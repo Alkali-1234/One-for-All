@@ -28,6 +28,6 @@ class QuizQuestion {
   List<String> answers;
   //Between 0 to length of answers
   List<int> correctAnswer;
-  quizTypes? type;
+  QuizTypes? type;
   String? imagePath;
 }
