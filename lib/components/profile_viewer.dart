@@ -11,6 +11,7 @@ class ProfileViewer extends StatefulWidget {
 }
 
 class _ProfileViewerState extends State<ProfileViewer> {
+  late final getUserData = getDocument("users", widget.uid);
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -24,7 +25,7 @@ class _ProfileViewerState extends State<ProfileViewer> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: FutureBuilder<dynamic>(
-                future: getDocument("users", widget.uid),
+                future: getUserData,
                 builder: (c, data) => Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:oneforall/components/profile_viewer.dart';
 import 'package:oneforall/constants.dart';
 // import 'package:oneforall/service/firebase_api.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +37,7 @@ class _ThreadScreenState extends State<ThreadScreen> {
                   "message": messageQuery,
                   "author": appState.getCurrentUser.username,
                   "authorpfp": appState.getCurrentUser.profilePicture,
+                  "authorUID": FirebaseAuth.instance.currentUser!.uid,
                   "time": Timestamp.now(),
                 }
               ])
@@ -49,6 +52,7 @@ class _ThreadScreenState extends State<ThreadScreen> {
                   "message": messageQuery,
                   "author": appState.getCurrentUser.username,
                   "authorpfp": appState.getCurrentUser.profilePicture,
+                  "authorUID": FirebaseAuth.instance.currentUser!.uid,
                   "time": Timestamp.now(),
                 }
               ])
@@ -81,6 +85,9 @@ class _ThreadScreenState extends State<ThreadScreen> {
     var tm = appState.currentUserSelectedTheme.colorScheme;
     var ttm = appState.currentUserSelectedTheme.textTheme;
 
+    late final communityStream = FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").doc(widget.threadID).snapshots();
+    late final localStream = FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("forum").doc(widget.threadID).snapshots();
+
     return Container(
       decoration: appState.currentUserSelectedTheme == defaultBlueTheme
           ? const BoxDecoration(
@@ -91,7 +98,7 @@ class _ThreadScreenState extends State<ThreadScreen> {
             )
           : BoxDecoration(color: tm.background),
       child: StreamBuilder(
-          stream: widget.target == "community" ? FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").doc(widget.threadID).snapshots() : FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("forum").doc(widget.threadID).snapshots(),
+          stream: widget.target == "community" ? communityStream : localStream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Scaffold(
@@ -128,7 +135,7 @@ class _ThreadScreenState extends State<ThreadScreen> {
             return Scaffold(
               backgroundColor: Colors.transparent,
               appBar: AppBar(
-                backgroundColor: tm.background,
+                backgroundColor: Colors.transparent,
                 leading: IconButton(
                   icon: Icon(Icons.arrow_back, color: tm.onBackground),
                   onPressed: () => Navigator.pop(context),
@@ -171,6 +178,7 @@ class _ThreadBodyState extends State<ThreadBody> {
                 "message": messageQuery,
                 "author": appState.getCurrentUser.username,
                 "authorpfp": appState.getCurrentUser.profilePicture,
+                "authorUID": FirebaseAuth.instance.currentUser!.uid,
                 "time": Timestamp.now(),
               }
             ])
@@ -271,7 +279,19 @@ class _ThreadBodyState extends State<ThreadBody> {
           Row(children: [
             for (var i = 0; i < snapshot.data!['tags'].length; i++) ...[
               const SizedBox(width: 5),
-              Chip(side: BorderSide(color: tm.secondary), label: Text("#${snapshot.data!['tags'][0]}", style: ttm.displaySmall), backgroundColor: tm.primaryContainer),
+              Chip(
+                side: BorderSide.none,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                label: Text("#${snapshot.data!['tags'][i]}", style: ttm.displaySmall),
+                backgroundColor: [
+                  Colors.red,
+                  Colors.green,
+                  Colors.blue,
+                  Colors.yellow,
+                  Colors.purple,
+                ][i % 5]
+                    .withOpacity(0.25),
+              ), //Alternating background color
             ]
           ]),
           const SizedBox(height: 15),
@@ -316,6 +336,10 @@ class _ThreadBodyState extends State<ThreadBody> {
                       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       hintText: 'Send a message',
                       hintStyle: ttm.displaySmall!.copyWith(color: tm.onBackground.withOpacity(0.25)),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: tm.onBackground),
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -347,15 +371,31 @@ class _ThreadBodyState extends State<ThreadBody> {
           Expanded(
               child: ListView.builder(
             itemBuilder: (context, index) {
-              return ListTile(
-                  shape: Border.symmetric(horizontal: BorderSide(color: tm.onBackground.withOpacity(0.25), width: 0.5)),
-                  title: Text(snapshot.data!['replies'][snapshot.data!['replies'].length - (index + 1)]['author'], style: ttm.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-                  subtitle: Text(snapshot.data!['replies'][snapshot.data!['replies'].length - (index + 1)]['message'], style: ttm.displaySmall),
-                  leading: CircleAvatar(
-                    radius: 15,
-                    backgroundImage: NetworkImage(snapshot.data!['replies'][snapshot.data!['replies'].length - (index + 1)]['authorpfp']),
+              return Container(
+                decoration: BoxDecoration(
+                  border: Border.symmetric(
+                    horizontal: BorderSide(color: tm.onBackground.withOpacity(0.5)),
                   ),
-                  trailing: Text("${DateTime.now().difference(snapshot.data!['replies'][snapshot.data!['replies'].length - (index + 1)]['time'].toDate()).inMinutes} Minutes ago", style: ttm.displaySmall!.copyWith(color: tm.onBackground.withOpacity(0.25))));
+                ),
+                child: ListTile(
+                    title: GestureDetector(
+                        // style: ElevatedButton.styleFrom(
+                        //   padding: EdgeInsets.zero,
+                        //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        //   backgroundColor: Colors.transparent,
+                        //   surfaceTintColor: Colors.transparent,
+                        //   elevation: 0,
+                        //   shadowColor: Colors.transparent,
+                        // ),
+                        onTap: () => showBottomSheet(context: context, builder: (c) => ProfileViewer(uid: snapshot.data!['replies'][snapshot.data!['replies'].length - (index + 1)]['authorUID'])),
+                        child: Text(snapshot.data!['replies'][snapshot.data!['replies'].length - (index + 1)]['author'], style: ttm.displaySmall!.copyWith(fontWeight: FontWeight.bold))),
+                    subtitle: Text(snapshot.data!['replies'][snapshot.data!['replies'].length - (index + 1)]['message'], style: ttm.displaySmall),
+                    leading: CircleAvatar(
+                      radius: 15,
+                      backgroundImage: NetworkImage(snapshot.data!['replies'][snapshot.data!['replies'].length - (index + 1)]['authorpfp']),
+                    ),
+                    trailing: Text("${DateTime.now().difference(snapshot.data!['replies'][snapshot.data!['replies'].length - (index + 1)]['time'].toDate()).inMinutes} Minutes ago", style: ttm.displaySmall!.copyWith(color: tm.onBackground.withOpacity(0.25)))),
+              );
             },
             itemCount: snapshot.data!['replies'].length,
             physics: const BouncingScrollPhysics(),
