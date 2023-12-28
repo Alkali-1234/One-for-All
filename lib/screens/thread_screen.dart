@@ -242,6 +242,27 @@ class _ThreadBodyState extends State<ThreadBody> {
     super.initState();
   }
 
+  ///Formats timestamp to a readable format
+  String dateFormatter(Timestamp date) {
+    var now = DateTime.now();
+    var difference = now.difference(date.toDate());
+    if (difference.inSeconds < 60) {
+      return "${difference.inSeconds} seconds ago";
+    } else if (difference.inMinutes < 60) {
+      return "${difference.inMinutes} minutes ago";
+    } else if (difference.inHours < 24) {
+      return "${difference.inHours} hours ago";
+    } else if (difference.inDays < 7) {
+      return "${difference.inDays} days ago";
+    } else if (difference.inDays < 30) {
+      return "${(difference.inDays / 7).floor()} weeks ago";
+    } else if (difference.inDays < 365) {
+      return "${(difference.inDays / 30).floor()} months ago";
+    } else {
+      return "${(difference.inDays / 365).floor()} years ago";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final AsyncSnapshot snapshot = widget.snapshot;
@@ -252,6 +273,7 @@ class _ThreadBodyState extends State<ThreadBody> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 10),
           Row(
@@ -276,7 +298,7 @@ class _ThreadBodyState extends State<ThreadBody> {
           ),
           const SizedBox(height: 5),
           //Tags
-          Row(children: [
+          Wrap(alignment: WrapAlignment.start, direction: Axis.horizontal, textDirection: TextDirection.ltr, children: [
             for (var i = 0; i < snapshot.data!['tags'].length; i++) ...[
               const SizedBox(width: 5),
               Chip(
@@ -298,18 +320,29 @@ class _ThreadBodyState extends State<ThreadBody> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  //Pfp
-                  CircleAvatar(
-                    radius: 15,
-                    backgroundImage: NetworkImage(snapshot.data!['authorPFP']),
-                  ),
-                  const SizedBox(width: 5),
-                  Text("${snapshot.data!['author']}", style: ttm.displaySmall),
-                ],
+              ElevatedButton(
+                onPressed: () => showBottomSheet(context: context, builder: (c) => ProfileViewer(uid: snapshot.data!['authorUID'])),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  shadowColor: Colors.transparent,
+                ),
+                child: Row(
+                  children: [
+                    //Pfp
+                    CircleAvatar(
+                      radius: 15,
+                      backgroundImage: NetworkImage(snapshot.data!['authorPFP']),
+                    ),
+                    const SizedBox(width: 5),
+                    Text("${snapshot.data!['author']}", style: ttm.displaySmall),
+                  ],
+                ),
               ),
-              Text(snapshot.data!['creationDate'].toDate().toString(), style: ttm.displaySmall!.copyWith(color: tm.onBackground.withOpacity(0.25))),
+              Text(dateFormatter(snapshot.data!['creationDate']), style: ttm.displaySmall!.copyWith(color: tm.onBackground.withOpacity(0.25))),
             ],
           ),
           const SizedBox(height: 25),
@@ -325,8 +358,7 @@ class _ThreadBodyState extends State<ThreadBody> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Flexible(
-                flex: 7,
+              Expanded(
                 child: SizedBox(
                   width: double.infinity,
                   child: TextField(
@@ -353,17 +385,14 @@ class _ThreadBodyState extends State<ThreadBody> {
                   ),
                 ),
               ),
-              Flexible(
-                flex: 1,
-                child: isLoading
-                    ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: tm.onBackground))
-                    : IconButton(
-                        onPressed: () {
-                          sendMessage(appState, tm);
-                        },
-                        icon: Icon(Icons.send_rounded, color: tm.onBackground.withOpacity(0.25)),
-                      ),
-              ),
+              isLoading
+                  ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: tm.onBackground))
+                  : IconButton(
+                      onPressed: () {
+                        sendMessage(appState, tm);
+                      },
+                      icon: Icon(Icons.send_rounded, color: tm.onBackground.withOpacity(0.25)),
+                    ),
             ],
           ),
           const SizedBox(height: 10),
@@ -373,9 +402,7 @@ class _ThreadBodyState extends State<ThreadBody> {
             itemBuilder: (context, index) {
               return Container(
                 decoration: BoxDecoration(
-                  border: Border.symmetric(
-                    horizontal: BorderSide(color: tm.onBackground.withOpacity(0.5)),
-                  ),
+                  border: index != snapshot.data!['replies'].length ? Border(bottom: BorderSide(color: tm.onBackground.withOpacity(0.25))) : null,
                 ),
                 child: ListTile(
                     title: GestureDetector(
@@ -394,7 +421,7 @@ class _ThreadBodyState extends State<ThreadBody> {
                       radius: 15,
                       backgroundImage: NetworkImage(snapshot.data!['replies'][snapshot.data!['replies'].length - (index + 1)]['authorpfp']),
                     ),
-                    trailing: Text("${DateTime.now().difference(snapshot.data!['replies'][snapshot.data!['replies'].length - (index + 1)]['time'].toDate()).inMinutes} Minutes ago", style: ttm.displaySmall!.copyWith(color: tm.onBackground.withOpacity(0.25)))),
+                    trailing: Text(dateFormatter(snapshot.data!['replies'][snapshot.data!['replies'].length - (index + 1)]['time']), style: ttm.displaySmall!.copyWith(color: tm.onBackground.withOpacity(0.25)))),
               );
             },
             itemCount: snapshot.data!['replies'].length,

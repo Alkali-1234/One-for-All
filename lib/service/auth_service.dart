@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 //ignore: unused_import
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
@@ -305,10 +307,21 @@ Future changeUserProfilePicture(File file, String? previousProfilePicture) async
   } catch (e) {
     rethrow;
   }
-  if (previousProfilePicture != null) {
-    //* Delete previous profile picture from firebase storage
-    //TODO implement
+  try {
+    await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser!.uid).update({
+      "profilePicture": url
+    });
+  } catch (e) {
+    rethrow;
   }
+  // if (previousProfilePicture != null) {
+  //   //* Delete previous profile picture from firebase storage
+  //   try {
+  //     await FirebaseStorage.instance.refFromURL(previousProfilePicture).delete();
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
   return url;
 }
 

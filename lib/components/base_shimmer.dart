@@ -16,9 +16,9 @@ class BaseShimmer extends StatelessWidget {
               enabled: enabled,
               gradient: enabled
                   ? LinearGradient(colors: [
-                      Colors.grey.shade300,
+                      Colors.grey.shade300.withOpacity(0.25),
                       Colors.grey.shade100,
-                      Colors.grey.shade300
+                      Colors.grey.shade300.withOpacity(0.25)
                     ])
                   : LinearGradient(colors: [
                       theme.onBackground,

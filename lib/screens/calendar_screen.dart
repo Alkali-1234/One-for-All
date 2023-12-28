@@ -79,6 +79,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   }
                                   selectedMonth++;
                                 });
+                                calendarKey.currentState!.initializeCalendarEvents(appState);
                               },
                               child: Icon(
                                 Icons.arrow_right_rounded,

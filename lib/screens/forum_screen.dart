@@ -166,13 +166,16 @@ class _ForumScreenState extends State<ForumScreen> with TickerProviderStateMixin
     var appState = Provider.of<AppState>(context);
     var tm = appState.currentUserSelectedTheme.colorScheme;
     var ttm = appState.currentUserSelectedTheme.textTheme;
-    return Scaffold(
+    return Container(
+      decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/purpwallpaper 2.png"), fit: BoxFit.cover)) : BoxDecoration(color: tm.background),
+      child: Scaffold(
         appBar: AppBar(
           title: Text(
             "Forums",
             style: ttm.displayMedium,
           ),
           backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
           foregroundColor: tm.onBackground,
           elevation: 0,
           leading: IconButton(
@@ -200,77 +203,82 @@ class _ForumScreenState extends State<ForumScreen> with TickerProviderStateMixin
             color: tm.onBackground,
           ),
         ),
-        // bottomNavigationBar: const BannerAdWidget(),
-        backgroundColor: tm.background,
-        body: Container(
-            decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/purpwallpaper 2.png"), fit: BoxFit.cover)) : BoxDecoration(color: tm.background),
-            child: Column(
-                //Select forum: All/Global/Local using tabbar
-                //Search bar
-                //Filters
-                //List of threads title : X Active Posts
-                //List of threads
+        backgroundColor: Colors.transparent,
+        body: Column(
+            //Select forum: All/Global/Local using tabbar
+            //Search bar
+            //Filters
+            //List of threads title : X Active Posts
+            //List of threads
 
-                children: [
-                  TabBar(
-                    tabs: _tabs,
-                    labelColor: tm.onBackground,
-                    unselectedLabelColor: tm.onBackground.withOpacity(0.5),
-                    indicatorColor: tm.secondary,
-                    controller: _tabController,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  // //Search bar
-                  // Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: TextField(
-                  //     style: ttm.displaySmall,
-                  //     onChanged: (value) => setState(() {
-                  //       searchQuery = value;
-                  //     }),
-                  //     cursorColor: tm.onBackground,
-                  //     decoration: InputDecoration(
-                  //         hintText: "Search",
-                  //         hintStyle: ttm.displaySmall,
-                  //         fillColor: tm.primary,
-                  //         prefixIcon: Icon(
-                  //           Icons.search,
-                  //           color: tm.onBackground,
-                  //         ),
-                  //         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Colors.transparent, width: 0))),
-                  //   ),
-                  // ),
-                  //Filters
-                  //Tags, Date Creation, Date Last Active
-                  Expanded(
-                    child: StreamBuilder(
-                        // stream: FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").snapshots(),
-                        stream: selectedTab == 1 ? communityForumStream : localForumStream,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-                          if (snapshot.hasError) return Center(child: Text("Error loading data ${snapshot.error}"));
-                          if (snapshot.hasData == false) return Center(child: Text("No data", style: ttm.displaySmall));
-                          return StreamBody(
-                              snapshot: snapshot,
-                              addTag: (tag) => addTag(tag),
-                              target: selectedTab == 0
-                                  ? "all"
-                                  : selectedTab == 1
-                                      ? "community"
-                                      : "local");
-                        }),
-                  )
-                ])));
+            children: [
+              TabBar(
+                tabs: _tabs,
+                labelColor: tm.onBackground,
+                unselectedLabelColor: tm.onBackground.withOpacity(0.5),
+                indicatorColor: tm.secondary,
+                controller: _tabController,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              // //Search bar
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: TextField(
+              //     style: ttm.displaySmall,
+              //     onChanged: (value) => setState(() {
+              //       searchQuery = value;
+              //     }),
+              //     cursorColor: tm.onBackground,
+              //     decoration: InputDecoration(
+              //         hintText: "Search",
+              //         hintStyle: ttm.displaySmall,
+              //         fillColor: tm.primary,
+              //         prefixIcon: Icon(
+              //           Icons.search,
+              //           color: tm.onBackground,
+              //         ),
+              //         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Colors.transparent, width: 0))),
+              //   ),
+              // ),
+              //Filters
+              //Tags, Date Creation, Date Last Active
+              Expanded(
+                child: StreamBuilder(
+                    // stream: FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").snapshots(),
+                    stream: selectedTab == 1 ? communityForumStream : localForumStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+                      if (snapshot.hasError) return Center(child: Text("Error loading data ${snapshot.error}"));
+                      if (snapshot.hasData == false) return Center(child: Text("No data", style: ttm.displaySmall));
+                      return StreamBody(
+                          textTheme: ttm,
+                          resetTags: () => setTags([
+                                "All"
+                              ]),
+                          snapshot: snapshot,
+                          addTag: (tag) => addTag(tag),
+                          target: selectedTab == 0
+                              ? "all"
+                              : selectedTab == 1
+                                  ? "community"
+                                  : "local");
+                    }),
+              )
+            ]),
+      ),
+    );
   }
 }
 
 class StreamBody extends StatefulWidget {
-  const StreamBody({super.key, required this.snapshot, required this.addTag, required this.target});
+  const StreamBody({super.key, required this.snapshot, required this.addTag, required this.target, required this.resetTags, required this.textTheme});
   final AsyncSnapshot snapshot;
   final Function addTag;
   final String target;
+  final Function resetTags;
+  final TextTheme textTheme;
 
   @override
   State<StreamBody> createState() => _StreamBodyState();
@@ -380,22 +388,28 @@ class _StreamBodyState extends State<StreamBody> {
   @override
   void initState() {
     super.initState();
+    getTags();
+    for (var i = 0; i < tags.length; i++) {
+      dropdownItems.add(DropdownMenuItem(
+        value: i + 1,
+        child: Text(
+          tags[i],
+          style: widget.textTheme.displaySmall,
+        ),
+      ));
+    }
   }
 
   List<dynamic> tags = [
     "All"
   ];
 
-  @override
-  Widget build(BuildContext context) {
-    var appState = Provider.of<AppState>(context);
-    var tm = appState.currentUserSelectedTheme.colorScheme;
-    var ttm = appState.currentUserSelectedTheme.textTheme;
-    AsyncSnapshot snapshot = widget.snapshot;
+  void getTags() {
     tags = [
       "All"
     ];
-    for (var item in snapshot.data.docs) {
+    widget.resetTags();
+    for (var item in widget.snapshot.data.docs) {
       for (var tag in item["tags"]) {
         if (tags.contains(tag) == false) {
           tags.add(tag);
@@ -403,6 +417,17 @@ class _StreamBodyState extends State<StreamBody> {
         }
       }
     }
+    debugPrint(tags.toString());
+  }
+
+  List<DropdownMenuItem> dropdownItems = [];
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = Provider.of<AppState>(context);
+    var tm = appState.currentUserSelectedTheme.colorScheme;
+    var ttm = appState.currentUserSelectedTheme.textTheme;
+    AsyncSnapshot snapshot = widget.snapshot;
 
     return Column(
       children: [
@@ -410,20 +435,24 @@ class _StreamBodyState extends State<StreamBody> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextField(
-            style: ttm.displaySmall,
             onChanged: (value) => setState(() {
               searchQuery = value;
             }),
             cursorColor: tm.onBackground,
+            style: ttm.displayMedium!.copyWith(color: tm.onPrimary, fontWeight: FontWeight.bold),
             decoration: InputDecoration(
-                hintText: "Search",
-                hintStyle: ttm.displaySmall,
+                filled: true,
                 fillColor: tm.primary,
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: tm.onBackground,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    width: 0,
+                    style: BorderStyle.none,
+                  ),
                 ),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Colors.transparent, width: 0))),
+                hintText: 'Search',
+                suffixIcon: Icon(Icons.search, color: tm.onPrimary, size: 50),
+                hintStyle: ttm.displayMedium!.copyWith(color: tm.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
           ),
         ),
         Padding(
@@ -448,16 +477,7 @@ class _StreamBodyState extends State<StreamBody> {
                           filters[0] = value;
                         });
                       },
-                      items: [
-                        for (var i = 0; i < tags.length; i++)
-                          DropdownMenuItem(
-                            value: i + 1,
-                            child: Text(
-                              tags[i],
-                              style: ttm.displaySmall,
-                            ),
-                          )
-                      ],
+                      items: dropdownItems,
                     ),
                   )),
               const SizedBox(
@@ -597,54 +617,55 @@ class _StreamBodyState extends State<StreamBody> {
                     return Container();
                   }
                   tags.addAll(data["tags"]);
-                  return ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
-                      surfaceTintColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+                  return Container(
+                    decoration: BoxDecoration(
+                      border: index != snapshot.data!.docs.length - 1 ? Border(bottom: BorderSide(color: tm.onBackground.withOpacity(0.5))) : null,
                     ),
-                    onPressed: () async {
-                      late bool subscribed;
-                      final prefs = await SharedPreferences.getInstance();
-                      if (prefs.containsKey("forum_${appState.getCurrentUser.assignedCommunity}_${snapshot.data!.docs[index].id}")) {
-                        subscribed = true;
-                      } else {
-                        subscribed = false;
-                      }
-
-                      if (!mounted) return;
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ThreadScreen(
-                                    threadID: snapshot.data!.docs[index].id,
-                                    subscribed: subscribed,
-                                    target: widget.target,
-                                  )));
-                    },
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Card(
-                        color: tm.primaryContainer,
-                        child: ListTile(
-                          title: Text(
-                            data["title"] ?? "No Title",
-                            style: ttm.displayMedium,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          subtitle: Text(
-                            data["description"] ?? "No Description",
-                            style: ttm.displaySmall,
-                          ),
-                          trailing: Text(
+                    child: ListTile(
+                      title: Text(data["title"], style: ttm.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                      subtitle: Text(data["description"], style: ttm.displaySmall),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
                             "${data["replies"].length} Replies",
                             style: ttm.displaySmall,
                           ),
-                        ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Icon(
+                            Icons.chevron_right,
+                            color: tm.onBackground.withOpacity(0.5),
+                          )
+                        ],
                       ),
+                      // style: ElevatedButton.styleFrom(
+                      //   backgroundColor: Colors.transparent,
+                      //   elevation: 0,
+                      //   shadowColor: Colors.transparent,
+                      //   surfaceTintColor: Colors.transparent,
+                      //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+                      // ),
+                      onTap: () async {
+                        late bool subscribed;
+                        final prefs = await SharedPreferences.getInstance();
+                        if (prefs.containsKey("forum_${appState.getCurrentUser.assignedCommunity}_${snapshot.data!.docs[index].id}")) {
+                          subscribed = true;
+                        } else {
+                          subscribed = false;
+                        }
+
+                        if (!mounted) return;
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ThreadScreen(
+                                      threadID: snapshot.data!.docs[index].id,
+                                      subscribed: subscribed,
+                                      target: widget.target,
+                                    )));
+                      },
                     ),
                   );
                 });
@@ -701,6 +722,7 @@ class _NewThreadWidgetState extends State<NewThreadWidget> {
         "replies": [],
         "author": appState.getCurrentUser.username,
         "authorPFP": appState.getCurrentUser.profilePicture,
+        "authorUID": FirebaseAuth.instance.currentUser!.uid,
       }).then((value) async {
         final prefs = await SharedPreferences.getInstance();
         prefs.setBool("forum_${appState.getCurrentUser.assignedCommunity}_${value.id}", true);
@@ -897,29 +919,31 @@ class _NewThreadWidgetState extends State<NewThreadWidget> {
                           ),
                         ),
                         Expanded(
-                          child: Wrap(
-                            spacing: 5,
-                            runSpacing: 5,
-                            alignment: WrapAlignment.start,
-                            children: [
-                              for (var tag in widget.tags)
-                                GestureDetector(
-                                  onTap: () {
-                                    if (tags.contains(tag)) return;
+                          child: SingleChildScrollView(
+                            child: Wrap(
+                              spacing: 5,
+                              runSpacing: 5,
+                              alignment: WrapAlignment.start,
+                              children: [
+                                for (var tag in widget.tags)
+                                  GestureDetector(
+                                    onTap: () {
+                                      if (tags.contains(tag)) return;
 
-                                    setState(() {
-                                      tags.add(tag);
-                                    });
-                                  },
-                                  child: Chip(
-                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
-                                    avatar: Icon(Icons.tag, color: tm.onBackground),
-                                    label: Text(tag, style: ttm.displaySmall),
-                                    backgroundColor: tm.primary,
-                                    labelStyle: ttm.displaySmall,
+                                      setState(() {
+                                        tags.add(tag);
+                                      });
+                                    },
+                                    child: Chip(
+                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
+                                      avatar: Icon(Icons.tag, color: tm.onBackground),
+                                      label: Text(tag, style: ttm.displaySmall),
+                                      backgroundColor: tm.primary,
+                                      labelStyle: ttm.displaySmall,
+                                    ),
                                   ),
-                                ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ],

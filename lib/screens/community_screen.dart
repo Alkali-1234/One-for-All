@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 // import 'package:oneforall/data/community_data.dart';
 import 'package:provider/provider.dart';
 import '../service/community_service.dart';
-
+import '../components/base_shimmer.dart';
 import '../main.dart';
 
 class CommunityScreen extends StatefulWidget {
@@ -91,6 +91,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       // bottomNavigationBar: const BannerAdWidget(),
       backgroundColor: appState.currentUserSelectedTheme.colorScheme.background,
       body: Builder(builder: (context) {
+        bool enabled = localCommunityData.isEmpty;
         if (error != "") {
           return Center(
             child: Column(
@@ -114,21 +115,17 @@ class _CommunityScreenState extends State<CommunityScreen> {
             ),
           );
         }
-        if (appState.communityData.isEmpty) {
-          return Center(
-              child: Text(
-            "Loading...",
-            style: textTheme.displaySmall,
-          ));
-        }
         return Column(
           children: [
             Stack(children: [
               //Image
-              Container(
-                height: 270,
-                width: double.infinity,
-                decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(appState.communityData["image"] ?? ""), fit: BoxFit.cover)),
+              BaseShimmer(
+                enabled: enabled,
+                child: Container(
+                  height: 270,
+                  width: double.infinity,
+                  decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(appState.communityData["image"] ?? ""), fit: BoxFit.cover)),
+                ),
               ),
               //Gradient
               Container(
@@ -174,26 +171,32 @@ class _CommunityScreenState extends State<CommunityScreen> {
             ]),
             //Community Name
             const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                children: [
-                  Text(
-                    appState.communityData["name"] ?? "",
-                    style: textTheme.displayLarge,
-                  ),
-                ],
+            BaseShimmer(
+              enabled: enabled,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  children: [
+                    Text(
+                      appState.communityData["name"] ?? "Loading...",
+                      style: textTheme.displayLarge,
+                    ),
+                  ],
+                ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                children: [
-                  Text(
-                    appState.communityData["subName"] ?? "",
-                    style: textTheme.displaySmall,
-                  ),
-                ],
+            BaseShimmer(
+              enabled: enabled,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  children: [
+                    Text(
+                      appState.communityData["subName"] ?? "",
+                      style: textTheme.displaySmall,
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 10),
@@ -207,9 +210,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 "ID",
                 style: textTheme.displaySmall,
               ),
-              trailing: SelectableText(
-                appState.communityData["id"] ?? "",
-                style: textTheme.displaySmall,
+              trailing: BaseShimmer(
+                enabled: enabled,
+                child: SelectableText(
+                  appState.communityData["id"] ?? "",
+                  style: textTheme.displaySmall,
+                ),
               ),
             ),
             //Members
@@ -222,9 +228,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 "Members",
                 style: textTheme.displaySmall,
               ),
-              trailing: Text(
-                appState.communityData["members"]?.length.toString() ?? "0",
-                style: textTheme.displaySmall,
+              trailing: BaseShimmer(
+                enabled: enabled,
+                child: Text(
+                  appState.communityData["members"]?.length.toString() ?? "0",
+                  style: textTheme.displaySmall,
+                ),
               ),
             ),
             //* Sharing
@@ -260,9 +269,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 "Sections",
                 style: textTheme.displaySmall,
               ),
-              trailing: Text(
-                appState.communityData["_sections"]?.length.toString() ?? "0",
-                style: textTheme.displaySmall,
+              trailing: BaseShimmer(
+                enabled: enabled,
+                child: Text(
+                  appState.communityData["_sections"]?.length.toString() ?? "0",
+                  style: textTheme.displaySmall,
+                ),
               ),
             ),
             Divider(color: theme.secondary),
@@ -270,24 +282,32 @@ class _CommunityScreenState extends State<CommunityScreen> {
             Expanded(
               child: ListView.builder(
                   padding: EdgeInsets.zero,
-                  itemCount: appState.communityData["_sections"]?.length ?? 0,
+                  itemCount: appState.communityData["_sections"]?.length ?? 5,
                   itemBuilder: (context, index) {
                     return ListTile(
                       splashColor: theme.secondary,
-                      onTap: () {
-                        showDialog(
-                            context: context,
-                            builder: (_) => SelectedSection(
-                                  sectionData: appState.communityData["_sections"][index],
-                                ));
-                      },
-                      title: Text(
-                        appState.communityData["_sections"][index]["name"] ?? "",
-                        style: textTheme.displaySmall,
+                      onTap: enabled
+                          ? () {
+                              showDialog(
+                                  context: context,
+                                  builder: (_) => SelectedSection(
+                                        sectionData: appState.communityData["_sections"][index],
+                                      ));
+                            }
+                          : null,
+                      title: BaseShimmer(
+                        enabled: enabled,
+                        child: Text(
+                          appState.communityData["_sections"]?[index]["name"] ?? "Loading...",
+                          style: textTheme.displaySmall,
+                        ),
                       ),
-                      trailing: Text(
-                        "${appState.communityData["_sections"][index]["members"]?.length.toString() ?? "0"} Members",
-                        style: textTheme.displaySmall,
+                      trailing: BaseShimmer(
+                        enabled: enabled,
+                        child: Text(
+                          "${appState.communityData["_sections"]?[index]["members"]?.length.toString() ?? "0"} Members",
+                          style: textTheme.displaySmall,
+                        ),
                       ),
                     );
                   }),
