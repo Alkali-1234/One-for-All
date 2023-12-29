@@ -68,7 +68,7 @@ class _QuizzesPlayScreenState extends State<QuizzesPlayScreen> {
               }
             },
             child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(16.0),
                 child: PageTransitionSwitcher(
                   reverse: reversed,
                   duration: const Duration(milliseconds: 200),
@@ -1330,7 +1330,7 @@ class _EndScreenState extends State<EndScreen> with TickerProviderStateMixin {
       body: MainContainer(
           onClose: () => null,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
                 const SizedBox(

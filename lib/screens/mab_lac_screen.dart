@@ -569,7 +569,7 @@ class _NewEventModalState extends State<NewEventModal> {
     }
 
     return Dialog(
-      elevation: 2,
+      surfaceTintColor: Colors.transparent,
       backgroundColor: Theme.of(context).colorScheme.background,
       child: Padding(
         padding: const EdgeInsets.all(16.0),

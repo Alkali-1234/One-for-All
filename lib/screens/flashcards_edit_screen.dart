@@ -107,7 +107,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -125,7 +125,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
           const SizedBox(height: 10),
           //New Question button
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
                 onPressed: () => addCard(),
                 style: ElevatedButton.styleFrom(
@@ -164,7 +164,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                   children: [
                     for (int index = 0; index < questionQuery.length; index++) ...{
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: LayoutBuilder(builder: (context, consntraints) {
@@ -320,53 +320,35 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
           ),
           //Save and Cancel Buttons
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
+                IconButton(
                     onPressed: () {
                       saveFlashcards(context.read<AppState>());
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.secondary,
                       shadowColor: Colors.transparent,
                       elevation: 0,
-                      side: BorderSide(color: theme.tertiary, width: 1),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.save, color: theme.onPrimary),
-                        const SizedBox(width: 10),
-                        Text(
-                          "Save",
-                          style: textTheme.displaySmall,
-                        ),
-                      ],
+                    icon: const Icon(
+                      Icons.check,
+                      color: Colors.green,
                     )),
-                ElevatedButton(
+                IconButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.secondary,
                       shadowColor: Colors.transparent,
                       elevation: 0,
-                      side: BorderSide(color: theme.tertiary, width: 1),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.cancel, color: theme.onPrimary),
-                        const SizedBox(width: 10),
-                        Text(
-                          "Cancel",
-                          style: textTheme.displaySmall,
-                        ),
-                      ],
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.red,
                     )),
               ],
             ),

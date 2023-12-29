@@ -188,7 +188,7 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                 TextField(
                   style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
                   cursorColor: theme.onBackground,
-                  decoration: TextInputStyle(theme: theme, textTheme: textTheme).getTextInputStyle().copyWith(hintText: "Search", prefixIcon: const Icon(Icons.search), prefixIconColor: theme.onBackground),
+                  decoration: InputDecoration(hintStyle: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold, color: theme.onBackground.withOpacity(0.25)), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none), fillColor: theme.primary, filled: true, hintText: "Search", suffixIcon: Icon(Icons.search, size: 48, color: theme.onBackground), prefixIconColor: theme.onBackground),
                   onChanged: (value) => setState(() => searchQuery = value),
                 ),
                 const SizedBox(height: 10),

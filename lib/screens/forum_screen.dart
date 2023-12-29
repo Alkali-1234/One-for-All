@@ -777,6 +777,7 @@ class _NewThreadWidgetState extends State<NewThreadWidget> {
     var tm = appState.currentUserSelectedTheme.colorScheme;
     var ttm = appState.currentUserSelectedTheme.textTheme;
     return Dialog(
+      surfaceTintColor: Colors.transparent,
       backgroundColor: tm.background,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -885,6 +886,7 @@ class _NewThreadWidgetState extends State<NewThreadWidget> {
                       children: [
                         //Search
                         TextField(
+                          onChanged: (value) => setState(() {}),
                           controller: tagController,
                           cursorColor: tm.onBackground,
                           style: ttm.displaySmall,
@@ -930,7 +932,7 @@ class _NewThreadWidgetState extends State<NewThreadWidget> {
                               runSpacing: 5,
                               alignment: WrapAlignment.start,
                               children: [
-                                for (var tag in widget.tags)
+                                for (var tag in widget.tags.where((element) => element.toLowerCase().contains(tagController.text)))
                                   GestureDetector(
                                     onTap: () {
                                       if (tags.contains(tag)) return;

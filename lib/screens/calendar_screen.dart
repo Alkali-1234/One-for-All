@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/components/main_container.dart';
@@ -25,7 +24,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    var appState = context.watch<AppState>();
     return Scaffold(
         resizeToAvoidBottomInset: false,
         body: MainContainer(
