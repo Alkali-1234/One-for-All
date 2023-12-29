@@ -10,6 +10,7 @@ class TextInputStyle {
 
   InputDecoration getTextInputStyle() {
     final style = InputDecoration(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
       filled: true,
       fillColor: theme.primary,
       border: OutlineInputBorder(

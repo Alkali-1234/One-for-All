@@ -142,7 +142,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
               SafeArea(
                 bottom: false,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -170,147 +170,158 @@ class _CommunityScreenState extends State<CommunityScreen> {
               ),
             ]),
             //Community Name
-            const SizedBox(height: 10),
-            BaseShimmer(
-              enabled: enabled,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Row(
-                  children: [
-                    Text(
-                      appState.communityData["name"] ?? "Loading...",
-                      style: textTheme.displayLarge,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            BaseShimmer(
-              enabled: enabled,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Row(
-                  children: [
-                    Text(
-                      appState.communityData["subName"] ?? "",
-                      style: textTheme.displaySmall,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            //ID
-            ListTile(
-              leading: Icon(
-                Icons.qr_code,
-                color: theme.onBackground,
-              ),
-              title: Text(
-                "ID",
-                style: textTheme.displaySmall,
-              ),
-              trailing: BaseShimmer(
-                enabled: enabled,
-                child: SelectableText(
-                  appState.communityData["id"] ?? "",
-                  style: textTheme.displaySmall,
-                ),
-              ),
-            ),
-            //Members
-            ListTile(
-              leading: Icon(
-                Icons.people,
-                color: theme.onBackground,
-              ),
-              title: Text(
-                "Members",
-                style: textTheme.displaySmall,
-              ),
-              trailing: BaseShimmer(
-                enabled: enabled,
-                child: Text(
-                  appState.communityData["members"]?.length.toString() ?? "0",
-                  style: textTheme.displaySmall,
-                ),
-              ),
-            ),
-            //* Sharing
-            ListTile(
-              leading: Icon(Icons.share, color: theme.onBackground),
-              title: Text("Sharing", style: textTheme.displaySmall),
-              trailing: Text("0 Shared", style: textTheme.displaySmall),
-              splashColor: theme.onBackground.withOpacity(0.25),
-              onTap: () => showDialog(
-                  context: context,
-                  builder: (context) => Dialog(
-                      child: Container(
-                          decoration: BoxDecoration(color: theme.background, borderRadius: BorderRadius.circular(20)),
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text("Coming Soon", style: textTheme.displaySmall),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              TextButton(onPressed: () => Navigator.pop(context), child: Text("Close", style: textTheme.displaySmall))
-                            ],
-                          )))),
-            ),
-            //Sections
-            ListTile(
-              leading: Icon(
-                Icons.list,
-                color: theme.onBackground,
-              ),
-              title: Text(
-                "Sections",
-                style: textTheme.displaySmall,
-              ),
-              trailing: BaseShimmer(
-                enabled: enabled,
-                child: Text(
-                  appState.communityData["_sections"]?.length.toString() ?? "0",
-                  style: textTheme.displaySmall,
-                ),
-              ),
-            ),
-            Divider(color: theme.secondary),
-            //* Sections list
             Expanded(
-              child: ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: appState.communityData["_sections"]?.length ?? 5,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      splashColor: theme.secondary,
-                      onTap: enabled
-                          ? () {
-                              showDialog(
-                                  context: context,
-                                  builder: (_) => SelectedSection(
-                                        sectionData: appState.communityData["_sections"][index],
-                                      ));
-                            }
-                          : null,
-                      title: BaseShimmer(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 10),
+                    BaseShimmer(
+                      enabled: enabled,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                appState.communityData["name"] ?? "Loading...",
+                                style: textTheme.displayLarge,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    BaseShimmer(
+                      enabled: enabled,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              appState.communityData["subName"] ?? "",
+                              style: textTheme.displaySmall,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    //ID
+                    ListTile(
+                      leading: Icon(
+                        Icons.qr_code,
+                        color: theme.onBackground,
+                      ),
+                      title: Text(
+                        "ID",
+                        style: textTheme.displaySmall,
+                      ),
+                      trailing: BaseShimmer(
                         enabled: enabled,
-                        child: Text(
-                          appState.communityData["_sections"]?[index]["name"] ?? "Loading...",
+                        child: SelectableText(
+                          appState.communityData["id"] ?? "",
                           style: textTheme.displaySmall,
                         ),
+                      ),
+                    ),
+                    //Members
+                    ListTile(
+                      leading: Icon(
+                        Icons.people,
+                        color: theme.onBackground,
+                      ),
+                      title: Text(
+                        "Members",
+                        style: textTheme.displaySmall,
                       ),
                       trailing: BaseShimmer(
                         enabled: enabled,
                         child: Text(
-                          "${appState.communityData["_sections"]?[index]["members"]?.length.toString() ?? "0"} Members",
+                          appState.communityData["members"]?.length.toString() ?? "0",
                           style: textTheme.displaySmall,
                         ),
                       ),
-                    );
-                  }),
+                    ),
+                    //* Sharing
+                    ListTile(
+                      leading: Icon(Icons.share, color: theme.onBackground),
+                      title: Text("Sharing", style: textTheme.displaySmall),
+                      trailing: Text("0 Shared", style: textTheme.displaySmall),
+                      splashColor: theme.onBackground.withOpacity(0.25),
+                      onTap: () => showDialog(
+                          context: context,
+                          builder: (context) => Dialog(
+                              child: Container(
+                                  decoration: BoxDecoration(color: theme.background, borderRadius: BorderRadius.circular(20)),
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text("Coming Soon", style: textTheme.displaySmall),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      TextButton(onPressed: () => Navigator.pop(context), child: Text("Close", style: textTheme.displaySmall))
+                                    ],
+                                  )))),
+                    ),
+                    //Sections
+                    ListTile(
+                      leading: Icon(
+                        Icons.list,
+                        color: theme.onBackground,
+                      ),
+                      title: Text(
+                        "Sections",
+                        style: textTheme.displaySmall,
+                      ),
+                      trailing: BaseShimmer(
+                        enabled: enabled,
+                        child: Text(
+                          appState.communityData["_sections"]?.length.toString() ?? "0",
+                          style: textTheme.displaySmall,
+                        ),
+                      ),
+                    ),
+                    Divider(color: theme.secondary),
+                    //* Sections list
+                    Expanded(
+                      child: ListView.builder(
+                          padding: EdgeInsets.zero,
+                          itemCount: appState.communityData["_sections"]?.length ?? 5,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              splashColor: theme.secondary,
+                              onTap: !enabled
+                                  ? () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (_) => SelectedSection(
+                                                sectionData: appState.communityData["_sections"][index],
+                                              ));
+                                    }
+                                  : null,
+                              title: BaseShimmer(
+                                enabled: enabled,
+                                child: Text(
+                                  appState.communityData["_sections"]?[index]["name"] ?? "Loading...",
+                                  style: textTheme.displaySmall,
+                                ),
+                              ),
+                              trailing: BaseShimmer(
+                                enabled: enabled,
+                                child: Text(
+                                  "${appState.communityData["_sections"]?[index]["members"]?.length.toString() ?? "0"} Members",
+                                  style: textTheme.displaySmall,
+                                ),
+                              ),
+                            );
+                          }),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         );
@@ -420,6 +431,7 @@ class _SelectedSectionState extends State<SelectedSection> {
     var textTheme = context.watch<AppState>().currentUserSelectedTheme.textTheme;
     var appState = context.watch<AppState>();
     return Dialog(
+      surfaceTintColor: Colors.transparent,
       backgroundColor: theme.background,
       child: Container(
         padding: const EdgeInsets.all(8),
@@ -434,25 +446,22 @@ class _SelectedSectionState extends State<SelectedSection> {
                 Text("Members: ${widget.sectionData["members"]?.length ?? 0}", style: textTheme.displaySmall),
                 //* password
                 const SizedBox(height: 10),
-                SizedBox(
-                  height: 40,
-                  child: TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        passwordQuery = value;
-                      });
-                    },
-                    style: textTheme.displaySmall,
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.all(0),
-                      hintText: "Password",
-                      errorText: errorMessage.isNotEmpty ? errorMessage : null,
-                      filled: true,
-                      fillColor: theme.primary,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: theme.onBackground), borderRadius: BorderRadius.circular(10)),
-                      hintStyle: textTheme.displaySmall,
-                    ),
+                TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      passwordQuery = value;
+                    });
+                  },
+                  style: textTheme.displaySmall,
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    hintText: "Password",
+                    errorText: errorMessage.isNotEmpty ? errorMessage : null,
+                    filled: true,
+                    fillColor: theme.primary,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: theme.onBackground), borderRadius: BorderRadius.circular(10)),
+                    hintStyle: textTheme.displaySmall,
                   ),
                 ),
               ],

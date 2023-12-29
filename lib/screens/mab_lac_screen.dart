@@ -145,7 +145,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                   //Body
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(16),
                       child: Column(children: [
                         //Top selection
                         Flexible(
@@ -242,7 +242,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                   color: theme.primaryContainer,
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8),
+                                  padding: const EdgeInsets.all(16),
                                   child: Column(children: [
                                     //Search bar
                                     Flexible(

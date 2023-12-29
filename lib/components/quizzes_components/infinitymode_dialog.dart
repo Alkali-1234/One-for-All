@@ -22,26 +22,32 @@ class _InfinityModeDialogState extends State<InfinityModeDialog> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton.icon(
+            IconButton(
               style: ElevatedButton.styleFrom(
+                elevation: 0,
                 backgroundColor: theme.secondary,
                 foregroundColor: theme.onBackground,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
               onPressed: () => widget.putResult(true),
-              label: const Text("Start"),
-              icon: const Icon(Icons.check),
+              icon: const Icon(
+                Icons.check,
+                color: Colors.green,
+              ),
             ),
             const SizedBox(width: 20),
-            TextButton.icon(
+            IconButton(
               style: ElevatedButton.styleFrom(
+                elevation: 0,
                 backgroundColor: theme.secondary,
                 foregroundColor: theme.onBackground,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
               onPressed: () => widget.putResult(false),
-              label: const Text("Finish"),
-              icon: const Icon(Icons.close),
+              icon: const Icon(
+                Icons.close,
+                color: Colors.red,
+              ),
             ),
           ],
         )

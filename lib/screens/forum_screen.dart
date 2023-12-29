@@ -433,7 +433,7 @@ class _StreamBodyState extends State<StreamBody> {
       children: [
         //Search bar
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: TextField(
             onChanged: (value) => setState(() {
               searchQuery = value;
@@ -456,7 +456,7 @@ class _StreamBodyState extends State<StreamBody> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -586,90 +586,95 @@ class _StreamBodyState extends State<StreamBody> {
           ),
         ),
         Expanded(
-          child: Builder(
-              // stream: FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").snapshots(),
-              builder: (context) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: Text("Loading...", style: ttm.displaySmall),
-              );
-            }
-            if (!snapshot.hasData) {
-              return Center(
-                child: Text("No Data", style: ttm.displaySmall),
-              );
-            }
-            if (snapshot.hasError) {
-              return Center(
-                child: Text("Error: ${snapshot.error}", style: ttm.displaySmall),
-              );
-            }
-            return ListView.builder(
-                itemCount: snapshot.data?.docs.length ?? 0,
-                itemBuilder: (context, index) {
-                  Map<String, dynamic>? data = snapshot.data?.docs[index].data();
-                  if (data == null) {
-                    return Center(
-                      child: Text("No Data.. for some reason i can't explain", style: ttm.displaySmall),
-                    );
-                  }
-                  if (validateItem(data["tags"], data["title"], data["description"], data["creationDate"].toDate(), data["lastActive"].toDate()) != true) {
-                    return Container();
-                  }
-                  tags.addAll(data["tags"]);
-                  return Container(
-                    decoration: BoxDecoration(
-                      border: index != snapshot.data!.docs.length - 1 ? Border(bottom: BorderSide(color: tm.onBackground.withOpacity(0.5))) : null,
-                    ),
-                    child: ListTile(
-                      title: Text(data["title"], style: ttm.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-                      subtitle: Text(data["description"], style: ttm.displaySmall),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            "${data["replies"].length} Replies",
-                            style: ttm.displaySmall,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Icon(
-                            Icons.chevron_right,
-                            color: tm.onBackground.withOpacity(0.5),
-                          )
-                        ],
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Builder(
+                // stream: FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").snapshots(),
+                builder: (context) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: Text("Loading...", style: ttm.displaySmall),
+                );
+              }
+              if (!snapshot.hasData) {
+                return Center(
+                  child: Text("No Data", style: ttm.displaySmall),
+                );
+              }
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text("Error: ${snapshot.error}", style: ttm.displaySmall),
+                );
+              }
+              return ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: snapshot.data?.docs.length ?? 0,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic>? data = snapshot.data?.docs[index].data();
+                    if (data == null) {
+                      return Center(
+                        child: Text("No Data.. for some reason i can't explain", style: ttm.displaySmall),
+                      );
+                    }
+                    if (validateItem(data["tags"], data["title"], data["description"], data["creationDate"].toDate(), data["lastActive"].toDate()) != true) {
+                      return Container();
+                    }
+                    tags.addAll(data["tags"]);
+                    return Container(
+                      decoration: BoxDecoration(
+                        border: index != snapshot.data!.docs.length - 1 ? Border(bottom: BorderSide(color: tm.onBackground.withOpacity(0.5))) : null,
                       ),
-                      // style: ElevatedButton.styleFrom(
-                      //   backgroundColor: Colors.transparent,
-                      //   elevation: 0,
-                      //   shadowColor: Colors.transparent,
-                      //   surfaceTintColor: Colors.transparent,
-                      //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
-                      // ),
-                      onTap: () async {
-                        late bool subscribed;
-                        final prefs = await SharedPreferences.getInstance();
-                        if (prefs.containsKey("forum_${appState.getCurrentUser.assignedCommunity}_${snapshot.data!.docs[index].id}")) {
-                          subscribed = true;
-                        } else {
-                          subscribed = false;
-                        }
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
+                        title: Text(data["title"], style: ttm.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                        subtitle: Text(data["description"], style: ttm.displaySmall),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "${data["replies"].length} Replies",
+                              style: ttm.displaySmall,
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Icon(
+                              Icons.chevron_right,
+                              color: tm.onBackground.withOpacity(0.5),
+                            )
+                          ],
+                        ),
+                        // style: ElevatedButton.styleFrom(
+                        //   backgroundColor: Colors.transparent,
+                        //   elevation: 0,
+                        //   shadowColor: Colors.transparent,
+                        //   surfaceTintColor: Colors.transparent,
+                        //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+                        // ),
+                        onTap: () async {
+                          late bool subscribed;
+                          final prefs = await SharedPreferences.getInstance();
+                          if (prefs.containsKey("forum_${appState.getCurrentUser.assignedCommunity}_${snapshot.data!.docs[index].id}")) {
+                            subscribed = true;
+                          } else {
+                            subscribed = false;
+                          }
 
-                        if (!mounted) return;
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ThreadScreen(
-                                      threadID: snapshot.data!.docs[index].id,
-                                      subscribed: subscribed,
-                                      target: widget.target,
-                                    )));
-                      },
-                    ),
-                  );
-                });
-          }),
+                          if (!mounted) return;
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ThreadScreen(
+                                        threadID: snapshot.data!.docs[index].id,
+                                        subscribed: subscribed,
+                                        target: widget.target,
+                                      )));
+                        },
+                      ),
+                    );
+                  });
+            }),
+          ),
         ),
       ],
     );

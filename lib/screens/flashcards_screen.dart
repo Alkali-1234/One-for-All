@@ -44,7 +44,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
         resizeToAvoidBottomInset: false,
         body: MainContainer(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16),
             child: Column(
               children: [
                 Flexible(
@@ -180,6 +180,7 @@ class _ImportSetModalState extends State<ImportSetModal> {
     var textTheme = Theme.of(context).textTheme;
     // var appState = Provider.of<AppState>(context);
     return Dialog(
+      surfaceTintColor: Colors.transparent,
       backgroundColor: theme.background,
       child: Padding(
           padding: const EdgeInsets.all(16),
@@ -187,36 +188,33 @@ class _ImportSetModalState extends State<ImportSetModal> {
             Text("Import from JSON string", style: textTheme.displayMedium),
             const SizedBox(height: 10),
             //Text Field
-            SizedBox(
-              height: 40,
-              child: TextField(
-                onChanged: (value) => setState(() {
-                  // titleQuery = value;
-                }),
-                keyboardAppearance: Brightness.dark,
-                cursorColor: theme.onPrimary,
-                style: textTheme.displaySmall!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
-                decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                    filled: true,
-                    fillColor: theme.primary,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(
-                        width: 0,
-                        style: BorderStyle.none,
-                      ),
+            TextField(
+              onChanged: (value) => setState(() {
+                // titleQuery = value;
+              }),
+              keyboardAppearance: Brightness.dark,
+              cursorColor: theme.onPrimary,
+              style: textTheme.displaySmall!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                  filled: true,
+                  fillColor: theme.primary,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                      width: 0,
+                      style: BorderStyle.none,
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        width: 2,
-                        color: theme.onBackground,
-                      ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      width: 2,
+                      color: theme.onBackground,
                     ),
-                    hintText: 'JSON String',
-                    hintStyle: textTheme.displaySmall!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
-              ),
+                  ),
+                  hintText: 'JSON String',
+                  hintStyle: textTheme.displaySmall!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 10),
             //Buttons: Create and Cancel
@@ -264,77 +262,100 @@ class _NewSetOptionsState extends State<NewSetOptions> {
     var textTheme = Theme.of(context).textTheme;
     // var appState = Provider.of<AppState>(context);
     return Dialog(
-      backgroundColor: theme.background,
-      child: Padding(
+        backgroundColor: theme.background,
+        surfaceTintColor: Colors.transparent,
+        child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            //* Create New
-            //Button style: Basically a square with an icon inside, and a text below it
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              InkWell(
+                highlightColor: Colors.transparent,
+                splashColor: theme.onBackground.withOpacity(0.125),
+                onTap: () => {
+                  Navigator.pop(context),
+                  showDialog(context: context, builder: (context) => const NewSetModal())
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.primary,
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                      backgroundColor: theme.primary,
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
+                      padding: const EdgeInsets.all(16),
+                      child: Icon(Icons.add, color: theme.onBackground, size: 24),
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      showDialog(context: context, builder: (context) => const NewSetModal());
-                    },
-                    icon: Icon(Icons.add, color: theme.onBackground),
-                    label: Text("Create New", style: textTheme.displaySmall!.copyWith(color: theme.onBackground))),
-              ],
-            ),
-            const SizedBox(height: 16),
-            //* Import
-            //Button style: Basically a square with an icon inside, and a text below it
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "Create",
+                      style: textTheme.displaySmall,
+                    )
+                  ],
+                ),
+              ),
+              InkWell(
+                highlightColor: Colors.transparent,
+                splashColor: theme.onBackground.withOpacity(0.125),
+                // onTap: () => showDialog(context: context, builder: (context) => const ImportQuizModal()),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.primary,
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                      backgroundColor: theme.primary,
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
+                      padding: const EdgeInsets.all(16),
+                      child: Icon(Icons.smart_toy, color: theme.onBackground, size: 24),
                     ),
-                    onPressed: () {},
-                    icon: Icon(Icons.file_copy, color: theme.onBackground),
-                    label: Text("Import", style: textTheme.displaySmall!.copyWith(color: theme.onBackground))),
-              ],
-            ),
-            const SizedBox(height: 16),
-            //* Generate
-            //Button style: Basically a square with an icon inside, and a text below it
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "Generate",
+                      style: textTheme.displaySmall,
+                    )
+                  ],
+                ),
+              ),
+              InkWell(
+                highlightColor: Colors.transparent,
+                splashColor: theme.onBackground.withOpacity(0.125),
+                onTap: () => {
+                  Navigator.pop(context),
+                  showDialog(context: context, builder: (context) => const ImportSetModal())
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.primary,
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                      backgroundColor: theme.primary,
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
+                      padding: const EdgeInsets.all(16),
+                      child: Icon(Icons.download, color: theme.onBackground, size: 24),
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      showDialog(context: context, builder: (context) => const GenerateFlashcardsModal());
-                    },
-                    icon: Icon(Icons.smart_toy, color: theme.onBackground),
-                    label: Text("Generate", style: textTheme.displaySmall!.copyWith(color: theme.onBackground))),
-              ],
-            ),
-          ])),
-    );
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "Import",
+                      style: textTheme.displaySmall,
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ));
   }
 }
 

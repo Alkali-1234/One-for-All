@@ -35,7 +35,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
       // bottomNavigationBar: const BannerAdWidget(),
       body: MainContainer(
           child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             //* Search bar
@@ -52,7 +52,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
                   suffixIcon: Icon(Icons.search, color: theme.onBackground, size: 50),
                 )),
             const SizedBox(
-              height: 10,
+              height: 15,
             ),
             Row(
               children: [
@@ -64,7 +64,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
               ],
             ),
             const SizedBox(
-              height: 5,
+              height: 15,
             ),
             appState.getQuizzes.isEmpty
                 ? Expanded(
@@ -126,6 +126,9 @@ class ListItem extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
+          shadowColor: Colors.transparent,
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
           backgroundColor: theme.secondary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: theme.tertiary)),
         ),
@@ -599,11 +602,7 @@ class _ImportQuizModalState extends State<ImportQuizModal> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  children: [
-                    Text("Import from JSON String", style: textTheme.displaySmall),
-                  ],
-                ),
+                Text("Import from JSON String", style: textTheme.displayMedium),
                 const SizedBox(height: 5),
                 TextField(
                   style: textTheme.displaySmall,
@@ -616,15 +615,21 @@ class _ImportQuizModalState extends State<ImportQuizModal> {
                 const SizedBox(height: 5),
                 error != "" ? Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error)) : const SizedBox(),
                 const SizedBox(height: 5),
-                ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.primaryContainer,
-                      foregroundColor: theme.onBackground,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide.none),
-                    ),
-                    onPressed: () => validateJSON(context.read<AppState>()),
-                    icon: const Icon(Icons.add),
-                    label: const Text("Import"))
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: theme.secondary,
+                          foregroundColor: theme.onBackground,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide.none),
+                        ),
+                        onPressed: () => validateJSON(context.read<AppState>()),
+                        child: const Text("Import")),
+                    ElevatedButton(style: ElevatedButton.styleFrom(elevation: 0, backgroundColor: theme.secondary, foregroundColor: theme.onBackground, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide.none)), onPressed: () => Navigator.of(context).pop(), child: const Text("Cancel"))
+                  ],
+                )
               ],
             )));
   }

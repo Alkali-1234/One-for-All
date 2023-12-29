@@ -271,7 +271,7 @@ class _ThreadBodyState extends State<ThreadBody> {
     final TextTheme ttm = widget.ttm;
 
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -402,7 +402,7 @@ class _ThreadBodyState extends State<ThreadBody> {
             itemBuilder: (context, index) {
               return Container(
                 decoration: BoxDecoration(
-                  border: index != snapshot.data!['replies'].length ? Border(bottom: BorderSide(color: tm.onBackground.withOpacity(0.25))) : null,
+                  border: index != snapshot.data!['replies'].length - 1 ? Border(bottom: BorderSide(color: tm.onBackground.withOpacity(0.25))) : null,
                 ),
                 child: ListTile(
                     title: GestureDetector(

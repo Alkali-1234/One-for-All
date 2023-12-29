@@ -30,7 +30,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         resizeToAvoidBottomInset: false,
         body: MainContainer(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
                 //Month and year
@@ -60,7 +60,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   }
                                   selectedMonth--;
                                 });
-                                calendarKey.currentState!.initializeCalendarEvents(appState);
+                                // calendarKey.currentState!.initializeCalendarEvents(appState);
                               },
                               child: Icon(
                                 Icons.arrow_left_rounded,
@@ -79,7 +79,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   }
                                   selectedMonth++;
                                 });
-                                calendarKey.currentState!.initializeCalendarEvents(appState);
+                                // calendarKey.currentState!.initializeCalendarEvents(appState);
                               },
                               child: Icon(
                                 Icons.arrow_right_rounded,
@@ -95,20 +95,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 Flexible(
                     flex: 5,
                     //not working
-                    child: PageTransitionSwitcher(
-                      transitionBuilder: (child, animation, secondaryAnimation) => SharedAxisTransition(
-                        fillColor: Colors.transparent,
-                        transitionType: SharedAxisTransitionType.horizontal,
-                        animation: animation,
-                        secondaryAnimation: secondaryAnimation,
-                        child: child,
-                      ),
-                      duration: const Duration(milliseconds: 150),
-                      child: Calendar(
-                        key: calendarKey,
-                        selectedMonth: selectedMonth,
-                        selectedYear: selectedYear,
-                      ),
+                    child: Calendar(
+                      key: Key(selectedMonth.toString() + selectedYear.toString()),
+                      selectedMonth: selectedMonth,
+                      selectedYear: selectedYear,
                     )),
                 const SizedBox(height: 10),
               ],
@@ -305,10 +295,11 @@ class _CalendarState extends State<Calendar> {
           //Check if event is in selected month and year, if yes, add to calendarDataEvents
           if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
             getCalendarDataEvents["events"][e.dueDate.day].add(e);
+            print("added mab data lol?????????");
           }
         }
-        loadMabData = false;
       });
+      loadMabData = false;
     }
 
     if (appState.getLacData?.posts.isNotEmpty ?? false) {
@@ -323,6 +314,8 @@ class _CalendarState extends State<Calendar> {
       });
       loadLacData = false;
     }
+
+    if (loadMabData == false && loadLacData == false) return;
 
     print("Getting MAB Data");
 
@@ -348,7 +341,7 @@ class _CalendarState extends State<Calendar> {
     //LET'S GOO I FIXED IT
     //i'm so happy
     //i'm gonna cry
-    if (loadMabData && appState.getCurrentUser.assignedCommunity != "0") {
+    if (loadMabData && appState.getCurrentUser.assignedCommunity != "0" && appState.getMabData != null) {
       await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity!).collection("MAB").get().then((value) {
         for (var _element in value.docs) {
           var element = _element.data();
@@ -370,7 +363,7 @@ class _CalendarState extends State<Calendar> {
       });
     }
 
-    if (loadLacData && appState.getCurrentUser.assignedCommunity != "0" && appState.getCurrentUser.assignedSection != "0") {
+    if (loadLacData && appState.getCurrentUser.assignedCommunity != "0" && appState.getCurrentUser.assignedSection != "0" && appState.getLacData != null) {
       await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity!).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("LAC").get().then((value) {
         for (var _element in value.docs) {
           var element = _element.data();
@@ -393,18 +386,22 @@ class _CalendarState extends State<Calendar> {
     }
 
     //Get data from MAB
-    for (MabPost e in mabPosts) {
-      //Check if event is in selected month and year, if yes, add to calendarDataEvents
-      if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
-        getCalendarDataEvents["events"][e.dueDate.day].add(e);
+    if (loadMabData) {
+      for (MabPost e in mabPosts) {
+        //Check if event is in selected month and year, if yes, add to calendarDataEvents
+        if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
+          getCalendarDataEvents["events"][e.dueDate.day].add(e);
+        }
       }
     }
 
     //Get data from LAC
-    for (LACPost e in lacPosts) {
-      //Check if event is in selected month and year, if yes, add to calendarDataEvents
-      if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
-        getCalendarDataEvents["events"][e.dueDate.day].add(e);
+    if (loadLacData) {
+      for (LACPost e in lacPosts) {
+        //Check if event is in selected month and year, if yes, add to calendarDataEvents
+        if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
+          getCalendarDataEvents["events"][e.dueDate.day].add(e);
+        }
       }
     }
     // Set data to appstate
@@ -561,6 +558,8 @@ class _CalendarState extends State<Calendar> {
                               context: context,
                               builder: (BuildContext context) {
                                 return SelectedDateModal(
+                                  lacPosts: getCalendarDataEvents["events"][getCalendarData["week${i + 1}"]["dates"][j]].where((item) => item is LACPost).toList(),
+                                  mabPosts: getCalendarDataEvents["events"][getCalendarData["week${i + 1}"]["dates"][j]].where((item) => item is MabPost).toList(),
                                   title: "${getCalendarDataEvents["events"][getCalendarData["week${i + 1}"]["dates"][j]].length} Events",
                                   description: "${getCalendarData["week${i + 1}"]["dates"][j]} of ${getMonthsOfTheYear[widget.selectedMonth]}, ${widget.selectedYear}",
                                 );
@@ -572,6 +571,8 @@ class _CalendarState extends State<Calendar> {
                                 return const SelectedDateModal(
                                   title: "Invalid Date",
                                   description: "Please select a valid date",
+                                  mabPosts: [],
+                                  lacPosts: [],
                                 );
                               });
                         }
@@ -599,8 +600,10 @@ class _CalendarState extends State<Calendar> {
 
 //Mab Modal
 class SelectedDateModal extends StatelessWidget {
-  const SelectedDateModal({super.key, required this.title, required this.description});
+  const SelectedDateModal({super.key, required this.title, required this.description, required this.mabPosts, required this.lacPosts});
   final String title, description;
+  final List<dynamic> mabPosts;
+  final List<dynamic> lacPosts;
 
   @override
   Widget build(BuildContext context) {
@@ -611,48 +614,94 @@ class SelectedDateModal extends StatelessWidget {
       backgroundColor: theme.background,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 8),
-            //Main header
-            Text(
-              title,
-              style: textTheme.displayMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            //Sub header
-            Text(description, style: textTheme.displaySmall, textAlign: TextAlign.center),
-            const SizedBox(height: 16),
-            //Back button
-            Container(
-              height: 40,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: getPrimaryGradient,
-                borderRadius: BorderRadius.circular(10),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 8),
+              //Main header
+              Text(
+                title,
+                style: textTheme.displayMedium,
+                textAlign: TextAlign.center,
               ),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              const SizedBox(height: 8),
+              //Sub header
+              Text(description, style: textTheme.displaySmall, textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              for (int i = 0; i < mabPosts.length; i++)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: theme.primaryContainer,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Text(
+                          mabPosts[i].title,
+                          style: textTheme.displaySmall,
+                        )),
+                      ],
+                    ),
                   ),
                 ),
-                onPressed: () => {
-                  Navigator.pop(context)
-                },
-                child: Text(
-                  "Back",
-                  style: textTheme.displaySmall!.copyWith(
-                    fontWeight: FontWeight.bold,
+              for (int i = 0; i < lacPosts.length; i++)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: theme.primaryContainer,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Text(
+                          lacPosts[i].title,
+                          style: textTheme.displaySmall,
+                        )),
+                      ],
+                    ),
                   ),
                 ),
+
+              const SizedBox(
+                height: 16,
               ),
-            )
-          ],
+              //Back button
+              Container(
+                height: 40,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: getPrimaryGradient,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () => {
+                    Navigator.pop(context)
+                  },
+                  child: Text(
+                    "Back",
+                    style: textTheme.displaySmall!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

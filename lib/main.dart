@@ -220,7 +220,11 @@ class _HomePageState extends State<HomePage> {
 
     return WillPopScope(
       //* Prevents the user from going back to the login screen/loading screen.
-      onWillPop: () async => false,
+      onWillPop: () async {
+        // Quit the app
+        SystemNavigator.pop();
+        return false;
+      },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         //Global key for the scaffold
@@ -282,7 +286,7 @@ class _HomePageState extends State<HomePage> {
             //Main Content
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(16.0),
                 child: PageTransitionSwitcher(
                     reverse: reverseTransition,
                     transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
@@ -305,7 +309,7 @@ class _HomePageState extends State<HomePage> {
             SafeArea(
               top: false,
               child: Container(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(16.0),
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
                   child: BottomNavigationBar(
@@ -582,6 +586,7 @@ class _HomeScreenState extends State<HomeScreen> {
           flex: 2,
           child: Column(
             children: [
+              const SizedBox(height: 4),
               //Widget Title
               Container(
                 decoration: BoxDecoration(
@@ -637,7 +642,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 1,
                       )),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
                         //Filters
@@ -645,132 +650,139 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             //Filter 1 (ALL)
-                            Column(
-                              children: [
-                                Container(
-                                  height: 38,
-                                  width: MediaQuery.of(context).size.width * 0.29,
-                                  decoration: BoxDecoration(
-                                      //Bit spaghetti but it works
-                                      //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
-                                      borderRadius: BorderRadius.circular(10),
-                                      gradient: MABSelectedFilter == 0 ? getPrimaryGradient : null,
-                                      boxShadow: MABSelectedFilter == 0
-                                          ? [
-                                              const BoxShadow(
-                                                color: Colors.black,
-                                                blurRadius: 2,
-                                                offset: Offset(0, 2),
-                                              )
-                                            ]
-                                          : null,
-                                      color: MABSelectedFilter == 0 ? null : theme.secondary),
-                                  child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        shadowColor: Colors.transparent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      onPressed: () => {
-                                            setMABSelectedFilter(0)
-                                          },
-                                      child: FittedBox(
-                                        child: Text(
-                                          "All",
-                                          style: textTheme.displaySmall!.copyWith(
-                                            fontWeight: FontWeight.bold,
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: double.infinity,
+                                    height: 38,
+                                    decoration: BoxDecoration(
+                                        //Bit spaghetti but it works
+                                        //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
+                                        borderRadius: BorderRadius.circular(10),
+                                        gradient: MABSelectedFilter == 0 ? getPrimaryGradient : null,
+                                        boxShadow: MABSelectedFilter == 0
+                                            ? [
+                                                const BoxShadow(
+                                                  color: Colors.black,
+                                                  blurRadius: 2,
+                                                  offset: Offset(0, 2),
+                                                )
+                                              ]
+                                            : null,
+                                        color: MABSelectedFilter == 0 ? null : theme.secondary),
+                                    child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          shadowColor: Colors.transparent,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
                                           ),
                                         ),
-                                      )),
-                                ),
-                                SizedBox(height: MABSelectedFilter == 0 ? 2 : 0),
-                              ],
+                                        onPressed: () => {
+                                              setMABSelectedFilter(0)
+                                            },
+                                        child: FittedBox(
+                                          child: Text(
+                                            "All",
+                                            style: textTheme.displaySmall!.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        )),
+                                  ),
+                                  SizedBox(height: MABSelectedFilter == 0 ? 2 : 0),
+                                ],
+                              ),
                             ),
+                            const SizedBox(width: 5),
                             //Filter 2 (Announcements)
-                            Column(
-                              children: [
-                                Container(
-                                  height: 38,
-                                  width: MediaQuery.of(context).size.width * 0.29,
-                                  decoration: BoxDecoration(
-                                      //Bit spaghetti but it works
-                                      //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
-                                      borderRadius: BorderRadius.circular(10),
-                                      gradient: MABSelectedFilter == 1 ? getPrimaryGradient : null,
-                                      boxShadow: MABSelectedFilter == 1
-                                          ? [
-                                              const BoxShadow(
-                                                color: Colors.black,
-                                                blurRadius: 2,
-                                                offset: Offset(0, 2),
-                                              )
-                                            ]
-                                          : null,
-                                      color: MABSelectedFilter == 1 ? null : theme.secondary),
-                                  child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.transparent,
-                                          foregroundColor: theme.onSecondary,
-                                          shadowColor: Colors.transparent,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          )),
-                                      onPressed: () => setMABSelectedFilter(1),
-                                      child: FittedBox(
-                                        child: Text(
-                                          "Announces",
-                                          style: textTheme.displaySmall!.copyWith(
-                                            fontWeight: FontWeight.bold,
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: 38,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                        //Bit spaghetti but it works
+                                        //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
+                                        borderRadius: BorderRadius.circular(10),
+                                        gradient: MABSelectedFilter == 1 ? getPrimaryGradient : null,
+                                        boxShadow: MABSelectedFilter == 1
+                                            ? [
+                                                const BoxShadow(
+                                                  color: Colors.black,
+                                                  blurRadius: 2,
+                                                  offset: Offset(0, 2),
+                                                )
+                                              ]
+                                            : null,
+                                        color: MABSelectedFilter == 1 ? null : theme.secondary),
+                                    child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.transparent,
+                                            foregroundColor: theme.onSecondary,
+                                            shadowColor: Colors.transparent,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            )),
+                                        onPressed: () => setMABSelectedFilter(1),
+                                        child: FittedBox(
+                                          child: Text(
+                                            "Announces",
+                                            style: textTheme.displaySmall!.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                      )),
-                                ),
-                                SizedBox(height: MABSelectedFilter == 1 ? 2 : 0),
-                              ],
+                                        )),
+                                  ),
+                                  SizedBox(height: MABSelectedFilter == 1 ? 2 : 0),
+                                ],
+                              ),
                             ),
-
-                            Column(
-                              children: [
-                                Container(
-                                  height: 38,
-                                  width: MediaQuery.of(context).size.width * 0.29,
-                                  decoration: BoxDecoration(
-                                      //Bit spaghetti but it works
-                                      //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
-                                      borderRadius: BorderRadius.circular(10),
-                                      gradient: MABSelectedFilter == 2 ? getPrimaryGradient : null,
-                                      boxShadow: MABSelectedFilter == 2
-                                          ? [
-                                              const BoxShadow(
-                                                color: Colors.black,
-                                                blurRadius: 2,
-                                                offset: Offset(0, 2),
-                                              )
-                                            ]
-                                          : null,
-                                      color: MABSelectedFilter == 2 ? null : theme.secondary),
-                                  child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.transparent,
-                                          foregroundColor: theme.onSecondary,
-                                          shadowColor: Colors.transparent,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          )),
-                                      onPressed: () => setMABSelectedFilter(2),
-                                      child: FittedBox(
-                                        child: Text(
-                                          "Tasks",
-                                          style: textTheme.displaySmall!.copyWith(
-                                            fontWeight: FontWeight.bold,
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: 38,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                        //Bit spaghetti but it works
+                                        //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
+                                        borderRadius: BorderRadius.circular(10),
+                                        gradient: MABSelectedFilter == 2 ? getPrimaryGradient : null,
+                                        boxShadow: MABSelectedFilter == 2
+                                            ? [
+                                                const BoxShadow(
+                                                  color: Colors.black,
+                                                  blurRadius: 2,
+                                                  offset: Offset(0, 2),
+                                                )
+                                              ]
+                                            : null,
+                                        color: MABSelectedFilter == 2 ? null : theme.secondary),
+                                    child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.transparent,
+                                            foregroundColor: theme.onSecondary,
+                                            shadowColor: Colors.transparent,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            )),
+                                        onPressed: () => setMABSelectedFilter(2),
+                                        child: FittedBox(
+                                          child: Text(
+                                            "Tasks",
+                                            style: textTheme.displaySmall!.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                      )),
-                                ),
-                                SizedBox(height: MABSelectedFilter == 2 ? 2 : 0),
-                              ],
+                                        )),
+                                  ),
+                                  SizedBox(height: MABSelectedFilter == 2 ? 2 : 0),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -1391,7 +1403,7 @@ class MABModal extends StatelessWidget {
     }
 
     return Dialog(
-      elevation: 2,
+      surfaceTintColor: Colors.transparent,
       backgroundColor: theme.background,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
