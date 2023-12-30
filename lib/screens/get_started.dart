@@ -853,7 +853,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
     // } catch (e) {
     //   //continue
     // }
-    appState.setCurrentUser(UserData(uid: 0, exp: 0, streak: 0, posts: 0, flashCardSets: [], username: "Guest", email: "guest@guest.com", profilePicture: "https://picsum.photos/200", assignedCommunity: "0", assignedSection: "0"));
+    appState.setCurrentUser(UserData(uid: 0, exp: 0, streak: 0, posts: 0, flashCardSets: [], username: "Guest", email: "guest@guest.com", profilePicture: "https://picsum.photos/200", assignedCommunity: "0", assignedSection: "0", roles: []));
     appState.setQuizzes([]);
     //* Get quizzes data from shared preferences
     await SharedPreferences.getInstance().then((value) async {

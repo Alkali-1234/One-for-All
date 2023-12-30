@@ -6,7 +6,7 @@ import '../constants.dart';
 ThemeData passedUserTheme = defaultBlueTheme;
 
 class UserData {
-  UserData({required this.uid, required this.exp, required this.streak, required this.posts, required this.flashCardSets, required this.username, required this.email, required this.profilePicture, required this.assignedCommunity, required this.assignedSection});
+  UserData({required this.uid, required this.exp, required this.streak, required this.posts, required this.flashCardSets, required this.username, required this.email, required this.profilePicture, required this.assignedCommunity, required this.assignedSection, required this.roles});
 
   final int uid;
   int exp;
@@ -18,6 +18,7 @@ class UserData {
   List<FlashcardSet> flashCardSets;
   String? assignedCommunity;
   String? assignedSection;
+  List<String> roles;
 
   set setExp(int exp) => this.exp = exp;
   set setStreak(int streak) => this.streak = streak;

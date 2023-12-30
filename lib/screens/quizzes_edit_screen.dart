@@ -285,86 +285,87 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                 ),
                 const SizedBox(height: 10),
                 Expanded(
-                  child: Column(
-                    children: [
-                      //* Queries
-                      Flexible(
-                          flex: 10,
-                          child: ListView.builder(
-                            padding: EdgeInsets.zero,
-                            controller: listController,
-                            itemBuilder: (context, index) {
-                              if (listItems[index].question.question.toLowerCase().contains(searchQuery.toLowerCase())) {
-                                return listItems[index];
-                              } else {
-                                return const SizedBox.shrink();
-                              }
-                            },
-                            itemCount: listItems.length,
-                          )),
-                      const SizedBox(height: 10),
-                      Flexible(
-                          flex: 1,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    elevation: 0,
-                                    backgroundColor: theme.primaryContainer,
-                                    foregroundColor: theme.onBackground,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  icon: Icon(Icons.save, color: theme.onBackground),
-                                  onPressed: () => saveQuizSet(appState),
-                                  label: const Text("Save & Quit")),
-                              ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    elevation: 0,
-                                    backgroundColor: theme.primaryContainer,
-                                    foregroundColor: theme.onBackground,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  icon: Icon(Icons.save, color: theme.onBackground),
-                                  onPressed: () async {
-                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(duration: Duration(milliseconds: 500), backgroundColor: Colors.green, content: Text("Saved!", style: TextStyle(color: Colors.white))));
-
-                                    final prefs = await SharedPreferences.getInstance();
-// Save to prefs
-
-                                    //Convert to Object
-                                    Object quizData = {
-                                      "quizzes": [
-                                        for (var quiz in appState.getQuizzes)
-                                          {
-                                            "title": quiz.title,
-                                            "description": quiz.description,
-                                            "questions": [
-                                              for (var question in quiz.questions)
-                                                {
-                                                  "question": question.question,
-                                                  "answers": question.answers,
-                                                  "correctAnswer": question.correctAnswer,
-                                                  "type": question.type?.index ?? QuizTypes.multipleChoice.index,
-                                                  "imagePath": question.imagePath,
-                                                }
-                                            ],
-                                            "settings": quiz.settings
-                                          }
-                                      ]
-                                    };
-                                    //Save to prefs
-                                    await prefs.setString("quizData", jsonEncode(quizData));
-                                    setState(() {
-                                      appState.getQuizzes[widget.index] = quizSet;
-                                    });
-                                  },
-                                  label: const Text("Save")),
-                            ],
-                          )),
-                    ],
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    controller: listController,
+                    itemBuilder: (context, index) {
+                      if (listItems[index].question.question.toLowerCase().contains(searchQuery.toLowerCase())) {
+                        return listItems[index];
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    },
+                    itemCount: listItems.length,
                   ),
-                )
+                ),
+                const SizedBox(height: 10),
+                //* Save and discard
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => saveQuizSet(appState),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        child: Text("Save", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => showDialog(
+                            context: context,
+                            builder: (c) => Dialog(
+                                child: Container(
+                                    padding: const EdgeInsets.all(16.0),
+                                    decoration: BoxDecoration(
+                                      color: theme.background,
+                                      borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text("Are you sure you want to exit? All unsaved changes will be lost!", style: textTheme.displayMedium),
+                                        const SizedBox(height: 5),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: theme.primaryContainer,
+                                                  foregroundColor: theme.onBackground,
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                ),
+                                                onPressed: () => {
+                                                      QuizzesFunctions().refreshQuizzesFromLocal(appState, true),
+                                                      Navigator.pop(context),
+                                                      Navigator.pop(context),
+                                                    },
+                                                child: const Text("Confirm")),
+                                            ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: theme.primaryContainer,
+                                                  foregroundColor: theme.onBackground,
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                ),
+                                                onPressed: () => Navigator.pop(context),
+                                                child: const Text("Cancel"))
+                                          ],
+                                        ),
+                                      ],
+                                    )))),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        child: Text("Discard", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           )),

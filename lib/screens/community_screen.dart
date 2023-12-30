@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:oneforall/screens/community_settings.dart';
 // import 'package:oneforall/banner_ad.dart';
 // import 'package:oneforall/data/community_data.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +20,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   Map<String, dynamic> localCommunityData = {};
   String error = "";
 
-  void initializeCommunityData(AppState appState) async {
+  Future<void> initializeCommunityData(AppState appState) async {
     if (appState.getCurrentUser.assignedCommunity == null || appState.getCurrentUser.assignedCommunity == "0" || FirebaseAuth.instance.currentUser!.isAnonymous) {
       error = "No assigned community";
       return;
@@ -76,11 +77,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    initializeCommunityData(context.read<AppState>());
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   initializeCommunityData(context.read<AppState>());
+  // }
+
+  late final initializeCommunityDataFuture = initializeCommunityData(context.read<AppState>());
 
   @override
   Widget build(BuildContext context) {
@@ -90,242 +93,244 @@ class _CommunityScreenState extends State<CommunityScreen> {
     return Scaffold(
       // bottomNavigationBar: const BannerAdWidget(),
       backgroundColor: appState.currentUserSelectedTheme.colorScheme.background,
-      body: Builder(builder: (context) {
-        bool enabled = localCommunityData.isEmpty;
-        if (error != "") {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(error, style: textTheme.displaySmall!.copyWith(color: Colors.red)),
-                const SizedBox(
-                  height: 5,
-                ),
-                Row(
+      body: FutureBuilder(
+          future: initializeCommunityDataFuture,
+          builder: (context, value) {
+            bool enabled = localCommunityData.isEmpty;
+            if (error != "") {
+              return Center(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: theme.primaryContainer, foregroundColor: theme.onBackground, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))), onPressed: () => Navigator.of(context).pop(), icon: const Icon(Icons.arrow_back), label: const Text("Back")),
+                    Text(error, style: textTheme.displaySmall!.copyWith(color: Colors.red)),
                     const SizedBox(
-                      width: 5,
+                      height: 5,
                     ),
-                    ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: theme.primaryContainer, foregroundColor: theme.onBackground, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))), onPressed: () => initializeCommunityData(appState), icon: const Icon(Icons.restart_alt_outlined), label: const Text("Retry"))
-                  ],
-                )
-              ],
-            ),
-          );
-        }
-        return Column(
-          children: [
-            Stack(children: [
-              //Image
-              BaseShimmer(
-                enabled: enabled,
-                child: Container(
-                  height: 270,
-                  width: double.infinity,
-                  decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(appState.communityData["image"] ?? ""), fit: BoxFit.cover)),
-                ),
-              ),
-              //Gradient
-              Container(
-                height: 270,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
-                  theme.background.withOpacity(0),
-                  theme.background.withOpacity(0.5),
-                  theme.background.withOpacity(1),
-                ])),
-              ),
-              // Back button and settings button
-              SafeArea(
-                bottom: false,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      //Back button
-                      IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: theme.onBackground,
-                          )),
-                      //Settings button
-                      IconButton(
-                          onPressed: () {
-                            showDialog(context: context, builder: (_) => const CommunitySettingsModal());
-                          },
-                          icon: Icon(
-                            Icons.settings,
-                            color: theme.onBackground,
-                          )),
-                    ],
-                  ),
-                ),
-              ),
-            ]),
-            //Community Name
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 10),
-                    BaseShimmer(
-                      enabled: enabled,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                appState.communityData["name"] ?? "Loading...",
-                                style: textTheme.displayLarge,
-                              ),
-                            ),
-                          ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: theme.primaryContainer, foregroundColor: theme.onBackground, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))), onPressed: () => Navigator.of(context).pop(), icon: const Icon(Icons.arrow_back), label: const Text("Back")),
+                        const SizedBox(
+                          width: 5,
                         ),
+                        ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: theme.primaryContainer, foregroundColor: theme.onBackground, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))), onPressed: () => initializeCommunityData(appState), icon: const Icon(Icons.restart_alt_outlined), label: const Text("Retry"))
+                      ],
+                    )
+                  ],
+                ),
+              );
+            }
+            return Column(
+              children: [
+                Stack(children: [
+                  //Image
+                  BaseShimmer(
+                    enabled: enabled,
+                    child: Container(
+                      height: 270,
+                      width: double.infinity,
+                      decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(appState.communityData["image"] ?? ""), fit: BoxFit.cover)),
+                    ),
+                  ),
+                  //Gradient
+                  Container(
+                    height: 270,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+                      theme.background.withOpacity(0),
+                      theme.background.withOpacity(0.5),
+                      theme.background.withOpacity(1),
+                    ])),
+                  ),
+                  // Back button and settings button
+                  SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          //Back button
+                          IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(
+                                Icons.arrow_back,
+                                color: theme.onBackground,
+                              )),
+                          //Settings button
+                          IconButton(
+                              onPressed: () {
+                                showDialog(context: context, builder: (_) => const CommunitySettingsModal());
+                              },
+                              icon: Icon(
+                                Icons.settings,
+                                color: theme.onBackground,
+                              )),
+                        ],
                       ),
                     ),
-                    BaseShimmer(
-                      enabled: enabled,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Row(
-                          children: [
-                            Text(
-                              appState.communityData["subName"] ?? "",
+                  ),
+                ]),
+                //Community Name
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        BaseShimmer(
+                          enabled: enabled,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    appState.communityData["name"] ?? "Loading...",
+                                    style: textTheme.displayLarge,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        BaseShimmer(
+                          enabled: enabled,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  appState.communityData["subName"] ?? "",
+                                  style: textTheme.displaySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        //ID
+                        ListTile(
+                          leading: Icon(
+                            Icons.qr_code,
+                            color: theme.onBackground,
+                          ),
+                          title: Text(
+                            "ID",
+                            style: textTheme.displaySmall,
+                          ),
+                          trailing: BaseShimmer(
+                            enabled: enabled,
+                            child: SelectableText(
+                              appState.communityData["id"] ?? "",
                               style: textTheme.displaySmall,
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    //ID
-                    ListTile(
-                      leading: Icon(
-                        Icons.qr_code,
-                        color: theme.onBackground,
-                      ),
-                      title: Text(
-                        "ID",
-                        style: textTheme.displaySmall,
-                      ),
-                      trailing: BaseShimmer(
-                        enabled: enabled,
-                        child: SelectableText(
-                          appState.communityData["id"] ?? "",
-                          style: textTheme.displaySmall,
+                        //Members
+                        ListTile(
+                          leading: Icon(
+                            Icons.people,
+                            color: theme.onBackground,
+                          ),
+                          title: Text(
+                            "Members",
+                            style: textTheme.displaySmall,
+                          ),
+                          trailing: BaseShimmer(
+                            enabled: enabled,
+                            child: Text(
+                              appState.communityData["members"]?.length.toString() ?? "0",
+                              style: textTheme.displaySmall,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    //Members
-                    ListTile(
-                      leading: Icon(
-                        Icons.people,
-                        color: theme.onBackground,
-                      ),
-                      title: Text(
-                        "Members",
-                        style: textTheme.displaySmall,
-                      ),
-                      trailing: BaseShimmer(
-                        enabled: enabled,
-                        child: Text(
-                          appState.communityData["members"]?.length.toString() ?? "0",
-                          style: textTheme.displaySmall,
+                        //* Sharing
+                        ListTile(
+                          leading: Icon(Icons.share, color: theme.onBackground),
+                          title: Text("Sharing", style: textTheme.displaySmall),
+                          trailing: Text("0 Shared", style: textTheme.displaySmall),
+                          splashColor: theme.onBackground.withOpacity(0.25),
+                          onTap: () => showDialog(
+                              context: context,
+                              builder: (context) => Dialog(
+                                  child: Container(
+                                      decoration: BoxDecoration(color: theme.background, borderRadius: BorderRadius.circular(20)),
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text("Coming Soon", style: textTheme.displaySmall),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          TextButton(onPressed: () => Navigator.pop(context), child: Text("Close", style: textTheme.displaySmall))
+                                        ],
+                                      )))),
                         ),
-                      ),
-                    ),
-                    //* Sharing
-                    ListTile(
-                      leading: Icon(Icons.share, color: theme.onBackground),
-                      title: Text("Sharing", style: textTheme.displaySmall),
-                      trailing: Text("0 Shared", style: textTheme.displaySmall),
-                      splashColor: theme.onBackground.withOpacity(0.25),
-                      onTap: () => showDialog(
-                          context: context,
-                          builder: (context) => Dialog(
-                              child: Container(
-                                  decoration: BoxDecoration(color: theme.background, borderRadius: BorderRadius.circular(20)),
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text("Coming Soon", style: textTheme.displaySmall),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      TextButton(onPressed: () => Navigator.pop(context), child: Text("Close", style: textTheme.displaySmall))
-                                    ],
-                                  )))),
-                    ),
-                    //Sections
-                    ListTile(
-                      leading: Icon(
-                        Icons.list,
-                        color: theme.onBackground,
-                      ),
-                      title: Text(
-                        "Sections",
-                        style: textTheme.displaySmall,
-                      ),
-                      trailing: BaseShimmer(
-                        enabled: enabled,
-                        child: Text(
-                          appState.communityData["_sections"]?.length.toString() ?? "0",
-                          style: textTheme.displaySmall,
+                        //Sections
+                        ListTile(
+                          leading: Icon(
+                            Icons.list,
+                            color: theme.onBackground,
+                          ),
+                          title: Text(
+                            "Sections",
+                            style: textTheme.displaySmall,
+                          ),
+                          trailing: BaseShimmer(
+                            enabled: enabled,
+                            child: Text(
+                              appState.communityData["_sections"]?.length.toString() ?? "0",
+                              style: textTheme.displaySmall,
+                            ),
+                          ),
                         ),
-                      ),
+                        Divider(color: theme.secondary),
+                        //* Sections list
+                        Expanded(
+                          child: ListView.builder(
+                              padding: EdgeInsets.zero,
+                              itemCount: appState.communityData["_sections"]?.length ?? 5,
+                              itemBuilder: (context, index) {
+                                return ListTile(
+                                  splashColor: theme.secondary,
+                                  onTap: !enabled
+                                      ? () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (_) => SelectedSection(
+                                                    sectionData: appState.communityData["_sections"][index],
+                                                  ));
+                                        }
+                                      : null,
+                                  title: BaseShimmer(
+                                    enabled: enabled,
+                                    child: Text(
+                                      appState.communityData["_sections"]?[index]["name"] ?? "Loading...",
+                                      style: textTheme.displaySmall,
+                                    ),
+                                  ),
+                                  trailing: BaseShimmer(
+                                    enabled: enabled,
+                                    child: Text(
+                                      "${appState.communityData["_sections"]?[index]["members"]?.length.toString() ?? "0"} Members",
+                                      style: textTheme.displaySmall,
+                                    ),
+                                  ),
+                                );
+                              }),
+                        ),
+                      ],
                     ),
-                    Divider(color: theme.secondary),
-                    //* Sections list
-                    Expanded(
-                      child: ListView.builder(
-                          padding: EdgeInsets.zero,
-                          itemCount: appState.communityData["_sections"]?.length ?? 5,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              splashColor: theme.secondary,
-                              onTap: !enabled
-                                  ? () {
-                                      showDialog(
-                                          context: context,
-                                          builder: (_) => SelectedSection(
-                                                sectionData: appState.communityData["_sections"][index],
-                                              ));
-                                    }
-                                  : null,
-                              title: BaseShimmer(
-                                enabled: enabled,
-                                child: Text(
-                                  appState.communityData["_sections"]?[index]["name"] ?? "Loading...",
-                                  style: textTheme.displaySmall,
-                                ),
-                              ),
-                              trailing: BaseShimmer(
-                                enabled: enabled,
-                                child: Text(
-                                  "${appState.communityData["_sections"]?[index]["members"]?.length.toString() ?? "0"} Members",
-                                  style: textTheme.displaySmall,
-                                ),
-                              ),
-                            );
-                          }),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ],
-        );
-      }),
+              ],
+            );
+          }),
     );
   }
 }
@@ -342,8 +347,10 @@ class _CommunitySettingsModalState extends State<CommunitySettingsModal> {
   Widget build(BuildContext context) {
     var theme = context.watch<AppState>().currentUserSelectedTheme.colorScheme;
     var textTheme = context.watch<AppState>().currentUserSelectedTheme.textTheme;
+    var appState = context.watch<AppState>();
     return Dialog(
       backgroundColor: theme.background,
+      surfaceTintColor: Colors.transparent,
       child: Container(
         padding: const EdgeInsets.all(8),
         height: 300,
@@ -351,20 +358,30 @@ class _CommunitySettingsModalState extends State<CommunitySettingsModal> {
         child: Column(
           children: [
             Text("Community Settings", style: textTheme.displayMedium),
-            //! Hardcoded
-            Text("No permissions to edit this community", style: textTheme.displaySmall),
+            appState.getCurrentUser.roles.contains("admin")
+                ? ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(backgroundColor: theme.primaryContainer, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))),
+                    onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => CommunitySettingsScreen(
+                              communityID: appState.communityData["id"],
+                              communityName: appState.communityData["name"],
+                              communityDescription: appState.communityData["subName"],
+                              communityImage: appState.communityData["image"],
+                              communityMembers: List<String>.from(appState.communityData["members"]),
+                              communitySections: appState.communityData["_sections"],
+                            ))),
+                    icon: Icon(
+                      Icons.arrow_right,
+                      color: theme.onBackground,
+                    ),
+                    label: Text(
+                      "Settings",
+                      style: textTheme.displaySmall,
+                    ))
+                : Text("No permissions to edit this community", style: textTheme.displaySmall),
+            const Spacer(),
             //* Leave community
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: theme.error, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8)))), child: Text("Leave Community", style: textTheme.displaySmall)),
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text("Close", style: textTheme.displaySmall)),
-              ],
-            )
+            ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: theme.error, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8)))), child: Text("Leave Community", style: textTheme.displaySmall))
           ],
         ),
       ),

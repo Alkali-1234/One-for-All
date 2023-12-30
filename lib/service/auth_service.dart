@@ -56,6 +56,7 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
     // //   }
     // // }
 
+    //* USER VALUES *//
     List<String> incompleteData = [];
     //* Check if user data is incomplete
     if (value.data()!["exp"] == null) {
@@ -89,6 +90,9 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
     if (value.data()!["community"] == null) {
       incompleteData.add("community");
     }
+    if (value.data()!["roles"] == null) {
+      incompleteData.add("roles");
+    }
 
     //* Set missing data
     if (incompleteData.isNotEmpty) {
@@ -104,7 +108,9 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
                           ? auth.currentUser!.displayName
                           : data == "profilePicture"
                               ? auth.currentUser!.photoURL
-                              : 0
+                              : data == "roles"
+                                  ? []
+                                  : 0
       });
     }
 
@@ -121,6 +127,7 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
       assignedCommunity: (assignedCommunity.isEmpty || assignedCommunity == null) ? "0" : assignedCommunity,
       //! user may have multiple sections
       assignedSection: value.data()!["sections"].isEmpty ? "0" : value.data()!["sections"][0],
+      roles: List<String>.from(value.data()!["roles"] ?? []),
     ));
 
     print(appState.getCurrentUser);

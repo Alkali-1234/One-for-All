@@ -318,38 +318,33 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                   ]),
             ),
           ),
-          //Save and Cancel Buttons
+          //* Save and discard
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                    onPressed: () {
-                      saveFlashcards(context.read<AppState>());
-                    },
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => saveFlashcards(appState),
                     style: ElevatedButton.styleFrom(
-                      shadowColor: Colors.transparent,
-                      elevation: 0,
+                      backgroundColor: Colors.green,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                    icon: const Icon(
-                      Icons.check,
-                      color: Colors.green,
-                    )),
-                IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                    child: Text("Save", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
                     style: ElevatedButton.styleFrom(
-                      shadowColor: Colors.transparent,
-                      elevation: 0,
+                      backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                    icon: const Icon(
-                      Icons.close,
-                      color: Colors.red,
-                    )),
+                    child: Text("Discard", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
+                  ),
+                ),
               ],
             ),
           )
