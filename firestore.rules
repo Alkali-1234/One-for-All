@@ -1,0 +1,107 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // match /{document=**} {
+    //   allow read, write;
+    // }
+
+		function isUserAdmin(user) {
+    	
+      let userAssignedCommunity = get(/databases/$(database)/documents/users/$(user)).data.assignedCommunity;
+      let userCommunityDocument = get(/databases/$(database)/documents/communities/$(userAssignedCommunity));
+      let userRoles = get(/databases/$(database)/documents/users/$(user)).data.roles;
+      return (user in userCommunityDocument.data.members && "admin" in userRoles);
+      
+    }
+    
+  	function sameCommunity(user1, user2) {
+    	let user1AssignedCommunity = get(/databases/$(database)/documents/users/$(user1)).data.assignedCommunity;
+      let user2AssignedCommunity = get(/databases/$(database)/documents/users/$(user2)).data.assignedCommunity;
+    	return user1AssignedCommunity == user2AssignedCommunity;
+    }
+    
+    function userAuthCommunity(user) {
+    	let userAssignedCommunity = get(/databases/$(database)/documents/users/$(user)).data.assignedCommunity;
+      let userCommunityDocument = get(/databases/$(database)/documents/communities/$(userAssignedCommunity));
+      
+      return (user in userCommunityDocument.data.members);
+    
+    }
+    
+    function getUserCommunity(user) {
+			let userAssignedCommunity = get(/databases/$(database)/documents/users/$(user)).data.assignedCommunity;
+    	return userAssignedCommunity;
+		}
+
+    //* User Documents *//
+    match /users/{userDoc} {
+    
+    	// if roles
+    	match /roles {
+    		allow read: if true;
+    		allow update: if true;
+    	}
+    
+    	// Allow anyone to read
+      allow read: if true;
+      allow create: if request.auth.uid == resource.id;
+      allow delete: if false;
+      // Allow the user itself to write, except for the field roles
+      allow update: if (request.auth.uid == resource.id && request.resource.data.roles == resource.data.roles) || 
+                        // Allow admins to update the roles field
+                        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['roles']) && isUserAdmin(request.auth.uid) && sameCommunity(request.auth.uid, resource.id))
+      
+      
+     }                   
+      
+    
+    //* Community Documents *//
+    
+    
+    // Allow authenticated users to read to /communities/{communityDoc} and everything thereafter
+    match /communities/{community} {
+      allow read: if request.auth != null;
+      // Only admins can write
+      allow write: if request.auth.uid in resource.data.members && isUserAdmin(request.auth.uid);
+      
+      // Allow members to write 
+      match /MAB/{mab} {
+      	allow read, create: if userAuthCommunity(request.auth.uid) && getUserCommunity(request.auth.uid) == community;
+        allow update, delete: if userAuthCommunity(request.auth.uid) && getUserCommunity(request.auth.uid) == community && isUserAdmin(request.auth.uid);
+      }
+      
+      // Allow members to write 
+      match /forum/{forum} {
+      	allow read, create: if userAuthCommunity(request.auth.uid) && getUserCommunity(request.auth.uid) == community;
+        allow update, delete: if userAuthCommunity(request.auth.uid) && getUserCommunity(request.auth.uid) == community && request.auth.uid == resource.id;
+      }
+      
+      // Allow members to read to sections within the community
+      // Allow admins to write to sections
+      
+      match /sections/{section} {
+        allow read: if request.auth != null;
+      	// Only admins can write
+      	allow write: if request.auth.uid in resource.data.members && isUserAdmin(request.auth.uid);
+      	
+        
+        // Allow members to write 
+      	match /LAC/{lac} {
+      		allow read, create: if userAuthCommunity(request.auth.uid) && getUserCommunity(request.auth.uid) == community;
+        	allow update, delete: if userAuthCommunity(request.auth.uid) && getUserCommunity(request.auth.uid) == community && isUserAdmin(request.auth.uid);
+      	}
+      
+      	// Allow members to write 
+      	match /forum/{forum} {
+      		allow read, create: if userAuthCommunity(request.auth.uid) && getUserCommunity(request.auth.uid) == community;
+        	allow update, delete: if userAuthCommunity(request.auth.uid) && getUserCommunity(request.auth.uid) == community && request.auth.uid == resource.id;
+      	}
+      
+      }
+    }
+  }
+}
+
+

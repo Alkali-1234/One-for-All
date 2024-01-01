@@ -53,6 +53,11 @@ void main() async {
   ]);
   //* Initialize
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // //* Run on emulator if debug is true
+  // if (kDebugMode) {
+  //   await FirebaseAuth.instance.useAuthEmulator('localhost', 8080);
+  //   FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+  // }
   // await FlutterDownloader.initialize(debug: true);
   //Init ads if platform is not web
   if (!kIsWeb) await MobileAds.instance.initialize();

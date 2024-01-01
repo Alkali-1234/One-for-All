@@ -41,6 +41,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.8"
+  archive:
+    dependency: "direct main"
+    description:
+      name: archive
+      sha256: "7b875fd4a20b165a3084bd2d210439b22ebc653f21cea4842729c0c30c82596b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.9"
   args:
     dependency: transitive
     description:
@@ -305,6 +313,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0"
+  file_picker:
+    dependency: "direct main"
+    description:
+      name: file_picker
+      sha256: "4e42aacde3b993c5947467ab640882c56947d9d27342a5b6f2895b23956954a6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.1"
   file_selector_linux:
     dependency: transitive
     description:
@@ -337,6 +353,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.3+1"
+  filesystem_picker:
+    dependency: "direct main"
+    description:
+      name: filesystem_picker
+      sha256: cc2bfe7e5a4ce21afd5b1b03824c0e6e5386a981ed6cce7bda062b1af805cf62
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.0"
   firebase_auth:
     dependency: "direct main"
     description:
@@ -872,6 +896,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  open_file:
+    dependency: "direct main"
+    description:
+      name: open_file
+      sha256: a5a32d44acb7c899987d0999e1e3cbb0a0f1adebbf41ac813ec6d2d8faa0af20
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.2"
   ordered_set:
     dependency: transitive
     description:

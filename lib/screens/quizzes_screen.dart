@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
+import 'package:oneforall/functions/quizzes_functions.dart';
 import 'package:oneforall/styles/styles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/main_container.dart';
@@ -184,7 +188,56 @@ class SelectedQuizModal extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(quiz.title, style: textTheme.displayLarge),
+                Row(
+                  children: [
+                    Expanded(child: Text(quiz.title, style: textTheme.displayLarge)),
+                    //* Options button
+                    PopupMenuButton(
+                        color: theme.background,
+                        itemBuilder: (context) {
+                          return [
+                            PopupMenuItem(child: Text("Export", style: textTheme.displaySmall), onTap: () => QuizzesFunctions().exportQuizzesToDownloads(quiz, context)),
+                            PopupMenuItem(
+                                child: Text("Edit", style: textTheme.displaySmall),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuizzesEditScreen(index: index)));
+                                }),
+                            PopupMenuItem(
+                                child: Text("Delete", style: textTheme.displaySmall),
+                                onTap: () async {
+                                  Navigator.pop(context);
+                                  context.read<AppState>().getQuizzes.removeAt(index);
+                                  final prefs = await SharedPreferences.getInstance();
+                                  //Convert to Object
+                                  Object quizData = {
+                                    "quizzes": [
+                                      for (var quiz in context.read<AppState>().getQuizzes)
+                                        {
+                                          "title": quiz.title,
+                                          "description": quiz.description,
+                                          "questions": [
+                                            for (var question in quiz.questions)
+                                              {
+                                                "question": question.question,
+                                                "answers": question.answers,
+                                                "correctAnswer": question.correctAnswer,
+                                                "type": question.type?.index ?? QuizTypes.multipleChoice.index
+                                              }
+                                          ],
+                                          "settings": quiz.settings
+                                        }
+                                    ]
+                                  };
+                                  //Save to prefs
+                                  await prefs.setString("quizData", jsonEncode(quizData));
+                                  context.read<AppState>().thisNotifyListeners();
+                                }),
+                          ];
+                        },
+                        child: Icon(Icons.more_vert, color: theme.onBackground))
+                  ],
+                ),
                 const SizedBox(height: 10),
                 Text(quiz.description, style: textTheme.displayMedium),
                 const SizedBox(height: 10),
@@ -629,7 +682,27 @@ class _ImportQuizModalState extends State<ImportQuizModal> {
                         child: const Text("Import")),
                     ElevatedButton(style: ElevatedButton.styleFrom(elevation: 0, backgroundColor: theme.secondary, foregroundColor: theme.onBackground, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide.none)), onPressed: () => Navigator.of(context).pop(), child: const Text("Cancel"))
                   ],
-                )
+                ),
+                const SizedBox(height: 10),
+                //* Import from zip file
+                Text("Import from zip file", style: textTheme.displayMedium),
+                const SizedBox(height: 5),
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: theme.secondary,
+                      foregroundColor: theme.onBackground,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide.none),
+                    ),
+                    onPressed: () async {
+                      FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: [
+                        'zip'
+                      ]);
+                      if (result == null) return;
+                      if (!mounted) return;
+                      QuizzesFunctions().importQuizFromZip(File(result.files.single.path!), context.read<AppState>(), context);
+                    },
+                    child: const Text("Select File")),
               ],
             )));
   }
