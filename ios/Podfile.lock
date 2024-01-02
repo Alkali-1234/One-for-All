@@ -647,6 +647,40 @@ PODS:
     - firebase_core
     - Flutter
     - nanopb (< 2.30910.0, >= 2.30908.0)
+  - DKImagePickerController/Core (4.3.4):
+    - DKImagePickerController/ImageDataManager
+    - DKImagePickerController/Resource
+  - DKImagePickerController/ImageDataManager (4.3.4)
+  - DKImagePickerController/PhotoGallery (4.3.4):
+    - DKImagePickerController/Core
+    - DKPhotoGallery
+  - DKImagePickerController/Resource (4.3.4)
+  - DKPhotoGallery (0.0.17):
+    - DKPhotoGallery/Core (= 0.0.17)
+    - DKPhotoGallery/Model (= 0.0.17)
+    - DKPhotoGallery/Preview (= 0.0.17)
+    - DKPhotoGallery/Resource (= 0.0.17)
+    - SDWebImage
+    - SwiftyGif
+  - DKPhotoGallery/Core (0.0.17):
+    - DKPhotoGallery/Model
+    - DKPhotoGallery/Preview
+    - SDWebImage
+    - SwiftyGif
+  - DKPhotoGallery/Model (0.0.17):
+    - SDWebImage
+    - SwiftyGif
+  - DKPhotoGallery/Preview (0.0.17):
+    - DKPhotoGallery/Model
+    - DKPhotoGallery/Resource
+    - SDWebImage
+    - SwiftyGif
+  - DKPhotoGallery/Resource (0.0.17):
+    - SDWebImage
+    - SwiftyGif
+  - file_picker (0.0.1):
+    - DKImagePickerController/PhotoGallery
+    - Flutter
   - Firebase/Auth (10.18.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 10.18.0)
@@ -869,14 +903,20 @@ PODS:
     - nanopb/encode (= 2.30909.1)
   - nanopb/decode (2.30909.1)
   - nanopb/encode (2.30909.1)
+  - open_file (0.0.1):
+    - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
   - PromisesObjC (2.3.1)
   - RecaptchaInterop (100.0.0)
+  - SDWebImage (5.18.8):
+    - SDWebImage/Core (= 5.18.8)
+  - SDWebImage/Core (5.18.8)
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - SwiftyGif (5.4.4)
   - url_launcher_ios (0.0.1):
     - Flutter
   - webview_flutter_wkwebview (0.0.1):
@@ -885,6 +925,7 @@ PODS:
 DEPENDENCIES:
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
+  - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
@@ -895,6 +936,7 @@ DEPENDENCIES:
   - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
+  - open_file (from `.symlinks/plugins/open_file/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
@@ -905,6 +947,8 @@ SPEC REPOS:
     - abseil
     - AppAuth
     - BoringSSL-GRPC
+    - DKImagePickerController
+    - DKPhotoGallery
     - Firebase
     - FirebaseAppCheckInterop
     - FirebaseAuth
@@ -932,12 +976,16 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - RecaptchaInterop
+    - SDWebImage
+    - SwiftyGif
 
 EXTERNAL SOURCES:
   audio_session:
     :path: ".symlinks/plugins/audio_session/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
+  file_picker:
+    :path: ".symlinks/plugins/file_picker/ios"
   firebase_auth:
     :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
@@ -958,6 +1006,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/image_picker_ios/ios"
   just_audio:
     :path: ".symlinks/plugins/just_audio/ios"
+  open_file:
+    :path: ".symlinks/plugins/open_file/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   shared_preferences_foundation:
@@ -973,6 +1023,9 @@ SPEC CHECKSUMS:
   audio_session: 4f3e461722055d21515cf3261b64c973c062f345
   BoringSSL-GRPC: 3175b25143e648463a56daeaaa499c6cb86dad33
   cloud_firestore: c29d4c2e96fe31374d9dab458a99d7a488d3a735
+  DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
+  DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
+  file_picker: 15fd9539e4eb735dc54bae8c0534a7a9511a03de
   Firebase: 414ad272f8d02dfbf12662a9d43f4bba9bec2a06
   firebase_auth: df44e14f8a93e8a9869d91695bd3f8e53d2c9f5a
   firebase_core: 0af4a2b24f62071f9bf283691c0ee41556dcb3f5
@@ -1008,10 +1061,13 @@ SPEC CHECKSUMS:
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
   leveldb-library: f03246171cce0484482ec291f88b6d563699ee06
   nanopb: d4d75c12cd1316f4a64e3c6963f879ecd4b5e0d5
+  open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
+  SDWebImage: a81bbb3ba4ea5f810f4069c68727cb118467a04a
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
+  SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f
   url_launcher_ios: bf5ce03e0e2088bad9cc378ea97fa0ed5b49673b
   webview_flutter_wkwebview: 2e2d318f21a5e036e2c3f26171342e95908bd60a
 

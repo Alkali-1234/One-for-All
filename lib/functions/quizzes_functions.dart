@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:archive/archive_io.dart';
 import 'package:flutter/material.dart';
+import 'package:oneforall/functions/flashcards_functions.dart';
 import 'package:open_file/open_file.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/main.dart';
@@ -67,7 +68,7 @@ class QuizzesFunctions {
         archive.addFile(ArchiveFile('images/${question.imagePath!.split("/").last}', File(question.imagePath!).readAsBytesSync().length, File(question.imagePath!).readAsBytesSync()));
       }
     }
-    Directory? downloadsDirectory = await getDownloadsDirectory();
+    Directory? downloadsDirectory = await FlashcardsFunctions().getDownloadPath();
     if (downloadsDirectory == null) return;
     final File zipFile = await File('${downloadsDirectory.path}/quiz.zip').create();
     zipFile.writeAsBytesSync(ZipEncoder().encode(archive)!);

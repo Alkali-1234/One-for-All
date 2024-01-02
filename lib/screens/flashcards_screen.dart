@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/constants.dart';
+import 'package:oneforall/functions/flashcards_functions.dart';
 import 'package:oneforall/main.dart';
 import 'package:provider/provider.dart';
 import '../data/user_data.dart';
@@ -242,7 +244,29 @@ class _ImportSetModalState extends State<ImportSetModal> {
                     onPressed: () => Navigator.pop(context),
                     child: const Text("Cancel")),
               ],
-            )
+            ),
+            const SizedBox(height: 10),
+            Text("Import from ZIP file", style: textTheme.displayMedium),
+            const SizedBox(height: 10),
+            // Button
+            ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.secondary,
+                  foregroundColor: theme.onBackground,
+                ),
+                onPressed: () async {
+                  FilePickerResult? file = await FilePicker.platform.pickFiles(
+                    type: FileType.custom,
+                    allowedExtensions: [
+                      'zip'
+                    ],
+                  );
+                  if (file == null) return;
+                  if (!mounted) return;
+                  FlashcardsFunctions().importFlashcardFromZip(File(file.files.first.path!), context, context.read<AppState>());
+                },
+                icon: const Icon(Icons.download),
+                label: const Text("Import")),
           ])),
     );
   }
@@ -647,6 +671,15 @@ class SelectedSetModal extends StatelessWidget {
                       PopupMenuButton(
                           color: theme.background,
                           itemBuilder: (context) => <PopupMenuEntry>[
+                                PopupMenuItem(
+                                  child: Text(
+                                    "Export",
+                                    style: textTheme.displaySmall,
+                                  ),
+                                  onTap: () {
+                                    FlashcardsFunctions().exportFlashcardsToDownloads(flashcardSet, context);
+                                  },
+                                ),
                                 PopupMenuItem(
                                   child: Text(
                                     "Delete",
