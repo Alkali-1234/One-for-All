@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 //ignore: unused_import
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:oneforall/functions/community_functions.dart';
 import '../data/community_data.dart';
 import '../main.dart';
 import 'auth_service.dart';
@@ -240,30 +241,14 @@ Future getCommunity(String communityID) async {
   return document;
 }
 
-Future joinCommunity(String communityID, String password) async {
+Future joinCommunity(String communityID, String password, AppState appState) async {
   //* Attempt to join community
-  DocumentSnapshot<Object?>? communityDocument;
+  await CommunityFunctions().joinCommunity(communityID, password, appState);
   //* Get the community document
-  try {
-    communityDocument = await getCommunity(communityID);
-  } catch (e) {
-    rethrow;
-  }
-  //* Check for any errors
-  if (communityDocument == null) {
-    throw Exception("Community does not exist");
-  }
-  if (communityDocument["password"] != password) {
-    throw Exception("Incorrect password");
-  }
-  //* Add user to community at document["members"]
-  //* Check if user is authenticated
-  if (getUserAuth == null) {
-    throw Exception("User is not authenticated");
-  }
+  DocumentSnapshot<Object?>? communityDocument = await getCommunity(communityID);
+
   //* User
   User user = FirebaseAuth.instance.currentUser!;
-
   FirebaseFirestore.instance.collection("communities").doc(communityID).update({
     "members": FieldValue.arrayUnion([
       user.uid
@@ -292,6 +277,7 @@ Future joinCommunity(String communityID, String password) async {
   return communityDocument;
 }
 
+@Deprecated("Use joinCommunity instead")
 Future joinSection(String communityID, String sectionID) async {
   try {
     await FirebaseFirestore.instance.collection("communities").doc(communityID).collection("sections").doc(sectionID).update({

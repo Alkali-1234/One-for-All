@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:oneforall/functions/community_functions.dart';
 import 'package:oneforall/screens/login_screen.dart';
+import 'package:oneforall/styles/styles.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
@@ -178,6 +180,61 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
             : selectedTheme = 2;
   }
 
+  String communityIDQuery = "";
+  String passwordQuery = "";
+  bool loadingCommunity = false;
+
+  Future<void> _joinCommunity() async {
+    if (communityIDQuery.isEmpty || passwordQuery.isEmpty) return;
+    setState(() {
+      loadingCommunity = true;
+    });
+    var appState = Provider.of<AppState>(context, listen: false);
+    var result = await CommunityFunctions().joinCommunity(communityIDQuery, passwordQuery, appState);
+    if (!mounted) return;
+    if (result == "Successfully joined community") {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colors.green,
+        content: Text("Joined community!", style: TextStyle(color: Colors.white)),
+        duration: Duration(seconds: 2),
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        content: Text(result, style: const TextStyle(color: Colors.white)),
+        duration: const Duration(seconds: 4),
+      ));
+    }
+    setState(() {
+      loadingCommunity = false;
+    });
+  }
+
+  Future<void> _leaveCommunity() async {
+    setState(() {
+      loadingCommunity = true;
+    });
+    var appState = Provider.of<AppState>(context, listen: false);
+    var result = await CommunityFunctions().leaveCommunity(appState.getCurrentUser.assignedCommunity!, appState);
+    if (!mounted) return;
+    if (result == "Successfully left community") {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colors.green,
+        content: Text("Left community!", style: TextStyle(color: Colors.white)),
+        duration: Duration(seconds: 2),
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        content: Text(result, style: const TextStyle(color: Colors.white)),
+        duration: const Duration(seconds: 4),
+      ));
+    }
+    setState(() {
+      loadingCommunity = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -233,90 +290,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                       //* Back button
                       Column(
                         children: [
-                          // Row(
-                          //   children: [
-                          //     IconButton(
-                          //       onPressed: () {
-                          //         if (currentLoading != 0) return;
-                          //         if (Theme.of(context) != passedUserTheme) {
-                          //           appState.currentUserSelectedTheme = passedUserTheme;
-                          //         }
-                          //         Navigator.pop(context);
-                          //       },
-                          //       icon: Icon(
-                          //         Icons.arrow_back,
-                          //         color: theme.onBackground,
-                          //       ),
-                          //     ),
-                          //     Text(
-                          //       "Settings",
-                          //       style: textTheme.displayMedium,
-                          //     ),
-                          //   ],
-                          // )
-                          // //* User info card
-                          // Card(
-                          //   color: theme.secondary,
-                          //   elevation: 0,
-                          //   child: Padding(
-                          //     padding: const EdgeInsets.all(16.0),
-                          //     child: Row(
-                          //       mainAxisSize: MainAxisSize.max,
-                          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //       children: [
-                          //         CircleAvatar(
-                          //             radius: 30,
-                          //             backgroundImage: NetworkImage(
-                          //               appState.getCurrentUser.profilePicture == "" ? "https://picsum.photos/200" : appState.getCurrentUser.profilePicture,
-                          //             )),
-                          //         const SizedBox(width: 16.0),
-                          //         Column(
-                          //           mainAxisSize: MainAxisSize.min,
-                          //           children: [
-                          //             Text(
-                          //               appState.getCurrentUser.username,
-                          //               style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
-                          //               textAlign: TextAlign.end,
-                          //             ),
-                          //             Text(
-                          //               appState.getCurrentUser.email,
-                          //               style: textTheme.displaySmall,
-                          //               textAlign: TextAlign.end,
-                          //             ),
-                          //           ],
-                          //         ),
-                          //       ],
-                          //     ),
-                          //   ),
-                          // ),
-                          // //* Page number and changer (inconsistent, to be fixed)
-                          // Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          //   SizedBox(
-                          //     width: 30,
-                          //     child: IconButton(
-                          //       icon: Icon(
-                          //         Icons.arrow_back_ios,
-                          //         color: theme.onBackground,
-                          //       ),
-                          //       onPressed: null,
-                          //     ),
-                          //   ),
-                          //   Text(
-                          //     "1",
-                          //     style: textTheme.displayMedium,
-                          //     textAlign: TextAlign.center,
-                          //   ),
-                          //   SizedBox(
-                          //     width: 30,
-                          //     child: IconButton(
-                          //       icon: Icon(
-                          //         Icons.arrow_forward_ios,
-                          //         color: theme.onBackground,
-                          //       ),
-                          //       onPressed: null,
-                          //     ),
-                          //   ),
-                          // ]),
+                          //* Theme
                           const SizedBox(height: 10),
                           Text("Theme", style: textTheme.displaySmall),
                           const SizedBox(height: 10),
@@ -425,99 +399,6 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                               ),
                             ],
                           ),
-
-                          // SizedBox(
-                          //   height: 50,
-                          //   width: double.infinity,
-                          //   child: DefaultTabController(
-                          //     length: _themes.length,
-                          //     child: Builder(builder: (context) {
-                          //       _tabController = DefaultTabController.of(context);
-                          //       _tabController.addListener(() {
-                          //         debugPrint("Selected Index: ${_tabController.index}");
-                          //         if (!_tabController.indexIsChanging) {
-                          //           setState(() {
-                          //             selectedTheme = _tabController.index;
-                          //           });
-                          //           //* change theme
-                          //           switch (_tabController.index) {
-                          //             case 0:
-                          //               setState(() {
-                          //                 appState.currentUserSelectedTheme = defaultBlueTheme;
-                          //               });
-                          //               break;
-                          //             case 1:
-                          //               setState(() {
-                          //                 appState.currentUserSelectedTheme = darkTheme;
-                          //               });
-                          //               break;
-                          //             case 2:
-                          //               setState(() {
-                          //                 appState.currentUserSelectedTheme = lightTheme;
-                          //               });
-                          //               break;
-                          //             default:
-                          //               debugPrint("Invalid theme index");
-                          //           }
-                          //         }
-                          //       });
-                          //       return TabBarView(
-                          //         controller: _tabController,
-                          //         children: _themes
-                          //             .map((Tab tab) => Padding(
-                          //                   padding: const EdgeInsets.symmetric(horizontal: 5),
-                          //                   child: Container(
-                          //                     decoration: BoxDecoration(
-                          //                       color: theme.secondary,
-                          //                       borderRadius: BorderRadius.circular(10),
-                          //                     ),
-                          //                     child: Center(
-                          //                         child: Text(
-                          //                       tab.text!,
-                          //                       style: textTheme.displaySmall,
-                          //                     )),
-                          //                   ),
-                          //                 ))
-                          //             .toList(),
-                          //       );
-                          //     }),
-                          //   ),
-                          // ),
-                          // const SizedBox(height: 5),
-                          // //* Current theme three dots indicator
-                          // SizedBox(
-                          //   height: 10,
-                          //   width: 50,
-                          //   child: Row(
-                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //     children: [
-                          //       Container(
-                          //         height: 10,
-                          //         width: 10,
-                          //         decoration: BoxDecoration(
-                          //           color: selectedTheme == 0 ? theme.onBackground : theme.primaryContainer,
-                          //           borderRadius: BorderRadius.circular(10),
-                          //         ),
-                          //       ),
-                          //       Container(
-                          //         height: 10,
-                          //         width: 10,
-                          //         decoration: BoxDecoration(
-                          //           color: selectedTheme == 1 ? theme.onBackground : theme.primaryContainer,
-                          //           borderRadius: BorderRadius.circular(10),
-                          //         ),
-                          //       ),
-                          //       Container(
-                          //         height: 10,
-                          //         width: 10,
-                          //         decoration: BoxDecoration(
-                          //           color: selectedTheme == 2 ? theme.onBackground : theme.primaryContainer,
-                          //           borderRadius: BorderRadius.circular(10),
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
                           //* Notification settings
                           const SizedBox(height: 25),
                           Text("Notification Settings", style: textTheme.displaySmall),
@@ -604,6 +485,74 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                                     ],
                                   ))
                             ],
+                          ),
+                          const SizedBox(height: 25),
+                          Text("Community Settings", style: textTheme.displaySmall),
+                          const SizedBox(height: 10),
+                          Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: theme.primaryContainer,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Your Community:", style: textTheme.displaySmall),
+                                  Text(appState.getCurrentUser.assignedCommunity != "0" ? appState.getCurrentUser.assignedCommunity! : "None", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                                ],
+                              )),
+                          const SizedBox(height: 5),
+                          Row(
+                            children: [
+                              if (appState.getCurrentUser.assignedCommunity == "0")
+                                Expanded(
+                                  child: TextFormField(
+                                    cursorColor: theme.onBackground,
+                                    style: textTheme.displaySmall,
+                                    decoration: TextInputStyle(textTheme: textTheme, theme: theme).getTextInputStyle().copyWith(hintText: "Community ID", hintStyle: textTheme.displaySmall),
+                                    onChanged: (value) => setState(() {
+                                      communityIDQuery = value;
+                                    }),
+                                  ),
+                                ),
+                              const SizedBox(width: 10),
+                              if (appState.getCurrentUser.assignedCommunity == "0")
+                                Expanded(
+                                  child: TextFormField(
+                                    cursorColor: theme.onBackground,
+                                    style: textTheme.displaySmall,
+                                    decoration: TextInputStyle(textTheme: textTheme, theme: theme).getTextInputStyle().copyWith(hintText: "Password", hintStyle: textTheme.displaySmall),
+                                    onChanged: (value) => setState(() {
+                                      passwordQuery = value;
+                                    }),
+                                  ),
+                                ),
+                            ],
+                          ),
+
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: appState.getCurrentUser.assignedCommunity != "0" ? Colors.red : Colors.green,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onPressed: appState.getCurrentUser.assignedCommunity != "0" ? () => _leaveCommunity() : () => _joinCommunity(),
+                                child: loadingCommunity
+                                    ? SizedBox(
+                                        height: 15,
+                                        width: 15,
+                                        child: CircularProgressIndicator(
+                                          color: theme.onBackground,
+                                        ),
+                                      )
+                                    : Text(
+                                        appState.getCurrentUser.assignedCommunity != "0" ? "Leave Community" : "Join Community",
+                                      )),
                           )
                         ],
                       ),
@@ -618,15 +567,13 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                                 saveSettings();
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: theme.secondary,
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              child: Text(
-                                "Save",
-                                style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
-                              ),
+                              child: const Text("Save"),
                             ),
                           ),
                           // //* Clear cache and logout button

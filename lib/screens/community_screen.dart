@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:oneforall/functions/community_functions.dart';
 import 'package:oneforall/screens/community_settings.dart';
 // import 'package:oneforall/banner_ad.dart';
 // import 'package:oneforall/data/community_data.dart';
@@ -303,6 +304,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                           showDialog(
                                               context: context,
                                               builder: (_) => SelectedSection(
+                                                    sectionIndex: index,
                                                     sectionData: appState.communityData["_sections"][index],
                                                   ));
                                         }
@@ -381,7 +383,7 @@ class _CommunitySettingsModalState extends State<CommunitySettingsModal> {
                 : Text("No permissions to edit this community", style: textTheme.displaySmall),
             const Spacer(),
             //* Leave community
-            ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: theme.error, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8)))), child: Text("Leave Community", style: textTheme.displaySmall))
+            Text("Go to settings for community settings", style: textTheme.displaySmall),
           ],
         ),
       ),
@@ -390,8 +392,9 @@ class _CommunitySettingsModalState extends State<CommunitySettingsModal> {
 }
 
 class SelectedSection extends StatefulWidget {
-  const SelectedSection({super.key, required this.sectionData});
+  const SelectedSection({super.key, required this.sectionData, required this.sectionIndex});
   final Map<String, dynamic> sectionData;
+  final int sectionIndex;
 
   @override
   State<SelectedSection> createState() => _SelectedSectionState();
@@ -407,28 +410,23 @@ class _SelectedSectionState extends State<SelectedSection> {
       setState(() {
         errorMessage = "Please enter a password";
       });
+      return;
     } else {
       setState(() {
         loading = true;
       });
     }
-    if (passwordQuery != widget.sectionData["password"]) {
+    var message = await CommunityFunctions().joinSection(widget.sectionData["id"], appState, passwordQuery);
+    if (message != "Successfully joined section") {
       setState(() {
-        errorMessage = "Incorrect password";
         loading = false;
+        errorMessage = message;
       });
       return;
     }
-    await joinSection(appState.getCurrentUser.assignedCommunity!, widget.sectionData["id"]).catchError((e) {
-      setState(() {
-        errorMessage = e.toString();
-        loading = false;
-      });
-      return;
-    });
     //* Update app state
-    appState.communityData["_sections"][widget.sectionData["id"]]["members"].add(appState.getCurrentUser.uid);
-    appState.getCurrentUser.assignedSection = widget.sectionData["id"];
+    appState.communityData["_sections"][widget.sectionIndex]["members"].add(appState.getCurrentUser.uid);
+    appState.thisNotifyListeners();
     setState(() {
       loading = false;
     });
@@ -440,6 +438,31 @@ class _SelectedSectionState extends State<SelectedSection> {
           "Joined section ${widget.sectionData["name"]}",
           style: const TextStyle(color: Colors.white),
         )));
+  }
+
+  Future leaveSection() async {
+    setState(() {
+      loading = true;
+    });
+    var message = await CommunityFunctions().leaveSection(widget.sectionData["id"], context.read<AppState>());
+    if (message != "Successfully left section") {
+      return;
+    }
+    //* Update app state
+    if (!mounted) return;
+    var appState = context.read<AppState>();
+    appState.communityData["_sections"][widget.sectionIndex]["members"].remove(context.read<AppState>().getCurrentUser.uid);
+    appState.thisNotifyListeners();
+    //* Show snackbar
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.green,
+        content: Text(
+          "Left section ${widget.sectionData["name"]}",
+          style: const TextStyle(color: Colors.white),
+        )));
+    setState(() {
+      loading = false;
+    });
   }
 
   @override
@@ -476,7 +499,7 @@ class _SelectedSectionState extends State<SelectedSection> {
                     errorText: errorMessage.isNotEmpty ? errorMessage : null,
                     filled: true,
                     fillColor: theme.primary,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                     focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: theme.onBackground), borderRadius: BorderRadius.circular(10)),
                     hintStyle: textTheme.displaySmall,
                   ),
@@ -491,7 +514,13 @@ class _SelectedSectionState extends State<SelectedSection> {
                       Navigator.pop(context);
                     },
                     child: Text("Close", style: textTheme.displaySmall)),
-                appState.getCurrentUser.assignedSection != widget.sectionData["id"] ? TextButton(onPressed: () => attemptJoin(context.read<AppState>()), child: loading ? CircularProgressIndicator(color: theme.onBackground) : Text("Join", style: textTheme.displaySmall)) : Text("Joined", style: textTheme.displaySmall),
+                appState.getCurrentUser.assignedSection != widget.sectionData["id"]
+                    ? TextButton(onPressed: () => attemptJoin(context.read<AppState>()), child: loading ? CircularProgressIndicator(color: theme.onBackground) : Text("Join", style: textTheme.displaySmall))
+                    : TextButton(
+                        onPressed: () => leaveSection().then((value) {
+                              Navigator.pop(context);
+                            }),
+                        child: Text("Leave", style: textTheme.displaySmall)),
               ],
             )
           ],

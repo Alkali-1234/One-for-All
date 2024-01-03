@@ -27,6 +27,7 @@ class _ProfileViewerState extends State<ProfileViewer> {
             child: FutureBuilder<dynamic>(
                 future: getUserData,
                 builder: (c, data) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const SizedBox(height: 16),
@@ -72,6 +73,31 @@ class _ProfileViewerState extends State<ProfileViewer> {
                             BaseShimmer(enabled: data.connectionState != ConnectionState.done, child: Text(data.data?['community'] ?? "Loading", style: textTheme.displaySmall)),
                           ],
                         ),
+                        const SizedBox(height: 10),
+                        //* Roles
+                        Text("Roles", style: textTheme.displaySmall),
+                        const SizedBox(height: 4),
+                        Wrap(
+                          spacing: 4,
+                          runSpacing: 4,
+                          alignment: WrapAlignment.start,
+                          textDirection: TextDirection.ltr,
+                          children: [
+                            for (String role in data.data?['roles'] ?? [])
+                              Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: Chip(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                                  side: BorderSide.none,
+                                  backgroundColor: role == "admin" ? Colors.red.withOpacity(0.25) : theme.primaryContainer,
+                                  label: Text(
+                                    role,
+                                    style: textTheme.displaySmall,
+                                  ),
+                                ),
+                              )
+                          ],
+                        )
                       ],
                     )),
           ),

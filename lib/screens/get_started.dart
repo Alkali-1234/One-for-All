@@ -595,7 +595,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
       return;
     }
     //* Join community
-    joinCommunity(communityIDQuery, passwordQuery).then((value) => debugPrint("Joined community")).catchError((error, stackTrace) => setState(() {
+    joinCommunity(communityIDQuery, passwordQuery, context.read<AppState>()).then((value) => debugPrint("Joined community")).catchError((error, stackTrace) => setState(() {
           this.error = error.toString();
           isLoading = false;
         }));
