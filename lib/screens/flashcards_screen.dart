@@ -550,92 +550,94 @@ class _NewSetModalState extends State<NewSetModal> {
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Text("New Set", style: textTheme.displayLarge),
-                const Divider(),
-                const SizedBox(height: 10),
-                //Title Text Field
-                SizedBox(
-                  height: 40,
-                  child: TextField(
-                    onChanged: (value) => setState(() {
-                      titleQuery = value;
-                    }),
-                    keyboardAppearance: Brightness.dark,
-                    cursorColor: theme.onPrimary,
-                    style: textTheme.displaySmall!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                        filled: true,
-                        fillColor: theme.primary,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(
-                            width: 0,
-                            style: BorderStyle.none,
+              child: SingleChildScrollView(
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Text("New Set", style: textTheme.displayLarge),
+                  const Divider(),
+                  const SizedBox(height: 10),
+                  //Title Text Field
+                  SizedBox(
+                    height: 40,
+                    child: TextField(
+                      onChanged: (value) => setState(() {
+                        titleQuery = value;
+                      }),
+                      keyboardAppearance: Brightness.dark,
+                      cursorColor: theme.onPrimary,
+                      style: textTheme.displaySmall!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                          filled: true,
+                          fillColor: theme.primary,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              width: 0,
+                              style: BorderStyle.none,
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            width: 2,
-                            color: theme.onBackground,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              width: 2,
+                              color: theme.onBackground,
+                            ),
                           ),
-                        ),
-                        hintText: 'Title',
-                        hintStyle: textTheme.displaySmall!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                //How to use
-                Row(
-                  children: [
-                    Icon(
-                      Icons.info,
-                      color: theme.onPrimary,
-                      size: 24,
+                          hintText: 'Title',
+                          hintStyle: textTheme.displaySmall!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
                     ),
-                    const SizedBox(width: 10),
-                    Text("How to use", style: textTheme.displaySmall),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                //How to use text
-                Text("You may put as much question as you will, each flashcard set are stored locally (CACHED!). Each set represents one collection of cards. For each card you encounter you must think of the answer in your head, and then flip the card by tapping it, revealing the answer. You then must choose the following buttons depending on your performance on the question (The buttons mentioned are the 100% knew it, 50% some, 0% didn’t know). Each question has a weight, depending on your performance on the question, the weight can go down and up. In which if it goes up it will show more frequently per as if it goes down it will show less frequently. For more information, look at the *docs*", style: textTheme.displaySmall),
-                const SizedBox(height: 10),
-                //Buttons: Create and Cancel
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.secondary,
-                          foregroundColor: theme.onPrimary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                  ),
+                  const SizedBox(height: 10),
+                  //How to use
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.info,
+                        color: theme.onPrimary,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 10),
+                      Text("How to use", style: textTheme.displaySmall),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  //How to use text
+                  Text("You may put as much question as you will, each flashcard set are stored locally (CACHED!). Each set represents one collection of cards. For each card you encounter you must think of the answer in your head, and then flip the card by tapping it, revealing the answer. You then must choose the following buttons depending on your performance on the question (The buttons mentioned are the 100% knew it, 50% some, 0% didn’t know). Each question has a weight, depending on your performance on the question, the weight can go down and up. In which if it goes up it will show more frequently per as if it goes down it will show less frequently. For more information, look at the *docs*", style: textTheme.displaySmall),
+                  const SizedBox(height: 10),
+                  //Buttons: Create and Cancel
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.secondary,
+                            foregroundColor: theme.onPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
-                        ),
-                        onPressed: () {
-                          createSet(context.read<AppState>());
-                        },
-                        child: isLoading
-                            ? const CircularProgressIndicator()
-                            : success
-                                ? const Icon(Icons.check)
-                                : const Text("Create")),
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.secondary,
-                          foregroundColor: theme.onPrimary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                          onPressed: () {
+                            createSet(context.read<AppState>());
+                          },
+                          child: isLoading
+                              ? const CircularProgressIndicator()
+                              : success
+                                  ? const Icon(Icons.check)
+                                  : const Text("Create")),
+                      ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.secondary,
+                            foregroundColor: theme.onPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
-                        ),
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Cancel")),
-                  ],
-                )
-              ]),
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("Cancel")),
+                    ],
+                  )
+                ]),
+              ),
             )));
   }
 }

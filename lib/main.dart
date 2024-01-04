@@ -877,19 +877,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           ))
                                                 },
                                                 child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
-                                                    SizedBox(
-                                                      width: MediaQuery.of(context).size.width * 0.5,
-                                                      height: 30,
-                                                      child: FittedBox(
-                                                        child: Text(
-                                                          post.title,
-                                                          style: textTheme.displaySmall!.copyWith(
-                                                            fontWeight: FontWeight.bold,
-                                                          ),
-                                                          textAlign: TextAlign.left,
+                                                    Expanded(
+                                                      child: Text(
+                                                        post.title,
+                                                        style: textTheme.displaySmall!.copyWith(
+                                                          fontWeight: FontWeight.bold,
                                                         ),
+                                                        textAlign: TextAlign.left,
+                                                        overflow: TextOverflow.ellipsis,
                                                       ),
                                                     ),
                                                     ClipRRect(
@@ -931,8 +927,8 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(width: 10),
             Text(
               "Recent Activity",
-              style: textTheme.displayLarge!.copyWith(
-                fontWeight: FontWeight.w600,
+              style: textTheme.displayMedium!.copyWith(
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],

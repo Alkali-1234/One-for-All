@@ -48,12 +48,16 @@ class _ProfileViewerState extends State<ProfileViewer> {
                                     backgroundImage: NetworkImage(data.data?['profilePicture'] ?? "https://i.imgur.com/BoN9kdC.png"),
                                   ),
                             const SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                BaseShimmer(enabled: data.connectionState != ConnectionState.done, child: Text(data.data?['username'] ?? "Loading", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold))),
-                                Text(widget.uid, style: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5))),
-                              ],
+                            Expanded(
+                              child: FittedBox(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    BaseShimmer(enabled: data.connectionState != ConnectionState.done, child: Text(data.data?['username'] ?? "Loading", style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold))),
+                                    Text(widget.uid, style: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5))),
+                                  ],
+                                ),
+                              ),
                             ),
                           ],
                         ),

@@ -91,6 +91,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
     return Container(
         decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
         child: Scaffold(
+            resizeToAvoidBottomInset: false,
             floatingActionButton: FloatingActionButton(
               onPressed: () {
                 showDialog(
@@ -104,394 +105,283 @@ class _MABLACScreenState extends State<MABLACScreen> {
             ),
             backgroundColor: Colors.transparent,
             body: MainContainer(
-              child: Column(
-                children: [
-                  // //App Bar
-                  // Container(
-                  //   color: theme.secondary,
-                  //   child: Padding(
-                  //     padding: const EdgeInsets.all(16.0),
-                  //     child: Row(
-                  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //       children: [
-                  //         GestureDetector(
-                  //           onTap: () => Navigator.pop(context),
-                  //           child: Icon(
-                  //             Icons.arrow_back,
-                  //             color: theme.onPrimary,
-                  //           ),
-                  //         ),
-                  //         Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
-                  //         Container(
-                  //           width: 30,
-                  //           height: 30,
-                  //           decoration: BoxDecoration(
-                  //             color: theme.onPrimary,
-                  //             borderRadius: BorderRadius.circular(20),
-                  //             gradient: getPrimaryGradient,
-                  //           ),
-                  //           child: ClipRRect(
-                  //               borderRadius: const BorderRadius.all(Radius.circular(15)),
-                  //               child: Image.network(
-                  //                 appState.getCurrentUser.profilePicture,
-                  //                 fit: BoxFit.cover,
-                  //               )),
-                  //         )
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-                  // //End of App Bar
-                  //Body
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(children: [
-                        //Top selection
-                        Flexible(
-                          flex: 1,
-                          child: Row(children: [
-                            Flexible(
-                              flex: 1,
-                              child: LayoutBuilder(builder: (context, constraints) {
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    SizedBox(
-                                      height: selectedSection == 0 ? constraints.maxHeight : constraints.maxHeight - 10,
-                                      width: constraints.maxWidth,
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            selectedSection = 0;
-                                          });
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          elevation: 0,
-                                          shadowColor: Colors.transparent,
-                                          padding: const EdgeInsets.all(8),
-                                          backgroundColor: selectedSection == 0 ? theme.primaryContainer : theme.secondary,
-                                          foregroundColor: theme.onPrimary,
-                                          shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(10),
-                                              topRight: Radius.circular(10),
-                                            ),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          "MAB",
-                                          style: textTheme.displaySmall,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              }),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: LayoutBuilder(builder: (context, constraints) {
+                  return Column(children: [
+                    //Top selection
+                    Row(crossAxisAlignment: CrossAxisAlignment.end, verticalDirection: VerticalDirection.down, children: [
+                      SizedBox(
+                        width: constraints.maxWidth / 2,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              selectedSection = 0;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            elevation: 0,
+                            shadowColor: Colors.transparent,
+                            backgroundColor: selectedSection == 0 ? theme.primaryContainer : theme.secondary,
+                            foregroundColor: theme.onPrimary,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
+                              ),
                             ),
-                            Flexible(
-                              flex: 1,
-                              child: LayoutBuilder(builder: (context, constraints) {
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    SizedBox(
-                                      height: selectedSection == 1 ? constraints.maxHeight : constraints.maxHeight - 10,
-                                      width: constraints.maxWidth,
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            selectedSection = 1;
-                                          });
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          elevation: 0,
-                                          shadowColor: Colors.transparent,
-                                          padding: const EdgeInsets.all(8),
-                                          backgroundColor: selectedSection == 1 ? theme.primaryContainer : theme.secondary,
-                                          foregroundColor: theme.onPrimary,
-                                          shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(10),
-                                              topRight: Radius.circular(10),
-                                            ),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          "LAC",
-                                          style: textTheme.displaySmall,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              }),
+                          ),
+                          child: Padding(
+                            padding: selectedSection == 0 ? const EdgeInsets.symmetric(vertical: 15.0) : const EdgeInsets.symmetric(vertical: 2.0),
+                            child: Text(
+                              "MAB",
+                              style: textTheme.displaySmall,
                             ),
-                          ]),
+                          ),
                         ),
-                        Flexible(
-                            flex: 14,
-                            child: Container(
-                                width: double.infinity,
-                                height: double.infinity,
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.only(
-                                    bottomLeft: Radius.circular(10),
-                                    bottomRight: Radius.circular(10),
-                                  ),
-                                  color: theme.primaryContainer,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Column(children: [
-                                    //Search bar
-                                    Flexible(
-                                      flex: 3,
-                                      child: TextField(
-                                        controller: searchController,
-                                        onChanged: (value) => setState(() {
-                                          searchQuery = value;
-                                        }),
-                                        keyboardAppearance: Brightness.dark,
-                                        cursorColor: theme.onPrimary,
-                                        style: textTheme.displayMedium!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
-                                        decoration: InputDecoration(
-                                            filled: true,
-                                            fillColor: theme.primary,
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(10),
-                                              borderSide: const BorderSide(
-                                                width: 0,
-                                                style: BorderStyle.none,
-                                              ),
-                                            ),
-                                            hintText: 'Search',
-                                            suffixIcon: Icon(Icons.search, color: theme.onPrimary, size: 50),
-                                            hintStyle: textTheme.displayMedium!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
+                      ),
+                      SizedBox(
+                        width: constraints.maxWidth / 2,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              selectedSection = 1;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            elevation: 0,
+                            shadowColor: Colors.transparent,
+                            backgroundColor: selectedSection == 1 ? theme.primaryContainer : theme.secondary,
+                            foregroundColor: theme.onPrimary,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
+                              ),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: selectedSection == 1 ? const EdgeInsets.symmetric(vertical: 15.0) : const EdgeInsets.symmetric(vertical: 2.0),
+                            child: Text(
+                              "LAC",
+                              style: textTheme.displaySmall,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
+                    Expanded(
+                      child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(10),
+                              bottomRight: Radius.circular(10),
+                            ),
+                            color: theme.primaryContainer,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(children: [
+                              //Search bar
+                              TextField(
+                                controller: searchController,
+                                onChanged: (value) => setState(() {
+                                  searchQuery = value;
+                                }),
+                                keyboardAppearance: Brightness.dark,
+                                cursorColor: theme.onPrimary,
+                                style: textTheme.displayMedium!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
+                                decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: theme.primary,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: const BorderSide(
+                                        width: 0,
+                                        style: BorderStyle.none,
                                       ),
                                     ),
-                                    const SizedBox(height: 10),
-                                    //Filters
-                                    Flexible(
-                                        flex: 3,
-                                        child: Column(children: [
-                                          Flexible(
-                                            flex: 1,
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                //Filter by
+                                    hintText: 'Search',
+                                    suffixIcon: Icon(Icons.search, color: theme.onPrimary, size: 50),
+                                    hintStyle: textTheme.displayMedium!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
+                              ),
+                              const SizedBox(height: 10),
+                              //Filters
+                              Column(mainAxisSize: MainAxisSize.min, children: [
+                                Flexible(
+                                  flex: 1,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      //Filter by
 
-                                                //All
-                                                Flexible(
-                                                  flex: 1,
-                                                  child: SizedBox(
-                                                    width: double.infinity,
-                                                    child: DropdownButton(
-                                                      value: selectedTypeFilter,
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          selectedTypeFilter = value as int;
-                                                        });
-                                                      },
-                                                      items: const [
-                                                        DropdownMenuItem(
-                                                          value: 0,
-                                                          child: Text("All", style: TextStyle(color: Colors.white)),
-                                                        ),
-                                                        DropdownMenuItem(
-                                                          value: 1,
-                                                          child: FittedBox(
-                                                            child: Text("Announces", style: TextStyle(color: Colors.white)),
-                                                          ),
-                                                        ),
-                                                        DropdownMenuItem(
-                                                          value: 2,
-                                                          child: Text("Tasks", style: TextStyle(color: Colors.white)),
-                                                        ),
-                                                      ],
-                                                    ),
+                                      //All
+                                      Flexible(
+                                        flex: 1,
+                                        child: SizedBox(
+                                          width: double.infinity,
+                                          child: DropdownButton(
+                                            isExpanded: true,
+                                            value: selectedTypeFilter,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                selectedTypeFilter = value as int;
+                                              });
+                                            },
+                                            items: const [
+                                              DropdownMenuItem(
+                                                value: 0,
+                                                child: Text(
+                                                  "All",
+                                                  style: TextStyle(color: Colors.white),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 1,
+                                                child: FittedBox(
+                                                  child: Text(
+                                                    "Announces",
+                                                    style: TextStyle(color: Colors.white),
+                                                    overflow: TextOverflow.ellipsis,
                                                   ),
                                                 ),
-                                                const SizedBox(width: 10),
-                                                //Subject
-                                                Flexible(
-                                                  flex: 1,
-                                                  child: SizedBox(
-                                                    width: double.infinity,
-                                                    child: DropdownButton(
-                                                        value: selectedSubjectFilter,
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            selectedSubjectFilter = value as int;
-                                                          });
-                                                        },
-                                                        items: List.generate(
-                                                            getSubjects.length + 1,
-                                                            (index) => DropdownMenuItem(
-                                                                  value: index,
-                                                                  child: index == 0 ? const Text("All", style: TextStyle(color: Colors.white)) : FittedBox(child: Text(getSubjects[index - 1], style: const TextStyle(color: Colors.white))),
-                                                                ))),
-                                                  ),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 2,
+                                                child: Text(
+                                                  "Tasks",
+                                                  style: TextStyle(color: Colors.white),
+                                                  overflow: TextOverflow.ellipsis,
                                                 ),
-                                                const SizedBox(width: 10),
-                                                //Due
-                                                Flexible(
-                                                  flex: 1,
-                                                  child: SizedBox(
-                                                    width: double.infinity,
-                                                    child: DropdownButton(
-                                                      value: selectedDueFilter,
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          selectedDueFilter = value as int;
-                                                        });
-                                                      },
-                                                      items: const [
-                                                        DropdownMenuItem(
-                                                          value: 0,
-                                                          child: Text("All", style: TextStyle(color: Colors.white)),
-                                                        ),
-                                                        DropdownMenuItem(
-                                                          value: 1,
-                                                          child: FittedBox(
-                                                            child: Text("3 Days", style: TextStyle(color: Colors.white)),
-                                                          ),
-                                                        ),
-                                                        DropdownMenuItem(
-                                                          value: 2,
-                                                          child: Text("7 Days", style: TextStyle(color: Colors.white)),
-                                                        ),
-                                                        DropdownMenuItem(value: 3, child: Text("14 Days", style: TextStyle(color: Colors.white)))
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
-                                          const SizedBox(height: 5),
-                                          //   const Flexible(
-                                          //     flex: 1,
-                                          //     child: Row(
-                                          //       children: [
-                                          //         // Container(
-                                          //         //   width:
-                                          //         //       MediaQuery.of(context)
-                                          //         //               .size
-                                          //         //               .width *
-                                          //         //           0.3,
-                                          //         //   decoration: BoxDecoration(
-                                          //         //     color: theme.secondary,
-                                          //         //     borderRadius:
-                                          //         //         BorderRadius.circular(
-                                          //         //             10),
-                                          //         //   ),
-                                          //         //   child: Padding(
-                                          //         //     padding:
-                                          //         //         const EdgeInsets.all(
-                                          //         //             8.0),
-                                          //         //     child: DropdownButton(
-                                          //         //       value: sortFilter,
-                                          //         //       icon: const Icon(null),
-                                          //         //       underline: Container(),
-                                          //         //       onChanged: (value) {
-                                          //         //         setState(() {
-                                          //         //           sortFilter =
-                                          //         //               value as int;
-                                          //         //         });
-                                          //         //       },
-                                          //         //       items: const [
-                                          //         //         DropdownMenuItem(
-                                          //         //           value: 0,
-                                          //         //           child: Text(
-                                          //         //               "Newest",
-                                          //         //               style: TextStyle(
-                                          //         //                   color: Colors
-                                          //         //                       .white)),
-                                          //         //         ),
-                                          //         //         DropdownMenuItem(
-                                          //         //           value: 1,
-                                          //         //           child: FittedBox(
-                                          //         //             child: Text(
-                                          //         //                 "Due Date",
-                                          //         //                 style: TextStyle(
-                                          //         //                     color: Colors
-                                          //         //                         .white)),
-                                          //         //           ),
-                                          //         //         ),
-                                          //         //       ],
-                                          //         //     ),
-                                          //         //   ),
-                                          //         // ),
-                                          //       ],
-                                          //     ),
-                                          //   )
-                                        ])),
-                                    const SizedBox(height: 10),
-                                    //List of items
-                                    Flexible(
-                                        flex: 20,
-                                        child: SizedBox.expand(
-                                          child: LayoutBuilder(builder: (context, c) {
-                                            return StreamBuilder(
-                                                stream: selectedSection == 0 ? mabDataStream : lacDataStream,
-                                                builder: (context, snapshot) {
-                                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                                    return Center(
-                                                        child: Text(
-                                                      "Loading...",
-                                                      style: textTheme.displaySmall,
-                                                    ));
-                                                  }
-                                                  if (snapshot.hasError) {
-                                                    return Center(
-                                                        child: Text(
-                                                      "Error: ${snapshot.error}",
-                                                      style: textTheme.displaySmall!.copyWith(color: theme.error),
-                                                    ));
-                                                  }
-                                                  if (!snapshot.hasData) {
-                                                    return Center(
-                                                        child: Text(
-                                                      "No data",
-                                                      style: textTheme.displaySmall,
-                                                    ));
-                                                  }
-                                                  MabData mabData = MabData(uid: 0, posts: [
-                                                    for (var post in (selectedSection == 0 ? snapshot.data?.docs ?? [] : snapshot.data?.docs ?? []))
-                                                      MabPost(
-                                                          uid: 0,
-                                                          title: post["title"],
-                                                          description: post["description"],
-                                                          date: DateTime.parse(post["date"].toDate().toString()),
-                                                          authorUID: 0,
-                                                          image: post["image"] ?? "",
-                                                          fileAttatchments: [
-                                                            for (String file in post["files"]) file
-                                                          ],
-                                                          dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
-                                                          type: post["type"],
-                                                          subject: post["subject"])
-                                                  ]);
-
-                                                  return ListView.builder(
-                                                      padding: EdgeInsets.zero,
-                                                      //MabData is misleading, it's actually both !!!!! (no way) (crazy right?)
-                                                      itemCount: mabData.posts.length,
-                                                      itemBuilder: (context, index) {
-                                                        MabPost post = mabData.posts[index];
-                                                        return isItemValid(post) ? ListItem(theme: theme, textTheme: textTheme, c: c, post: post) : const SizedBox();
-                                                      });
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      //Subject
+                                      Flexible(
+                                        flex: 1,
+                                        child: SizedBox(
+                                          width: double.infinity,
+                                          child: DropdownButton(
+                                              isExpanded: true,
+                                              value: selectedSubjectFilter,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  selectedSubjectFilter = value as int;
                                                 });
-                                          }),
-                                        )),
-                                  ]),
-                                ))),
-                      ]),
+                                              },
+                                              items: List.generate(
+                                                  getSubjects.length + 1,
+                                                  (index) => DropdownMenuItem(
+                                                        value: index,
+                                                        child: index == 0 ? const Text("All", style: TextStyle(color: Colors.white)) : FittedBox(child: Text(getSubjects[index - 1], style: const TextStyle(color: Colors.white))),
+                                                      ))),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      //Due
+                                      Flexible(
+                                        flex: 1,
+                                        child: SizedBox(
+                                          width: double.infinity,
+                                          child: DropdownButton(
+                                            isExpanded: true,
+                                            value: selectedDueFilter,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                selectedDueFilter = value as int;
+                                              });
+                                            },
+                                            items: const [
+                                              DropdownMenuItem(
+                                                value: 0,
+                                                child: Text("All", style: TextStyle(color: Colors.white)),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 1,
+                                                child: FittedBox(
+                                                  child: Text("3 Days", style: TextStyle(color: Colors.white)),
+                                                ),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 2,
+                                                child: Text("7 Days", style: TextStyle(color: Colors.white)),
+                                              ),
+                                              DropdownMenuItem(value: 3, child: Text("14 Days", style: TextStyle(color: Colors.white)))
+                                            ].map((e) => DropdownMenuItem(value: e.value, child: FittedBox(child: e.child))).toList(),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                              ]),
+                              const SizedBox(height: 10),
+                              //List of items
+                              Expanded(
+                                child: StreamBuilder(
+                                    stream: selectedSection == 0 ? mabDataStream : lacDataStream,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return Center(
+                                            child: Text(
+                                          "Loading...",
+                                          style: textTheme.displaySmall,
+                                        ));
+                                      }
+                                      if (snapshot.hasError) {
+                                        return Center(
+                                            child: Text(
+                                          "Error: ${snapshot.error}",
+                                          style: textTheme.displaySmall!.copyWith(color: theme.error),
+                                        ));
+                                      }
+                                      if (!snapshot.hasData) {
+                                        return Center(
+                                            child: Text(
+                                          "No data",
+                                          style: textTheme.displaySmall,
+                                        ));
+                                      }
+                                      MabData mabData = MabData(uid: 0, posts: [
+                                        for (var post in (selectedSection == 0 ? snapshot.data?.docs ?? [] : snapshot.data?.docs ?? []))
+                                          MabPost(
+                                              uid: 0,
+                                              title: post["title"],
+                                              description: post["description"],
+                                              date: DateTime.parse(post["date"].toDate().toString()),
+                                              authorUID: 0,
+                                              image: post["image"] ?? "",
+                                              fileAttatchments: [
+                                                for (String file in post["files"]) file
+                                              ],
+                                              dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
+                                              type: post["type"],
+                                              subject: post["subject"])
+                                      ]);
+
+                                      return ListView.builder(
+                                          padding: EdgeInsets.zero,
+                                          //MabData is misleading, it's actually both !!!!! (no way) (crazy right?)
+                                          itemCount: mabData.posts.length,
+                                          itemBuilder: (context, index) {
+                                            MabPost post = mabData.posts[index];
+                                            return isItemValid(post) ? ListItem(theme: theme, textTheme: textTheme, post: post) : const SizedBox();
+                                          });
+                                    }),
+                              ),
+                            ]),
+                          )),
                     ),
-                  ),
-                ],
+                  ]);
+                }),
               ),
             )));
   }
@@ -870,13 +760,11 @@ class ListItem extends StatelessWidget {
     super.key,
     required this.theme,
     required this.textTheme,
-    required this.c,
     required this.post,
   });
 
   final ColorScheme theme;
   final TextTheme textTheme;
-  final BoxConstraints c;
   final MabPost post;
 
   @override

@@ -467,6 +467,7 @@ class _StreamBodyState extends State<StreamBody> {
                   child: SizedBox(
                     width: double.infinity,
                     child: DropdownButton(
+                      isExpanded: true,
                       hint: Text(
                         "Tags",
                         style: ttm.displaySmall,
@@ -477,7 +478,7 @@ class _StreamBodyState extends State<StreamBody> {
                           filters[0] = value;
                         });
                       },
-                      items: dropdownItems,
+                      items: dropdownItems.map((e) => DropdownMenuItem(value: e.value, child: FittedBox(child: e.child))).toList(),
                     ),
                   )),
               const SizedBox(
@@ -489,9 +490,12 @@ class _StreamBodyState extends State<StreamBody> {
                   child: SizedBox(
                     width: double.infinity,
                     child: DropdownButton(
-                      hint: Text(
-                        "Date Creation",
-                        style: ttm.displaySmall,
+                      isExpanded: true,
+                      hint: FittedBox(
+                        child: Text(
+                          "Date Creation",
+                          style: ttm.displaySmall,
+                        ),
                       ),
                       value: filters[1] == 0 ? null : filters[1],
                       onChanged: (value) {
@@ -528,7 +532,7 @@ class _StreamBodyState extends State<StreamBody> {
                             style: ttm.displaySmall,
                           ),
                         ),
-                      ],
+                      ].map((e) => DropdownMenuItem(value: e.value, child: FittedBox(child: e.child))).toList(),
                     ),
                   )),
               const SizedBox(
@@ -540,9 +544,12 @@ class _StreamBodyState extends State<StreamBody> {
                   child: SizedBox(
                     width: double.infinity,
                     child: DropdownButton(
-                      hint: Text(
-                        "Date Last Active",
-                        style: ttm.displaySmall,
+                      isExpanded: true,
+                      hint: FittedBox(
+                        child: Text(
+                          "Date Last Active",
+                          style: ttm.displaySmall,
+                        ),
                       ),
                       value: filters[2] == 0 ? null : filters[2],
                       onChanged: (value) {
@@ -579,7 +586,7 @@ class _StreamBodyState extends State<StreamBody> {
                             style: ttm.displaySmall,
                           ),
                         ),
-                      ],
+                      ].map((e) => DropdownMenuItem(value: e.value, child: FittedBox(child: e.child))).toList(),
                     ),
                   )),
             ],

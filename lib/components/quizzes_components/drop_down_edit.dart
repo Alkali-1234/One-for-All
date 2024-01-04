@@ -56,8 +56,7 @@ class DropDownEditState extends State<DropDownEdit> {
         for (int i = 0; i < dropdownAnswers.length; i++) ...{
           Row(
             children: [
-              Flexible(
-                flex: 8,
+              Expanded(
                 child: TextField(
                   controller: answerTextControllers[i],
                   cursorColor: theme.onBackground,
@@ -80,33 +79,23 @@ class DropDownEditState extends State<DropDownEdit> {
               const SizedBox(
                 width: 10,
               ),
-              Flexible(
-                  flex: 2,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          backgroundColor: theme.secondary,
-                          foregroundColor: theme.onBackground,
-                        ),
-                        onPressed: () {
-                          if (dropdownAnswers.length == 1) return;
-                          setState(() {
-                            //* Update the dropdowns
-                            for (int j = 0; j < dropdownSentence.length; j++) {
-                              if (dropdownSentence[j].contains("answer=$i")) {
-                                dropdownSentence[j] = "<dropdown answer=0 />";
-                              } else if (dropdownSentence[j].contains("answer=${dropdownAnswers.length - 1}")) {
-                                dropdownSentence[j] = "<dropdown answer=${dropdownAnswers.length - 2} />";
-                              }
-                            }
-                            dropdownAnswers.removeAt(i);
-                            answerTextControllers.removeAt(i);
-                          });
-                        },
-                        child: const Icon(Icons.close_rounded)),
-                  )),
+              IconButton(
+                  onPressed: () {
+                    if (dropdownAnswers.length == 1) return;
+                    setState(() {
+                      //* Update the dropdowns
+                      for (int j = 0; j < dropdownSentence.length; j++) {
+                        if (dropdownSentence[j].contains("answer=$i")) {
+                          dropdownSentence[j] = "<dropdown answer=0 />";
+                        } else if (dropdownSentence[j].contains("answer=${dropdownAnswers.length - 1}")) {
+                          dropdownSentence[j] = "<dropdown answer=${dropdownAnswers.length - 2} />";
+                        }
+                      }
+                      dropdownAnswers.removeAt(i);
+                      answerTextControllers.removeAt(i);
+                    });
+                  },
+                  icon: const Icon(Icons.remove_circle_outline, color: Colors.red)),
             ],
           ),
           const SizedBox(
@@ -138,8 +127,8 @@ class DropDownEditState extends State<DropDownEdit> {
         const SizedBox(
           height: 10,
         ),
-        Wrap(
-          runSpacing: 10,
+        Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             //* Loops through the sentence and checks if it contains a dropdown
             for (var i = 0; i < dropdownSentence.length; i++)
@@ -167,23 +156,14 @@ class DropDownEditState extends State<DropDownEdit> {
                     ),
                     const SizedBox(width: 5),
                     //* Delete button
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.secondary,
-                        foregroundColor: theme.onBackground,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                        elevation: 0,
-                        padding: const EdgeInsets.all(7),
-                      ),
+                    IconButton(
                       onPressed: () {
                         setState(() {
                           dropdownSentence.removeAt(i);
                           sentenceTextControllers.removeAt(i);
                         });
                       },
-                      child: const Icon(Icons.close_rounded),
+                      icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
                     ),
                     const SizedBox(width: 5),
                   ],
@@ -214,60 +194,63 @@ class DropDownEditState extends State<DropDownEdit> {
                       ),
                     ),
                     const SizedBox(width: 5),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.secondary,
-                          foregroundColor: theme.onBackground,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                          ),
-                          elevation: 0,
-                          padding: const EdgeInsets.all(7)),
+                    IconButton(
                       onPressed: () {
                         setState(() {
                           dropdownSentence.removeAt(i);
                           sentenceTextControllers.removeAt(i);
                         });
                       },
-                      child: const Icon(Icons.close_rounded),
+                      icon: const Icon(
+                        Icons.remove_circle_outline,
+                        color: Colors.red,
+                      ),
                     ),
                     const SizedBox(width: 5),
                   ],
                 ),
           ],
         ),
-        ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            elevation: 0,
-            backgroundColor: theme.secondary,
-            foregroundColor: theme.onBackground,
-          ),
-          onPressed: () {
-            setState(() {
-              dropdownSentence.add("");
-              sentenceTextControllers.add(TextEditingController());
-            });
-          },
-          icon: const Icon(Icons.text_fields_rounded),
-          label: const Text("Add Text"),
-        ),
-        const SizedBox(
-          width: 10,
-        ),
-        ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              backgroundColor: theme.secondary,
-              foregroundColor: theme.onBackground,
+        Row(
+          children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: theme.secondary,
+                  foregroundColor: theme.onBackground,
+                ),
+                onPressed: () {
+                  setState(() {
+                    dropdownSentence.add("");
+                    sentenceTextControllers.add(TextEditingController());
+                  });
+                },
+                icon: const Icon(Icons.text_fields_rounded),
+                label: const Text("Text"),
+              ),
             ),
-            onPressed: () {
-              setState(() {
-                dropdownSentence.add("<dropdown answer=0 />");
-                sentenceTextControllers.add(TextEditingController());
-              });
-            },
-            icon: const Icon(Icons.question_mark_rounded),
-            label: const Text("Add Dropdown")),
+            const SizedBox(
+              width: 10,
+            ),
+            Expanded(
+              child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: theme.secondary,
+                    foregroundColor: theme.onBackground,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      dropdownSentence.add("<dropdown answer=0 />");
+                      sentenceTextControllers.add(TextEditingController());
+                    });
+                  },
+                  icon: const Icon(Icons.question_mark_rounded),
+                  label: const Text("Dropdown")),
+            ),
+          ],
+        ),
       ],
     );
   }

@@ -403,89 +403,58 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                           const SizedBox(height: 25),
                           Text("Notification Settings", style: textTheme.displaySmall),
                           const SizedBox(height: 5),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Flexible(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("MAB", style: textTheme.displaySmall),
-                                          Switch(
-                                            value: notificationSettings["MAB"]!,
-                                            onChanged: (value) => setState(() {
-                                              notificationSettings["MAB"] = !notificationSettings["MAB"]!;
-                                              changedNotifSettings = true;
-                                            }),
-                                            activeColor: Colors.green,
-                                            activeTrackColor: Colors.white,
-                                            inactiveThumbColor: Colors.red,
-                                          )
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("LAC", style: textTheme.displaySmall),
-                                          Switch(
-                                            value: notificationSettings["LAC"]!,
-                                            onChanged: (value) => setState(() {
-                                              notificationSettings["LAC"] = !notificationSettings["LAC"]!;
-                                              changedNotifSettings = true;
-                                            }),
-                                            activeColor: Colors.green,
-                                            activeTrackColor: Colors.white,
-                                            inactiveThumbColor: Colors.red,
-                                          )
-                                        ],
-                                      ),
-                                    ],
-                                  )),
-                              const SizedBox(width: 15),
-                              Flexible(
-                                  flex: 1,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("Recent Activity", style: textTheme.displaySmall),
-                                          Switch(
-                                            value: notificationSettings["RA"]!,
-                                            onChanged: (value) => setState(() {
-                                              notificationSettings["RA"] = !notificationSettings["RA"]!;
-                                              changedNotifSettings = true;
-                                            }),
-                                            activeColor: Colors.green,
-                                            activeTrackColor: Colors.white,
-                                            inactiveThumbColor: Colors.red,
-                                          )
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("Placeholder", style: textTheme.displaySmall),
-                                          Switch(
-                                            value: true,
-                                            onChanged: (value) {},
-                                            activeColor: Colors.green,
-                                            activeTrackColor: Colors.white,
-                                            inactiveThumbColor: Colors.red,
-                                          )
-                                        ],
-                                      )
-                                    ],
-                                  ))
-                            ],
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.symmetric(horizontal: BorderSide(color: theme.onBackground.withOpacity(0.25))),
+                            ),
+                            child: ListTile(
+                                leading: Text("MAB", style: textTheme.displaySmall),
+                                trailing: Switch(
+                                  value: notificationSettings["MAB"]!,
+                                  onChanged: (value) => setState(() {
+                                    notificationSettings["MAB"] = !notificationSettings["MAB"]!;
+                                    changedNotifSettings = true;
+                                  }),
+                                  activeColor: Colors.green,
+                                  activeTrackColor: Colors.white,
+                                  inactiveThumbColor: Colors.red,
+                                )),
                           ),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.symmetric(horizontal: BorderSide(color: theme.onBackground.withOpacity(0.25))),
+                            ),
+                            child: ListTile(
+                                leading: Text("LAC", style: textTheme.displaySmall),
+                                trailing: Switch(
+                                  value: notificationSettings["LAC"]!,
+                                  onChanged: (value) => setState(() {
+                                    notificationSettings["LAC"] = !notificationSettings["LAC"]!;
+                                    changedNotifSettings = true;
+                                  }),
+                                  activeColor: Colors.green,
+                                  activeTrackColor: Colors.white,
+                                  inactiveThumbColor: Colors.red,
+                                )),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.symmetric(horizontal: BorderSide(color: theme.onBackground.withOpacity(0.25))),
+                            ),
+                            child: ListTile(
+                                leading: Text("Recent Activity", style: textTheme.displaySmall),
+                                trailing: Switch(
+                                  value: notificationSettings["RA"]!,
+                                  onChanged: (value) => setState(() {
+                                    notificationSettings["RA"] = !notificationSettings["RA"]!;
+                                    changedNotifSettings = true;
+                                  }),
+                                  activeColor: Colors.green,
+                                  activeTrackColor: Colors.white,
+                                  inactiveThumbColor: Colors.red,
+                                )),
+                          ),
+
                           const SizedBox(height: 25),
                           Text("Community Settings", style: textTheme.displaySmall),
                           const SizedBox(height: 10),
@@ -496,10 +465,15 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Your Community:", style: textTheme.displaySmall),
-                                  Text(appState.getCurrentUser.assignedCommunity != "0" ? appState.getCurrentUser.assignedCommunity! : "None", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                                  Expanded(
+                                    child: Text(
+                                      appState.getCurrentUser.assignedCommunity != "0" ? appState.getCurrentUser.assignedCommunity! : "None",
+                                      style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
                                 ],
                               )),
                           const SizedBox(height: 5),
