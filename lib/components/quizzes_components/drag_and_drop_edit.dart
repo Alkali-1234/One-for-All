@@ -104,7 +104,7 @@ class ReorderEditState extends State<ReorderEdit> {
         Row(
           children: [
             Text(
-              "Options: ",
+              "Options: (Double tap the text to change it)",
               style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
             ),
           ],
@@ -203,9 +203,13 @@ class ReorderEditState extends State<ReorderEdit> {
             ),
           ),
         ),
-        Text(
-          "Correct Order: ",
-          style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+        Row(
+          children: [
+            Text(
+              "Correct Order: ",
+              style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
         const SizedBox(height: 5),
         SizedBox(
@@ -216,7 +220,7 @@ class ReorderEditState extends State<ReorderEdit> {
               children: [
                 for (int i = 0; i < correctOrder.length; i++) ...[
                   SizedBox(
-                    height: 40,
+                    height: 55,
                     child: DragTarget<int>(
                       onAccept: (data) {
                         correctOrder[i] = data;

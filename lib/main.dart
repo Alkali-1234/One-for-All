@@ -268,7 +268,7 @@ class _HomePageState extends State<HomePage> {
                             size: 30,
                           ),
                         ),
-                        Text(appState.getCurrentUser.username, style: textTheme.displaySmall),
+                        Text(appState.getCurrentUser.username, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
                         GestureDetector(
                           onTap: () => showModalBottomSheet(context: context, builder: (c) => ProfileViewer(uid: FirebaseAuth.instance.currentUser!.uid)),
                           child: Container(

@@ -337,7 +337,7 @@ class PlayScreenState extends State<PlayScreen> {
         correctStreak = 0;
         redemptionSet.questions.add(question);
       }
-      if (redemptionSet.questions.isNotEmpty && redemptionAmount < (int.parse(quizSet.settings["redemptionAmounts"] ?? "0"))) {
+      if (infinityMode == false && redemptionSet.questions.isNotEmpty && redemptionAmount < (int.parse(quizSet.settings["redemptionAmounts"] ?? "0"))) {
         redemptionSequence();
 
         initializeRedemption();
@@ -1442,15 +1442,18 @@ class _NumberAddingAnimationState extends State<NumberAddingAnimation> {
   }
 
   void animationSound() async {
+    if (widget.value == 0) return;
     bool stop = false;
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      stop = true;
-      timer.cancel();
-    });
+    Timer(const Duration(milliseconds: 1000), () => stop = true);
+    Duration durationBetweenSounds = Duration(milliseconds: (1000 / widget.value).round());
+    if (durationBetweenSounds.inMilliseconds < 17) {
+      durationBetweenSounds = const Duration(milliseconds: 17);
+    }
+
     while (!stop) {
-      await Future.delayed(const Duration(milliseconds: 50));
+      await Future.delayed(durationBetweenSounds);
       AudioPlayer audioPlayer = AudioPlayer();
-      audioPlayer.setAsset("assets/audio/boop.mp3");
+      await audioPlayer.setAsset("assets/audio/boop.mp3");
       audioPlayer.play();
     }
   }
