@@ -112,6 +112,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                     //Top selection
                     Row(crossAxisAlignment: CrossAxisAlignment.end, verticalDirection: VerticalDirection.down, children: [
                       SizedBox(
+                        height: selectedSection == 0 ? 60 : 50,
                         width: constraints.maxWidth / 2,
                         child: ElevatedButton(
                           onPressed: () {
@@ -132,16 +133,14 @@ class _MABLACScreenState extends State<MABLACScreen> {
                               ),
                             ),
                           ),
-                          child: Padding(
-                            padding: selectedSection == 0 ? const EdgeInsets.symmetric(vertical: 15.0) : const EdgeInsets.symmetric(vertical: 2.0),
-                            child: Text(
-                              "MAB",
-                              style: textTheme.displaySmall,
-                            ),
+                          child: Text(
+                            "MAB",
+                            style: textTheme.displaySmall,
                           ),
                         ),
                       ),
                       SizedBox(
+                        height: selectedSection == 1 ? 60 : 50,
                         width: constraints.maxWidth / 2,
                         child: ElevatedButton(
                           onPressed: () {
@@ -162,12 +161,9 @@ class _MABLACScreenState extends State<MABLACScreen> {
                               ),
                             ),
                           ),
-                          child: Padding(
-                            padding: selectedSection == 1 ? const EdgeInsets.symmetric(vertical: 15.0) : const EdgeInsets.symmetric(vertical: 2.0),
-                            child: Text(
-                              "LAC",
-                              style: textTheme.displaySmall,
-                            ),
+                          child: Text(
+                            "LAC",
+                            style: textTheme.displaySmall,
                           ),
                         ),
                       ),
