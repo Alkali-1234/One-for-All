@@ -134,7 +134,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                             ),
                           ),
                           child: Text(
-                            "MAB",
+                            "Main",
                             style: textTheme.displaySmall,
                           ),
                         ),
@@ -162,7 +162,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                             ),
                           ),
                           child: Text(
-                            "LAC",
+                            "Local",
                             style: textTheme.displaySmall,
                           ),
                         ),
@@ -362,7 +362,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                               type: post["type"],
                                               subject: post["subject"])
                                       ]);
-
+                                      mabData.posts.sort((a, b) => b.date.compareTo(a.date));
                                       return ListView.builder(
                                           padding: EdgeInsets.zero,
                                           //MabData is misleading, it's actually both !!!!! (no way) (crazy right?)

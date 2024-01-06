@@ -43,6 +43,7 @@ import 'screens/community_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/loading_screen.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:showcaseview/showcaseview.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -96,6 +97,13 @@ class AppState extends ChangeNotifier {
   void thisNotifyListeners() {
     notifyListeners();
   }
+
+  void setViewedShowcase(bool value) {
+    viewedShowcase = value;
+    notifyListeners();
+  }
+
+  bool viewedShowcase = false;
 
   // //* get theme func
   Future<ThemeData> getSavedTheme() async {
@@ -190,7 +198,8 @@ class AppState extends ChangeNotifier {
 
 //Home Page
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.doShowcase});
+  final bool? doShowcase;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -204,6 +213,26 @@ class _HomePageState extends State<HomePage> {
   int selectedScreen = 0;
   bool reverseTransition = false;
   //HomePage State
+
+  //* Showcase
+  GlobalKey showcase1 = GlobalKey();
+  GlobalKey showcase2 = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    print("starting showcase");
+    var appState = Provider.of<AppState>(context, listen: false);
+    if (widget.doShowcase == true && appState.viewedShowcase == false) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ShowCaseWidget.of(context).startShowCase([
+          showcase1,
+          showcase2
+        ]);
+        appState.setViewedShowcase(true);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -239,120 +268,125 @@ class _HomePageState extends State<HomePage> {
         //Background
         backgroundColor: theme.background,
         //Main application
-        body: Container(
-          height: double.maxFinite,
-          width: double.maxFinite,
-          decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
-          child: Column(children: [
-            Hero(
-              tag: "topAppBar",
-              child: Container(
-                width: double.infinity,
-                color: theme.secondary,
-                //Top App Bar
-                child: SafeArea(
-                  bottom: false,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () => {
-                            _key.currentState?.openDrawer(),
-                            debugPrint("e")
-                          },
-                          child: Icon(
-                            Icons.menu,
-                            color: theme.onPrimary,
-                            size: 30,
-                          ),
-                        ),
-                        Text(appState.getCurrentUser.username, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-                        GestureDetector(
-                          onTap: () => showModalBottomSheet(context: context, builder: (c) => ProfileViewer(uid: FirebaseAuth.instance.currentUser!.uid)),
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              color: theme.onPrimary,
-                              borderRadius: BorderRadius.circular(20),
-                              gradient: getPrimaryGradient,
+        body: Builder(
+            builder: (context) => Container(
+                  decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
+                  child: Column(children: [
+                    Hero(
+                      tag: "topAppBar",
+                      child: Container(
+                        width: double.infinity,
+                        color: theme.secondary,
+                        //Top App Bar
+                        child: SafeArea(
+                          bottom: false,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                GestureDetector(
+                                  onTap: () => {
+                                    _key.currentState?.openDrawer(),
+                                    debugPrint("e")
+                                  },
+                                  child: Showcase(
+                                    key: showcase2,
+                                    description: "This is the menu button. Tap it to access all of the features!",
+                                    child: Icon(
+                                      Icons.menu,
+                                      color: theme.onPrimary,
+                                      size: 30,
+                                    ),
+                                  ),
+                                ),
+                                Text(appState.getCurrentUser.username, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                                GestureDetector(
+                                  onTap: () => showModalBottomSheet(context: context, builder: (c) => ProfileViewer(uid: FirebaseAuth.instance.currentUser!.uid)),
+                                  child: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      color: theme.onPrimary,
+                                      borderRadius: BorderRadius.circular(20),
+                                      gradient: getPrimaryGradient,
+                                    ),
+                                    child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
+                                  ),
+                                )
+                              ],
                             ),
-                            child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
                           ),
-                        )
-                      ],
+                        ), //END OF TOP APP BAR
+                      ),
                     ),
-                  ),
-                ), //END OF TOP APP BAR
-              ),
-            ),
-            //Main Content
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: PageTransitionSwitcher(
-                    reverse: reverseTransition,
-                    transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
-                          transitionType: SharedAxisTransitionType.horizontal,
-                          fillColor: Colors.transparent,
-                          animation: primaryAnimation,
-                          secondaryAnimation: secondaryAnimation,
-                          child: child,
-                        ),
-                    child: selectedScreen == 0
-                        ? const HomeScreen()
-                        : selectedScreen == 1
-                            ? const ProfileScreen()
-                            : Container()),
-              ),
-            ),
-            //END OF MAIN CONTENT
+                    //Main Content
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: PageTransitionSwitcher(
+                            reverse: reverseTransition,
+                            transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
+                                  transitionType: SharedAxisTransitionType.horizontal,
+                                  fillColor: Colors.transparent,
+                                  animation: primaryAnimation,
+                                  secondaryAnimation: secondaryAnimation,
+                                  child: child,
+                                ),
+                            child: selectedScreen == 0
+                                ? HomeScreen(
+                                    showcase1Key: showcase1,
+                                  )
+                                : selectedScreen == 1
+                                    ? const ProfileScreen()
+                                    : Container()),
+                      ),
+                    ),
+                    //END OF MAIN CONTENT
 
-            //Bottom Nav Bar
-            SafeArea(
-              top: false,
-              child: Container(
-                padding: const EdgeInsets.all(16.0),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  child: BottomNavigationBar(
-                    showSelectedLabels: false,
-                    showUnselectedLabels: false,
-                    backgroundColor: theme.secondary,
-                    elevation: 0,
-                    items: [
-                      BottomNavigationBarItem(
-                          icon: Icon(
-                            selectedScreen == 0 ? Icons.home_rounded : Icons.home_outlined,
-                            color: theme.onPrimary,
+                    //Bottom Nav Bar
+                    SafeArea(
+                      top: false,
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.all(Radius.circular(10)),
+                          child: BottomNavigationBar(
+                            showSelectedLabels: false,
+                            showUnselectedLabels: false,
+                            backgroundColor: theme.secondary,
+                            elevation: 0,
+                            items: [
+                              BottomNavigationBarItem(
+                                  icon: Icon(
+                                    selectedScreen == 0 ? Icons.home_rounded : Icons.home_outlined,
+                                    color: theme.onPrimary,
+                                  ),
+                                  label: "Home",
+                                  tooltip: "Home"),
+                              // BottomNavigationBarItem(
+                              //   icon: Icon(
+                              //     selectedScreen == 1 ? Icons.grid_view_rounded : Icons.grid_view_outlined,
+                              //     color: theme.onPrimary,
+                              //   ),
+                              //   label: "Navigation",
+                              // ),
+                              BottomNavigationBarItem(
+                                  icon: Icon(
+                                    selectedScreen == 1 ? Icons.person_rounded : Icons.person_outline,
+                                    color: theme.onPrimary,
+                                  ),
+                                  label: "Profile",
+                                  tooltip: "Profile"),
+                            ],
+                            onTap: (index) => setSelectedScreen(index),
+                            currentIndex: selectedScreen,
                           ),
-                          label: "Home",
-                          tooltip: "Home"),
-                      // BottomNavigationBarItem(
-                      //   icon: Icon(
-                      //     selectedScreen == 1 ? Icons.grid_view_rounded : Icons.grid_view_outlined,
-                      //     color: theme.onPrimary,
-                      //   ),
-                      //   label: "Navigation",
-                      // ),
-                      BottomNavigationBarItem(
-                          icon: Icon(
-                            selectedScreen == 1 ? Icons.person_rounded : Icons.person_outline,
-                            color: theme.onPrimary,
-                          ),
-                          label: "Profile",
-                          tooltip: "Profile"),
-                    ],
-                    onTap: (index) => setSelectedScreen(index),
-                    currentIndex: selectedScreen,
-                  ),
-                ),
-              ),
-            )
-          ]),
-        ),
+                        ),
+                      ),
+                    )
+                  ]),
+                )),
       ),
     );
   }
@@ -387,9 +421,15 @@ class SidebarXWidget extends StatelessWidget {
 }
 
 //* Menu Selection
-class MenuSelection extends StatelessWidget {
+class MenuSelection extends StatefulWidget {
   const MenuSelection({super.key});
 
+  @override
+  State<MenuSelection> createState() => _MenuSelectionState();
+}
+
+class _MenuSelectionState extends State<MenuSelection> {
+  ScrollController scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -400,9 +440,18 @@ class MenuSelection extends StatelessWidget {
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
+          child: RawScrollbar(
+            radius: const Radius.circular(100),
+            trackColor: theme.background,
+            thumbColor: theme.onBackground.withOpacity(0.25),
+            controller: scrollController,
+            thumbVisibility: true,
+            trackVisibility: true,
+            thickness: 10,
+            child: ListView.builder(
+              controller: scrollController,
+              itemCount: 25,
+              itemBuilder: (context, index) => [
                 Row(
                   children: [
                     IconButton(onPressed: () => Navigator.pop(context), icon: Icon(Icons.arrow_back, color: theme.onBackground)),
@@ -416,11 +465,12 @@ class MenuSelection extends StatelessWidget {
                 const Divider(),
                 const SizedBox(height: 5),
                 DrawerItem(
+                  disabled: true,
                   icon: Icons.article,
                   title: "Summaries",
                   onTap: () => null,
                 ),
-                DrawerItem(icon: Icons.calendar_month, title: "Refresher", onTap: () => null),
+                DrawerItem(disabled: true, icon: Icons.calendar_month, title: "Refresher", onTap: () => null),
                 DrawerItem(
                     icon: Icons.note,
                     title: "Flashcards",
@@ -465,7 +515,7 @@ class MenuSelection extends StatelessWidget {
                       Navigator.pop(context);
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const CalendarScreen()));
                     }),
-                DrawerItem(icon: Icons.calculate, title: "Notes", onTap: () => null),
+                DrawerItem(disabled: true, icon: Icons.calculate, title: "Notes", onTap: () => null),
                 //* Commuity and other
                 const SizedBox(height: 20),
                 Text("Community & Other", style: textTheme.displaySmall),
@@ -516,7 +566,7 @@ class MenuSelection extends StatelessWidget {
                       Navigator.pop(context);
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const InformationScreen()));
                     })
-              ],
+              ][index],
             ),
           ),
         ),
@@ -526,10 +576,11 @@ class MenuSelection extends StatelessWidget {
 }
 
 class DrawerItem extends StatelessWidget {
-  const DrawerItem({super.key, required this.icon, required this.title, required this.onTap});
+  const DrawerItem({super.key, required this.icon, required this.title, required this.onTap, this.disabled});
   final IconData icon;
   final String title;
   final Function onTap;
+  final bool? disabled;
 
   @override
   Widget build(BuildContext context) {
@@ -538,8 +589,8 @@ class DrawerItem extends StatelessWidget {
     return ListTile(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       hoverColor: theme.onBackground.withOpacity(0.125),
-      leading: Icon(icon, color: theme.onBackground),
-      title: Text(title, style: textTheme.displaySmall),
+      leading: Icon(icon, color: disabled == true ? theme.onBackground.withOpacity(0.5) : theme.onBackground),
+      title: Text(title, style: textTheme.displaySmall!.copyWith(color: disabled == true ? theme.onBackground.withOpacity(0.5) : theme.onBackground)),
       onTap: () => onTap(),
     );
   }
@@ -547,13 +598,16 @@ class DrawerItem extends StatelessWidget {
 
 /// Home **Screen** NOT Home Page
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, required this.showcase1Key});
+  final GlobalKey showcase1Key;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // GlobalKey showcase1 =
+
   //HomeScreen State
   int MABSelectedFilter = 0;
   bool reverseTransition = false;
@@ -564,6 +618,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     mabDataStream = context.read<AppState>().getCurrentUser.assignedCommunity != "0" ? FirebaseFirestore.instance.collection("communities").doc(context.read<AppState>().getCurrentUser.assignedCommunity).collection("MAB").snapshots().distinct() : const Stream.empty();
+    // WidgetsBinding.instance.addPostFrameCallback((_) => ShowCaseWidget.of(context).startShowCase([
+    //       showcase1
+    //     ]));
   }
 
   @override
@@ -638,281 +695,277 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 8),
               //Widget Content
               Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: theme.primaryContainer,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: theme.secondary,
-                        width: 1,
-                      )),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        //Filters
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            //Filter 1 (ALL)
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Container(
-                                    width: double.infinity,
-                                    height: 38,
-                                    decoration: BoxDecoration(
-                                        //Bit spaghetti but it works
-                                        //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
-                                        borderRadius: BorderRadius.circular(10),
-                                        gradient: MABSelectedFilter == 0 ? getPrimaryGradient : null,
-                                        boxShadow: MABSelectedFilter == 0
-                                            ? [
-                                                const BoxShadow(
-                                                  color: Colors.black,
-                                                  blurRadius: 2,
-                                                  offset: Offset(0, 2),
-                                                )
-                                              ]
-                                            : null,
-                                        color: MABSelectedFilter == 0 ? null : theme.secondary),
-                                    child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.transparent,
-                                          shadowColor: Colors.transparent,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        onPressed: () => {
-                                              setMABSelectedFilter(0)
-                                            },
-                                        child: FittedBox(
-                                          child: Text(
-                                            "All",
-                                            style: textTheme.displaySmall!.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        )),
-                                  ),
-                                  SizedBox(height: MABSelectedFilter == 0 ? 2 : 0),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            //Filter 2 (Announcements)
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Container(
-                                    height: 38,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                        //Bit spaghetti but it works
-                                        //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
-                                        borderRadius: BorderRadius.circular(10),
-                                        gradient: MABSelectedFilter == 1 ? getPrimaryGradient : null,
-                                        boxShadow: MABSelectedFilter == 1
-                                            ? [
-                                                const BoxShadow(
-                                                  color: Colors.black,
-                                                  blurRadius: 2,
-                                                  offset: Offset(0, 2),
-                                                )
-                                              ]
-                                            : null,
-                                        color: MABSelectedFilter == 1 ? null : theme.secondary),
-                                    child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
+                child: Showcase(
+                  key: widget.showcase1Key,
+                  description: "This is your home screen widget. Currently it is set to the Main Announcement Board widget.",
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: theme.primaryContainer,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: theme.secondary,
+                          width: 1,
+                        )),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          //Filters
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              //Filter 1 (ALL)
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      width: double.infinity,
+                                      height: 38,
+                                      decoration: BoxDecoration(
+                                          //Bit spaghetti but it works
+                                          //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
+                                          borderRadius: BorderRadius.circular(10),
+                                          gradient: MABSelectedFilter == 0 ? getPrimaryGradient : null,
+                                          boxShadow: MABSelectedFilter == 0
+                                              ? [
+                                                  const BoxShadow(
+                                                    color: Colors.black,
+                                                    blurRadius: 2,
+                                                    offset: Offset(0, 2),
+                                                  )
+                                                ]
+                                              : null,
+                                          color: MABSelectedFilter == 0 ? null : theme.secondary),
+                                      child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.transparent,
-                                            foregroundColor: theme.onSecondary,
                                             shadowColor: Colors.transparent,
                                             shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.circular(10),
-                                            )),
-                                        onPressed: () => setMABSelectedFilter(1),
-                                        child: FittedBox(
-                                          child: Text(
-                                            "Announces",
-                                            style: textTheme.displaySmall!.copyWith(
-                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                        )),
-                                  ),
-                                  SizedBox(height: MABSelectedFilter == 1 ? 2 : 0),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Container(
-                                    height: 38,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                        //Bit spaghetti but it works
-                                        //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
-                                        borderRadius: BorderRadius.circular(10),
-                                        gradient: MABSelectedFilter == 2 ? getPrimaryGradient : null,
-                                        boxShadow: MABSelectedFilter == 2
-                                            ? [
-                                                const BoxShadow(
-                                                  color: Colors.black,
-                                                  blurRadius: 2,
-                                                  offset: Offset(0, 2),
-                                                )
-                                              ]
-                                            : null,
-                                        color: MABSelectedFilter == 2 ? null : theme.secondary),
-                                    child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.transparent,
-                                            foregroundColor: theme.onSecondary,
-                                            shadowColor: Colors.transparent,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(10),
-                                            )),
-                                        onPressed: () => setMABSelectedFilter(2),
-                                        child: FittedBox(
-                                          child: Text(
-                                            "Tasks",
-                                            style: textTheme.displaySmall!.copyWith(
-                                              fontWeight: FontWeight.bold,
+                                          onPressed: () => {
+                                                setMABSelectedFilter(0)
+                                              },
+                                          child: FittedBox(
+                                            child: Text(
+                                              "All",
+                                              style: textTheme.displaySmall!.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
-                                          ),
-                                        )),
-                                  ),
-                                  SizedBox(height: MABSelectedFilter == 2 ? 2 : 0),
-                                ],
+                                          )),
+                                    ),
+                                    SizedBox(height: MABSelectedFilter == 0 ? 2 : 0),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-
-                        Divider(
-                          color: theme.onPrimary,
-                          thickness: 1,
-                        ),
-                        Expanded(
-                          child: StreamBuilder(
-                              initialData: null,
-                              stream: mabDataStream,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return Center(
-                                    child: Text("Loading MAB data...", style: textTheme.displaySmall!),
-                                  );
-                                }
-
-                                if (snapshot.hasError) {
-                                  return Center(
-                                    child: Text(
-                                      "Error loading MAB data ${snapshot.error}",
-                                      style: textTheme.displaySmall!.copyWith(color: theme.error),
+                              const SizedBox(width: 5),
+                              //Filter 2 (Announcements)
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      height: 38,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                          //Bit spaghetti but it works
+                                          //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
+                                          borderRadius: BorderRadius.circular(10),
+                                          gradient: MABSelectedFilter == 1 ? getPrimaryGradient : null,
+                                          boxShadow: MABSelectedFilter == 1
+                                              ? [
+                                                  const BoxShadow(
+                                                    color: Colors.black,
+                                                    blurRadius: 2,
+                                                    offset: Offset(0, 2),
+                                                  )
+                                                ]
+                                              : null,
+                                          color: MABSelectedFilter == 1 ? null : theme.secondary),
+                                      child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.transparent,
+                                              foregroundColor: theme.onSecondary,
+                                              shadowColor: Colors.transparent,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                              )),
+                                          onPressed: () => setMABSelectedFilter(1),
+                                          child: FittedBox(
+                                            child: Text(
+                                              "Announces",
+                                              style: textTheme.displaySmall!.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          )),
                                     ),
-                                  );
-                                }
-
-                                if (!snapshot.hasData) {
-                                  return Center(
-                                    child: Text(
-                                      "No MAB data",
-                                      style: textTheme.displaySmall!.copyWith(color: theme.error),
+                                    SizedBox(height: MABSelectedFilter == 1 ? 2 : 0),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      height: 38,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                          //Bit spaghetti but it works
+                                          //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
+                                          borderRadius: BorderRadius.circular(10),
+                                          gradient: MABSelectedFilter == 2 ? getPrimaryGradient : null,
+                                          boxShadow: MABSelectedFilter == 2
+                                              ? [
+                                                  const BoxShadow(
+                                                    color: Colors.black,
+                                                    blurRadius: 2,
+                                                    offset: Offset(0, 2),
+                                                  )
+                                                ]
+                                              : null,
+                                          color: MABSelectedFilter == 2 ? null : theme.secondary),
+                                      child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.transparent,
+                                              foregroundColor: theme.onSecondary,
+                                              shadowColor: Colors.transparent,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                              )),
+                                          onPressed: () => setMABSelectedFilter(2),
+                                          child: FittedBox(
+                                            child: Text(
+                                              "Tasks",
+                                              style: textTheme.displaySmall!.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          )),
                                     ),
-                                  );
-                                }
-                                MabData mabData = MabData(uid: 0, posts: [
-                                  for (var post in snapshot.data!.docs)
-                                    MabPost(
-                                        uid: 0,
-                                        title: post["title"],
-                                        description: post["description"],
-                                        date: DateTime.parse(post["date"].toDate().toString()),
-                                        authorUID: 0,
-                                        image: post["image"] ?? "",
-                                        fileAttatchments: [
-                                          for (String file in post["files"]) file
-                                        ],
-                                        dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
-                                        type: post["type"],
-                                        subject: post["subject"])
-                                ]);
-                                return ListView.builder(
-                                  padding: EdgeInsets.zero,
-                                  itemCount: mabData.posts.length,
-                                  itemBuilder: (context, index) {
-                                    MabPost post = mabData.posts[index];
-                                    return AnimatedSwitcher(
-                                      duration: const Duration(milliseconds: 100),
-                                      transitionBuilder: (child, animation) => FadeTransition(
-                                        opacity: animation,
-                                        child: child,
+                                    SizedBox(height: MABSelectedFilter == 2 ? 2 : 0),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          Divider(
+                            color: theme.onPrimary,
+                            thickness: 1,
+                          ),
+                          Expanded(
+                            child: StreamBuilder(
+                                initialData: null,
+                                stream: mabDataStream,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return Center(
+                                      child: Text("Loading MAB data...", style: textTheme.displaySmall!),
+                                    );
+                                  }
+
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text(
+                                        "Error loading MAB data ${snapshot.error}",
+                                        style: textTheme.displaySmall!.copyWith(color: theme.error),
                                       ),
-                                      child: MABSelectedFilter == 0 || post.type == MABSelectedFilter
-                                          ? Padding(
-                                              padding: const EdgeInsets.only(bottom: 5.0),
-                                              child: ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  side: BorderSide(color: theme.secondary, width: 1),
-                                                  padding: const EdgeInsets.all(8),
-                                                  backgroundColor: theme.secondary,
-                                                  foregroundColor: theme.onSecondary,
-                                                  shadowColor: Colors.black,
-                                                  elevation: 0,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(10),
+                                    );
+                                  }
+
+                                  if (!snapshot.hasData) {
+                                    return Center(
+                                      child: Text(
+                                        "No MAB data",
+                                        style: textTheme.displaySmall!.copyWith(color: theme.error),
+                                      ),
+                                    );
+                                  }
+                                  MabData mabData = MabData(uid: 0, posts: [
+                                    for (var post in snapshot.data!.docs)
+                                      MabPost(
+                                          uid: 0,
+                                          title: post["title"],
+                                          description: post["description"],
+                                          date: DateTime.parse(post["date"].toDate().toString()),
+                                          authorUID: 0,
+                                          image: post["image"] ?? "",
+                                          fileAttatchments: [
+                                            for (String file in post["files"]) file
+                                          ],
+                                          dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
+                                          type: post["type"],
+                                          subject: post["subject"])
+                                  ]);
+                                  mabData.posts.sort((a, b) => b.dueDate.difference(DateTime.now()).inMilliseconds.compareTo(a.dueDate.difference(DateTime.now()).inMilliseconds));
+                                  return ListView.builder(
+                                    padding: EdgeInsets.zero,
+                                    itemCount: mabData.posts.length,
+                                    itemBuilder: (context, index) {
+                                      MabPost post = mabData.posts[index];
+                                      return AnimatedSwitcher(
+                                        duration: const Duration(milliseconds: 100),
+                                        transitionBuilder: (child, animation) => FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        ),
+                                        child: MABSelectedFilter == 0 || post.type == MABSelectedFilter
+                                            ? Padding(
+                                                padding: const EdgeInsets.only(bottom: 5.0),
+                                                child: ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    side: BorderSide(color: theme.secondary, width: 1),
+                                                    padding: const EdgeInsets.all(8),
+                                                    backgroundColor: theme.secondary,
+                                                    foregroundColor: theme.onSecondary,
+                                                    shadowColor: Colors.black,
+                                                    elevation: 0,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(10),
+                                                    ),
+                                                  ),
+                                                  onPressed: () => {
+                                                    showDialog(
+                                                        context: context,
+                                                        builder: (context) => MABModal(
+                                                              title: post.title,
+                                                              description: post.description,
+                                                              image: post.image,
+                                                              attatchements: post.fileAttatchments,
+                                                            ))
+                                                  },
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          post.title,
+                                                          style: textTheme.displaySmall!.copyWith(
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                          textAlign: TextAlign.left,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        //days left due, and the day it is due
+                                                        "${post.dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(post.dueDate)})",
+                                                        style: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                                                      )
+                                                    ],
                                                   ),
                                                 ),
-                                                onPressed: () => {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (context) => MABModal(
-                                                            title: post.title,
-                                                            description: post.description,
-                                                            image: post.image,
-                                                            attatchements: post.fileAttatchments,
-                                                          ))
-                                                },
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text(
-                                                        post.title,
-                                                        style: textTheme.displaySmall!.copyWith(
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
-                                                        textAlign: TextAlign.left,
-                                                        overflow: TextOverflow.ellipsis,
-                                                      ),
-                                                    ),
-                                                    ClipRRect(
-                                                      borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                                                      child: Container(
-                                                        color: theme.secondary,
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.all(6.0),
-                                                          child: Text(
-                                                            //days left due, and the day it is due
-                                                            "${post.dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(post.dueDate)})",
-                                                            style: textTheme.displaySmall,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                            )
-                                          : const SizedBox.shrink(),
-                                    );
-                                  },
-                                );
-                              }),
-                        ),
-                      ],
+                                              )
+                                            : const SizedBox.shrink(),
+                                      );
+                                    },
+                                  );
+                                }),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -1187,49 +1240,50 @@ class RecentActivityCard extends StatelessWidget {
 
         //Card Content (foreground)
         FittedBox(
-          child: Align(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //Left (Profile Picture)
-                children: [
-                  //Profile Pictre (will show gradient if unavailable)
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(color: theme.onPrimary, gradient: getPrimaryGradient, shape: BoxShape.circle),
-                    child: ClipRRect(
-                        borderRadius: const BorderRadius.all(Radius.circular(25)),
-                        child: Image.network(
-                          activity.authorProfilePircture,
-                          fit: BoxFit.cover,
-                        )),
-                  ),
-                  const SizedBox(width: 10),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "${activity.authorName} just posted a new ${getTypes[activity.type]}!",
-                        style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w600, fontSize: 20),
-                      ),
-                      Row(
-                        children: [
-                          Text("${DateTime.now().difference(activity.date).inMinutes} Minutes ago", style: textTheme.displaySmall),
-                          Text(" • ", style: textTheme.displaySmall),
-                          Text(activity.other, style: textTheme.displaySmall),
-                          // Text(" • ", style: textTheme.displaySmall),
-                          // Text("///", style: textTheme.displaySmall)
-                        ],
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ),
+          // child: Align(
+          //   alignment: Alignment.center,
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(8.0),
+          //     child: Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          //       //Left (Profile Picture)
+          //       children: [
+          //         //Profile Pictre (will show gradient if unavailable)
+          //         Container(
+          //           width: 50,
+          //           height: 50,
+          //           decoration: BoxDecoration(color: theme.onPrimary, gradient: getPrimaryGradient, shape: BoxShape.circle),
+          //           child: ClipRRect(
+          //               borderRadius: const BorderRadius.all(Radius.circular(25)),
+          //               child: Image.network(
+          //                 activity.authorProfilePircture,
+          //                 fit: BoxFit.cover,
+          //               )),
+          //         ),
+          //         const SizedBox(width: 10),
+          //         Column(
+          //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //           children: [
+          //             Text(
+          //               "${activity.authorName} just posted a new ${getTypes[activity.type]}!",
+          //               style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w600, fontSize: 20),
+          //             ),
+          //             Row(
+          //               children: [
+          //                 Text("${DateTime.now().difference(activity.date).inMinutes} Minutes ago", style: textTheme.displaySmall),
+          //                 Text(" • ", style: textTheme.displaySmall),
+          //                 Text(activity.other, style: textTheme.displaySmall),
+          //                 // Text(" • ", style: textTheme.displaySmall),
+          //                 // Text("///", style: textTheme.displaySmall)
+          //               ],
+          //             )
+          //           ],
+          //         )
+          //       ],
+          //     ),
+          //   ),
+          // ),
+          child: Text("Coming soon!", style: textTheme.displaySmall),
         ),
       ],
     );

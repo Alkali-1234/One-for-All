@@ -6,6 +6,7 @@ import 'package:oneforall/main.dart';
 import 'package:oneforall/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:showcaseview/showcaseview.dart';
 import '../constants.dart';
 import '../data/user_data.dart';
 import '../models/quizzes_models.dart';
@@ -745,6 +746,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
 
       // final assignedSection = appState.getCurrentUser.assignedSection != "0" ? appState.getCurrentUser.assignedSection![0] : "";
 
+      bool hasOpenedBefore = prefs.getBool("hasOpenedBefore") ?? false;
       //* initialize FCM
       // await initializeFCM(assignedCommunity, assignedSection);
       //* hasOpenedBefore = true
@@ -753,7 +755,14 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
       //* Push to home screen
 
       if (!mounted) return;
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const HomePage()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => ShowCaseWidget(
+                builder: Builder(builder: (context) {
+                  return HomePage(
+                    doShowcase: !hasOpenedBefore,
+                  );
+                }),
+              )));
     });
   }
 

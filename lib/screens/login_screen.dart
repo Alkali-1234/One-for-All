@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:oneforall/data/user_data.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:showcaseview/showcaseview.dart';
 import '../constants.dart';
 import '../models/quizzes_models.dart';
 import '../service/auth_service.dart';
@@ -51,11 +52,23 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       return;
     }
+
+    var prefs = await SharedPreferences.getInstance();
+    bool hasOpenedBefore = prefs.getBool("hasOpenedBefore") ?? false;
+
     //Attempt to login
-    await login(emailQuery, passwordQuery, saveCredentials, appState).then((value) => pushToPage(const HomePage())).onError((error, stackTrace) => setState(() {
-          isLoading = false;
-          this.error = error.toString();
-        }));
+    await login(emailQuery, passwordQuery, saveCredentials, appState)
+        .then((value) => pushToPage(ShowCaseWidget(
+              builder: Builder(builder: (context) {
+                return HomePage(
+                  doShowcase: !hasOpenedBefore,
+                );
+              }),
+            )))
+        .onError((error, stackTrace) => setState(() {
+              isLoading = false;
+              this.error = error.toString();
+            }));
   }
 
   void loginAsGuest(AppState appState) async {
@@ -144,9 +157,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
     //* initialize FCM
     // await initializeFCM(assignedCommunity, assignedSection);
+    bool hasOpenedBefore = prefs.getBool("hasOpenedBefore") ?? false;
     //* hasOpenedBefore = true
     prefs.setBool("hasOpenedBefore", true);
-    pushToPage(const HomePage());
+    pushToPage(ShowCaseWidget(
+      builder: Builder(builder: (context) {
+        return HomePage(
+          doShowcase: !hasOpenedBefore,
+        );
+      }),
+    ));
   }
 
   @override

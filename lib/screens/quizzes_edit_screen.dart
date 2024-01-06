@@ -906,6 +906,7 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
               SizedBox(
                 width: double.infinity,
                 child: DropdownButton(
+                    isExpanded: true,
                     value: questionType,
                     style: textTheme.displaySmall,
                     items: [

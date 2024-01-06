@@ -6,6 +6,7 @@ import 'package:oneforall/data/community_data.dart';
 import 'package:oneforall/data/user_data.dart';
 import 'package:oneforall/service/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:showcaseview/showcaseview.dart';
 import '../main.dart';
 import 'login_screen.dart';
 import 'get_started.dart';
@@ -128,7 +129,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
       verbose = "Finished";
     });
     await Future.delayed(const Duration(seconds: 1));
-    pushToPage(const HomePage());
+    pushToPage(ShowCaseWidget(
+      builder: Builder(builder: (context) {
+        return const HomePage();
+      }),
+    ));
   }
 
   @override
