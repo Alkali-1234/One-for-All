@@ -67,6 +67,7 @@ flutter:
     - assets/images/logo.png
     - assets/images/builtwithflutter.png
     - assets/audio/boop.mp3
+    - assets/images/logoanim.gif
   fonts:
     - family: MyFlutterApp
       fonts: 

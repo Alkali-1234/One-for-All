@@ -172,9 +172,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
                     flex: 1,
                     child: Column(
                       children: [
-                        Image.asset(
-                          "assets/images/logo.png",
-                          width: 200,
+                        Container(
+                          width: 150,
+                          height: 150,
+                          decoration: const BoxDecoration(
+                            image: DecorationImage(filterQuality: FilterQuality.none, image: AssetImage("assets/images/logoanim.gif"), fit: BoxFit.cover),
+                          ),
                         ),
                         const SizedBox(height: 10),
                         const Text(
@@ -206,7 +209,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                               child: Row(
                                 children: [
                                   Text(
-                                    "v0.0.4",
+                                    "v0.0.5",
                                     style: TextStyle(color: Colors.grey, fontSize: 12),
                                   ),
                                 ],

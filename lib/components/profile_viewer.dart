@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:oneforall/components/base_shimmer.dart';
 import 'package:oneforall/service/community_service.dart';
+import 'package:provider/provider.dart';
+
+import '../main.dart';
 
 class ProfileViewer extends StatefulWidget {
   const ProfileViewer({super.key, required this.uid});
@@ -12,10 +15,20 @@ class ProfileViewer extends StatefulWidget {
 
 class _ProfileViewerState extends State<ProfileViewer> {
   late final getUserData = getDocument("users", widget.uid);
+  Future guestFuture() async {
+    return {
+      "username": "Guest",
+      "profilePicture": "https://i.imgur.com/BoN9kdC.png",
+      "community": "Guest",
+      "roles": [],
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var appState = context.watch<AppState>();
     return BottomSheet(
       backgroundColor: theme.background,
       enableDrag: false,
@@ -25,7 +38,7 @@ class _ProfileViewerState extends State<ProfileViewer> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: FutureBuilder<dynamic>(
-                future: getUserData,
+                future: appState.getCurrentUser.username != "Guest" ? getUserData : guestFuture(),
                 builder: (c, data) => Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,

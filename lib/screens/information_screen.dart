@@ -41,7 +41,7 @@ class InformationScreen extends StatelessWidget {
                 ListItem(
                   textTheme: textTheme,
                   title: "Version",
-                  subtitle: "v0.0.4",
+                  subtitle: "v0.0.5",
                 ),
                 ListItem(textTheme: textTheme, title: "Build Number", subtitle: "f789123"),
                 ListItem(textTheme: textTheme, title: "Branch", subtitle: "main/stable"),
@@ -60,7 +60,7 @@ class InformationScreen extends StatelessWidget {
                 ),
                 ListTile(
                   onTap: () {
-                    //TODO implement licence
+                    showDialog(context: context, builder: (context) => AlertDialog(titleTextStyle: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold), contentTextStyle: textTheme.displaySmall!, title: const Text("Licenced under the Apache Licence 2.0"), content: Text(Licence().licence)));
                   },
                   splashColor: theme.onBackground.withOpacity(0.5),
                   title: Text("Licence", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
@@ -104,4 +104,20 @@ class ListItem extends StatelessWidget {
       ),
     );
   }
+}
+
+class Licence {
+  String licence = """Copyright 2024 M. Algazel F
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.""";
 }
