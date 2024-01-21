@@ -895,7 +895,8 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
     return Container(
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          color: theme.background,
+          color: theme.primaryContainer,
+          border: Border.all(color: theme.secondary, width: 1),
           borderRadius: BorderRadius.circular(20),
         ),
         child: SingleChildScrollView(

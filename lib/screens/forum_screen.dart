@@ -971,19 +971,8 @@ class _NewThreadWidgetState extends State<NewThreadWidget> {
               children: [
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      side: BorderSide(color: tm.tertiary),
-                      backgroundColor: tm.secondary,
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
-                      surfaceTintColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text("Cancel", style: ttm.displaySmall)),
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      side: BorderSide(color: tm.tertiary),
-                      backgroundColor: tm.secondary,
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
                       elevation: 0,
                       shadowColor: Colors.transparent,
                       surfaceTintColor: Colors.transparent,
@@ -991,6 +980,17 @@ class _NewThreadWidgetState extends State<NewThreadWidget> {
                     ),
                     onPressed: () => createThread(appState),
                     child: isLoading ? Text("Creating...", style: ttm.displaySmall) : Text("Create", style: ttm.displaySmall)),
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                      surfaceTintColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text("Cancel", style: ttm.displaySmall)),
               ],
             )
           ],

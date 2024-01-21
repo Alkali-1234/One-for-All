@@ -719,31 +719,28 @@ class _NewEventModalState extends State<NewEventModal> {
             ),
             const SizedBox(height: 16),
             //* Confirm button
-            Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(
-                  gradient: primaryGradient,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: ElevatedButton(
-                  onPressed: () => addNewEvent(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => addNewEvent(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  //* Confirm button text : if loading, show loading indicator, if not loading and there is error, show error text, else show confirm text
-                  child: isLoading
-                      ? SizedBox(height: 25, width: 25, child: CircularProgressIndicator(color: theme.onBackground))
-                      : !isLoading && error != ""
-                          ? Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error))
-                          : success
-                              ? Icon(Icons.check, color: theme.onBackground)
-                              : Text("Confirm", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-                ))
+                ),
+                //* Confirm button text : if loading, show loading indicator, if not loading and there is error, show error text, else show confirm text
+                child: isLoading
+                    ? SizedBox(height: 25, width: 25, child: CircularProgressIndicator(color: theme.onBackground))
+                    : !isLoading && error != ""
+                        ? Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error))
+                        : success
+                            ? Icon(Icons.check, color: theme.onBackground)
+                            : Text("Confirm", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+              ),
+            )
           ],
         ),
       ),

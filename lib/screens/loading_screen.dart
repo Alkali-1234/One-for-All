@@ -39,7 +39,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       }
       await Future.delayed(const Duration(milliseconds: 500));
     }
-    loadingScreenAnimation();
+    if (loadingStatus != null) loadingScreenAnimation();
   }
 
   void initializeApp(AppState appState) async {
@@ -173,8 +173,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
                     child: Column(
                       children: [
                         Container(
-                          width: 150,
-                          height: 150,
+                          width: 200,
+                          height: 200,
                           decoration: const BoxDecoration(
                             image: DecorationImage(filterQuality: FilterQuality.none, image: AssetImage("assets/images/logoanim.gif"), fit: BoxFit.cover),
                           ),

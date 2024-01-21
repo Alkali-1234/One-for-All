@@ -62,7 +62,7 @@ class CreditsScreen extends StatelessWidget {
               ),
               Row(
                 children: [
-                  Text("Fabian, Emir Nasatya, Kevin Alvaro, Gede Wirya P", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                  Text("Fabian", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
                 ],
               ),
             ],

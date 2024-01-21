@@ -151,7 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -161,6 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   color: theme.primaryContainer,
+                  border: Border.all(color: theme.secondary, width: 1),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),

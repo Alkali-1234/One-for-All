@@ -192,71 +192,65 @@ class _LoginScreenState extends State<LoginScreen> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 20),
-                      SizedBox(
-                        height: 40,
-                        child: TextField(
-                          onChanged: (value) => setState(() {
-                            emailQuery = value;
-                          }),
-                          style: textTheme.displaySmall,
-                          cursorColor: theme.onBackground,
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.only(left: 10),
-                            filled: true,
-                            fillColor: theme.primary.withOpacity(0.125),
-                            hintText: "Email",
-                            hintStyle: textTheme.displaySmall,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color: theme.onBackground, width: 1),
-                            ),
-                            disabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                            ),
+                      TextField(
+                        onChanged: (value) => setState(() {
+                          emailQuery = value;
+                        }),
+                        style: textTheme.displaySmall,
+                        cursorColor: theme.onBackground,
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.only(left: 10),
+                          filled: true,
+                          fillColor: theme.primary,
+                          hintText: "Email",
+                          hintStyle: textTheme.displaySmall,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.transparent, width: 0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: theme.onBackground, width: 1),
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.transparent, width: 0),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.transparent, width: 0),
                           ),
                         ),
                       ),
                       const SizedBox(height: 10),
-                      SizedBox(
-                        height: 40,
-                        child: TextField(
-                          onChanged: (value) => setState(() {
-                            passwordQuery = value;
-                          }),
-                          cursorColor: theme.onBackground,
-                          style: textTheme.displaySmall,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.only(left: 10),
-                            filled: true,
-                            fillColor: theme.primary.withOpacity(0.125),
-                            hintText: "Password",
-                            hintStyle: textTheme.displaySmall,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color: theme.onBackground, width: 1),
-                            ),
-                            disabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                            ),
+                      TextField(
+                        onChanged: (value) => setState(() {
+                          passwordQuery = value;
+                        }),
+                        cursorColor: theme.onBackground,
+                        style: textTheme.displaySmall,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.only(left: 10),
+                          filled: true,
+                          fillColor: theme.primary,
+                          hintText: "Password",
+                          hintStyle: textTheme.displaySmall,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.transparent, width: 0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: theme.onBackground, width: 1),
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.transparent, width: 0),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Colors.transparent, width: 0),
                           ),
                         ),
                       ),

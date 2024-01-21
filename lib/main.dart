@@ -942,9 +942,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       Expanded(
                                                         child: Text(
                                                           post.title,
-                                                          style: textTheme.displaySmall!.copyWith(
-                                                            fontWeight: FontWeight.bold,
-                                                          ),
+                                                          style: textTheme.displaySmall,
                                                           textAlign: TextAlign.left,
                                                           overflow: TextOverflow.ellipsis,
                                                         ),
@@ -952,7 +950,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       Text(
                                                         //days left due, and the day it is due
                                                         "${post.dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(post.dueDate)})",
-                                                        style: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                                                        style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
                                                       )
                                                     ],
                                                   ),

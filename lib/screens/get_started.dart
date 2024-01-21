@@ -865,37 +865,91 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
           //Account creation form
           const SizedBox(height: 50),
 
-          FormField(
-            textTheme: textTheme,
-            theme: theme,
-            hintText: "Username",
+          TextField(
+            style: textTheme.displaySmall,
+            cursorColor: theme.onBackground,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.only(left: 10),
+              filled: true,
+              hintStyle: textTheme.displaySmall,
+              hintText: "Username",
+              fillColor: theme.primary,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0), borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide(
+                  color: theme.onBackground,
+                ),
+              ),
+            ),
             onChanged: (value) => setState(() {
               userNameQuery = value;
             }),
           ),
           const SizedBox(height: 10),
-          FormField(
-            textTheme: textTheme,
-            theme: theme,
-            hintText: "Email",
+          TextField(
+            style: textTheme.displaySmall,
+            cursorColor: theme.onBackground,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.only(left: 10),
+              filled: true,
+              hintStyle: textTheme.displaySmall,
+              hintText: "Email",
+              fillColor: theme.primary,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0), borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide(
+                  color: theme.onBackground,
+                ),
+              ),
+            ),
             onChanged: (value) => setState(() {
               emailQuery = value;
             }),
           ),
           const SizedBox(height: 10),
-          FormField(
-            textTheme: textTheme,
-            theme: theme,
-            hintText: "Password",
+          TextField(
+            obscureText: true,
+            cursorColor: theme.onBackground,
+            style: textTheme.displaySmall,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.only(left: 10),
+              filled: true,
+              hintStyle: textTheme.displaySmall,
+              hintText: "Password",
+              fillColor: theme.primary,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0), borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide(
+                  color: theme.onBackground,
+                ),
+              ),
+            ),
             onChanged: (value) => setState(() {
               passwordQuery = value;
             }),
           ),
           const SizedBox(height: 10),
-          FormField(
-            textTheme: textTheme,
-            theme: theme,
-            hintText: "Retype Password",
+          TextField(
+            obscureText: true,
+            style: textTheme.displaySmall,
+            cursorColor: theme.onBackground,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.only(left: 10),
+              filled: true,
+              hintStyle: textTheme.displaySmall,
+              hintText: "Retype Password",
+              fillColor: theme.primary,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0), borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide(
+                  color: theme.onBackground,
+                ),
+              ),
+            ),
             onChanged: (value) => setState(() {
               retypePasswordQuery = value;
             }),
@@ -1036,10 +1090,10 @@ class WelcomeScreen extends StatelessWidget {
       FadeInTransition(
         delayMilliseconds: 500 * 2,
         child: Container(
-          height: 200,
-          width: 200,
+          height: 300,
+          width: 300,
           decoration: const BoxDecoration(
-            image: DecorationImage(filterQuality: FilterQuality.none, image: AssetImage('assets/images/logoanim.gif'), fit: BoxFit.cover),
+            image: DecorationImage(filterQuality: FilterQuality.none, image: AssetImage('assets/images/logo.png'), fit: BoxFit.cover),
           ),
           // decoration: BoxDecoration(
           //     image: DecorationImage(

@@ -277,6 +277,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                     child: Container(
                       decoration: BoxDecoration(
                         color: theme.primaryContainer,
+                        border: Border.all(color: theme.secondary, width: 1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -403,57 +404,42 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                           const SizedBox(height: 25),
                           Text("Notification Settings", style: textTheme.displaySmall),
                           const SizedBox(height: 5),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.symmetric(horizontal: BorderSide(color: theme.onBackground.withOpacity(0.25))),
-                            ),
-                            child: ListTile(
-                                leading: Text("MAB", style: textTheme.displaySmall),
-                                trailing: Switch(
-                                  value: notificationSettings["MAB"]!,
-                                  onChanged: (value) => setState(() {
-                                    notificationSettings["MAB"] = !notificationSettings["MAB"]!;
-                                    changedNotifSettings = true;
-                                  }),
-                                  activeColor: Colors.green,
-                                  activeTrackColor: Colors.white,
-                                  inactiveThumbColor: Colors.red,
-                                )),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.symmetric(horizontal: BorderSide(color: theme.onBackground.withOpacity(0.25))),
-                            ),
-                            child: ListTile(
-                                leading: Text("LAC", style: textTheme.displaySmall),
-                                trailing: Switch(
-                                  value: notificationSettings["LAC"]!,
-                                  onChanged: (value) => setState(() {
-                                    notificationSettings["LAC"] = !notificationSettings["LAC"]!;
-                                    changedNotifSettings = true;
-                                  }),
-                                  activeColor: Colors.green,
-                                  activeTrackColor: Colors.white,
-                                  inactiveThumbColor: Colors.red,
-                                )),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.symmetric(horizontal: BorderSide(color: theme.onBackground.withOpacity(0.25))),
-                            ),
-                            child: ListTile(
-                                leading: Text("Recent Activity", style: textTheme.displaySmall),
-                                trailing: Switch(
-                                  value: notificationSettings["RA"]!,
-                                  onChanged: (value) => setState(() {
-                                    notificationSettings["RA"] = !notificationSettings["RA"]!;
-                                    changedNotifSettings = true;
-                                  }),
-                                  activeColor: Colors.green,
-                                  activeTrackColor: Colors.white,
-                                  inactiveThumbColor: Colors.red,
-                                )),
-                          ),
+                          ListTile(
+                              leading: Text("MAB", style: textTheme.displaySmall),
+                              trailing: Switch(
+                                value: notificationSettings["MAB"]!,
+                                onChanged: (value) => setState(() {
+                                  notificationSettings["MAB"] = !notificationSettings["MAB"]!;
+                                  changedNotifSettings = true;
+                                }),
+                                activeColor: Colors.green,
+                                activeTrackColor: Colors.white,
+                                inactiveThumbColor: Colors.red,
+                              )),
+                          ListTile(
+                              leading: Text("LAC", style: textTheme.displaySmall),
+                              trailing: Switch(
+                                value: notificationSettings["LAC"]!,
+                                onChanged: (value) => setState(() {
+                                  notificationSettings["LAC"] = !notificationSettings["LAC"]!;
+                                  changedNotifSettings = true;
+                                }),
+                                activeColor: Colors.green,
+                                activeTrackColor: Colors.white,
+                                inactiveThumbColor: Colors.red,
+                              )),
+                          ListTile(
+                              leading: Text("Recent Activity", style: textTheme.displaySmall),
+                              trailing: Switch(
+                                value: notificationSettings["RA"]!,
+                                onChanged: (value) => setState(() {
+                                  notificationSettings["RA"] = !notificationSettings["RA"]!;
+                                  changedNotifSettings = true;
+                                }),
+                                activeColor: Colors.green,
+                                activeTrackColor: Colors.white,
+                                inactiveThumbColor: Colors.red,
+                              )),
 
                           const SizedBox(height: 25),
                           Text("Community Settings", style: textTheme.displaySmall),

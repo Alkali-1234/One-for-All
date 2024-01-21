@@ -511,7 +511,8 @@ class _CalendarState extends State<Calendar> {
     return SizedBox.expand(
         child: Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondary,
+        color: Theme.of(context).colorScheme.primaryContainer,
+        border: Border.all(color: theme.secondary),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
