@@ -132,7 +132,6 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                   backgroundColor: theme.secondary,
                   shadowColor: Colors.transparent,
                   elevation: 0,
-                  side: BorderSide(color: theme.tertiary, width: 1),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
                 child: Row(
@@ -201,7 +200,6 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                                                 backgroundColor: theme.secondary,
                                                                 shadowColor: Colors.transparent,
                                                                 elevation: 0,
-                                                                side: BorderSide(color: theme.tertiary, width: 1),
                                                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                                               ),
                                                               onPressed: () => showDialog(
@@ -213,18 +211,18 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                                                               label: const Text("Hints")),
                                                           const SizedBox(width: 10),
                                                           ElevatedButton.icon(
-                                                              label: Text("Delete", style: textTheme.displaySmall),
+                                                              label: const Text("Delete"),
                                                               style: ElevatedButton.styleFrom(
-                                                                backgroundColor: theme.secondary,
+                                                                backgroundColor: Colors.red,
+                                                                foregroundColor: Colors.white,
                                                                 shadowColor: Colors.transparent,
                                                                 elevation: 0,
-                                                                side: BorderSide(color: theme.tertiary, width: 1),
                                                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                                               ),
                                                               onPressed: () => setState(() {
                                                                     questionQuery.removeAt(index);
                                                                   }),
-                                                              icon: const Icon(Icons.delete, color: Colors.red)),
+                                                              icon: const Icon(Icons.delete, color: Colors.white)),
                                                         ],
                                                       )
                                                     : const SizedBox.shrink(),
@@ -496,90 +494,83 @@ class _HintsDialogState extends State<HintsDialog> {
     return Dialog(
       backgroundColor: theme.background,
       surfaceTintColor: Colors.transparent,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 10),
-          Text("Hints for ${widget.questionQuery.question}", style: textTheme.displayMedium),
-          const SizedBox(height: 10),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                key: Key(widget.questionQuery.hints?.length.toString() ?? "0"),
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  for (int index = 0; index < (widget.questionQuery.hints?.length ?? 0); index++)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              cursorColor: theme.onPrimary,
-                              textAlign: TextAlign.center,
-                              initialValue: widget.questionQuery.hints?[index] ?? [],
-                              decoration: InputDecoration(
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: theme.onBackground, width: 0.5),
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: const BorderSide(width: 0, style: BorderStyle.none),
-                                ),
-                                contentPadding: EdgeInsets.zero,
-                                hintText: "Hint ${index + 1}",
-                                hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
-                                filled: true,
-                                fillColor: theme.primary,
-                              ),
-                              style: textTheme.displaySmall,
-                              onChanged: (value) {
-                                widget.questionQuery.hints?[index] = value;
-                              },
-                            ),
+      child: SingleChildScrollView(
+        child: Column(
+          key: Key(widget.questionQuery.hints?.length.toString() ?? "0"),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 10),
+            Text("Hints for ${widget.questionQuery.question}", style: textTheme.displayMedium),
+            const SizedBox(height: 10),
+            for (int index = 0; index < (widget.questionQuery.hints?.length ?? 0); index++)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        cursorColor: theme.onPrimary,
+                        textAlign: TextAlign.center,
+                        initialValue: widget.questionQuery.hints?[index] ?? [],
+                        decoration: InputDecoration(
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: theme.onBackground, width: 0.5),
                           ),
-                          IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  widget.questionQuery.hints?.removeAt(index);
-                                });
-                              },
-                              icon: const Icon(Icons.delete, color: Colors.red))
-                        ],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+                          ),
+                          contentPadding: EdgeInsets.zero,
+                          hintText: "Hint ${index + 1}",
+                          hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                          filled: true,
+                          fillColor: theme.primary,
+                        ),
+                        style: textTheme.displaySmall,
+                        onChanged: (value) {
+                          widget.questionQuery.hints?[index] = value;
+                        },
                       ),
                     ),
+                    IconButton(
+                        onPressed: () {
+                          setState(() {
+                            widget.questionQuery.hints?.removeAt(index);
+                          });
+                        },
+                        icon: const Icon(Icons.delete, color: Colors.red))
+                  ],
+                ),
+              ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        widget.questionQuery.hints?.add("");
+                      });
+                    },
+                    icon: const Icon(Icons.add),
+                    color: theme.onBackground,
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(
+                        Icons.done,
+                        color: Colors.green,
+                      )),
                 ],
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      widget.questionQuery.hints?.add("");
-                    });
-                  },
-                  icon: const Icon(Icons.add),
-                  color: theme.onBackground,
-                ),
-                IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(
-                      Icons.done,
-                      color: Colors.green,
-                    )),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

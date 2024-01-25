@@ -558,7 +558,7 @@ class PlayScreenState extends State<PlayScreen> {
                                       score++
                                     });
                                 AudioPlayer audioPlayer = AudioPlayer();
-                                audioPlayer.setAsset("assets/audio/boop.mp3");
+                                audioPlayer.setAsset("assets/audio/boopSound.mp3");
                                 audioPlayer.play();
                               },
                             )),
@@ -1453,7 +1453,7 @@ class _NumberAddingAnimationState extends State<NumberAddingAnimation> {
     while (!stop) {
       await Future.delayed(durationBetweenSounds);
       AudioPlayer audioPlayer = AudioPlayer();
-      await audioPlayer.setAsset("assets/audio/boop.mp3");
+      await audioPlayer.setAsset("assets/audio/boopSound.mp3");
       audioPlayer.play();
     }
   }
@@ -1507,19 +1507,17 @@ class _OnCloseDialogState extends State<OnCloseDialog> {
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
-                      backgroundColor: theme.primaryContainer,
-                      foregroundColor: theme.onBackground,
-                      side: BorderSide(color: theme.onBackground.withOpacity(0.25)),
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
                       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
                     onPressed: () => widget.onCloseFunction(),
-                    child: const Text("Quit")),
+                    child: const Text("Yes, quit")),
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
                       backgroundColor: theme.primaryContainer,
                       foregroundColor: theme.onBackground,
-                      side: BorderSide(color: theme.onBackground.withOpacity(0.25)),
                       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
                     onPressed: () => Navigator.of(context).pop(),

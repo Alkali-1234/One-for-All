@@ -221,9 +221,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    print("starting showcase");
     var appState = Provider.of<AppState>(context, listen: false);
     if (widget.doShowcase == true && appState.viewedShowcase == false) {
+      print("starting showcase");
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ShowCaseWidget.of(context).startShowCase([
           showcase1,

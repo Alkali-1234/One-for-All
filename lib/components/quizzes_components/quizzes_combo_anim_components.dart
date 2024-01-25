@@ -47,7 +47,7 @@ class GameWorld extends Forge2DGame {
   FutureOr<void> onLoad() async {
     await super.onLoad();
     world.addAll(createBoundaries());
-    world.addAll(List.generate(amount, (index) => Ball(incrementFunc: incrementFunc)));
+    world.addAll(List.generate(amount, (index) => Star(incrementFunc: incrementFunc)));
   }
 
   List<Component> createBoundaries() {
@@ -110,11 +110,38 @@ class Wall extends BodyComponent {
   }
 }
 
-class Ball extends BodyComponent {
-  Ball({required this.incrementFunc}) : super();
+class Star extends BodyComponent {
+  Star({required this.incrementFunc}) : super();
   DateTime creationTime = DateTime.now();
 
   final Function incrementFunc;
+
+  @override
+  void render(Canvas canvas) {
+    final path = Path();
+    final starPoints = _createStarPoints(2, 1, 5);
+    path.addPolygon(starPoints, true);
+
+    final paint = Paint()
+      ..color = Colors.yellow
+      ..style = PaintingStyle.fill;
+
+    canvas.drawPath(path, paint);
+  }
+
+  List<Offset> _createStarPoints(double outerRadius, double innerRadius, int numPoints) {
+    final skip = 2.0 * pi / numPoints;
+    final points = <Offset>[];
+    for (int i = 0; i < numPoints; i++) {
+      points.add(_polarToCartesian(outerRadius, skip * i));
+      points.add(_polarToCartesian(innerRadius, skip * (i + 0.5)));
+    }
+    return points;
+  }
+
+  Offset _polarToCartesian(double radius, double angle) {
+    return Offset(radius * cos(angle), radius * sin(angle));
+  }
 
   @override
   Body createBody() {

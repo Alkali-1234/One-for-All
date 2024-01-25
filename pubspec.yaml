@@ -54,6 +54,15 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^2.0.0
   build_runner: ^2.4.6
+  flutter_launcher_icons: ^0.13.1
+
+# * Launcher Icons
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"
+  remove_alpha_ios: true
+  
 
 # The following section is specific to Flutter packages.
 # ! Do not bundle with line 48, or you will leak the private key in your source!
@@ -66,7 +75,7 @@ flutter:
     - assets/audio/successSound.mp3
     - assets/images/logo.png
     - assets/images/builtwithflutter.png
-    - assets/audio/boop.mp3
+    - assets/audio/boopSound.mp3
     - assets/images/logoanim.gif
   fonts:
     - family: MyFlutterApp

@@ -158,8 +158,8 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                             children: [
                               ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: theme.primaryContainer,
-                                    foregroundColor: theme.onBackground,
+                                    backgroundColor: Colors.red,
+                                    foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                   ),
                                   onPressed: () => {
@@ -167,7 +167,7 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                                         Navigator.pop(context),
                                         Navigator.pop(context),
                                       },
-                                  child: const Text("Confirm")),
+                                  child: const Text("Yes, exit.")),
                               ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: theme.primaryContainer,
@@ -335,8 +335,8 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                                           children: [
                                             ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
-                                                  backgroundColor: theme.primaryContainer,
-                                                  foregroundColor: theme.onBackground,
+                                                  backgroundColor: Colors.red,
+                                                  foregroundColor: Colors.white,
                                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                                 ),
                                                 onPressed: () => {
@@ -344,7 +344,7 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                                                       Navigator.pop(context),
                                                       Navigator.pop(context),
                                                     },
-                                                child: const Text("Confirm")),
+                                                child: const Text("Yes, exit")),
                                             ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
                                                   backgroundColor: theme.primaryContainer,
@@ -1368,12 +1368,12 @@ class DeleteConfirmationModal extends StatelessWidget {
                   children: [
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryContainer,
-                          foregroundColor: theme.onBackground,
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                         onPressed: () => onConfirm(),
-                        child: const Text("Confirm")),
+                        child: const Text("Yes, delete")),
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.primaryContainer,

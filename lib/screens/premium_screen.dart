@@ -67,7 +67,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: t.primaryContainer,
-                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: t.secondary, width: 1),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   padding: const EdgeInsets.all(20),
                   child: Column(
