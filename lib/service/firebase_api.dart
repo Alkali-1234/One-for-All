@@ -1,5 +1,7 @@
 // import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 // import 'package:firebase_core/firebase_core.dart';
+// ignore_for_file: avoid_print
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis_auth/auth_io.dart' as auth;
@@ -38,18 +40,15 @@ Future initializeFCM(String assignedCommunity, String assignedSection) async {
 
   //* Get notification permissions, and change settings accordingly
   if (settings.authorizationStatus == AuthorizationStatus.denied || settings.authorizationStatus == AuthorizationStatus.notDetermined) {
-    print("Notifications not enabled");
     await prefs.setBool("setting_notifications_MAB", false);
     await prefs.setBool("setting_notifications_LAC", false);
     await prefs.setBool("setting_notifications_RecentActivity", false);
   } else {
-    print("Notifications enabled");
     await prefs.setBool("setting_notifications_MAB", true);
     await prefs.setBool("setting_notifications_LAC", true);
     await prefs.setBool("setting_notifications_RecentActivity", true);
   }
-  final fcmToken = await firebaseMessaging.getToken();
-  print('Initialized FCM with token: $fcmToken');
+  // final fcmToken = await firebaseMessaging.getToken();
   //! FCM Token currently not needed
   // if (fcmToken != null) {
   //   await saveFCMToken(fcmToken);
@@ -107,7 +106,6 @@ Future initializeFCM(String assignedCommunity, String assignedSection) async {
   });
 }
 
-//TODO show notification
 void handleNotification(RemoteMessage message) {
   print(message.data.toString());
   print(message.notification!.title);

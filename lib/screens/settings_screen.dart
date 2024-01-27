@@ -121,6 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
       ..remove("theme")
       ..remove("hasOpenedBefore");
     debugPrint("Cleared cache");
+    if (!mounted) return;
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       backgroundColor: Colors.black,
@@ -153,6 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
     setState(() {
       currentLoading = 0;
     });
+    if (!mounted) return;
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const LoginScreen()));
   }
 

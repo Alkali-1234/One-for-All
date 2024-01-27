@@ -11,7 +11,7 @@
 ///      fonts:
 ///       - asset: fonts/MyFlutterApp.ttf
 ///
-/// 
+///
 ///
 import 'package:flutter/widgets.dart';
 
@@ -22,6 +22,6 @@ class MyFlutterApp {
   static const String? _kFontPkg = null;
 
   static const IconData group_11customicon = IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData grid_outline = IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData grid_outline__1_ = IconData(0xe802, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData gridOutline = IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData gridOutline1 = IconData(0xe802, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

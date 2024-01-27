@@ -42,7 +42,7 @@ class FlashcardsFunctions {
       ));
       return;
     }
-    File file = await File('${downloadsDirectory!.path}/flashcard.zip').create();
+    File file = await File('${downloadsDirectory.path}/flashcard.zip').create();
     file.writeAsBytesSync(ZipEncoder().encode(archive)!);
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -133,8 +133,8 @@ class FlashcardsFunctions {
         // ignore: avoid_slow_async_io
         if (!await directory.exists()) directory = await getExternalStorageDirectory();
       }
-    } catch (err, stack) {
-      print("Cannot get download folder path");
+    } catch (err) {
+      throw ("Cannot get download folder path");
     }
     return directory;
   }

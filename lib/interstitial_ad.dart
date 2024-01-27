@@ -15,7 +15,6 @@ class InterstitialAdWidget extends StatefulWidget {
 class _InterstitialAdWidgetState extends State<InterstitialAdWidget> {
   InterstitialAd? _interstitialAd;
 
-  //TODO Replace with actual ad unit id
   final adUnitId = Platform.isAndroid ? 'ca-app-pub-4869371288390264/4176414771' : 'ca-app-pub-3940256099942544/4411468910';
 
   void loadAd() {
@@ -44,7 +43,7 @@ class _InterstitialAdWidgetState extends State<InterstitialAdWidget> {
             );
           },
           onAdFailedToLoad: (error) {
-            print('InterstitialAd failed to load: $error');
+            debugPrint('InterstitialAd failed to load: $error');
             dispose();
             if (widget.onFailed != null) widget.onFailed!();
           },

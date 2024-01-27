@@ -28,7 +28,6 @@ class _FadeInTransitionHorizontalState extends State<FadeInTransitionHorizontal>
     super.initState();
   }
 
-  //! FIXME i tink it borken
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder(

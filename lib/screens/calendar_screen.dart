@@ -236,7 +236,6 @@ class _CalendarState extends State<Calendar> {
   //! faulty but works
   //WORKING CODE, DO NOT TOUCH
   void initializeCalendarEvents(AppState appState) async {
-    print("Initializing calendar events");
     //* Reset calendar data
     calendarDataEvents = {
       "events": {
@@ -293,7 +292,6 @@ class _CalendarState extends State<Calendar> {
           //Check if event is in selected month and year, if yes, add to calendarDataEvents
           if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
             getCalendarDataEvents["events"][e.dueDate.day].add(e);
-            print("added mab data lol?????????");
           }
         }
       });
@@ -314,8 +312,6 @@ class _CalendarState extends State<Calendar> {
     }
 
     if (loadMabData == false && loadLacData == false) return;
-
-    print("Getting MAB Data");
 
     //if user is not assigned to a community, return
     if (appState.getCurrentUser.assignedCommunity == null) {
@@ -341,10 +337,8 @@ class _CalendarState extends State<Calendar> {
     //i'm gonna cry
     if (loadMabData && appState.getCurrentUser.assignedCommunity != "0" && appState.getMabData != null) {
       await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity!).collection("MAB").get().then((value) {
-        for (var _element in value.docs) {
-          var element = _element.data();
-          print(element);
-          //Tranform Map to MabPost
+        for (var e in value.docs) {
+          var element = e.data();
           mabPosts.add(MabPost(
             authorUID: 0,
             uid: 0,
@@ -363,9 +357,8 @@ class _CalendarState extends State<Calendar> {
 
     if (loadLacData && appState.getCurrentUser.assignedCommunity != "0" && appState.getCurrentUser.assignedSection != "0" && appState.getLacData != null) {
       await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity!).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("LAC").get().then((value) {
-        for (var _element in value.docs) {
-          var element = _element.data();
-          print(element);
+        for (var e in value.docs) {
+          var element = e.data();
           //Tranform Map to LACPost
           lacPosts.add(LACPost(
             authorUID: 0,
@@ -403,11 +396,6 @@ class _CalendarState extends State<Calendar> {
       }
     }
     // Set data to appstate
-    //for some reason does this 4 times??????
-    print("Setting data to appstate");
-    print(mabPosts.toList());
-    print(lacPosts.toList());
-    //has been set before... hmm
     appState.setMabData(MabData(uid: 0, posts: mabPosts));
     appState.setLacData(LACData(uid: 0, posts: lacPosts));
 

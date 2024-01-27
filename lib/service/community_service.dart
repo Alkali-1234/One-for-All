@@ -256,7 +256,7 @@ Future joinCommunity(String communityID, String password, AppState appState) asy
   });
 
   //* Save data to community_data.dart
-  setCommunityData(communityDocument);
+  setCommunityData(communityDocument!);
   //! Deprecated
   // setMabData(
   //     //! data is not complete in community document
@@ -319,7 +319,7 @@ Future getCommunityData(String communityID) async {
   }
 
   //* Save data to community_data.dart
-  setCommunityData(document);
+  setCommunityData(document!);
   //! Deprecated
   // setMabData(MabData(uid: 0, posts: [
   //   for (var post in document.data()["MAB"])
@@ -336,6 +336,6 @@ Future getCommunityData(String communityID) async {
   //         subject: post["subject"]),
   // ]));
   //* If the user is in a section, get the section data
-  //TODO
+  // For a later date
   return document;
 }

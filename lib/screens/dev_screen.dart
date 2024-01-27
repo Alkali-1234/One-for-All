@@ -17,6 +17,8 @@ class _DevScreenState extends State<DevScreen> {
       testFunction1Running = true;
     });
     await FirebaseMessaging.instance.subscribeToTopic("MAB_test");
+
+    // ignore: deprecated_member_use_from_same_package
     await sendNotification(
       "Test Notification",
       "This is a test notification from the dev screen.",

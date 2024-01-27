@@ -130,8 +130,6 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
       roles: List<String>.from(value.data()!["roles"] ?? []),
     ));
 
-    print(appState.getCurrentUser);
-
     // //! Deprecated method
     // setUserData(UserData(
     //   uid: int.tryParse(auth.currentUser!.uid) ?? 0,
@@ -225,9 +223,6 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
   if (!prefs.containsKey("setting_notifications_RecentActivity")) {
     prefs.setBool("setting_notifications_RecentActivity", true);
   }
-
-  //if my hypothesis is correct, this should be null
-  print(appState.getMabData?.posts);
 
   final assignedSection = appState.getCurrentUser.assignedSection != "0" ? appState.getCurrentUser.assignedSection![0] : "";
 

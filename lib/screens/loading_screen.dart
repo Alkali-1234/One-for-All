@@ -91,9 +91,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
       String language = prefs.getString("language") ?? "en";
       // pass the language in myapp
       if (language == "en") {
-        //TODO implement
+        //implement localization
       } else if (language == "id") {
-        //TODO implement
+        //implement localization
       }
     }
     debugPrint("Has opened before");

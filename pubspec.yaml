@@ -60,12 +60,12 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/logo.png"
+  image_path: "assets/images/logoquality.png"
   remove_alpha_ios: true
+  adaptive_icon_background: "assets/images/background_image.png"
   
 
 # The following section is specific to Flutter packages.
-# ! Do not bundle with line 48, or you will leak the private key in your source!
 flutter:
   uses-material-design: true
   assets:
@@ -77,6 +77,8 @@ flutter:
     - assets/images/builtwithflutter.png
     - assets/audio/boopSound.mp3
     - assets/images/logoanim.gif
+    - assets/images/logoquality.png
+    - assets/images/background_image.png
   fonts:
     - family: MyFlutterApp
       fonts: 

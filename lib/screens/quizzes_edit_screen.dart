@@ -726,7 +726,7 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
                       },
                       widget.setQuizSet(widget.quizSet),
                       widget.addQuestion(widget.quizSet.questions.last),
-                      //! FIXME fake
+                      //! fake
                       //** ------------ Update --------------- **
                       //* Should be real this time */
                       widget.listController.animateTo(widget.listController.position.maxScrollExtent, duration: const Duration(milliseconds: 200), curve: Curves.decelerate)

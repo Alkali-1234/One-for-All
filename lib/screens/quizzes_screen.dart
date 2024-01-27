@@ -212,6 +212,7 @@ class SelectedQuizModal extends StatelessWidget {
                                   //Convert to Object
                                   Object quizData = {
                                     "quizzes": [
+                                      // ignore: use_build_context_synchronously
                                       for (var quiz in context.read<AppState>().getQuizzes)
                                         {
                                           "title": quiz.title,
@@ -231,6 +232,7 @@ class SelectedQuizModal extends StatelessWidget {
                                   };
                                   //Save to prefs
                                   await prefs.setString("quizData", jsonEncode(quizData));
+                                  if (!context.mounted) return;
                                   context.read<AppState>().thisNotifyListeners();
                                 }),
                           ];

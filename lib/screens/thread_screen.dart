@@ -61,6 +61,7 @@ class _ThreadScreenState extends State<ThreadScreen> {
         }
       } on Exception catch (e) {
         isLoading = false;
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e', style: TextStyle(color: tm.onBackground)),
@@ -186,6 +187,7 @@ class _ThreadBodyState extends State<ThreadBody> {
         );
       } on Exception catch (e) {
         isLoading = false;
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e', style: TextStyle(color: tm.onBackground)),
@@ -213,6 +215,7 @@ class _ThreadBodyState extends State<ThreadBody> {
     if (prefs.containsKey("forum_${appState.getCurrentUser.assignedCommunity}_${widget.threadID}")) {
       FirebaseMessaging.instance.unsubscribeFromTopic("forum_${appState.getCurrentUser.assignedCommunity}_${widget.threadID}");
       prefs.remove("forum_${appState.getCurrentUser.assignedCommunity}_${widget.threadID}");
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Unsubscribed from thread', style: TextStyle(color: Colors.white)),
@@ -223,6 +226,7 @@ class _ThreadBodyState extends State<ThreadBody> {
     } else {
       FirebaseMessaging.instance.subscribeToTopic("forum_${appState.getCurrentUser.assignedCommunity}_${widget.threadID}");
       prefs.setBool("forum_${appState.getCurrentUser.assignedCommunity}_${widget.threadID}", true);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Subscribed to thread', style: TextStyle(color: Colors.white)),

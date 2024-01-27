@@ -412,7 +412,6 @@ class PlayScreenState extends State<PlayScreen> {
         });
         await Future.delayed(const Duration(milliseconds: 150));
       }
-      //! FIXME : doesn't call the function for some reason ???????
       // comboCounterKey.currentState!.startTimer();
       redemptionSet.questions = [];
       quizSet.questions.shuffle();

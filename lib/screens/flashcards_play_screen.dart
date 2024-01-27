@@ -804,205 +804,205 @@ class _FinishedScreenState extends State<FinishedScreen> with TickerProviderStat
                     //End of App Bar
                     //Body
                     //Title
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          _buildAnimatedWidget(1, Text("Finished", style: textTheme.displayLarge!.copyWith(fontStyle: FontStyle.italic))),
-                          const SizedBox(height: 24),
-                          //Card
-                          _buildAnimatedWidget(
-                            2,
-                            Container(
-                              decoration: BoxDecoration(
-                                color: theme.primary,
-                                border: Border.all(color: theme.secondary),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius: const BorderRadius.all(Radius.circular(100)),
-                                              child: Image.network(
-                                                appState.getCurrentUser.profilePicture,
-                                                height: 35,
-                                                width: 35,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Text(appState.getCurrentUser.username, maxLines: 1, overflow: TextOverflow.ellipsis, style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text("Finished flashcards with an accuracy of:", style: textTheme.displaySmall),
-                                      ],
-                                    ),
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "${(widget.accuracy * 100).round()}%",
-                                          style: textTheme.displayLarge,
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          //End of Card
-                          const SizedBox(height: 24),
-                          _buildAnimatedWidget(
-                            3,
-                            Container(
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            _buildAnimatedWidget(1, Text("Finished", style: textTheme.displayLarge!.copyWith(fontStyle: FontStyle.italic))),
+                            const SizedBox(height: 24),
+                            //Card
+                            _buildAnimatedWidget(
+                              2,
+                              Container(
                                 decoration: BoxDecoration(
-                                  color: theme.primaryContainer,
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(10),
-                                  ),
+                                  color: theme.primary,
+                                  border: Border.all(color: theme.secondary),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
                                   child: Row(
+                                    mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        "Score",
-                                        style: textTheme.displayMedium,
-                                      ),
-                                      Text(widget.score.toString(), style: textTheme.displayMedium)
-                                    ],
-                                  ),
-                                )),
-                          ),
-                          const SizedBox(height: 10),
-                          //Questions done
-                          _buildAnimatedWidget(
-                            4,
-                            Container(
-                                decoration: BoxDecoration(
-                                  color: theme.primaryContainer,
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(10),
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Questions done",
-                                        style: textTheme.displayMedium,
-                                      ),
-                                      Text(widget.questionsDone.toString(), style: textTheme.displayMedium)
-                                    ],
-                                  ),
-                                )),
-                          ),
-                          const SizedBox(height: 10),
-                          _buildAnimatedWidget(
-                            5,
-                            Container(
-                                decoration: BoxDecoration(
-                                  color: theme.primaryContainer,
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(10),
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Time spent",
-                                        style: textTheme.displayMedium,
-                                      ),
-                                      Text("${removeMilliseconds(widget.timeSpent.abs().toString())} H", style: textTheme.displayMedium)
-                                    ],
-                                  ),
-                                )),
-                          ),
-
-                          const SizedBox(height: 24),
-                          _buildAnimatedWidget(
-                            6,
-                            Row(
-                              children: [
-                                Text("Questions - ${widget.set.flashcards.length}", style: textTheme.displayMedium),
-                              ],
-                            ),
-                          ),
-                          const Divider(),
-                          _buildAnimatedWidget(
-                            7,
-                            SizedBox(
-                              height: 200,
-                              child: ListView.builder(
-                                itemBuilder: (context, index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        showDialog(context: context, builder: ((context) => QuestionModal(card: widget.set.flashcards[index], weightOfCard: getWeights["weights"][index]["weight"])));
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: theme.secondary,
-                                        shadowColor: Colors.transparent,
-                                        elevation: 0,
-                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        side: BorderSide(color: theme.tertiary),
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text(
-                                                widget.set.flashcards[index].question,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+                                              ClipRRect(
+                                                borderRadius: const BorderRadius.all(Radius.circular(100)),
+                                                child: Image.network(
+                                                  appState.getCurrentUser.profilePicture,
+                                                  height: 35,
+                                                  width: 35,
+                                                ),
                                               ),
+                                              const SizedBox(width: 10),
+                                              Text(appState.getCurrentUser.username, maxLines: 1, overflow: TextOverflow.ellipsis, style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
                                             ],
                                           ),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                widget.set.flashcards[index].answer,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: textTheme.displaySmall,
-                                              ),
-                                            ],
-                                          ),
+                                          const SizedBox(height: 5),
+                                          Text("Finished flashcards with an accuracy of:", style: textTheme.displaySmall),
                                         ],
                                       ),
-                                    ),
-                                  );
-                                },
-                                itemCount: widget.set.flashcards.length,
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "${(widget.accuracy * 100).round()}%",
+                                            style: textTheme.displayLarge,
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                            //End of Card
+                            const SizedBox(height: 24),
+                            _buildAnimatedWidget(
+                              3,
+                              Container(
+                                  decoration: BoxDecoration(
+                                    color: theme.primaryContainer,
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Score",
+                                          style: textTheme.displayMedium,
+                                        ),
+                                        Text(widget.score.toString(), style: textTheme.displayMedium)
+                                      ],
+                                    ),
+                                  )),
+                            ),
+                            const SizedBox(height: 10),
+                            //Questions done
+                            _buildAnimatedWidget(
+                              4,
+                              Container(
+                                  decoration: BoxDecoration(
+                                    color: theme.primaryContainer,
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Questions done",
+                                          style: textTheme.displayMedium,
+                                        ),
+                                        Text(widget.questionsDone.toString(), style: textTheme.displayMedium)
+                                      ],
+                                    ),
+                                  )),
+                            ),
+                            const SizedBox(height: 10),
+                            _buildAnimatedWidget(
+                              5,
+                              Container(
+                                  decoration: BoxDecoration(
+                                    color: theme.primaryContainer,
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Time spent",
+                                          style: textTheme.displayMedium,
+                                        ),
+                                        Text("${removeMilliseconds(widget.timeSpent.abs().toString())} H", style: textTheme.displayMedium)
+                                      ],
+                                    ),
+                                  )),
+                            ),
+
+                            const SizedBox(height: 24),
+                            _buildAnimatedWidget(
+                              6,
+                              Row(
+                                children: [
+                                  Text("Questions - ${widget.set.flashcards.length}", style: textTheme.displayMedium),
+                                ],
+                              ),
+                            ),
+                            const Divider(),
+                            Expanded(
+                              child: _buildAnimatedWidget(
+                                7,
+                                ListView.builder(
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          showDialog(context: context, builder: ((context) => QuestionModal(card: widget.set.flashcards[index], weightOfCard: getWeights["weights"][index]["weight"])));
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: theme.secondary,
+                                          shadowColor: Colors.transparent,
+                                          elevation: 0,
+                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  widget.set.flashcards[index].question,
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  widget.set.flashcards[index].answer,
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: textTheme.displaySmall,
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  itemCount: widget.set.flashcards.length,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     )
                   ],
@@ -1010,7 +1010,6 @@ class _FinishedScreenState extends State<FinishedScreen> with TickerProviderStat
   }
 
   //hopefully this thing from chatgpt works
-  //TODO make this work, temp solution
   //already works
   Widget _buildAnimatedWidget(int index, Widget child) {
     const delayInterval = 20; // Adjust the delay between each widget animation
@@ -1191,7 +1190,6 @@ class ThreeTwoOneGoRibbon extends StatefulWidget {
 class _ThreeTwoOneGoRibbonState extends State<ThreeTwoOneGoRibbon> {
   String text = "3";
   void startAnimation() async {
-    //TODO add sounds
     if (mounted) {
       await Future.delayed(const Duration(seconds: 1));
       setState(() {

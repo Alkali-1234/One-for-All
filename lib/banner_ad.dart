@@ -13,8 +13,6 @@ class BannerAdWidget extends StatefulWidget {
 class BannerAdState extends State<BannerAdWidget> {
   BannerAd? _bannerAd;
   bool _isLoaded = false;
-
-  //TODO replace with actual ad unit
   final adUnitId = Platform.isAndroid ? 'ca-app-pub-4869371288390264/6167604555' : 'ca-app-pub-3940256099942544/2934735716';
   void loadAd() {
     setState(() {

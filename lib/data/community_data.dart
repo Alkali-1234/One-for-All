@@ -1,22 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:oneforall/main.dart';
 
-var communityData;
-void setCommunityData(data) => communityData = data;
+DocumentSnapshot? communityData;
+void setCommunityData(DocumentSnapshot data) => communityData = data;
 get getSavedCommunityData => communityData;
 
 //ignore: deprecated_member_use_from_same_package
 ///Newer version of community data. Use this instead of deprecated [getMabData], [getLACData], [getRecentActivities]
 class CommunityData {
   Stream<MabData> mabDataStream(AppState appState) {
-    print("Getting MAB data");
     //!!! Hardcoded community ID
-    return FirebaseFirestore.instance
-        .collection("communities")
-        .doc("P3xcmRih8YYxkOqsuV7u")
-        .snapshots()
-        .distinct()
-        .map((event) {
+    return FirebaseFirestore.instance.collection("communities").doc("P3xcmRih8YYxkOqsuV7u").snapshots().distinct().map((event) {
       late MabData mabData;
       // event.data()!.forEach((key, value) {
       //   print(key.toString());
@@ -51,13 +45,13 @@ class CommunityData {
               date: DateTime.parse(post["date"].toDate().toString()),
               authorUID: 0,
               image: post["image"] ?? "",
-              fileAttatchments: [for (String file in post["files"]) file],
+              fileAttatchments: [
+                for (String file in post["files"]) file
+              ],
               dueDate: DateTime.parse(post["date"].toDate().toString()),
               type: post["type"],
               subject: post["subject"]),
       ]);
-
-      print(mabData);
       // appState.setMabData(mabData);
 
       return mabData;
@@ -69,27 +63,13 @@ class CommunityData {
 
   Stream<LACData> lacDataStream(AppState appState) {
     //!!! Hardcoded community ID
-    return FirebaseFirestore.instance
-        .collection("communities")
-        .doc("P3xcmRih8YYxkOqsuV7u")
-        .snapshots()
-        .map((event) {
+    return FirebaseFirestore.instance.collection("communities").doc("P3xcmRih8YYxkOqsuV7u").snapshots().map((event) {
       late LACData lacData;
       event.data()!.forEach((key, value) {
         if (key == "LAC") {
           lacData = LACData(uid: int.parse(key), posts: []);
           value.forEach((key, value) {
-            lacData.posts.add(LACPost(
-                uid: int.parse(key),
-                title: value["title"],
-                description: value["description"],
-                date: DateTime.parse(value["date"]),
-                authorUID: value["authorUID"],
-                image: value["image"],
-                fileAttatchments: value["fileAttatchments"],
-                dueDate: DateTime.parse(value["dueDate"]),
-                type: value["type"],
-                subject: value["subject"]));
+            lacData.posts.add(LACPost(uid: int.parse(key), title: value["title"], description: value["description"], date: DateTime.parse(value["date"]), authorUID: value["authorUID"], image: value["image"], fileAttatchments: value["fileAttatchments"], dueDate: DateTime.parse(value["dueDate"]), type: value["type"], subject: value["subject"]));
           });
         }
       });
@@ -158,17 +138,7 @@ class LACData {
 }
 
 class LACPost {
-  LACPost(
-      {required this.uid,
-      required this.title,
-      required this.description,
-      required this.image,
-      required this.fileAttatchments,
-      required this.dueDate,
-      required this.type,
-      required this.date,
-      required this.authorUID,
-      required this.subject});
+  LACPost({required this.uid, required this.title, required this.description, required this.image, required this.fileAttatchments, required this.dueDate, required this.type, required this.date, required this.authorUID, required this.subject});
   final int uid;
   String title;
   String description;
@@ -187,34 +157,10 @@ get getLACData => LACData(uid: 0, posts: []);
 class RecentActivities {
   RecentActivities({
     required this.uid,
+    required this.activities,
   });
   final int uid;
-  List<RecentActivity> activities = [
-    RecentActivity(
-        uid: 0,
-        date: DateTime(2023, 7, 9, 10, 30),
-        authorUID: 0,
-        type: 0,
-        other: "IPS",
-        authorName: "John Doe",
-        authorProfilePircture: "https://picsum.photos/200/300"),
-    RecentActivity(
-        uid: 0,
-        date: DateTime(2023, 7, 9, 10, 00),
-        authorUID: 0,
-        type: 1,
-        other: "IPA",
-        authorName: "John Doe",
-        authorProfilePircture: "https://picsum.photos/200/300"),
-    RecentActivity(
-        uid: 0,
-        date: DateTime(2023, 7, 9, 10, 00),
-        authorUID: 0,
-        type: 2,
-        other: "IPA",
-        authorName: "John Doe",
-        authorProfilePircture: "https://picsum.photos/200/300"),
-  ];
+  final List<RecentActivity> activities;
 }
 
 class RecentActivity {
@@ -228,18 +174,18 @@ class RecentActivity {
     required this.authorProfilePircture,
   });
   final int uid;
+
+  ///Types:
+  ///0: Quiz
+  ///1: Flashcards
+  ///2: Notes
   final int type;
   final String other;
   final DateTime date;
   final int authorUID;
   final String authorName;
   final String authorProfilePircture;
-
-  //Types:
-  //0: Quiz
-  //1: Flashcards
-  //2: Notes
 }
 
 @Deprecated("Use stream builder and provider instead")
-get getRecentActivities => RecentActivities(uid: 0);
+get getRecentActivities => RecentActivities(uid: 0, activities: []);

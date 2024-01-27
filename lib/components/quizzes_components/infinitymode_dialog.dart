@@ -11,7 +11,6 @@ class InfinityModeDialog extends StatefulWidget {
 class _InfinityModeDialogState extends State<InfinityModeDialog> {
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     return Center(
         child: Column(
@@ -22,7 +21,7 @@ class _InfinityModeDialogState extends State<InfinityModeDialog> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton.icon(
+            IconButton(
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 backgroundColor: Colors.green,
@@ -34,10 +33,9 @@ class _InfinityModeDialogState extends State<InfinityModeDialog> {
                 Icons.check,
                 color: Colors.white,
               ),
-              label: const Text("Yes!"),
             ),
             const SizedBox(width: 20),
-            ElevatedButton.icon(
+            IconButton(
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 backgroundColor: Colors.red,
@@ -49,7 +47,6 @@ class _InfinityModeDialogState extends State<InfinityModeDialog> {
                 Icons.close,
                 color: Colors.white,
               ),
-              label: const Text("No, end quiz."),
             ),
           ],
         )

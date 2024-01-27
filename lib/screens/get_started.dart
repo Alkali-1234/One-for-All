@@ -302,7 +302,7 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
                   : selectedTheme == 1
                       ? darkPrimaryGradient
                       : lightPrimaryGradient,
-              borderRadius: BorderRadius.all(Radius.circular(100))),
+              borderRadius: const BorderRadius.all(Radius.circular(100))),
           child: ElevatedButton(
             onPressed: () async {
               await saveSettings();
@@ -339,6 +339,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
   String getCommunityError = "";
   String communityIDQuery = "";
   String passwordQuery = "";
+  // ignore: prefer_typing_uninitialized_variables
   var communityData;
 
   Future<void> getCommunityWithValidation() async {
@@ -416,13 +417,14 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
     if (error != "") {
       return;
     }
-
-    //TODO go to page 3
     //* Success
     setState(() {
       success = true;
       isLoading = false;
     });
+
+    widget.changeStep(3);
+
     return;
   }
 

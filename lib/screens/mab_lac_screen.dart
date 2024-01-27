@@ -32,7 +32,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
   //1 = Announces
   //2 = Tasks
 
-  //TODO Make subject filter dynamic
+  //Dynamic at a later date
   int selectedSubjectFilter = 0;
   //0 = All
   //...

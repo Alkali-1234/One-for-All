@@ -43,6 +43,33 @@ class _CommunitySettingsScreenState extends State<CommunitySettingsScreen> {
 
   late final getUsernamesFunction = getUsernames();
 
+  Future removeSectionFromCommunity(String sectionID) async {
+    try {
+      await FirebaseFirestore.instance.collection('communities').doc(widget.communityID).update({
+        "sections": FieldValue.arrayRemove([
+          sectionID
+        ])
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text(
+          "Section removed successfully",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.green,
+      ));
+    } on FirebaseException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          "Error removing section: $e",
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
   Future<List<String>> getUsernames() async {
     try {
       // final collectionGroup = FirebaseFirestore.instance.collection('users');
@@ -53,14 +80,12 @@ class _CommunitySettingsScreenState extends State<CommunitySettingsScreen> {
       final usernames = querySnapshot.docs.map((doc) => doc.get('username'));
 
       // Process the usernames here
-      print(usernames);
       setState(() {
         commmunityMembersUsernames = List<String>.from(usernames);
         communityMembersDataSnapshot = querySnapshot.docs.asMap().map((key, value) => MapEntry(value.id, value.data()));
       });
       return List<String>.from(usernames);
     } on FirebaseException catch (e) {
-      print('Error fetching usernames: $e');
       return [
         "error fetching usernames: $e"
       ];
@@ -254,9 +279,7 @@ class _CommunitySettingsScreenState extends State<CommunitySettingsScreen> {
                               style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
                             ),
                             trailing: IconButton(
-                              onPressed: () => setState(() {
-                                //TODO remove section from community
-                              }),
+                              onPressed: () => removeSectionFromCommunity(widget.communitySections[index]["id"]),
                               icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
                             ),
                           ),

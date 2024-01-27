@@ -134,10 +134,7 @@ class AppState extends ChangeNotifier {
 
   ///Sets the current user data
   void setCurrentUser(UserData user) {
-    print(user);
-    print("User set!");
     _currentUser = user;
-    print(_currentUser);
     notifyListeners();
   }
 
@@ -160,7 +157,6 @@ class AppState extends ChangeNotifier {
   MabData? _mabData;
   MabData? get getMabData => _mabData;
   void setMabData(MabData mabData) {
-    print("Mab data set! ${mabData.posts}");
     _mabData = mabData;
     notifyListeners();
   }
@@ -168,12 +164,13 @@ class AppState extends ChangeNotifier {
   LACData? _lacData;
   LACData? get getLacData => _lacData;
   void setLacData(LACData lacData) {
-    print("Lac data set! ${lacData.posts}");
     _lacData = lacData;
     notifyListeners();
   }
 
-  late RecentActivities _recentActivities;
+  RecentActivities _recentActivities = RecentActivities(uid: 0, activities: [
+    RecentActivity(uid: 0, date: DateTime(2001, 9, 11), authorUID: 0, type: 0, other: "", authorName: "", authorProfilePircture: "")
+  ]);
   RecentActivities get getRecentActivities => _recentActivities;
   set setRecentActivities(RecentActivities recentActivities) {
     _recentActivities = recentActivities;
@@ -223,7 +220,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     var appState = Provider.of<AppState>(context, listen: false);
     if (widget.doShowcase == true && appState.viewedShowcase == false) {
-      print("starting showcase");
+      debugPrint("Starting showcase");
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ShowCaseWidget.of(context).startShowCase([
           showcase1,
@@ -609,7 +606,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // GlobalKey showcase1 =
 
   //HomeScreen State
-  int MABSelectedFilter = 0;
+  int mabSelectedFilter = 0;
   bool reverseTransition = false;
 
   late Stream mabDataStream;
@@ -630,14 +627,14 @@ class _HomeScreenState extends State<HomeScreen> {
     // AppState appState = Provider.of(context);
     void setMABSelectedFilter(int filter) {
       setState(() {
-        if (filter > MABSelectedFilter) {
+        if (filter > mabSelectedFilter) {
           reverseTransition = false;
         } else {
           reverseTransition = true;
         }
-        MABSelectedFilter = filter;
+        mabSelectedFilter = filter;
       });
-      debugPrint("Selected Filter: $MABSelectedFilter");
+      debugPrint("Selected Filter: $mabSelectedFilter");
     }
 
     var appState = Provider.of<AppState>(context);
@@ -725,8 +722,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           //Bit spaghetti but it works
                                           //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
                                           borderRadius: BorderRadius.circular(10),
-                                          gradient: MABSelectedFilter == 0 ? getPrimaryGradient : null,
-                                          boxShadow: MABSelectedFilter == 0
+                                          gradient: mabSelectedFilter == 0 ? getPrimaryGradient : null,
+                                          boxShadow: mabSelectedFilter == 0
                                               ? [
                                                   const BoxShadow(
                                                     color: Colors.black,
@@ -735,7 +732,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   )
                                                 ]
                                               : null,
-                                          color: MABSelectedFilter == 0 ? null : theme.secondary),
+                                          color: mabSelectedFilter == 0 ? null : theme.secondary),
                                       child: ElevatedButton(
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.transparent,
@@ -756,7 +753,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           )),
                                     ),
-                                    SizedBox(height: MABSelectedFilter == 0 ? 2 : 0),
+                                    SizedBox(height: mabSelectedFilter == 0 ? 2 : 0),
                                   ],
                                 ),
                               ),
@@ -772,8 +769,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           //Bit spaghetti but it works
                                           //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
                                           borderRadius: BorderRadius.circular(10),
-                                          gradient: MABSelectedFilter == 1 ? getPrimaryGradient : null,
-                                          boxShadow: MABSelectedFilter == 1
+                                          gradient: mabSelectedFilter == 1 ? getPrimaryGradient : null,
+                                          boxShadow: mabSelectedFilter == 1
                                               ? [
                                                   const BoxShadow(
                                                     color: Colors.black,
@@ -782,7 +779,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   )
                                                 ]
                                               : null,
-                                          color: MABSelectedFilter == 1 ? null : theme.secondary),
+                                          color: mabSelectedFilter == 1 ? null : theme.secondary),
                                       child: ElevatedButton(
                                           style: ElevatedButton.styleFrom(
                                               backgroundColor: Colors.transparent,
@@ -801,7 +798,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           )),
                                     ),
-                                    SizedBox(height: MABSelectedFilter == 1 ? 2 : 0),
+                                    SizedBox(height: mabSelectedFilter == 1 ? 2 : 0),
                                   ],
                                 ),
                               ),
@@ -816,8 +813,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           //Bit spaghetti but it works
                                           //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
                                           borderRadius: BorderRadius.circular(10),
-                                          gradient: MABSelectedFilter == 2 ? getPrimaryGradient : null,
-                                          boxShadow: MABSelectedFilter == 2
+                                          gradient: mabSelectedFilter == 2 ? getPrimaryGradient : null,
+                                          boxShadow: mabSelectedFilter == 2
                                               ? [
                                                   const BoxShadow(
                                                     color: Colors.black,
@@ -826,7 +823,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   )
                                                 ]
                                               : null,
-                                          color: MABSelectedFilter == 2 ? null : theme.secondary),
+                                          color: mabSelectedFilter == 2 ? null : theme.secondary),
                                       child: ElevatedButton(
                                           style: ElevatedButton.styleFrom(
                                               backgroundColor: Colors.transparent,
@@ -845,7 +842,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           )),
                                     ),
-                                    SizedBox(height: MABSelectedFilter == 2 ? 2 : 0),
+                                    SizedBox(height: mabSelectedFilter == 2 ? 2 : 0),
                                   ],
                                 ),
                               ),
@@ -912,12 +909,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                           opacity: animation,
                                           child: child,
                                         ),
-                                        child: MABSelectedFilter == 0 || post.type == MABSelectedFilter
+                                        child: mabSelectedFilter == 0 || post.type == mabSelectedFilter
                                             ? Padding(
                                                 padding: const EdgeInsets.only(bottom: 5.0),
                                                 child: ElevatedButton(
                                                   style: ElevatedButton.styleFrom(
-                                                    side: BorderSide(color: theme.secondary, width: 1),
                                                     padding: const EdgeInsets.all(8),
                                                     backgroundColor: theme.secondary,
                                                     foregroundColor: theme.onSecondary,
@@ -950,7 +946,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       Text(
                                                         //days left due, and the day it is due
                                                         "${post.dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(post.dueDate)})",
-                                                        style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+                                                        style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: post.dueDate.difference(DateTime.now()).inDays < 0 ? Colors.red : theme.onBackground),
                                                       )
                                                     ],
                                                   ),
@@ -1093,6 +1089,7 @@ class RecentActivityCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var appState = Provider.of<AppState>(context);
     CarouselController controller = CarouselController();
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1100,11 +1097,11 @@ class RecentActivityCarousel extends StatelessWidget {
         CarouselSlider(
           carouselController: controller,
           items: [
-            for (int i = 0; i < getRecentActivities.activities.length; i++)
+            for (int i = 0; i < appState.getRecentActivities.activities.length; i++)
               RecentActivityCard(
                 theme: theme,
                 textTheme: textTheme,
-                activity: getRecentActivities.activities[i],
+                activity: appState.getRecentActivities.activities[i],
               ),
           ],
           options: CarouselOptions(

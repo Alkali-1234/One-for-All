@@ -38,8 +38,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
 
   Future saveFlashcards(AppState appState) async {
     //* Determine wether flashcard is stored on cloud or locally
-    //TODO implement
-
+    //! ^ Currently not needed
     //* In case of local storage
     //! Will always use the local storage method for now
     //* Set the flashcard set to the new flashcard set

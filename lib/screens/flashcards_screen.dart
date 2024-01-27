@@ -8,7 +8,7 @@ import 'package:oneforall/functions/flashcards_functions.dart';
 import 'package:oneforall/main.dart';
 import 'package:provider/provider.dart';
 import '../data/user_data.dart';
-import 'flashcardsPlay_screen.dart';
+import 'flashcards_play_screen.dart';
 import 'flashcards_edit_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -441,7 +441,6 @@ class _GenerateFlashcardsModalState extends State<GenerateFlashcardsModal> {
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, elevation: 0, shadowColor: Colors.transparent, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))),
                   onPressed: () {
                     if (selectedQuiz == null) return;
-                    //TODO support all question types
                     appState.getCurrentUser.flashCardSets.add(FlashcardSet(id: appState.getCurrentUser.flashCardSets.length + 1, title: appState.getQuizzes[selectedQuiz!].title, description: appState.getQuizzes[selectedQuiz!].description, flashcards: [
                       for (int i = 0; i < appState.getQuizzes[selectedQuiz!].questions.length; i++) ...[
                         Flashcard(hints: [], id: i, image: appState.getQuizzes[selectedQuiz!].questions[i].imagePath, question: appState.getQuizzes[selectedQuiz!].questions[i].type == QuizTypes.multipleChoice ? appState.getQuizzes[selectedQuiz!].questions[i].question : "not supported", answer: appState.getQuizzes[selectedQuiz!].questions[i].type == QuizTypes.multipleChoice ? List<String>.generate(appState.getQuizzes[selectedQuiz!].questions[i].correctAnswer.length, (index) => appState.getQuizzes[selectedQuiz!].questions[i].answers[index]).join(", ") : "not supported")

@@ -116,6 +116,7 @@ class Star extends BodyComponent {
 
   final Function incrementFunc;
 
+  //* Thank you github copilot and openai for such an amazing invention
   @override
   void render(Canvas canvas) {
     final path = Path();
