@@ -15,8 +15,9 @@ abstract class QuizzesComboAnimComponentsFunctions {
           child: Column(
             children: [
               const SafeArea(
+                bottom: false,
                 child: SizedBox(
-                  height: 30,
+                  height: 60,
                 ),
               ),
               Expanded(child: GameWidget.controlled(gameFactory: () => GameWorld(incrementFunc: incrementFunction, amount: amount))),
