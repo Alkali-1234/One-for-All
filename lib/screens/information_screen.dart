@@ -32,10 +32,10 @@ class InformationScreen extends StatelessWidget {
               title: "Version",
               subtitle: "v0.0.5",
             ),
-            ListItem(textTheme: textTheme, title: "Build Number", subtitle: "f789123"),
+            ListItem(textTheme: textTheme, title: "Build Number", subtitle: "75adf7b"),
             ListItem(textTheme: textTheme, title: "Branch", subtitle: "main/stable"),
-            ListItem(textTheme: textTheme, title: "Flutter SDK Version", subtitle: "3.13.2"),
-            ListItem(textTheme: textTheme, title: "Dart Version", subtitle: "3.1.0"),
+            ListItem(textTheme: textTheme, title: "Flutter SDK Version", subtitle: "3.16.9"),
+            ListItem(textTheme: textTheme, title: "Dart Version", subtitle: "3.2.6"),
             ListTile(
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CreditsScreen()));

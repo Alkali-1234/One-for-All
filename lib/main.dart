@@ -249,12 +249,11 @@ class _HomePageState extends State<HomePage> {
       debugPrint("Selected Screen: $selectedScreen");
     }
 
-    return WillPopScope(
-      //* Prevents the user from going back to the login screen/loading screen.
-      onWillPop: () async {
-        // Quit the app
-        SystemNavigator.pop();
-        return false;
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (_) async {
+        // Open the app drawer
+        _key.currentState?.openDrawer();
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,

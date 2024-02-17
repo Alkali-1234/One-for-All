@@ -693,8 +693,8 @@ class _NewQuestionModalState extends State<NewQuestionModal> {
                     onPressed: () => {
                       switch (questionType) {
                         QuizTypes.multipleChoice => widget.quizSet.questions.add(QuizQuestion(imagePath: "", id: widget.quizSet.questions.length + 1, question: "Question", answers: [
-                            "Answer 1"
-                                "Answer 2"
+                            "Answer 1",
+                            "Answer 2"
                           ], correctAnswer: [
                             0
                           ])),
@@ -970,7 +970,7 @@ class _EditQuestionModalState extends State<EditQuestionModal> {
                       },
                       icon: const Icon(Icons.add_a_photo),
                       label: const Text("Add Image")),
-                  if (question.imagePath != "")
+                  if (question.imagePath != null && question.imagePath?.isNotEmpty == true)
                     ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           elevation: 0,

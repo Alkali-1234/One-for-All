@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:oneforall/components/base_shimmer.dart';
@@ -79,9 +80,11 @@ class _CommunitySettingsScreenState extends State<CommunitySettingsScreen> {
 
       final usernames = querySnapshot.docs.map((doc) => doc.get('username'));
 
+      List<String> usernamesList = List<String>.from(usernames);
+      usernamesList.reverse();
       // Process the usernames here
       setState(() {
-        commmunityMembersUsernames = List<String>.from(usernames);
+        commmunityMembersUsernames = usernamesList;
         communityMembersDataSnapshot = querySnapshot.docs.asMap().map((key, value) => MapEntry(value.id, value.data()));
       });
       return List<String>.from(usernames);

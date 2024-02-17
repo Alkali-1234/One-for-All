@@ -47,8 +47,8 @@ class _QuizzesPlayScreenState extends State<QuizzesPlayScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => currentScreen == 0 ? true : false,
+    return PopScope(
+      canPop: currentScreen == 0 ? true : false,
       child: Scaffold(
         // bottomNavigationBar: const BannerAdWidget(),
         body: MainContainer(

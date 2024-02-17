@@ -246,6 +246,7 @@ class _ForumScreenState extends State<ForumScreen> with TickerProviderStateMixin
               //Tags, Date Creation, Date Last Active
               Expanded(
                 child: StreamBuilder(
+                    key: ValueKey(selectedTab),
                     // stream: FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("forum").snapshots(),
                     stream: selectedTab == 1 ? communityForumStream : localForumStream,
                     builder: (context, snapshot) {
