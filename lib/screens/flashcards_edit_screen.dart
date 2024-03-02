@@ -162,7 +162,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
                   children: [
                     for (int index = 0; index < questionQuery.length; index++) ...{
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: LayoutBuilder(builder: (context, consntraints) {

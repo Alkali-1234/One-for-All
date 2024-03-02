@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oneforall/interstitial_ad.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 
 class InterstitialScreen extends StatefulWidget {
   const InterstitialScreen({super.key, required this.onClosed, required this.onFailed});
@@ -29,7 +29,7 @@ class _InterstitialScreenState extends State<InterstitialScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      bottomNavigationBar: kIsWeb == false ? InterstitialAdWidget(onClosed: widget.onClosed, onFailed: widget.onFailed) : null,
+      bottomNavigationBar: kIsWeb == false && kDebugMode == false ? InterstitialAdWidget(onClosed: widget.onClosed, onFailed: widget.onFailed) : null,
       body: Center(
         child: Text('Please wait...', style: Theme.of(context).textTheme.displaySmall),
       ),

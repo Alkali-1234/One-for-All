@@ -233,19 +233,8 @@ class PlayScreenState extends State<PlayScreen> {
     currentQuestion = quizSet.questions[0];
     redemptionSet = QuizSet(title: "Redemption", description: "Redemption", questions: [], settings: quizSet.settings);
     redemptionAmount++;
-    if (currentQuestion.type == QuizTypes.reorder) {
-      if (reorderKey.currentState == null) return;
-      reorderKey.currentState!.selectedAnswers = List.generate(currentQuestion.answers.length, (index) => -1);
-    }
-
-    if (currentQuestion.type == QuizTypes.dropdown) {
-      if (dropdownKey.currentState == null) return;
-      dropdownKey.currentState!.sentence = currentQuestion.question.split("<seperator />");
-      dropdownKey.currentState!.selectedAnswers = List.generate(currentQuestion.correctAnswer.length, (index) => 0);
-    }
     questionTransitionTween = Tween<double>(begin: 0, end: 1);
     setState(() {});
-    // currentQuestion = quizSet.questions[quizSet.questions.indexOf(currentQuestion) + 1];
   }
 
   String formatSeconds(int seconds) {
@@ -279,9 +268,9 @@ class PlayScreenState extends State<PlayScreen> {
   }
 
   //* Keys
-  final reorderKey = GlobalKey<_ReorderQuestionState>();
-  final dropdownKey = GlobalKey<_DropdownQuestionState>();
-  final multipleChoiceKey = GlobalKey<_MultipleChoiceState>();
+  late final reorderKey = ValueKey("REORDER_${currentQuestion.question}_${currentQuestion.id}_${quizSet.title}");
+  late final dropdownKey = ValueKey("DROPDOWN_${currentQuestion.question}_${currentQuestion.id}_${quizSet.title}");
+  late final multipleChoiceKey = ValueKey("MULTIPLE_CHOICE_${currentQuestion.question}_${currentQuestion.id}_${quizSet.title}");
   final comboCounterKey = GlobalKey<ComboCounterState>();
   final shakeKey = GlobalKey<ShakeWidgetState>();
 
@@ -305,23 +294,9 @@ class PlayScreenState extends State<PlayScreen> {
     updaterNumber++;
     totallyDifferentWidget = !totallyDifferentWidget;
     // });
-    setState(() {
-      questionTransitionTween = Tween<double>(begin: 1, end: 0);
-    });
+    questionTransitionTween = Tween<double>(begin: 1, end: 0);
+    setState(() {});
     await Future.delayed(const Duration(milliseconds: 150));
-    if (currentQuestion.type == QuizTypes.multipleChoice) {
-      multipleChoiceKey.currentState!.showAnswers = false;
-      multipleChoiceKey.currentState!.selectedAnswers = [];
-    }
-    if (currentQuestion.type == QuizTypes.dropdown) {
-      dropdownKey.currentState!.showAnswers = false;
-      dropdownKey.currentState!.selectedAnswers = [];
-    }
-    if (currentQuestion.type == QuizTypes.reorder) {
-      reorderKey.currentState!.showAnswers = false;
-      reorderKey.currentState!.selectedAnswers = [];
-    }
-    // if (!correct) comboCounterKey.currentState!.resetComboCount();
     //* Check if quiz is finished
     if (quizSet.questions.indexOf(currentQuestion) + 1 > quizSet.questions.length - 1) {
       questionsDone++;
@@ -337,9 +312,8 @@ class PlayScreenState extends State<PlayScreen> {
         correctStreak = 0;
         redemptionSet.questions.add(question);
       }
-      if (infinityMode == false && redemptionSet.questions.isNotEmpty && redemptionAmount < (int.parse(quizSet.settings["redemptionAmounts"] ?? "0"))) {
+      if (infinityMode == null && redemptionSet.questions.isNotEmpty && redemptionAmount < (int.parse(quizSet.settings["redemptionAmounts"] ?? "0"))) {
         redemptionSequence();
-
         initializeRedemption();
         return;
       }
@@ -349,7 +323,6 @@ class PlayScreenState extends State<PlayScreen> {
     questionsDone++;
     comboCounterKey.currentState!.startTimer();
     if (correct) {
-      // comboCounterKey.currentState!.addComboCount();
       correctAnswers++;
       correctStreak++;
       this.score += scoreBeingAdded;
@@ -358,17 +331,7 @@ class PlayScreenState extends State<PlayScreen> {
       this.score += scoreBeingAdded;
       redemptionSet.questions.add(question);
     }
-    // updaterNumber++;
     currentQuestion = quizSet.questions[quizSet.questions.indexOf(currentQuestion) + 1];
-    if (currentQuestion.type == QuizTypes.reorder) {
-      if (reorderKey.currentState == null) return;
-      reorderKey.currentState!.selectedAnswers = List.generate(currentQuestion.answers.length, (index) => -1);
-    }
-    if (currentQuestion.type == QuizTypes.dropdown) {
-      if (dropdownKey.currentState == null) return;
-      dropdownKey.currentState!.sentence = currentQuestion.question.split("<seperator />");
-      dropdownKey.currentState!.selectedAnswers = List.generate(currentQuestion.correctAnswer.length, (index) => 0);
-    }
     questionTransitionTween = Tween<double>(begin: 0, end: 1);
     setState(() {});
   }
@@ -377,9 +340,9 @@ class PlayScreenState extends State<PlayScreen> {
     showDialog(
         context: context,
         builder: (c) => Container(
-              color: Colors.black,
+              color: Colors.black.withOpacity(0.5),
               width: double.infinity,
-              child: Center(child: Text("Redemption #$redemptionAmount", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 50))),
+              child: Center(child: Text("Previous Mistake #$redemptionAmount", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24), textAlign: TextAlign.center)),
             ),
         barrierDismissible: false);
     await Future.delayed(const Duration(milliseconds: 2000));
@@ -447,16 +410,6 @@ class PlayScreenState extends State<PlayScreen> {
           }
         }
       }
-
-      // if (showInfinityModeDialog == true) {
-      //   showInfinityModeDialog = false;
-      //   updaterNumber++;
-      //   totallyDifferentWidget = !totallyDifferentWidget;
-      //   setState(() {
-      //     questionTransitionTween = Tween<double>(begin: 1, end: 0);
-      //   });
-      //   await Future.delayed(const Duration(milliseconds: 150));
-      // }
       setState(() {
         if (showInfinityModeDialog == true) showInfinityModeDialog = false;
         quizSet = modifiedQuiz;
@@ -474,6 +427,7 @@ class PlayScreenState extends State<PlayScreen> {
     audioPlayer.stop();
     if (!mounted) return;
     showDialog(context: context, builder: (c) => const FinishedRibbon(), barrierDismissible: false);
+    QuizzesFunctions().refreshQuizzesFromLocal(context.read<AppState>(), false);
     await Future.delayed(const Duration(milliseconds: 2000));
     if (!mounted) return;
     Navigator.of(context).pop();
@@ -1316,7 +1270,6 @@ class _EndScreenState extends State<EndScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    QuizzesFunctions().refreshQuizzesFromLocal(context.read<AppState>(), true);
     onAnimationFinished();
     //* Notify listeners after build
   }

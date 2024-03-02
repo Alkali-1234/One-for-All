@@ -82,3 +82,6 @@ app.*.map.json
 .envied
 env.g.dart
 
+# Premium Subscription Files
+
+/lib/premium
