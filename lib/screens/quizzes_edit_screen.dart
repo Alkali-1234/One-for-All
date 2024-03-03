@@ -10,6 +10,7 @@ import 'package:oneforall/components/quizzes_components/drag_and_drop_edit.dart'
 import 'package:oneforall/components/quizzes_components/drop_down_edit.dart';
 import 'package:oneforall/functions/quizzes_functions.dart';
 import 'package:oneforall/models/quizzes_models.dart';
+// import 'package:oneforall/premium/quiz_gen.dart';
 import 'package:oneforall/screens/quizzes_screen.dart';
 import 'package:oneforall/styles/styles.dart';
 import 'package:path_provider/path_provider.dart';
@@ -241,47 +242,61 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: theme.primaryContainer,
-                        foregroundColor: theme.onBackground,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
-                      onPressed: () => showDialog(
-                          context: context,
-                          builder: (context) => NewQuestionModal(
-                              quizSet: quizSet,
-                              setQuizSet: setQuizSet,
-                              listController: listController,
-                              addQuestion: (question) async {
-                                final key = GlobalKey<_QueryListItemState>();
-                                setState(() {
-                                  listItems.add(QueryListItem(
-                                      key: key,
-                                      question: question,
-                                      index: listItems.length,
-                                      setQuizSet: setQuizSet,
-                                      quizIndex: widget.index,
-                                      duplicated: true,
-                                      remveListItem: (i) => setState(() => listItems.removeAt(i)),
-                                      addListItem: (QueryListItem item) async {
-                                        final key = GlobalKey<_QueryListItemState>();
-                                        setState(() {
-                                          listItems.insert(item.index + 1, QueryListItem(key: key, question: item.question, index: item.index + 1, setQuizSet: setQuizSet, quizIndex: item.quizIndex, duplicated: true, addListItem: item.addListItem, remveListItem: (i) => setState(() => listItems.removeAt(i))));
-                                        });
-                                        await Future.delayed(const Duration(milliseconds: 50));
-                                        key.currentState!.doColorAnim();
-                                      }));
-                                });
-                                await Future.delayed(const Duration(milliseconds: 50));
-                                await listController.animateTo(listController.position.maxScrollExtent, duration: const Duration(milliseconds: 200), curve: Curves.decelerate);
-                                key.currentState!.doColorAnim();
-                              })),
-                      icon: const Icon(Icons.add),
-                      label: const Text("Add Question")),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: theme.primaryContainer,
+                            foregroundColor: theme.onBackground,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          onPressed: () => showDialog(
+                              context: context,
+                              builder: (context) => NewQuestionModal(
+                                  quizSet: quizSet,
+                                  setQuizSet: setQuizSet,
+                                  listController: listController,
+                                  addQuestion: (question) async {
+                                    final key = GlobalKey<_QueryListItemState>();
+                                    setState(() {
+                                      listItems.add(QueryListItem(
+                                          key: key,
+                                          question: question,
+                                          index: listItems.length,
+                                          setQuizSet: setQuizSet,
+                                          quizIndex: widget.index,
+                                          duplicated: true,
+                                          remveListItem: (i) => setState(() => listItems.removeAt(i)),
+                                          addListItem: (QueryListItem item) async {
+                                            final key = GlobalKey<_QueryListItemState>();
+                                            setState(() {
+                                              listItems.insert(item.index + 1, QueryListItem(key: key, question: item.question, index: item.index + 1, setQuizSet: setQuizSet, quizIndex: item.quizIndex, duplicated: true, addListItem: item.addListItem, remveListItem: (i) => setState(() => listItems.removeAt(i))));
+                                            });
+                                            await Future.delayed(const Duration(milliseconds: 50));
+                                            key.currentState!.doColorAnim();
+                                          }));
+                                    });
+                                    await Future.delayed(const Duration(milliseconds: 50));
+                                    await listController.animateTo(listController.position.maxScrollExtent, duration: const Duration(milliseconds: 200), curve: Curves.decelerate);
+                                    key.currentState!.doColorAnim();
+                                  })),
+                          icon: const Icon(Icons.add),
+                          label: const Text("Add Question")),
+                    ),
+                    // Expanded(
+                    //     child: ElevatedButton.icon(
+                    //         style: ElevatedButton.styleFrom(
+                    //           elevation: 0,
+                    //           backgroundColor: theme.primaryContainer,
+                    //           foregroundColor: theme.onBackground,
+                    //           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    //         ),
+                    //         onPressed: () => showDialog(context: context, builder: (c) => QuizGenDialog()),
+                    //         icon: const Icon(Icons.auto_awesome),
+                    //         label: const Text("Generate"))),
+                  ],
                 ),
                 const SizedBox(height: 10),
                 Expanded(

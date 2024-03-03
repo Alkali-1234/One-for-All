@@ -569,6 +569,7 @@ class PlayScreenState extends State<PlayScreen> {
                                     ? InfinityModeDialog(putResult: (value) => setState(() => infinityMode = value))
                                     : currentQuestion.type == QuizTypes.multipleChoice || currentQuestion.type == null
                                         ? MultipleChoice(
+                                            currentCombo: comboCounterKey.currentState?.counter ?? 0,
                                             question: currentQuestion,
                                             nextQuestionFunction: nextQuestion,
                                             doAnimationFunction: doNextQuestionAnimations,
@@ -587,6 +588,7 @@ class PlayScreenState extends State<PlayScreen> {
                                                     ))
                                             : currentQuestion.type == QuizTypes.reorder
                                                 ? ReorderQuestion(
+                                                    currentCombo: comboCounterKey.currentState?.counter ?? 0,
                                                     key: reorderKey,
                                                     question: currentQuestion,
                                                     nextQuestionFunction: nextQuestion,
@@ -723,11 +725,12 @@ class FinishedRibbon extends StatelessWidget {
 
 //* Multiple choice question
 class MultipleChoice extends StatefulWidget {
-  const MultipleChoice({super.key, required this.question, required this.nextQuestionFunction, required this.doAnimationFunction, required this.toggleShowingAnswers});
+  const MultipleChoice({super.key, required this.question, required this.nextQuestionFunction, required this.doAnimationFunction, required this.toggleShowingAnswers, required this.currentCombo});
   final QuizQuestion question;
   final Function nextQuestionFunction;
   final Function doAnimationFunction;
   final Function toggleShowingAnswers;
+  final int currentCombo;
 
   @override
   State<MultipleChoice> createState() => _MultipleChoiceState();
@@ -762,6 +765,12 @@ class _MultipleChoiceState extends State<MultipleChoice> {
       calculatedScore,
       widget.question,
     );
+    final correct = correctAnswers == widget.question.correctAnswer.length;
+    await Future.delayed(Duration(milliseconds: correct ? (1500 - (widget.currentCombo * 100).round()) : 3000));
+    setState(() {
+      showAnswers = false;
+      selectedAnswers = [];
+    });
   }
 
   int calculateScore(int correctAnswers, int answersLength) {
@@ -1031,11 +1040,12 @@ class _DropdownQuestionState extends State<DropdownQuestion> {
 
 //* Reorder Question
 class ReorderQuestion extends StatefulWidget {
-  const ReorderQuestion({super.key, required this.question, required this.nextQuestionFunction, required this.doAnimationFunction, required this.toggleShowingAnswers});
+  const ReorderQuestion({super.key, required this.question, required this.nextQuestionFunction, required this.doAnimationFunction, required this.toggleShowingAnswers, required this.currentCombo});
   final QuizQuestion question;
   final Function nextQuestionFunction;
   final Function doAnimationFunction;
   final Function toggleShowingAnswers;
+  final int currentCombo;
 
   @override
   State<ReorderQuestion> createState() => _ReorderQuestionState();
@@ -1073,6 +1083,11 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
     //   });
     widget.nextQuestionFunction((correctAnswers == widget.question.correctAnswer.length), 100 * correctAnswers, widget.question);
     // });
+    await Future.delayed(Duration(milliseconds: correctAnswers == widget.question.correctAnswer.length ? (1500 - (widget.currentCombo * 100).round()) : 3000));
+    setState(() {
+      showAnswers = false;
+      selectedAnswers = [];
+    });
   }
 
   bool dragging = false;
