@@ -62,12 +62,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCFbW0TTdb6WFwQ1DOUzUxN1RM8LDlWLq0',
-    appId: '1:369551606717:ios:ef7906ce06efb7144a08d4',
+    appId: '1:369551606717:ios:59d7df3d2ec2af2d4a08d4',
     messagingSenderId: '369551606717',
     projectId: 'one-for-all-vcr',
     storageBucket: 'one-for-all-vcr.appspot.com',
-    iosClientId: '369551606717-bn1o8v0i10lcfcltt1qgp5elsotftd70.apps.googleusercontent.com',
-    iosBundleId: 'com.example.oneforall',
+    iosBundleId: 'com.vcomrade.oneforall',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(

@@ -450,7 +450,7 @@ class _NewEventModalState extends State<NewEventModal> {
       });
 
       await Future.delayed(const Duration(seconds: 1));
-      if (!mounted) return;
+      if (!context.mounted) return;
       Navigator.pop(context);
     }
 

@@ -701,7 +701,7 @@ class _ImportQuizModalState extends State<ImportQuizModal> {
                         'zip'
                       ]);
                       if (result == null) return;
-                      if (!mounted) return;
+                      if (!context.mounted) return;
                       QuizzesFunctions().importQuizFromZip(File(result.files.single.path!), context.read<AppState>(), context);
                     },
                     child: const Text("Select File")),

@@ -262,7 +262,7 @@ class _ImportSetModalState extends State<ImportSetModal> {
                     ],
                   );
                   if (file == null) return;
-                  if (!mounted) return;
+                  if (!context.mounted) return;
                   FlashcardsFunctions().importFlashcardFromZip(File(file.files.first.path!), context, context.read<AppState>());
                 },
                 icon: const Icon(Icons.download),

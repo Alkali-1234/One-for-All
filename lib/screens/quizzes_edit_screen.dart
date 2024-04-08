@@ -10,6 +10,7 @@ import 'package:oneforall/components/quizzes_components/drag_and_drop_edit.dart'
 import 'package:oneforall/components/quizzes_components/drop_down_edit.dart';
 import 'package:oneforall/functions/quizzes_functions.dart';
 import 'package:oneforall/models/quizzes_models.dart';
+import 'package:oneforall/premium/quiz_gen.dart';
 // import 'package:oneforall/premium/quiz_gen.dart';
 import 'package:oneforall/screens/quizzes_screen.dart';
 import 'package:oneforall/styles/styles.dart';
@@ -285,32 +286,30 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                           icon: const Icon(Icons.add),
                           label: const Text("Add Question")),
                     ),
-                    // Expanded(
-                    //     child: ElevatedButton.icon(
-                    //         style: ElevatedButton.styleFrom(
-                    //           elevation: 0,
-                    //           backgroundColor: theme.primaryContainer,
-                    //           foregroundColor: theme.onBackground,
-                    //           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    //         ),
-                    //         onPressed: () => showDialog(context: context, builder: (c) => QuizGenDialog()),
-                    //         icon: const Icon(Icons.auto_awesome),
-                    //         label: const Text("Generate"))),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              elevation: 0,
+                              backgroundColor: theme.primaryContainer,
+                              foregroundColor: theme.onBackground,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            onPressed: () => showDialog(context: context, builder: (c) => const QuizGenDialog()),
+                            icon: const Icon(Icons.auto_awesome),
+                            label: const Text("Generate"))),
                   ],
                 ),
                 const SizedBox(height: 10),
                 Expanded(
-                  child: ListView.builder(
+                  child: ListView(
                     padding: EdgeInsets.zero,
                     controller: listController,
-                    itemBuilder: (context, index) {
-                      if (listItems[index].question.question.toLowerCase().contains(searchQuery.toLowerCase())) {
-                        return listItems[index];
-                      } else {
-                        return const SizedBox.shrink();
-                      }
-                    },
-                    itemCount: listItems.length,
+                    children: [
+                      for (int index = 0; index < listItems.length; index++) ...[
+                        if (searchQuery.isEmpty || listItems[index].question.question.toLowerCase().contains(searchQuery.toLowerCase())) listItems[index]
+                      ]
+                    ],
                   ),
                 ),
                 const SizedBox(height: 10),

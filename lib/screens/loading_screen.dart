@@ -23,24 +23,24 @@ class LoadingScreen extends StatefulWidget {
 class _LoadingScreenState extends State<LoadingScreen> {
   String verbose = "";
   String loadingDots = ".";
-  Icon? loadingStatus;
+  bool loadingStatus = false;
 
   void pushToPage(Widget page) {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => page));
     return;
   }
 
-  void loadingScreenAnimation() async {
-    for (var i = 0; i < 4; i++) {
-      if (mounted) {
-        setState(() {
-          loadingDots = "." * (i + 1);
-        });
-      }
-      await Future.delayed(const Duration(milliseconds: 500));
-    }
-    if (loadingStatus != null) loadingScreenAnimation();
-  }
+  // void loadingScreenAnimation() async {
+  //   for (var i = 0; i < 4; i++) {
+  //     if (mounted) {
+  //       setState(() {
+  //         loadingDots = "." * (i + 1);
+  //       });
+  //     }
+  //     await Future.delayed(const Duration(milliseconds: 500));
+  //   }
+  //   if (loadingStatus == false) loadingScreenAnimation();
+  // }
 
   void initializeApp(AppState appState) async {
     //is it there because of the loading screen????
@@ -127,6 +127,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     }
     setState(() {
       verbose = "Finished";
+      loadingStatus = true;
     });
     await Future.delayed(const Duration(seconds: 1));
     pushToPage(ShowCaseWidget(
@@ -139,7 +140,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
-    loadingScreenAnimation();
+    // loadingScreenAnimation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       initializeApp(context.read<AppState>());
     });

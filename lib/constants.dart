@@ -254,42 +254,45 @@ ThemeData lightTheme = ThemeData(
 
 const defaultBluePrimaryGradient = LinearGradient(
   colors: [
-    // candidate 1
-    // Color.fromRGBO(0, 150, 255, 1),
-    // Color.fromRGBO(0, 150, 255, 1),
-    // candidate 2
-    Color.fromRGBO(31, 81, 255, 1),
-    Color.fromRGBO(31, 81, 255, 1),
+    Colors.blue,
+    Colors.deepPurple,
   ],
   stops: [
     0.0,
     1.0
   ],
-  begin: Alignment.topCenter,
-  end: Alignment.bottomCenter,
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
 );
 
 get getDefaultBluePrimaryGradient => defaultBluePrimaryGradient;
 
 const darkPrimaryGradient = LinearGradient(
   colors: [
-    Color.fromRGBO(72, 72, 72, 1),
-    Color.fromRGBO(72, 72, 72, 1),
+    Colors.blue,
+    Colors.deepPurple,
   ],
   stops: [
     0.0,
     1.0
   ],
-  begin: Alignment.topCenter,
-  end: Alignment.bottomCenter,
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
 );
 
 get getDarkPrimaryGradient => darkPrimaryGradient;
 
-const lightPrimaryGradient = LinearGradient(colors: [
-  Color.fromRGBO(130, 130, 130, 1),
-  Color.fromRGBO(130, 130, 130, 1)
-]);
+const lightPrimaryGradient = LinearGradient(
+    colors: [
+      Colors.lightGreen,
+      Colors.deepOrange
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    stops: [
+      0.0,
+      1.0
+    ]);
 
 get getLightPrimaryGradient => lightPrimaryGradient;
 

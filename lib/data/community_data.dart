@@ -5,6 +5,7 @@ DocumentSnapshot? communityData;
 void setCommunityData(DocumentSnapshot data) => communityData = data;
 get getSavedCommunityData => communityData;
 
+@Deprecated("Do not use class.")
 //ignore: deprecated_member_use_from_same_package
 ///Newer version of community data. Use this instead of deprecated [getMabData], [getLACData], [getRecentActivities]
 class CommunityData {

@@ -668,7 +668,7 @@ class _StreamBodyState extends State<StreamBody> {
                             subscribed = false;
                           }
 
-                          if (!mounted) return;
+                          if (!context.mounted) return;
                           Navigator.push(
                               context,
                               MaterialPageRoute(

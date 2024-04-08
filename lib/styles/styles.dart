@@ -28,3 +28,23 @@ class TextInputStyle {
     return style;
   }
 }
+
+class BaseElevatedButtonInputStyle {
+  BaseElevatedButtonInputStyle({
+    required this.theme,
+    required this.textTheme,
+  });
+  final ColorScheme theme;
+  final TextTheme textTheme;
+
+  late ButtonStyle style = ElevatedButton.styleFrom(
+    elevation: 0,
+    surfaceTintColor: Colors.transparent,
+    shadowColor: Colors.transparent,
+    backgroundColor: theme.secondary,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+    side: BorderSide(color: theme.tertiary, width: 1),
+  );
+}

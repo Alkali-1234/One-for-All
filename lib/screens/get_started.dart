@@ -307,7 +307,7 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
             onPressed: () async {
               await saveSettings();
 
-              if (!mounted) return;
+              if (!context.mounted) return;
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, elevation: 0, padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),

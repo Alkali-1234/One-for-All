@@ -222,8 +222,8 @@ class ReorderEditState extends State<ReorderEdit> {
                   SizedBox(
                     height: 55,
                     child: DragTarget<int>(
-                      onAccept: (data) {
-                        correctOrder[i] = data;
+                      onAcceptWithDetails: (data) {
+                        correctOrder[i] = data.data;
                         setState(() {});
                       },
                       builder: (context, List<int?> candidateData, rejectedData) {

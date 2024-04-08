@@ -506,10 +506,10 @@ class PlayScreenState extends State<PlayScreen> {
                               key: comboCounterKey,
                               theme: Theme.of(context).colorScheme,
                               incrementScore: () {
-                                setState(() => {
-                                      scoreStatTween = Tween<double>(begin: score.toDouble(), end: score.toDouble() + 1),
-                                      score++
-                                    });
+                                setState(() {
+                                  scoreStatTween = Tween<double>(begin: score.toDouble(), end: score.toDouble() + 1);
+                                  score++;
+                                });
                                 AudioPlayer audioPlayer = AudioPlayer();
                                 audioPlayer.setAsset("assets/audio/boopSound.mp3");
                                 audioPlayer.play();
@@ -1226,7 +1226,7 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
                             ),
                           );
                         },
-                        onAccept: (data) {
+                        onAcceptWithDetails: (data) {
                           for (var i = 0; i < widget.question.correctAnswer.length - selectedAnswers.length; i++) {
                             //Add missing answers
                             //fuck state
@@ -1234,7 +1234,7 @@ class _ReorderQuestionState extends State<ReorderQuestion> {
                           }
 
                           setState(() {
-                            selectedAnswers[i] = data;
+                            selectedAnswers[i] = data.data;
                           });
                         },
                       ),
