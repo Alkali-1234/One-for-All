@@ -24,7 +24,6 @@ import 'package:flutter/material.dart';
 import 'package:oneforall/data/user_data.dart';
 import 'package:provider/provider.dart';
 import 'constants.dart';
-import 'package:sidebarx/sidebarx.dart';
 import 'package:intl/intl.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
@@ -383,34 +382,6 @@ class _HomePageState extends State<HomePage> {
                   ]),
                 )),
       ),
-    );
-  }
-}
-
-//SidebarWidget
-class SidebarXWidget extends StatelessWidget {
-  const SidebarXWidget({Key? key, required SidebarXController controller})
-      : _controller = controller,
-        super(key: key);
-  final SidebarXController _controller;
-
-  @override
-  Widget build(BuildContext context) {
-    var theme = Theme.of(context).colorScheme;
-    var textTheme = Theme.of(context).textTheme;
-    return SidebarX(
-      controller: _controller,
-      theme: SidebarXTheme(
-        decoration: BoxDecoration(color: theme.background),
-        iconTheme: const IconThemeData(color: Colors.white),
-        selectedIconTheme: IconThemeData(color: getRareMainTheme),
-        textStyle: textTheme.displaySmall,
-        selectedTextStyle: textTheme.displaySmall,
-      ),
-      items: const [
-        SidebarXItem(icon: Icons.home, label: '  Home'),
-      ],
-      extendedTheme: const SidebarXTheme(width: 140),
     );
   }
 }
