@@ -78,7 +78,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
                             icon: Icons.note,
                             name: "Flashcards",
                             onPressed: () {
-                              debugPrint("Flashcards");
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => const FlashcardsScreen()),
@@ -133,7 +132,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
                             icon: Icons.calendar_today,
                             name: "Calendar",
                             onPressed: () {
-                              debugPrint("Calendar");
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => const CalendarScreen()),
@@ -146,7 +144,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
                             icon: Icons.list,
                             name: "M.A.B",
                             onPressed: () {
-                              debugPrint("M.A.B");
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => const MABLACScreen()),
@@ -262,7 +259,6 @@ class NavigationItem extends StatelessWidget {
       height: constraints.maxWidth * 0.235,
       child: ElevatedButton(
         onPressed: () {
-          debugPrint("hi");
           onPressed!();
         },
         style: ElevatedButton.styleFrom(

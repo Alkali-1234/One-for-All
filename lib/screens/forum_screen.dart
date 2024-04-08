@@ -418,7 +418,6 @@ class _StreamBodyState extends State<StreamBody> {
         }
       }
     }
-    debugPrint(tags.toString());
   }
 
   List<DropdownMenuItem> dropdownItems = [];

@@ -96,7 +96,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
         //implement localization
       }
     }
-    debugPrint("Has opened before");
     setState(() {
       verbose = "Checking for saved credentials";
     });

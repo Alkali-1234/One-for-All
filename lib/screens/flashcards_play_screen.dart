@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/interstitial_ad.dart';
+import 'package:oneforall/logger.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import '../data/user_data.dart';
@@ -314,7 +315,7 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
     //Change the weight of the current card
     //Look for the card in the weights list
     int index = getFlashcardWeights["weights"].indexWhere((element) => element["card"] == currentCard);
-    debugPrint("Index: $index");
+    logger.i("Index: $index");
     //Change the weight of the card
     changeWeights(index, getFlashcardWeights["weights"][index]["weight"] + weightDifference);
     //Get the next card
@@ -331,10 +332,10 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
       }
       totalWeight += getFlashcardWeights["weights"][i]["weight"] as int;
     }
-    debugPrint("Total Weight: $totalWeight");
+    logger.i("Total Weight: $totalWeight");
     //Get a random number between 0 and totalWeight
     int randomNumber = totalWeight > 0 ? Random().nextInt(totalWeight) : 0;
-    debugPrint("Random Number: $randomNumber");
+    logger.i("Random Number: $randomNumber");
     //Get the card that corresponds to the random number
     int currentWeight = 0;
     for (var i = 0; i < getFlashcardWeights["weights"].length; i++) {
@@ -348,7 +349,7 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
     for (var i = 0; i < getFlashcardWeights["weights"].length; i++) {
       changeWeights(i, getFlashcardWeights["weights"][i]["weight"] + 10);
     }
-    debugPrint("Weights: $getFlashcardWeights");
+    logger.i("Weights: $getFlashcardWeights");
     await Future.delayed(const Duration(milliseconds: 150));
     setState(() {
       hideCard = false;
@@ -612,7 +613,7 @@ class _PlayScreenState extends State<PlayScreen> with SingleTickerProviderStateM
           //Bottom
           ElevatedButton(
               onPressed: () {
-                debugPrint("Finish");
+                logger.i("Finished playing flashcards");
                 finishPlaying();
               },
               style: ElevatedButton.styleFrom(

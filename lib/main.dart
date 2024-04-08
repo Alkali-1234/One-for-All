@@ -37,6 +37,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'data/community_data.dart';
 
 //Screens
+import 'logger.dart';
 import 'models/quizzes_models.dart';
 import 'screens/community_screen.dart';
 // import 'screens/navigation_screen.dart';
@@ -62,7 +63,7 @@ void main() async {
   // await FlutterDownloader.initialize(debug: true);
   //Init ads if platform is not web
   if (!kIsWeb) await MobileAds.instance.initialize();
-  debugPrint(
+  logger.i(
     "Initialized app! : ${Firebase.app().options.projectId}",
   );
 
@@ -220,7 +221,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     var appState = Provider.of<AppState>(context, listen: false);
     if (widget.doShowcase == true && appState.viewedShowcase == false) {
-      debugPrint("Starting showcase");
+      logger.i("Starting showcase");
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ShowCaseWidget.of(context).startShowCase([
           showcase1,
@@ -246,7 +247,6 @@ class _HomePageState extends State<HomePage> {
         }
         selectedScreen = index;
       });
-      debugPrint("Selected Screen: $selectedScreen");
     }
 
     return PopScope(
@@ -284,7 +284,6 @@ class _HomePageState extends State<HomePage> {
                                 GestureDetector(
                                   onTap: () => {
                                     _key.currentState?.openDrawer(),
-                                    debugPrint("e")
                                   },
                                   child: Showcase(
                                     key: showcase2,
@@ -633,7 +632,6 @@ class _HomeScreenState extends State<HomeScreen> {
         }
         mabSelectedFilter = filter;
       });
-      debugPrint("Selected Filter: $mabSelectedFilter");
     }
 
     var appState = Provider.of<AppState>(context);
@@ -683,7 +681,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ],
-                      onChanged: (value) => debugPrint(value.toString()),
+                      onChanged: (value) {},
                     ),
                   ),
                 ),

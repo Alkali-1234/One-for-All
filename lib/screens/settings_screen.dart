@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:oneforall/functions/community_functions.dart';
+import 'package:oneforall/logger.dart';
 import 'package:oneforall/screens/login_screen.dart';
 import 'package:oneforall/styles/styles.dart';
 import 'package:provider/provider.dart';
@@ -45,7 +46,6 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
 
   void saveSettings() async {
     if (currentLoading != 0) return;
-    debugPrint("Save pressed");
     setState(() {
       currentLoading = 1;
     });
@@ -105,7 +105,6 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
         duration: Duration(seconds: 1),
       ),
     );
-    debugPrint("Saved settings");
     setState(() {
       currentLoading = 0;
     });
@@ -113,14 +112,12 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
 
   void clearCache() async {
     if (currentLoading != 0) return;
-    debugPrint("Clear cache pressed");
     final prefs = await SharedPreferences.getInstance();
     prefs
       ..remove("email")
       ..remove("password")
       ..remove("theme")
       ..remove("hasOpenedBefore");
-    debugPrint("Cleared cache");
     if (!mounted) return;
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -132,13 +129,12 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
 
   void logoutUser() async {
     if (currentLoading != 0) return;
-    debugPrint("Logout pressed");
     setState(() {
       currentLoading = 3;
     });
     await logout().catchError((error, stacktrace) {
-      debugPrint("Error logging out: $error");
-      debugPrint(stacktrace.toString());
+      logger.e("Error logging out: $error");
+      logger.e(stacktrace.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,
@@ -150,7 +146,6 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
       });
       return;
     });
-    debugPrint("Logged out");
     setState(() {
       currentLoading = 0;
     });
@@ -525,7 +520,6 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () {
-                                debugPrint("Save pressed");
                                 saveSettings();
                               },
                               style: ElevatedButton.styleFrom(
@@ -538,47 +532,6 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                               child: const Text("Save"),
                             ),
                           ),
-                          // //* Clear cache and logout button
-                          // const SizedBox(height: 10),
-                          // SizedBox(
-                          //   width: double.infinity,
-                          //   child: ElevatedButton(
-                          //     onPressed: () {
-                          //       showDialog(context: context, builder: (_) => ConfirmationModal(clearCacheFunction: clearCache));
-                          //     },
-                          //     style: ElevatedButton.styleFrom(
-                          //       backgroundColor: theme.secondary,
-                          //       shadowColor: Colors.transparent,
-                          //       side: BorderSide(color: theme.tertiary),
-                          //       shape: RoundedRectangleBorder(
-                          //         borderRadius: BorderRadius.circular(10),
-                          //       ),
-                          //     ),
-                          //     child: Text(
-                          //       "Clear Cache",
-                          //       style: textTheme.displaySmall,
-                          //     ),
-                          //   ),
-                          // ),
-                          // const SizedBox(height: 10),
-                          // SizedBox(
-                          //   width: double.infinity,
-                          //   child: ElevatedButton(
-                          //     onPressed: () {
-                          //       debugPrint("Logout pressed");
-                          //       logoutUser();
-                          //     },
-                          //     style: ElevatedButton.styleFrom(
-                          //       backgroundColor: theme.error,
-                          //       shape: RoundedRectangleBorder(
-                          //         borderRadius: BorderRadius.circular(10),
-                          //       ),
-                          //     ),
-                          //     child: Text(
-                          //       "Logout",
-                          //       style: textTheme.displaySmall,
-                          //     ),
-                          //   ),
                           // ),
                         ],
                       ),
