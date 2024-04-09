@@ -248,13 +248,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: ElevatedButton(
                     onPressed: () => _saveChanges(context.read<AppState>()),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.secondary,
+                      surfaceTintColor: Colors.transparent,
+                      backgroundColor: Colors.green,
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: Text('Save Changes', style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                    child: Text('Save Changes', style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
                 ),
                 SizedBox(

@@ -3,6 +3,7 @@
 //Firebase
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
@@ -42,7 +43,7 @@ import 'screens/community_screen.dart';
 // import 'screens/navigation_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/loading_screen.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'package:showcaseview/showcaseview.dart';
 
 void main() async {
@@ -55,11 +56,11 @@ void main() async {
   //* Initialize
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // //* Run on emulator if debug is true
-  // if (kDebugMode) {
-  //   await FirebaseAuth.instance.useAuthEmulator('localhost', 8080);
-  //   FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-  // }
-  // await FlutterDownloader.initialize(debug: true);
+  if (kDebugMode) {
+    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+    FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
+  }
   //Init ads if platform is not web
   if (!kIsWeb) await MobileAds.instance.initialize();
   logger.i(
