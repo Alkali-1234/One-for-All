@@ -85,3 +85,6 @@ env.g.dart
 # Premium Subscription Files
 
 /lib/premium
+
+# Firebase hosting build files
+.firebase

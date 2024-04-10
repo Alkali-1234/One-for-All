@@ -8,6 +8,167 @@ import 'package:provider/provider.dart';
 // import '../data/user_data.dart';
 import '../main.dart';
 
+//* Models
+import '../models/calendar_model/calendar_model.dart';
+import '../models/month_model/month_model.dart';
+
+//* Riverpod
+import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
+
+//* State
+class CalendarState extends riverpod.Notifier<Calendar> {
+  Future<void> initializeCalendar(AppState appState) async {
+    if (ref.read(calendarInitializedProvider)) return;
+    ref.read(calendarInitializedProvider.notifier).state = false;
+    bool missingMabData = false;
+    bool missingLacData = false;
+    List<Month> months = [];
+    //* Attempt to get data from appstate
+    if (appState.getMabData != null) {
+      months.addAll(getMonthsListFromPosts(appState.getMabData!.posts));
+      missingMabData = false;
+    }
+    if (appState.getLacData != null) {
+      months.addAll(getMonthsListFromPosts(List<MabPost>.generate(appState.getLacData!.posts.length, (index) => MabPost(uid: index, title: appState.getLacData!.posts[index].title, description: appState.getLacData!.posts[index].description, date: appState.getLacData!.posts[index].date, authorUID: appState.getLacData!.posts[index].authorUID, image: appState.getLacData!.posts[index].image, fileAttatchments: appState.getLacData!.posts[index].fileAttatchments, dueDate: appState.getLacData!.posts[index].dueDate, type: appState.getLacData!.posts[index].type, subject: appState.getLacData!.posts[index].subject))));
+      missingLacData = false;
+    }
+
+    //* If data is missing, get data from firebase
+    if (missingMabData) {
+      await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity!).collection("MAB").get().then((value) {
+        List<MabPost> mabPosts = [];
+
+        //* Map the data to MabPost
+        for (var e in value.docs) {
+          var element = e.data();
+          mabPosts.add(MabPost(
+            authorUID: 0,
+            uid: 0,
+            title: element["title"],
+            description: element["description"],
+            dueDate: DateTime.parse(element["dueDate"].toDate().toString()),
+            date: DateTime.parse(element["date"].toDate().toString()),
+            image: element["image"] ?? "",
+            fileAttatchments: element["fileAttatchments"] ?? [],
+            type: element["type"],
+            subject: element["subject"],
+          ));
+        }
+        months.addAll(getMonthsListFromPosts(mabPosts));
+      });
+    }
+
+    if (missingLacData) {
+      await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity!).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("LAC").get().then((value) {
+        List<LACPost> lacPosts = [];
+
+        //* Map the data to LACPost
+        for (var e in value.docs) {
+          var element = e.data();
+          lacPosts.add(LACPost(
+            authorUID: 0,
+            uid: 0,
+            title: element["title"],
+            description: element["description"],
+            dueDate: DateTime.parse(element["dueDate"].toDate().toString()),
+            date: DateTime.parse(element["date"].toDate().toString()),
+            image: element["image"] ?? "",
+            fileAttatchments: element["fileAttatchments"] ?? [],
+            type: element["type"],
+            subject: element["subject"],
+          ));
+        }
+        months.addAll(getMonthsListFromPosts(List<MabPost>.generate(lacPosts.length, (index) => MabPost(uid: index, title: lacPosts[index].title, description: lacPosts[index].description, date: lacPosts[index].date, authorUID: lacPosts[index].authorUID, image: lacPosts[index].image, fileAttatchments: lacPosts[index].fileAttatchments, dueDate: lacPosts[index].dueDate, type: lacPosts[index].type, subject: lacPosts[index].subject))));
+      });
+    }
+    ref.read(calendarInitializedProvider.notifier).state = true;
+  }
+
+  List<Month> getMonthsListFromPosts(List<MabPost> posts) {
+    List<Month> months = [];
+    for (var post in posts) {
+      final day = post.dueDate.day;
+      final month = post.dueDate.month;
+      final year = post.dueDate.year;
+
+      //* Check if month is not in the list
+      if (state.months.indexWhere((element) => element.month == month && element.year == year) == -1) {
+        months.add(Month(month: month, year: year, daysList: []));
+      }
+
+      //* Update the month
+
+      //* Get the month
+      final monthIndex = months.indexWhere((element) => element.month == month && element.year == year);
+      //* Get the daysList
+      final daysList = months[monthIndex].daysList;
+      //* Check if day is not in the list
+      if (daysList.where((element) => element.keys.first == day).isEmpty) {
+        //* Add the day with the post if it doesn't exist
+        daysList.add({
+          day: [
+            post
+          ]
+        });
+      } else {
+        //* Update the day if it exists
+
+        //* Get the day
+        final dayIndex = daysList.indexWhere((element) => element.keys.first == day);
+        //* Update the day
+        daysList[dayIndex][day]!.add(post);
+      }
+      //* Update the daysList
+      months[monthIndex] = Month(month: month, year: year, daysList: daysList);
+    }
+    return months;
+  }
+
+  List<List<Map<int, List<MabPost>>>> getMonthEvents(int month, int year) {
+    final monthStartingDay = DateTime(year, month, 1).weekday;
+    final monthDays = DateTime(year, month + 1, 0).day;
+    //* List days for 6 weeks
+
+    //* List of 6 weeks, each week has 7 days, which has a list of events and it's date
+    List<List<Map<int, List<MabPost>>>> weeks = List.generate(6, (index) => List.generate(7, (index) => {}));
+
+    //* Fill in the dates
+    for (int i = 0; i < monthDays; i++) {
+      final week = (i + monthStartingDay) ~/ 7;
+      final day = (i + monthStartingDay) % 7;
+      weeks[week][day] = {
+        i + 1: []
+      };
+    }
+    //* Fill in previous month missing dates from the first week
+
+    //* Get last week of the previous months' amount of days
+    final lastMonthDays = DateTime(year, month, 0).day;
+    for (int i = 0; i < monthStartingDay; i++) {
+      weeks[0][i] = {
+        lastMonthDays - monthStartingDay + i + 1: []
+      };
+    }
+
+    //* Fill in next month missing dates from the last week
+    for (int i = monthDays + monthStartingDay; i < 42; i++) {
+      weeks[5][i % 7] = {
+        i - monthDays - monthStartingDay + 1: []
+      };
+    }
+    return weeks;
+  }
+
+  @override
+  Calendar build() {
+    return const Calendar(months: []);
+  }
+}
+
+final calendarProvider = riverpod.NotifierProvider<CalendarState, Calendar>(CalendarState.new);
+
+final calendarInitializedProvider = riverpod.StateProvider<bool>((ref) => false);
+
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
 
@@ -16,10 +177,9 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  int selectedYear = DateTime.now().year.toInt();
-  int selectedMonth = DateTime.now().month.toInt();
+  int selectedYear = DateTime.now().year;
+  int selectedMonth = DateTime.now().month;
   bool reversed = false;
-  GlobalKey<_CalendarState> calendarKey = GlobalKey<_CalendarState>();
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
@@ -92,12 +252,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 const SizedBox(height: 15),
                 Flexible(
                     flex: 5,
-                    //not working
-                    child: Calendar(
-                      key: Key(selectedMonth.toString() + selectedYear.toString()),
-                      selectedMonth: selectedMonth,
-                      selectedYear: selectedYear,
-                    )),
+                    child: riverpod.Consumer(builder: (context, ref, child) {
+                      final calendar = ref.watch(calendarProvider.notifier);
+                      return FutureBuilder(
+                          future: calendar.initializeCalendar(context.read<AppState>()),
+                          builder: (context, snapshot) {
+                            return CalendarWidget(
+                              key: Key(selectedMonth.toString() + selectedYear.toString()),
+                              selectedMonth: selectedMonth,
+                              selectedYear: selectedYear,
+                            );
+                          });
+                    })),
                 const SizedBox(height: 10),
               ],
             ),
@@ -106,390 +272,35 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 }
 
-class Calendar extends StatefulWidget {
-  const Calendar({super.key, required this.selectedYear, required this.selectedMonth});
+class CalendarWidget extends riverpod.ConsumerWidget {
+  const CalendarWidget({super.key, required this.selectedYear, required this.selectedMonth});
   final int selectedYear;
   final int selectedMonth;
 
-  @override
-  State<Calendar> createState() => _CalendarState();
-}
-
-class _CalendarState extends State<Calendar> {
-  // int firstDayOfMonth =
-  //       DateTime(widget.selectedYear, widget.selectedMonth, 1).weekday;
-  //   int lastDayOfMonth =
-  //       DateTime(widget.selectedYear, widget.selectedMonth + 1, 0)
-  //           .day; //Last day of month
-
-  bool loading = false;
-
-  Object calendarData = {
-    "week1": {
-      "dates": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ]
-    },
-    "week2": {
-      "dates": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ]
-    },
-    "week3": {
-      "dates": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ]
-    },
-    "week4": {
-      "dates": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ]
-    },
-    "week5": {
-      "dates": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ]
-    },
-    "week6": {
-      "dates": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ]
-    }
-  };
-
-  get getCalendarData => calendarData;
-
-  Object calendarDataEvents = {
-    "events": {
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-      5: [],
-      6: [],
-      7: [],
-      8: [],
-      9: [],
-      10: [],
-      11: [],
-      12: [],
-      13: [],
-      14: [],
-      15: [],
-      16: [],
-      17: [],
-      18: [],
-      19: [],
-      20: [],
-      21: [],
-      22: [],
-      23: [],
-      24: [],
-      25: [],
-      26: [],
-      27: [],
-      28: [],
-      29: [],
-      30: [],
-      31: []
-    }
-  };
-
-  get getCalendarDataEvents => calendarDataEvents;
-
-  //! faulty but works
-  //WORKING CODE, DO NOT TOUCH
-  void initializeCalendarEvents(AppState appState) async {
-    //* Reset calendar data
-    calendarDataEvents = {
-      "events": {
-        1: [],
-        2: [],
-        3: [],
-        4: [],
-        5: [],
-        6: [],
-        7: [],
-        8: [],
-        9: [],
-        10: [],
-        11: [],
-        12: [],
-        13: [],
-        14: [],
-        15: [],
-        16: [],
-        17: [],
-        18: [],
-        19: [],
-        20: [],
-        21: [],
-        22: [],
-        23: [],
-        24: [],
-        25: [],
-        26: [],
-        27: [],
-        28: [],
-        29: [],
-        30: [],
-        31: []
-      }
-    };
-    //oh god
-    //i forgot
-    // LEAP YEARS
-    //i wanna die
-    //working with dates is a pain
-
-    List<MabPost> mabPosts = [];
-    List<LACPost> lacPosts = [];
-
-    bool loadMabData = true;
-    bool loadLacData = true;
-
-    //Check if data is already stored in appState
-    if (appState.getMabData?.posts.isNotEmpty ?? false) {
-      setState(() {
-        mabPosts = appState.getMabData!.posts;
-        for (MabPost e in mabPosts) {
-          //Check if event is in selected month and year, if yes, add to calendarDataEvents
-          if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
-            getCalendarDataEvents["events"][e.dueDate.day].add(e);
-          }
-        }
-      });
-      loadMabData = false;
-    }
-
-    if (appState.getLacData?.posts.isNotEmpty ?? false) {
-      setState(() {
-        lacPosts = appState.getLacData!.posts;
-        for (LACPost e in lacPosts) {
-          //Check if event is in selected month and year, if yes, add to calendarDataEvents
-          if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
-            getCalendarDataEvents["events"][e.dueDate.day].add(e);
-          }
-        }
-      });
-      loadLacData = false;
-    }
-
-    if (loadMabData == false && loadLacData == false) return;
-
-    //if user is not assigned to a community, return
-    if (appState.getCurrentUser.assignedCommunity == null) {
-      return;
-    }
-
-    if (loading) {
-      return;
-    }
-
-    setState(() {
-      loading = true;
-    });
-
-    //i know what i'm doing
-    //istg if this breaks i'm gonna cry
-    //i'm not crying you're crying
-    //YOO IT WORKED
-    //nvm it broke
-    // wait wait wait i think i fixed it
-    //LET'S GOO I FIXED IT
-    //i'm so happy
-    //i'm gonna cry
-    if (loadMabData && appState.getCurrentUser.assignedCommunity != "0" && appState.getMabData != null) {
-      await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity!).collection("MAB").get().then((value) {
-        for (var e in value.docs) {
-          var element = e.data();
-          mabPosts.add(MabPost(
-            authorUID: 0,
-            uid: 0,
-            title: element["title"],
-            description: element["description"],
-            dueDate: DateTime.parse(element["dueDate"].toDate().toString()),
-            date: DateTime.parse(element["date"].toDate().toString()),
-            image: element["image"] ?? "",
-            fileAttatchments: element["fileAttatchments"] ?? [],
-            type: element["type"],
-            subject: element["subject"],
-          ));
-        }
-      });
-    }
-
-    if (loadLacData && appState.getCurrentUser.assignedCommunity != "0" && appState.getCurrentUser.assignedSection != "0" && appState.getLacData != null) {
-      await FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity!).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("LAC").get().then((value) {
-        for (var e in value.docs) {
-          var element = e.data();
-          //Tranform Map to LACPost
-          lacPosts.add(LACPost(
-            authorUID: 0,
-            uid: 0,
-            title: element["title"],
-            description: element["description"],
-            dueDate: DateTime.parse(element["dueDate"].toDate().toString()),
-            date: DateTime.parse(element["date"].toDate().toString()),
-            image: element["image"] ?? "",
-            fileAttatchments: element["fileAttatchments"] ?? [],
-            type: element["type"],
-            subject: element["subject"],
-          ));
-        }
-      });
-    }
-
-    //Get data from MAB
-    if (loadMabData) {
-      for (MabPost e in mabPosts) {
-        //Check if event is in selected month and year, if yes, add to calendarDataEvents
-        if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
-          getCalendarDataEvents["events"][e.dueDate.day].add(e);
-        }
-      }
-    }
-
-    //Get data from LAC
-    if (loadLacData) {
-      for (LACPost e in lacPosts) {
-        //Check if event is in selected month and year, if yes, add to calendarDataEvents
-        if (e.dueDate.month == widget.selectedMonth && e.dueDate.year == widget.selectedYear) {
-          getCalendarDataEvents["events"][e.dueDate.day].add(e);
-        }
-      }
-    }
-    // Set data to appstate
-    appState.setMabData(MabData(uid: 0, posts: mabPosts));
-    appState.setLacData(LACData(uid: 0, posts: lacPosts));
-
-    setState(() {});
-  }
-
-  void initializeCalendar(int firstDayOfMonth, int lastDayOfMonth, AppState appState) {
-    int currentDate = 1;
-    //First week
-    for (int i = 0; i < 7; i++) {
-      if (i < firstDayOfMonth) {
-        getCalendarData["week1"]["dates"][i] = 0;
-      } else {
-        getCalendarData["week1"]["dates"][i] = currentDate;
-        currentDate++;
-      }
-    }
-    //Second week
-    for (int i = 0; i < 7; i++) {
-      if (currentDate > lastDayOfMonth) {
-        getCalendarData["week2"]["dates"][i] = 0;
-      } else {
-        getCalendarData["week2"]["dates"][i] = currentDate;
-        currentDate++;
-      }
-    }
-    //Third week
-    for (int i = 0; i < 7; i++) {
-      if (currentDate > lastDayOfMonth) {
-        getCalendarData["week3"]["dates"][i] = 0;
-      } else {
-        getCalendarData["week3"]["dates"][i] = currentDate;
-        currentDate++;
-      }
-    }
-    //Fourth week
-    for (int i = 0; i < 7; i++) {
-      if (currentDate > lastDayOfMonth) {
-        getCalendarData["week4"]["dates"][i] = 0;
-      } else {
-        getCalendarData["week4"]["dates"][i] = currentDate;
-        currentDate++;
-      }
-    }
-    //Fifth week
-    for (int i = 0; i < 7; i++) {
-      if (currentDate > lastDayOfMonth) {
-        getCalendarData["week5"]["dates"][i] = 0;
-      } else {
-        getCalendarData["week5"]["dates"][i] = currentDate;
-        currentDate++;
-      }
-    }
-    //Sixth week
-    for (int i = 0; i < 7; i++) {
-      if (currentDate > lastDayOfMonth) {
-        getCalendarData["week6"]["dates"][i] = 0;
-      } else {
-        getCalendarData["week6"]["dates"][i] = currentDate;
-        currentDate++;
-      }
-    }
+  int getCurrentDate(List<List<Map<int, List<MabPost>>>> monthEvents, int week, int day) {
+    return monthEvents[week][day].entries.first.key;
   }
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) {
-        initializeCalendar(DateTime(widget.selectedYear, widget.selectedMonth, 1).weekday, DateTime(widget.selectedYear, widget.selectedMonth + 1, 0).day, context.read<AppState>());
-
-        initializeCalendarEvents(context.read<AppState>());
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, riverpod.WidgetRef ref) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+
+    final calendarData = ref.watch(calendarProvider.notifier).getMonthEvents(selectedMonth, selectedYear);
 
     Color getDateColor(int date) {
       //1 Event = 0xFF00FFA3
       //2-3 Events = 0xFFF9FF00
       //4-5 Events = 0xFFFF9900
       //6+ Events = 0xFFFF0000
-      if (getCalendarDataEvents["events"][date] != null) {
-        if (getCalendarDataEvents["events"][date].length == 1) {
+      if (calendarData[selectedMonth][date].isNotEmpty) {
+        if (calendarData[selectedMonth][date].length == 1) {
           return const Color(0xFF00FFA3);
-        } else if (getCalendarDataEvents["events"][date].length >= 2 && getCalendarDataEvents["events"][date].length <= 3) {
+        } else if (calendarData[selectedMonth][date].length >= 2 && calendarData[selectedMonth][date].length <= 3) {
           return const Color(0xFFF9FF00);
-        } else if (getCalendarDataEvents["events"][date].length >= 4 && getCalendarDataEvents["events"][date].length <= 5) {
+        } else if (calendarData[selectedMonth][date].length >= 4 && calendarData[selectedMonth][date].length <= 5) {
           return const Color(0xFFFF9900);
-        } else if (getCalendarDataEvents["events"][date].length >= 6) {
+        } else if (calendarData[selectedMonth][date].length >= 6) {
           return const Color(0xFFFF0000);
         }
       }
@@ -523,32 +334,39 @@ class _CalendarState extends State<Calendar> {
             ),
           ),
           const SizedBox(height: 10),
-          for (int i = 0; i < 6; i++) ...[
+          for (int week = 0; week < 6; week++) ...[
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                for (int j = 0; j < 7; j++)
+                for (int day = 0; day < 7; day++)
                   Container(
                     width: 30,
                     height: 30,
-                    decoration: widget.selectedYear == DateTime.now().year.toInt() && widget.selectedMonth == DateTime.now().month.toInt() && getCalendarData["week${i + 1}"]["dates"][j] == DateTime.now().day.toInt()
+                    decoration: selectedYear == DateTime.now().year.toInt() && selectedMonth == DateTime.now().month.toInt() && getCurrentDate(calendarData, week, day) == DateTime.now().day.toInt()
                         ? BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             gradient: getPrimaryGradient,
                           )
-                        : BoxDecoration(borderRadius: BorderRadius.circular(20), color: getDateColor(getCalendarData["week${i + 1}"]["dates"][j]), border: Border.all(color: theme.tertiary)),
+                        : BoxDecoration(borderRadius: BorderRadius.circular(20), color: getDateColor(getCurrentDate(calendarData, week, day)), border: Border.all(color: theme.tertiary)),
                     child: ElevatedButton(
                       onPressed: () {
-                        if (getCalendarData["week${i + 1}"]["dates"][j] != 0) {
+                        if (getCurrentDate(calendarData, week, day) != 0) {
                           showDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 return SelectedDateModal(
-                                  lacPosts: getCalendarDataEvents["events"][getCalendarData["week${i + 1}"]["dates"][j]].where((item) => item is LACPost).toList(),
-                                  mabPosts: getCalendarDataEvents["events"][getCalendarData["week${i + 1}"]["dates"][j]].where((item) => item is MabPost).toList(),
-                                  title: "${getCalendarDataEvents["events"][getCalendarData["week${i + 1}"]["dates"][j]].length} Events",
-                                  description: "${getCalendarData["week${i + 1}"]["dates"][j]} of ${getMonthsOfTheYear[widget.selectedMonth]}, ${widget.selectedYear}",
+                                  lacPosts: const [],
+                                  //* Check if it was last month's date
+                                  mabPosts: getCurrentDate(calendarData, week, day) > 7 && week == 0
+                                      ? calendarData[selectedMonth - 1 == 0 ? 12 : selectedMonth][getCurrentDate(calendarData, week, day)].entries.first.value
+                                      //* Check if it was next month's date
+                                      : getCurrentDate(calendarData, week, day) < 7 && week >= 5
+                                          ? calendarData[selectedMonth + 1 == 13 ? 1 : selectedMonth][getCurrentDate(calendarData, week, day)].entries.first.value
+                                          //* Current month's date
+                                          : calendarData[selectedMonth][getCurrentDate(calendarData, week, day)].entries.first.value,
+                                  title: "${calendarData[selectedMonth][getCurrentDate(calendarData, week, day)].entries.first.value.length} Events",
+                                  description: "${calendarData[selectedMonth][getCurrentDate(calendarData, week, day)].entries.first.value} of ${getMonthsOfTheYear[selectedMonth]}, $selectedYear",
                                 );
                               });
                         } else {
@@ -573,7 +391,7 @@ class _CalendarState extends State<Calendar> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      child: Text(getCalendarData["week${i + 1}"]["dates"][j] == 0 ? "-" : getCalendarData["week${i + 1}"]["dates"][j].toString(), style: textTheme.displaySmall),
+                      child: Text(getCurrentDate(calendarData, week, day).toString(), style: textTheme.displaySmall),
                     ),
                   ),
               ],

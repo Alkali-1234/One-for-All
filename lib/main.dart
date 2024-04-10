@@ -7,6 +7,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:oneforall/components/profile_viewer.dart';
 import 'package:oneforall/screens/calendar_screen.dart';
 import 'package:oneforall/screens/flashcards_screen.dart';
@@ -67,7 +68,7 @@ void main() async {
     "Initialized app! : ${Firebase.app().options.projectId}",
   );
 
-  runApp(const MyApp());
+  runApp(const riverpod.ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
