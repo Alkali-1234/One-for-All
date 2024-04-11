@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/community_data.dart';
+import 'package:oneforall/logger.dart';
 // import 'package:oneforall/service/community_service.dart';
 import 'package:provider/provider.dart';
 // import '../data/user_data.dart';
@@ -15,21 +16,25 @@ import '../models/month_model/month_model.dart';
 //* Riverpod
 import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 
+//* Logic
+
 //* State
-class CalendarState extends riverpod.Notifier<Calendar> {
-  Future<void> initializeCalendar(AppState appState) async {
-    if (ref.read(calendarInitializedProvider)) return;
-    ref.read(calendarInitializedProvider.notifier).state = false;
-    bool missingMabData = false;
-    bool missingLacData = false;
+class CalendarState extends riverpod.Notifier<Calendar?> {
+  Future<Calendar?> initializeCalendar(AppState appState, BuildContext context) async {
+    logger.d("Before Initializing Calendar");
+    // if (!context.mounted) return null;
+    // if (ref.read(calendarInitializedProvider)) return null;
+    logger.i("Initializing Calendar");
+    bool missingMabData = true;
+    bool missingLacData = true;
     List<Month> months = [];
     //* Attempt to get data from appstate
     if (appState.getMabData != null) {
-      months.addAll(getMonthsListFromPosts(appState.getMabData!.posts));
+      months = getMonthsListFromPosts(appState.getMabData!.posts, months);
       missingMabData = false;
     }
     if (appState.getLacData != null) {
-      months.addAll(getMonthsListFromPosts(List<MabPost>.generate(appState.getLacData!.posts.length, (index) => MabPost(uid: index, title: appState.getLacData!.posts[index].title, description: appState.getLacData!.posts[index].description, date: appState.getLacData!.posts[index].date, authorUID: appState.getLacData!.posts[index].authorUID, image: appState.getLacData!.posts[index].image, fileAttatchments: appState.getLacData!.posts[index].fileAttatchments, dueDate: appState.getLacData!.posts[index].dueDate, type: appState.getLacData!.posts[index].type, subject: appState.getLacData!.posts[index].subject))));
+      months = getMonthsListFromPosts(List<MabPost>.generate(appState.getLacData!.posts.length, (index) => MabPost(uid: index, title: appState.getLacData!.posts[index].title, description: appState.getLacData!.posts[index].description, date: appState.getLacData!.posts[index].date, authorUID: appState.getLacData!.posts[index].authorUID, image: appState.getLacData!.posts[index].image, fileAttatchments: appState.getLacData!.posts[index].fileAttatchments, dueDate: appState.getLacData!.posts[index].dueDate, type: appState.getLacData!.posts[index].type, subject: appState.getLacData!.posts[index].subject)), months);
       missingLacData = false;
     }
 
@@ -54,7 +59,7 @@ class CalendarState extends riverpod.Notifier<Calendar> {
             subject: element["subject"],
           ));
         }
-        months.addAll(getMonthsListFromPosts(mabPosts));
+        months = getMonthsListFromPosts(mabPosts, months);
       });
     }
 
@@ -77,22 +82,28 @@ class CalendarState extends riverpod.Notifier<Calendar> {
             type: element["type"],
             subject: element["subject"],
           ));
+          logger.d("LAC Post: ${element["title"]}");
         }
-        months.addAll(getMonthsListFromPosts(List<MabPost>.generate(lacPosts.length, (index) => MabPost(uid: index, title: lacPosts[index].title, description: lacPosts[index].description, date: lacPosts[index].date, authorUID: lacPosts[index].authorUID, image: lacPosts[index].image, fileAttatchments: lacPosts[index].fileAttatchments, dueDate: lacPosts[index].dueDate, type: lacPosts[index].type, subject: lacPosts[index].subject))));
+        logger.d("LAC Posts: ${lacPosts.length}");
+        months = getMonthsListFromPosts(List<MabPost>.generate(lacPosts.length, (index) => MabPost(uid: index, title: lacPosts[index].title, description: lacPosts[index].description, date: lacPosts[index].date, authorUID: lacPosts[index].authorUID, image: lacPosts[index].image, fileAttatchments: lacPosts[index].fileAttatchments, dueDate: lacPosts[index].dueDate, type: lacPosts[index].type, subject: lacPosts[index].subject)), months);
       });
     }
-    ref.read(calendarInitializedProvider.notifier).state = true;
+    state = Calendar(months: months);
+    logger.i("Calendar Initialized");
+    return state;
   }
 
-  List<Month> getMonthsListFromPosts(List<MabPost> posts) {
-    List<Month> months = [];
+  List<Month> getMonthsListFromPosts(List<MabPost> posts, List<Month> monthsParam) {
+    List<Month> months = List.from(monthsParam);
+
+    logger.d("Updating Months List : ${posts.length}");
     for (var post in posts) {
       final day = post.dueDate.day;
       final month = post.dueDate.month;
       final year = post.dueDate.year;
 
       //* Check if month is not in the list
-      if (state.months.indexWhere((element) => element.month == month && element.year == year) == -1) {
+      if (months.indexWhere((element) => element.month == month && element.year == year) == -1) {
         months.add(Month(month: month, year: year, daysList: []));
       }
 
@@ -100,10 +111,11 @@ class CalendarState extends riverpod.Notifier<Calendar> {
 
       //* Get the month
       final monthIndex = months.indexWhere((element) => element.month == month && element.year == year);
-      //* Get the daysList
-      final daysList = months[monthIndex].daysList;
+      //* Days List
+      List<Map<int, List<MabPost>>> daysList = List.from(months[monthIndex].daysList);
+
       //* Check if day is not in the list
-      if (daysList.where((element) => element.keys.first == day).isEmpty) {
+      if (daysList.where((element) => element.entries.first.key == day).isEmpty) {
         //* Add the day with the post if it doesn't exist
         daysList.add({
           day: [
@@ -121,6 +133,7 @@ class CalendarState extends riverpod.Notifier<Calendar> {
       //* Update the daysList
       months[monthIndex] = Month(month: month, year: year, daysList: daysList);
     }
+    logger.d("Updated Months List : ${months.length}");
     return months;
   }
 
@@ -151,39 +164,63 @@ class CalendarState extends riverpod.Notifier<Calendar> {
     }
 
     //* Fill in next month missing dates from the last week
-    for (int i = monthDays + monthStartingDay; i < 42; i++) {
-      weeks[5][i % 7] = {
-        i - monthDays - monthStartingDay + 1: []
-      };
+
+    //* Get the index of the last week and date
+
+    //* Index of the week where it has an empty day
+    final lastWeekIndex = weeks.indexWhere((element) => element.where((element) => element.entries.isEmpty).isNotEmpty);
+
+    //* Index of the day where it has an empty day
+    int lastWeekDate = weeks[lastWeekIndex].indexWhere((element) => element.entries.isEmpty);
+
+    //* Fill in the missing dates
+
+    //* The day index that will be filled
+    int dayIndex = 1;
+
+    //* Iterate through the weeks with missing dates
+    for (int i = lastWeekIndex; i < weeks.length; i++) {
+      //* Iterate through the dates with missing dates
+      for (int j = lastWeekDate; j < 7; j++) {
+        weeks[i][j] = {
+          dayIndex: []
+        };
+        dayIndex++;
+      }
+      lastWeekDate = 0;
     }
     return weeks;
   }
 
   @override
-  Calendar build() {
-    return const Calendar(months: []);
+  Calendar? build() {
+    return null;
   }
 }
 
-final calendarProvider = riverpod.NotifierProvider<CalendarState, Calendar>(CalendarState.new);
+final calendarProvider = riverpod.NotifierProvider<CalendarState, Calendar?>(CalendarState.new);
 
 final calendarInitializedProvider = riverpod.StateProvider<bool>((ref) => false);
 
-class CalendarScreen extends StatefulWidget {
+class CalendarScreen extends riverpod.ConsumerStatefulWidget {
   const CalendarScreen({super.key});
 
   @override
-  State<CalendarScreen> createState() => _CalendarScreenState();
+  riverpod.ConsumerState<CalendarScreen> createState() => _CalendarScreenState();
 }
 
-class _CalendarScreenState extends State<CalendarScreen> {
+class _CalendarScreenState extends riverpod.ConsumerState<CalendarScreen> {
   int selectedYear = DateTime.now().year;
   int selectedMonth = DateTime.now().month;
   bool reversed = false;
+
+  late final initializeCalendarFunction = Future(() => ref.read(calendarProvider.notifier).initializeCalendar(context.read<AppState>(), context));
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    final calendar = ref.watch(calendarProvider);
     return Scaffold(
         resizeToAvoidBottomInset: false,
         body: MainContainer(
@@ -251,19 +288,24 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     )),
                 const SizedBox(height: 15),
                 Flexible(
-                    flex: 5,
-                    child: riverpod.Consumer(builder: (context, ref, child) {
-                      final calendar = ref.watch(calendarProvider.notifier);
-                      return FutureBuilder(
-                          future: calendar.initializeCalendar(context.read<AppState>()),
-                          builder: (context, snapshot) {
-                            return CalendarWidget(
-                              key: Key(selectedMonth.toString() + selectedYear.toString()),
-                              selectedMonth: selectedMonth,
-                              selectedYear: selectedYear,
-                            );
-                          });
-                    })),
+                  flex: 5,
+                  child: FutureBuilder(
+                      future: initializeCalendarFunction,
+                      builder: (context, snapshot) {
+                        if (calendar == null) {
+                          return Center(
+                              child: Text(
+                            "Loading...",
+                            style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
+                          ));
+                        }
+                        return CalendarWidget(
+                          key: Key(selectedMonth.toString() + selectedYear.toString()),
+                          selectedMonth: selectedMonth,
+                          selectedYear: selectedYear,
+                        );
+                      }),
+                ),
                 const SizedBox(height: 10),
               ],
             ),
@@ -281,31 +323,93 @@ class CalendarWidget extends riverpod.ConsumerWidget {
     return monthEvents[week][day].entries.first.key;
   }
 
+  Color getDateColor(int date, int week, ColorScheme theme, List<Month> calendarMonthsData) {
+    final month = //* Check if it is last weeks' month
+        date > 7 && week == 0
+            ? selectedMonth - 1 == 0
+                ? 12
+                : selectedMonth - 1
+            //* Check if it is next weeks' month
+            : date < 14 && week >= 4
+                ? selectedMonth + 1 == 13
+                    ? 1
+                    : selectedMonth + 1
+                //* Current month
+                : selectedMonth;
+    //1 Event = 0xFF00FFA3
+    //2-3 Events = 0xFFF9FF00
+    //4-5 Events = 0xFFFF9900
+    //6+ Events = 0xFFFF0000
+
+    //* Check if last week's month
+    if (month < selectedMonth || (month == 12 && selectedMonth == 1)) {
+      return Colors.transparent;
+    }
+
+    //* Check if next week's month
+    if (month > selectedMonth || (month == 1 && selectedMonth == 12)) {
+      return Colors.transparent;
+    }
+
+    //* Check if month exists
+    if (calendarMonthsData.where((element) => element.month == month && element.year == selectedYear).isEmpty) {
+      return theme.secondary;
+    }
+
+    //* Check if date exists
+    if (calendarMonthsData.where((element) => element.month == month && element.year == selectedYear).first.daysList.where((element) => element.keys.first == date).isEmpty) {
+      return theme.secondary;
+    }
+
+    final events = calendarMonthsData.where((element) => element.month == month && element.year == selectedYear).first.daysList.where((element) => element.keys.first == date).first.values.first;
+    if (events.isNotEmpty) {
+      if (events.length == 1) {
+        return const Color(0xFF00FFA3);
+      } else if (events.length >= 2 && events.length <= 3) {
+        return const Color(0xFFF9FF00);
+      } else if (events.length >= 4 && events.length <= 5) {
+        return const Color(0xFFFF9900);
+      } else if (events.length >= 6) {
+        return const Color(0xFFFF0000);
+      }
+    }
+    return theme.secondary;
+  }
+
+  List<MabPost> getEvents(int date, int week, List<List<Map<int, List<MabPost>>>> monthEvents, List<Month> calendarMonthsData) {
+    //* Check if it is last weeks' month
+    final month = date > 7 && week == 0
+        ? selectedMonth - 1 == 0
+            ? 12
+            : selectedMonth - 1
+        //* Check if it is next weeks' month
+        : date < 14 && week >= 4
+            ? selectedMonth + 1 == 13
+                ? 1
+                : selectedMonth + 1
+            //* Current month
+            : selectedMonth;
+
+    //* Check if month exists
+    if (calendarMonthsData.where((element) => element.month == month && element.year == selectedYear).isEmpty) {
+      return [];
+    }
+
+    //* Check if date exists
+    if (calendarMonthsData.where((element) => element.month == month && element.year == selectedYear).first.daysList.where((element) => element.keys.first == date).isEmpty) {
+      return [];
+    }
+
+    return calendarMonthsData.where((element) => element.month == month && element.year == selectedYear).first.daysList.where((element) => element.keys.first == date).first.values.first;
+  }
+
   @override
   Widget build(BuildContext context, riverpod.WidgetRef ref) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
 
-    final calendarData = ref.watch(calendarProvider.notifier).getMonthEvents(selectedMonth, selectedYear);
-
-    Color getDateColor(int date) {
-      //1 Event = 0xFF00FFA3
-      //2-3 Events = 0xFFF9FF00
-      //4-5 Events = 0xFFFF9900
-      //6+ Events = 0xFFFF0000
-      if (calendarData[selectedMonth][date].isNotEmpty) {
-        if (calendarData[selectedMonth][date].length == 1) {
-          return const Color(0xFF00FFA3);
-        } else if (calendarData[selectedMonth][date].length >= 2 && calendarData[selectedMonth][date].length <= 3) {
-          return const Color(0xFFF9FF00);
-        } else if (calendarData[selectedMonth][date].length >= 4 && calendarData[selectedMonth][date].length <= 5) {
-          return const Color(0xFFFF9900);
-        } else if (calendarData[selectedMonth][date].length >= 6) {
-          return const Color(0xFFFF0000);
-        }
-      }
-      return theme.secondary;
-    }
+    final currentMonthData = ref.watch(calendarProvider.notifier).getMonthEvents(selectedMonth, selectedYear);
+    final calendarMonthsData = ref.watch(calendarProvider)!.months;
 
     return SizedBox.expand(
         child: Container(
@@ -335,7 +439,7 @@ class CalendarWidget extends riverpod.ConsumerWidget {
           ),
           const SizedBox(height: 10),
           for (int week = 0; week < 6; week++) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -343,30 +447,24 @@ class CalendarWidget extends riverpod.ConsumerWidget {
                   Container(
                     width: 30,
                     height: 30,
-                    decoration: selectedYear == DateTime.now().year.toInt() && selectedMonth == DateTime.now().month.toInt() && getCurrentDate(calendarData, week, day) == DateTime.now().day.toInt()
+                    decoration: selectedYear == DateTime.now().year.toInt() && selectedMonth == DateTime.now().month.toInt() && getCurrentDate(currentMonthData, week, day) == DateTime.now().day.toInt() && getDateColor(getCurrentDate(currentMonthData, week, day), week, theme, calendarMonthsData) != Colors.transparent
                         ? BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             gradient: getPrimaryGradient,
                           )
-                        : BoxDecoration(borderRadius: BorderRadius.circular(20), color: getDateColor(getCurrentDate(calendarData, week, day)), border: Border.all(color: theme.tertiary)),
+                        : BoxDecoration(borderRadius: BorderRadius.circular(20), color: getDateColor(getCurrentDate(currentMonthData, week, day), week, theme, calendarMonthsData), border: getDateColor(getCurrentDate(currentMonthData, week, day), week, theme, calendarMonthsData) != Colors.transparent ? Border.all(color: theme.tertiary) : null),
                     child: ElevatedButton(
                       onPressed: () {
-                        if (getCurrentDate(calendarData, week, day) != 0) {
+                        if (getCurrentDate(currentMonthData, week, day) != 0) {
                           showDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 return SelectedDateModal(
                                   lacPosts: const [],
                                   //* Check if it was last month's date
-                                  mabPosts: getCurrentDate(calendarData, week, day) > 7 && week == 0
-                                      ? calendarData[selectedMonth - 1 == 0 ? 12 : selectedMonth][getCurrentDate(calendarData, week, day)].entries.first.value
-                                      //* Check if it was next month's date
-                                      : getCurrentDate(calendarData, week, day) < 7 && week >= 5
-                                          ? calendarData[selectedMonth + 1 == 13 ? 1 : selectedMonth][getCurrentDate(calendarData, week, day)].entries.first.value
-                                          //* Current month's date
-                                          : calendarData[selectedMonth][getCurrentDate(calendarData, week, day)].entries.first.value,
-                                  title: "${calendarData[selectedMonth][getCurrentDate(calendarData, week, day)].entries.first.value.length} Events",
-                                  description: "${calendarData[selectedMonth][getCurrentDate(calendarData, week, day)].entries.first.value} of ${getMonthsOfTheYear[selectedMonth]}, $selectedYear",
+                                  mabPosts: getEvents(getCurrentDate(currentMonthData, week, day), week, currentMonthData, calendarMonthsData),
+                                  title: "${getEvents(getCurrentDate(currentMonthData, week, day), week, currentMonthData, calendarMonthsData).length} Events",
+                                  description: "${getCurrentDate(currentMonthData, week, day)} of ${getMonthsOfTheYear[selectedMonth]}, $selectedYear",
                                 );
                               });
                         } else {
@@ -391,7 +489,7 @@ class CalendarWidget extends riverpod.ConsumerWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      child: Text(getCurrentDate(calendarData, week, day).toString(), style: textTheme.displaySmall),
+                      child: Text(getCurrentDate(currentMonthData, week, day).toString(), style: textTheme.displaySmall!.copyWith(color: getDateColor(getCurrentDate(currentMonthData, week, day), week, theme, calendarMonthsData) != Colors.transparent ? theme.onBackground : theme.onBackground.withOpacity(0.5))),
                     ),
                   ),
               ],
