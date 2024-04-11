@@ -46,12 +46,15 @@ service cloud.firestore {
     
     	// Allow anyone to read
       allow read: if true;
-      allow create: if request.auth.uid == resource.id;
+      // Allow any authenticated user to create
+      allow create: if request.auth != null;
       allow delete: if false;
       // Allow the user itself to write, except for the field roles
       allow update: if (request.auth.uid == resource.id && request.resource.data.roles == resource.data.roles) || 
                         // Allow admins to update the roles field
-                        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['roles']) && isUserAdmin(request.auth.uid) && sameCommunity(request.auth.uid, resource.id))
+                        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['roles']) && isUserAdmin(request.auth.uid) && sameCommunity(request.auth.uid, resource.id)) ||
+                        // Allow users to update roles, if it was not present before
+                        (!('roles' in resource.data) && request.auth.uid == resource.id);
       
       
      }                   

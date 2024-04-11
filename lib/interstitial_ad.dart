@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import 'logger.dart';
+
 class InterstitialAdWidget extends StatefulWidget {
   const InterstitialAdWidget({super.key, this.onClosed, this.onFailed});
   final Function? onClosed;
@@ -43,7 +45,7 @@ class _InterstitialAdWidgetState extends State<InterstitialAdWidget> {
             );
           },
           onAdFailedToLoad: (error) {
-            debugPrint('InterstitialAd failed to load: $error');
+            logger.i('InterstitialAd failed to load: $error');
             dispose();
             if (widget.onFailed != null) widget.onFailed!();
           },

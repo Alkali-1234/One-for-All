@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 //ignore: unused_import
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
 import 'package:oneforall/functions/community_functions.dart';
 import '../data/community_data.dart';
 import '../main.dart';
@@ -60,7 +59,6 @@ Future addNewMABEvent(String title, String description, int type, int subject, T
     //   ])
     // });
   } catch (e) {
-    debugPrint(e.toString());
     rethrow;
   }
   //! Deprecated, now using cloud functions
@@ -131,7 +129,6 @@ Future addNewLACEvent(String title, String description, int type, int subject, T
     //   ])
     // });
   } catch (e) {
-    debugPrint(e.toString());
     rethrow;
   }
   //! Deprecated, now using cloud functions
@@ -180,7 +177,6 @@ Future getValue(String collection, String document, String field) async {
       if (value.data() == null) {
         throw Exception("Community does not exist");
       } else {
-        debugPrint(value.data().toString());
         val = value[field];
       }
     }).catchError((error, stackTrace) {
@@ -201,7 +197,6 @@ Future getDocument(String collection, String document) async {
       if (value.data() == null) {
         throw Exception("Document does not exist");
       } else {
-        debugPrint(value.data().toString());
         doc = value;
       }
     }).catchError((error, stackTrace) {
@@ -219,16 +214,9 @@ Future getCommunity(String communityID) async {
   DocumentSnapshot<Object?>? document;
   try {
     await communityCollection.doc(communityID).get().then((value) {
-      // debugPrint(value.toString());
-      // debugPrint(value.data().toString());
-      // debugPrint(value.exists.toString());
-      // if (communityID == "P3xcmRih8YYxkOqsuV7u") {
-      //   debugPrint("Community should exists");
-      // }
       if (value.data() == null) {
         throw Exception("Community does not exist");
       } else {
-        debugPrint(value.data().toString());
         document = value;
       }
     }).catchError((error, stackTrace) {
@@ -307,8 +295,6 @@ Future getCommunityData(String communityID) async {
       if (value.data() == null) {
         throw Exception("Community does not exist");
       } else {
-        debugPrint(value.data().toString());
-
         document = value;
       }
     }).catchError((error, stackTrace) {

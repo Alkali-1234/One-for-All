@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 // import '../data/user_data.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../logger.dart';
 import '../main.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -53,7 +54,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
     if (_formKey.currentState!.validate()) {
-      debugPrint("e");
       // Save changes to the user profile
       if (profilePicture is File) {
         //* Change profile picture
@@ -102,17 +102,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return;
         }
       }
-      debugPrint('Changes saved!');
+      logger.i('Changes saved! $email');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Changes saved!', style: TextStyle(color: Colors.white)),
+          content: Text('Please check your new email to verify.', style: TextStyle(color: Colors.white)),
           backgroundColor: Colors.green,
         ),
       );
       return;
     } else {
-      debugPrint("called");
       Navigator.pop(context);
       //* Show snack bar
       ScaffoldMessenger.of(context).showSnackBar(
@@ -121,14 +120,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           backgroundColor: Colors.red,
         ),
       );
-      debugPrint('Changes not saved!');
       return;
     }
   }
 
   void changeProfilePicture() async {
     //* Handle change profile picture
-    debugPrint('Change profile picture clicked!');
     //* Pick image from gallery
     await ImagePicker().pickImage(source: ImageSource.gallery).then((value) {
       if (value != null) {
@@ -251,13 +248,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: ElevatedButton(
                     onPressed: () => _saveChanges(context.read<AppState>()),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.secondary,
+                      surfaceTintColor: Colors.transparent,
+                      backgroundColor: Colors.green,
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: Text('Save Changes', style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                    child: Text('Save Changes', style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
                 ),
                 SizedBox(

@@ -13,6 +13,7 @@ import 'package:oneforall/service/firebase_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/user_data.dart';
 //ignore: unused_import
+import '../logger.dart';
 import '../models/quizzes_models.dart';
 import 'community_service.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -40,7 +41,6 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
   await getDocument("users", auth.currentUser!.uid).then((value) async {
     //set flashcard sets for setUserData
     //* Initialize an empty list of flashcard sets
-    debugPrint(value.data()!["flashcardSets"].toString());
     List<FlashcardSet> flashcardSets = [];
     //! Temporarily unused
     // // if (value.data()!["flashcardSets"] != null) {
@@ -144,7 +144,7 @@ Future login(String email, String password, bool saveCredentials, AppState appSt
     //   assignedSection: value.data()!["sections"][0],
     // ));
   }).catchError((error, stackTrace) {
-    debugPrint("err on auth service: getDocument");
+    logger.e("err on auth service: getDocument");
     throw error;
   });
   appState.setQuizzes([]);
@@ -327,7 +327,7 @@ Future changeUserProfilePicture(File file, String? previousProfilePicture) async
 
 Future changeUserEmail(String email) async {
   try {
-    await FirebaseAuth.instance.currentUser!.updateEmail(email).catchError((error, stacktrace) {
+    await FirebaseAuth.instance.currentUser!.verifyBeforeUpdateEmail(email).catchError((error, stacktrace) {
       throw error;
     });
   } catch (e) {

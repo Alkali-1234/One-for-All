@@ -3,9 +3,11 @@
 //Firebase
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:oneforall/components/profile_viewer.dart';
 import 'package:oneforall/screens/calendar_screen.dart';
 import 'package:oneforall/screens/flashcards_screen.dart';
@@ -24,7 +26,6 @@ import 'package:flutter/material.dart';
 import 'package:oneforall/data/user_data.dart';
 import 'package:provider/provider.dart';
 import 'constants.dart';
-import 'package:sidebarx/sidebarx.dart';
 import 'package:intl/intl.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
@@ -37,12 +38,13 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'data/community_data.dart';
 
 //Screens
+import 'logger.dart';
 import 'models/quizzes_models.dart';
 import 'screens/community_screen.dart';
 // import 'screens/navigation_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/loading_screen.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 import 'package:showcaseview/showcaseview.dart';
 
 void main() async {
@@ -55,18 +57,18 @@ void main() async {
   //* Initialize
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // //* Run on emulator if debug is true
-  // if (kDebugMode) {
-  //   await FirebaseAuth.instance.useAuthEmulator('localhost', 8080);
-  //   FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-  // }
-  // await FlutterDownloader.initialize(debug: true);
+  if (kDebugMode) {
+    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+    FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
+  }
   //Init ads if platform is not web
   if (!kIsWeb) await MobileAds.instance.initialize();
-  debugPrint(
+  logger.i(
     "Initialized app! : ${Firebase.app().options.projectId}",
   );
 
-  runApp(const MyApp());
+  runApp(const riverpod.ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -220,7 +222,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     var appState = Provider.of<AppState>(context, listen: false);
     if (widget.doShowcase == true && appState.viewedShowcase == false) {
-      debugPrint("Starting showcase");
+      logger.i("Starting showcase");
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ShowCaseWidget.of(context).startShowCase([
           showcase1,
@@ -246,7 +248,6 @@ class _HomePageState extends State<HomePage> {
         }
         selectedScreen = index;
       });
-      debugPrint("Selected Screen: $selectedScreen");
     }
 
     return PopScope(
@@ -284,7 +285,6 @@ class _HomePageState extends State<HomePage> {
                                 GestureDetector(
                                   onTap: () => {
                                     _key.currentState?.openDrawer(),
-                                    debugPrint("e")
                                   },
                                   child: Showcase(
                                     key: showcase2,
@@ -384,34 +384,6 @@ class _HomePageState extends State<HomePage> {
                   ]),
                 )),
       ),
-    );
-  }
-}
-
-//SidebarWidget
-class SidebarXWidget extends StatelessWidget {
-  const SidebarXWidget({Key? key, required SidebarXController controller})
-      : _controller = controller,
-        super(key: key);
-  final SidebarXController _controller;
-
-  @override
-  Widget build(BuildContext context) {
-    var theme = Theme.of(context).colorScheme;
-    var textTheme = Theme.of(context).textTheme;
-    return SidebarX(
-      controller: _controller,
-      theme: SidebarXTheme(
-        decoration: BoxDecoration(color: theme.background),
-        iconTheme: const IconThemeData(color: Colors.white),
-        selectedIconTheme: IconThemeData(color: getRareMainTheme),
-        textStyle: textTheme.displaySmall,
-        selectedTextStyle: textTheme.displaySmall,
-      ),
-      items: const [
-        SidebarXItem(icon: Icons.home, label: '  Home'),
-      ],
-      extendedTheme: const SidebarXTheme(width: 140),
     );
   }
 }
@@ -633,7 +605,6 @@ class _HomeScreenState extends State<HomeScreen> {
         }
         mabSelectedFilter = filter;
       });
-      debugPrint("Selected Filter: $mabSelectedFilter");
     }
 
     var appState = Provider.of<AppState>(context);
@@ -683,7 +654,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ],
-                      onChanged: (value) => debugPrint(value.toString()),
+                      onChanged: (value) {},
                     ),
                   ),
                 ),

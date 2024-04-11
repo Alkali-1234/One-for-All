@@ -594,7 +594,6 @@ class _NewEventModalState extends State<NewEventModal> {
                       setState(() {
                         subject = value as int;
                       });
-                      debugPrint("Changed subject to $subject");
                     },
                     items: List.generate(getSubjects.length, (index) => DropdownMenuItem(value: index, child: Text(getSubjects[index], textAlign: TextAlign.center, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)))),
                   ),
@@ -696,7 +695,6 @@ class _NewEventModalState extends State<NewEventModal> {
                       setState(() {
                         for (var file in pickedFiles) {
                           attatchements.add(File(file.path));
-                          debugPrint("Added file ${file.path}");
                         }
                       });
                     },

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:oneforall/logger.dart';
 
 class BannerAdWidget extends StatefulWidget {
   const BannerAdWidget({super.key});
@@ -24,14 +25,14 @@ class BannerAdState extends State<BannerAdWidget> {
           onAdClosed: (ad) => ad.dispose(),
           // Called when an ad is successfully received.
           onAdLoaded: (ad) {
-            debugPrint('$ad loaded.');
+            logger.i('$ad loaded.');
             setState(() {
               _isLoaded = true;
             });
           },
           // Called when an ad request failed.
           onAdFailedToLoad: (ad, err) {
-            debugPrint('BannerAd failed to load: $err');
+            logger.i('BannerAd failed to load: $err');
             // Dispose the ad here to free resources.
             ad.dispose();
           },

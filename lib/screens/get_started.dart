@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showcaseview/showcaseview.dart';
 import '../constants.dart';
 import '../data/user_data.dart';
+import '../logger.dart';
 import '../models/quizzes_models.dart';
 import '../service/auth_service.dart';
 import 'package:email_validator/email_validator.dart';
@@ -366,7 +367,6 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
         .then((value) => setState(
               () {
                 communityData = value;
-                debugPrint(value.toString());
               },
             ))
         .catchError((error, stackTrace) => {
@@ -374,14 +374,11 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
                 getCommunityError = error.toString();
                 isSearchingCommunity = false;
               }),
-              debugPrint("Community not found"),
             });
 
     if (getCommunityError != "") {
       return;
     }
-
-    debugPrint(communityData.toString());
 
     setState(() {
       isSearchingCommunitySuccess = true;
@@ -409,7 +406,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
       return;
     }
     //* Join community
-    joinCommunity(communityIDQuery, passwordQuery, context.read<AppState>()).then((value) => debugPrint("Joined community")).catchError((error, stackTrace) => setState(() {
+    joinCommunity(communityIDQuery, passwordQuery, context.read<AppState>()).then((value) => logger.i("Joined community")).catchError((error, stackTrace) => setState(() {
           this.error = error.toString();
           isLoading = false;
         }));
@@ -785,7 +782,6 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
       });
       //Check if forms are filled
       if (userNameQuery == "" || emailQuery == "" || passwordQuery == "" || retypePasswordQuery == "") {
-        debugPrint("e");
         setState(() {
           isLoading = false;
           error = "Please fill in all fields.";
@@ -839,7 +835,7 @@ class _AccountCreationScreenState extends State<AccountCreationScreen> {
         return;
       }
       //*Create account
-      await createAccount(emailQuery, passwordQuery, userNameQuery, context.read<AppState>()).then((value) => debugPrint("Account created")).onError((error, stackTrace) => setState(() {
+      await createAccount(emailQuery, passwordQuery, userNameQuery, context.read<AppState>()).then((value) => logger.i("Account created : $emailQuery")).onError((error, stackTrace) => setState(() {
             isLoading = false;
             this.error = error.toString();
           }));
