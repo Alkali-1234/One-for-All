@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:oneforall/constants.dart';
-import 'package:oneforall/data/community_data.dart';
 import 'package:oneforall/data/user_data.dart';
 import 'package:oneforall/service/auth_service.dart';
 import 'package:provider/provider.dart';
@@ -45,7 +44,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void initializeApp(AppState appState) async {
     //is it there because of the loading screen????
     //make sure its empty
-    appState.setMabData(MabData(uid: 0, posts: []));
     appState.setCommunityData({});
     // I SWEAR TO GOD IF THIS WORKS
     // I WILL BE SO HAPPY
@@ -152,7 +150,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          image: DecorationImage(image: AssetImage("assets/images/logbg.png"), fit: BoxFit.cover),
+          image: DecorationImage(image: AssetImage("assets/images/purpwallpaper 2.png"), fit: BoxFit.cover),
         ),
         child: Center(
           child: Stack(

@@ -174,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     return Container(
-        decoration: const BoxDecoration(image: DecorationImage(fit: BoxFit.cover, image: AssetImage('assets/images/logbg.png'))),
+        decoration: const BoxDecoration(image: DecorationImage(fit: BoxFit.cover, image: AssetImage('assets/images/purpwallpaper 2.png'))),
         child: Scaffold(
             backgroundColor: Colors.transparent,
             body: SafeArea(

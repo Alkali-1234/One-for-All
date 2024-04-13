@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/constants.dart';
+import 'package:oneforall/logger.dart';
 import 'package:photo_view/photo_view.dart';
 // import 'package:oneforall/data/user_data.dart';
 import 'package:provider/provider.dart';
@@ -81,6 +82,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
     var appState = context.read<AppState>();
     mabDataStream = appState.getCurrentUser.assignedCommunity != "0" ? FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("MAB").snapshots() : const Stream.empty();
     lacDataStream = appState.getCurrentUser.assignedSection != "0" ? FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("LAC").snapshots() : const Stream.empty();
+    logger.d(lacDataStream);
   }
 
   @override
@@ -322,56 +324,107 @@ class _MABLACScreenState extends State<MABLACScreen> {
                               const SizedBox(height: 10),
                               //List of items
                               Expanded(
-                                child: StreamBuilder(
-                                    stream: selectedSection == 0 ? mabDataStream : lacDataStream,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return Center(
-                                            child: Text(
-                                          "Loading...",
-                                          style: textTheme.displaySmall,
-                                        ));
-                                      }
-                                      if (snapshot.hasError) {
-                                        return Center(
-                                            child: Text(
-                                          "Error: ${snapshot.error}",
-                                          style: textTheme.displaySmall!.copyWith(color: theme.error),
-                                        ));
-                                      }
-                                      if (!snapshot.hasData) {
-                                        return Center(
-                                            child: Text(
-                                          "No data",
-                                          style: textTheme.displaySmall,
-                                        ));
-                                      }
-                                      MabData mabData = MabData(uid: 0, posts: [
-                                        for (var post in (selectedSection == 0 ? snapshot.data?.docs ?? [] : snapshot.data?.docs ?? []))
-                                          MabPost(
-                                              uid: 0,
-                                              title: post["title"],
-                                              description: post["description"],
-                                              date: DateTime.parse(post["date"].toDate().toString()),
-                                              authorUID: 0,
-                                              image: post["image"] ?? "",
-                                              fileAttatchments: [
-                                                for (String file in post["files"]) file
-                                              ],
-                                              dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
-                                              type: post["type"],
-                                              subject: post["subject"])
-                                      ]);
-                                      mabData.posts.sort((a, b) => b.date.compareTo(a.date));
-                                      return ListView.builder(
-                                          padding: EdgeInsets.zero,
-                                          //MabData is misleading, it's actually both !!!!! (no way) (crazy right?)
-                                          itemCount: mabData.posts.length,
-                                          itemBuilder: (context, index) {
-                                            MabPost post = mabData.posts[index];
-                                            return isItemValid(post) ? ListItem(theme: theme, textTheme: textTheme, post: post) : const SizedBox();
-                                          });
-                                    }),
+                                child: selectedSection == 0
+                                    ? StreamBuilder(
+                                        stream: mabDataStream,
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                            return Center(
+                                                child: Text(
+                                              "Loading...",
+                                              style: textTheme.displaySmall,
+                                            ));
+                                          }
+                                          if (snapshot.hasError) {
+                                            return Center(
+                                                child: Text(
+                                              "Error: ${snapshot.error}",
+                                              style: textTheme.displaySmall!.copyWith(color: theme.error),
+                                            ));
+                                          }
+                                          if (!snapshot.hasData) {
+                                            return Center(
+                                                child: Text(
+                                              "No data",
+                                              style: textTheme.displaySmall,
+                                            ));
+                                          }
+                                          MabData mabData = MabData(uid: 0, posts: [
+                                            for (var post in (selectedSection == 0 ? snapshot.data?.docs ?? [] : snapshot.data?.docs ?? []))
+                                              MabPost(
+                                                  uid: 0,
+                                                  title: post["title"],
+                                                  description: post["description"],
+                                                  date: DateTime.parse(post["date"].toDate().toString()),
+                                                  authorUID: 0,
+                                                  image: post["image"] ?? "",
+                                                  fileAttatchments: [
+                                                    for (String file in post["files"]) file
+                                                  ],
+                                                  dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
+                                                  type: post["type"],
+                                                  subject: post["subject"])
+                                          ]);
+                                          mabData.posts.sort((a, b) => b.date.compareTo(a.date));
+                                          return ListView.builder(
+                                              padding: EdgeInsets.zero,
+                                              //MabData is misleading, it's actually both !!!!! (no way) (crazy right?)
+                                              itemCount: mabData.posts.length,
+                                              itemBuilder: (context, index) {
+                                                MabPost post = mabData.posts[index];
+                                                return isItemValid(post) ? ListItem(theme: theme, textTheme: textTheme, post: post) : const SizedBox();
+                                              });
+                                        })
+                                    : StreamBuilder(
+                                        stream: lacDataStream,
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                            return Center(
+                                                child: Text(
+                                              "Loading...",
+                                              style: textTheme.displaySmall,
+                                            ));
+                                          }
+                                          if (snapshot.hasError) {
+                                            return Center(
+                                                child: Text(
+                                              "Error: ${snapshot.error}",
+                                              style: textTheme.displaySmall!.copyWith(color: theme.error),
+                                            ));
+                                          }
+                                          if (!snapshot.hasData) {
+                                            return Center(
+                                                child: Text(
+                                              "No data",
+                                              style: textTheme.displaySmall,
+                                            ));
+                                          }
+                                          MabData mabData = MabData(uid: 0, posts: [
+                                            for (var post in (selectedSection == 0 ? snapshot.data?.docs ?? [] : snapshot.data?.docs ?? []))
+                                              MabPost(
+                                                  uid: 0,
+                                                  title: post["title"],
+                                                  description: post["description"],
+                                                  date: DateTime.parse(post["date"].toDate().toString()),
+                                                  authorUID: 0,
+                                                  image: post["image"] ?? "",
+                                                  fileAttatchments: [
+                                                    for (String file in post["files"]) file
+                                                  ],
+                                                  dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
+                                                  type: post["type"],
+                                                  subject: post["subject"])
+                                          ]);
+                                          mabData.posts.sort((a, b) => b.date.compareTo(a.date));
+                                          return ListView.builder(
+                                              padding: EdgeInsets.zero,
+                                              //MabData is misleading, it's actually both !!!!! (no way) (crazy right?)
+                                              itemCount: mabData.posts.length,
+                                              itemBuilder: (context, index) {
+                                                MabPost post = mabData.posts[index];
+                                                return isItemValid(post) ? ListItem(theme: theme, textTheme: textTheme, post: post) : const SizedBox();
+                                              });
+                                        }),
                               ),
                             ]),
                           )),
@@ -550,8 +603,8 @@ class _NewEventModalState extends State<NewEventModal> {
                               data: ThemeData.dark().copyWith(
                                 colorScheme: ColorScheme.dark(
                                   primary: theme.secondary,
-                                  onPrimary: theme.onPrimary,
-                                  surface: theme.secondary,
+                                  onPrimary: theme.onBackground,
+                                  surface: theme.background,
                                   onSurface: theme.onPrimary,
                                   background: theme.background,
                                   onBackground: theme.onBackground,
@@ -770,7 +823,7 @@ class ListItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         ListTile(
-          onTap: () => showDialog(context: context, builder: (context) => MABModal(title: title, description: description, image: image, attatchements: attatchements)),
+          onTap: () => showDialog(context: context, builder: (context) => MABModal(title: title, description: description, image: image, attatchements: attatchements, date: due, posterUID: post.authorUID)),
           leading: Icon(type == 1 ? Icons.announcement_rounded : Icons.task, color: theme.onBackground),
           title: Row(
             mainAxisSize: MainAxisSize.min,
@@ -802,10 +855,12 @@ class ListItem extends StatelessWidget {
 
 //Mab Modal
 class MABModal extends StatefulWidget {
-  const MABModal({super.key, required this.title, required this.description, this.image, required this.attatchements});
+  const MABModal({super.key, required this.title, required this.description, this.image, required this.attatchements, required this.date, required this.posterUID});
   final String title, description;
   final List<String> attatchements;
   final String? image;
+  final DateTime date;
+  final int posterUID;
 
   @override
   State<MABModal> createState() => _MABModalState();
@@ -912,8 +967,17 @@ class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
                     ),
                   )),
 
+              const SizedBox(height: 4),
+              //* Date of post and user
+              Row(
+                children: [
+                  Text(
+                    "Posted on ${DateFormat("dd/MM/yyyy").format(widget.date)} by ${widget.posterUID}",
+                    style: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
-
               //Attatchements (row here to align text to the left)
               Row(
                 children: [

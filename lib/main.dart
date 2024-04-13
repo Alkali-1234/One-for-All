@@ -612,7 +612,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         //WIDGET
         Flexible(
-          flex: 2,
+          flex: 3,
           child: Column(
             children: [
               const SizedBox(height: 4),

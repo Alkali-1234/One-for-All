@@ -243,7 +243,7 @@ Future createAccount(String email, String password, String username, AppState ap
   }
 
   await FirebaseAuth.instance.currentUser!.updateDisplayName(username).onError((error, stackTrace) => throw stackTrace);
-  await FirebaseAuth.instance.currentUser!.updatePhotoURL("https://api.dicebear.com/api/initials/$username.svg").onError((error, stackTrace) => throw stackTrace);
+  await FirebaseAuth.instance.currentUser!.updatePhotoURL("https://api.dicebear.com/8.x/initials/svg?seed=$username").onError((error, stackTrace) => throw stackTrace);
   //Create user data
   await createUserData(FirebaseAuth.instance.currentUser!.uid).catchError((error, stackTrace) {
     throw error;

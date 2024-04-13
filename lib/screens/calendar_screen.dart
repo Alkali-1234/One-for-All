@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/components/main_container.dart';
@@ -228,66 +229,60 @@ class _CalendarScreenState extends riverpod.ConsumerState<CalendarScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
+                const SizedBox(height: 32),
                 //Month and year
-                Flexible(
-                    flex: 1,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 150),
-                          transitionBuilder: (child, animation) => FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          ),
-                          child: Text(selectedYear.toString(), style: textTheme.displaySmall),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  reversed = true;
-                                  if (selectedMonth - 1 == 0) {
-                                    selectedMonth = 13;
-                                    selectedYear--;
-                                  }
-                                  selectedMonth--;
-                                });
-                                // calendarKey.currentState!.initializeCalendarEvents(appState);
-                              },
-                              child: Icon(
-                                Icons.arrow_left_rounded,
-                                color: theme.onPrimary,
-                                size: 48,
-                              ),
-                            ),
-                            Text(getMonthsOfTheYear[selectedMonth], style: textTheme.displayLarge),
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  reversed = false;
-                                  if (selectedMonth + 1 == 13) {
-                                    selectedMonth = 0;
-                                    selectedYear++;
-                                  }
-                                  selectedMonth++;
-                                });
-                                // calendarKey.currentState!.initializeCalendarEvents(appState);
-                              },
-                              child: Icon(
-                                Icons.arrow_right_rounded,
-                                color: theme.onPrimary,
-                                size: 48,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    )),
-                const SizedBox(height: 15),
-                Flexible(
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 150),
+                  transitionBuilder: (child, animation) => FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  ),
+                  child: Text(selectedYear.toString(), style: textTheme.displaySmall),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          reversed = true;
+                          if (selectedMonth - 1 == 0) {
+                            selectedMonth = 13;
+                            selectedYear--;
+                          }
+                          selectedMonth--;
+                        });
+                        // calendarKey.currentState!.initializeCalendarEvents(appState);
+                      },
+                      icon: Icon(
+                        Icons.arrow_left_rounded,
+                        color: theme.onPrimary,
+                        size: 48,
+                      ),
+                    ),
+                    Text(getMonthsOfTheYear[selectedMonth], style: textTheme.displayLarge),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          reversed = false;
+                          if (selectedMonth + 1 == 13) {
+                            selectedMonth = 0;
+                            selectedYear++;
+                          }
+                          selectedMonth++;
+                        });
+                        // calendarKey.currentState!.initializeCalendarEvents(appState);
+                      },
+                      icon: Icon(
+                        Icons.arrow_right_rounded,
+                        color: theme.onPrimary,
+                        size: 48,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Expanded(
                   flex: 5,
                   child: FutureBuilder(
                       future: initializeCalendarFunction,
@@ -299,10 +294,20 @@ class _CalendarScreenState extends riverpod.ConsumerState<CalendarScreen> {
                             style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
                           ));
                         }
-                        return CalendarWidget(
-                          key: Key(selectedMonth.toString() + selectedYear.toString()),
-                          selectedMonth: selectedMonth,
-                          selectedYear: selectedYear,
+                        return PageTransitionSwitcher(
+                          reverse: reversed,
+                          duration: const Duration(milliseconds: 500),
+                          transitionBuilder: (child, animation, secondaryAnimation) => SharedAxisTransition(
+                            animation: animation,
+                            secondaryAnimation: secondaryAnimation,
+                            transitionType: SharedAxisTransitionType.horizontal,
+                            child: child,
+                          ),
+                          child: CalendarWidget(
+                            key: Key(selectedMonth.toString() + selectedYear.toString()),
+                            selectedMonth: selectedMonth,
+                            selectedYear: selectedYear,
+                          ),
                         );
                       }),
                 ),
@@ -411,8 +416,7 @@ class CalendarWidget extends riverpod.ConsumerWidget {
     final currentMonthData = ref.watch(calendarProvider.notifier).getMonthEvents(selectedMonth, selectedYear);
     final calendarMonthsData = ref.watch(calendarProvider)!.months;
 
-    return SizedBox.expand(
-        child: Container(
+    return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primaryContainer,
         border: Border.all(color: theme.secondary),
@@ -497,7 +501,7 @@ class CalendarWidget extends riverpod.ConsumerWidget {
           ]
         ],
       ),
-    ));
+    );
   }
 }
 

@@ -50,7 +50,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
         backgroundColor: Colors.transparent,
         body: Container(
           decoration: currentSelectedTheme == 0
-              ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/logbg.png'), fit: BoxFit.cover))
+              ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover))
               : currentSelectedTheme == 1
                   ? BoxDecoration(color: darkTheme.colorScheme.background)
                   : BoxDecoration(color: lightTheme.colorScheme.background),

@@ -88,3 +88,7 @@ env.g.dart
 
 # Firebase hosting build files
 .firebase
+
+# Functions library and node_modules
+/functions/lib
+/functions/node_modules

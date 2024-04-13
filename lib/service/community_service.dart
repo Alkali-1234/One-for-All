@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-//ignore: unused_import
-import 'package:firebase_core/firebase_core.dart';
 import 'package:oneforall/functions/community_functions.dart';
 import '../data/community_data.dart';
 import '../main.dart';
@@ -43,40 +41,9 @@ Future addNewMABEvent(String title, String description, int type, int subject, T
       "type": type,
       "subject": subject,
     });
-    //     .update({
-    //   "MAB": FieldValue.arrayUnion([
-    //     {
-    //       "title": title,
-    //       "description": description,
-    //       "date": Timestamp.now(),
-    //       "authorUID": getUserAuth.currentUser!.uid,
-    //       "image": imageURL,
-    //       "files": fileURLs,
-    //       "dueDate": dueDate,
-    //       "type": type,
-    //       "subject": subject
-    //     }
-    //   ])
-    // });
   } catch (e) {
     rethrow;
   }
-  //! Deprecated, now using cloud functions
-  // //* Send notification
-  // Map<String, String> data = {
-  //   "MAB": "true",
-  //   "title": title,
-  //   "description": description,
-  //   "date": Timestamp.now().toString(),
-  //   "authorUID": getUserAuth.currentUser!.uid,
-  //   "image": imageURL ?? "",
-  //   //Seperate with commas
-  //   "files": fileURLs.join(","),
-  //   "dueDate": dueDate.toString(),
-  //   "type": type.toString(),
-  //   "subject": subject.toString(),
-  // };
-  // sendNotification(type == 1 ? "New Announcement" : "New Task", title, data, "MAB_${getSavedCommunityData.id}");
 }
 
 Future addNewLACEvent(String title, String description, int type, int subject, Timestamp dueDate, List<File> attatchements, File? image, AppState appState) async {
@@ -113,40 +80,9 @@ Future addNewLACEvent(String title, String description, int type, int subject, T
       "type": type,
       "subject": subject,
     });
-    //     .update({
-    //   "MAB": FieldValue.arrayUnion([
-    //     {
-    //       "title": title,
-    //       "description": description,
-    //       "date": Timestamp.now(),
-    //       "authorUID": getUserAuth.currentUser!.uid,
-    //       "image": imageURL,
-    //       "files": fileURLs,
-    //       "dueDate": dueDate,
-    //       "type": type,
-    //       "subject": subject
-    //     }
-    //   ])
-    // });
   } catch (e) {
     rethrow;
   }
-  //! Deprecated, now using cloud functions
-  // //* Send notification
-  // Map<String, String> data = {
-  //   "MAB": "true",
-  //   "title": title,
-  //   "description": description,
-  //   "date": Timestamp.now().toString(),
-  //   "authorUID": getUserAuth.currentUser!.uid,
-  //   "image": imageURL ?? "",
-  //   //Seperate with commas
-  //   "files": fileURLs.join(","),
-  //   "dueDate": dueDate.toString(),
-  //   "type": type.toString(),
-  //   "subject": subject.toString(),
-  // };
-  // sendNotification(type == 1 ? "New Announcement" : "New Task", title, data, "MAB_${getSavedCommunityData.id}");
 }
 
 Future createUserData(String uid) async {
@@ -160,6 +96,7 @@ Future createUserData(String uid) async {
       "flashCardSets": [],
       "assignedCommunity": "",
       "sections": [],
+      "roles": [],
     }).catchError((error, stackTrace) {
       throw error;
     });
