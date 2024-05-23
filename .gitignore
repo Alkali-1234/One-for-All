@@ -92,3 +92,6 @@ env.g.dart
 # Functions library and node_modules
 /functions/lib
 /functions/node_modules
+
+# Env files
+env.dart

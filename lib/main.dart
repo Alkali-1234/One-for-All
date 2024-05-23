@@ -49,21 +49,24 @@ import 'package:showcaseview/showcaseview.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   //* Prevents the app from rotating
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown
   ]);
-  //* Initialize
+
+  //* Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // //* Run on emulator if debug is true
+  // * Run on emulator if debug is true
   if (kDebugMode) {
     await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
     FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
     FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
   }
-  //Init ads if platform is not web
+  //* Initialize ads
   if (!kIsWeb) await MobileAds.instance.initialize();
+
   logger.i(
     "Initialized app! : ${Firebase.app().options.projectId}",
   );

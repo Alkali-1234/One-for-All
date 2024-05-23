@@ -1,7 +1,5 @@
 import 'dart:ui';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import 'package:oneforall/functions/community_functions.dart';
 import 'package:oneforall/logger.dart';
 import 'package:oneforall/screens/login_screen.dart';

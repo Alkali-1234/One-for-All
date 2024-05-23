@@ -10,7 +10,7 @@ import 'package:oneforall/components/quizzes_components/drag_and_drop_edit.dart'
 import 'package:oneforall/components/quizzes_components/drop_down_edit.dart';
 import 'package:oneforall/functions/quizzes_functions.dart';
 import 'package:oneforall/models/quizzes_models.dart';
-import 'package:oneforall/premium/quiz_gen.dart';
+import 'package:oneforall/premium/quiz_gen/quiz_gen.dart';
 // import 'package:oneforall/premium/quiz_gen.dart';
 import 'package:oneforall/screens/quizzes_screen.dart';
 import 'package:oneforall/styles/styles.dart';

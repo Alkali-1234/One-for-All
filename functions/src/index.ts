@@ -1,8 +1,17 @@
+// * ENV
+import "dotenv/config";
+
 import {onCall} from "firebase-functions/v2/https";
 import * as functions from "firebase-functions";
 import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
-import { FieldValue } from "firebase-admin/firestore";
+import {FieldValue} from "firebase-admin/firestore";
+
+// * OpenAI
+import {OpenAI} from "openai";
+const apiKey = process.env.OPENAI_API_KEY;
+const openai = new OpenAI({apiKey: apiKey});
+
 admin.initializeApp();
 
 // * ------------------ MAB ------------------ *//
@@ -209,4 +218,25 @@ export const leaveSection = onCall(async (request) => {
     return "Error leaving section" + error;
   });
   return message;
+});
+
+// * ------------------ OpenAI ------------------ *//
+export const generateQuiz = onCall(async (request) => {
+  if (request.auth == null) {
+    logger.error("Not authenticated");
+    return "Not authenticated";
+  }
+  const messages = request.data.messages;
+  const assistant =
+    await openai.beta.assistants.retrieve("asst_EqKF2EwRB7waTZgfH3mfdQh8");
+  const thread = await openai.beta.threads.create({
+    messages: messages,
+  });
+
+  const run = await openai.beta.threads.runs.create(
+    thread.id,
+    {assistant_id: assistant.id}
+  );
+  logger.info(`Run: ${run},`);
+  return run;
 });

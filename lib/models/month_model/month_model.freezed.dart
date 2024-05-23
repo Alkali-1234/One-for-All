@@ -18,6 +18,8 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$Month {
   int get month => throw _privateConstructorUsedError;
   int get year => throw _privateConstructorUsedError;
+
+  /// The list is actually unnecessary. (i forgor and it's too late to change it)
   List<Map<int, List<MabPost>>> get daysList =>
       throw _privateConstructorUsedError;
 
@@ -122,7 +124,11 @@ class _$MonthImpl with DiagnosticableTreeMixin implements _Month {
   final int month;
   @override
   final int year;
+
+  /// The list is actually unnecessary. (i forgor and it's too late to change it)
   final List<Map<int, List<MabPost>>> _daysList;
+
+  /// The list is actually unnecessary. (i forgor and it's too late to change it)
   @override
   List<Map<int, List<MabPost>>> get daysList {
     if (_daysList is EqualUnmodifiableListView) return _daysList;
@@ -177,6 +183,8 @@ abstract class _Month implements Month {
   @override
   int get year;
   @override
+
+  /// The list is actually unnecessary. (i forgor and it's too late to change it)
   List<Map<int, List<MabPost>>> get daysList;
   @override
   @JsonKey(ignore: true)

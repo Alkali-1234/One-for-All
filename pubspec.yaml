@@ -49,6 +49,8 @@ dependencies:
   flutter_riverpod: ^2.5.1
   riverpod_annotation: ^2.3.5
   freezed_annotation: ^2.4.1
+  envied: ^0.5.4+1
+  dart_openai: ^5.1.0
 
 
 dev_dependencies:
@@ -62,6 +64,7 @@ dev_dependencies:
   custom_lint: ^0.6.4
   riverpod_lint: ^2.3.10
   freezed: ^2.5.1
+  envied_generator: ^0.5.4+1
 
 # * Launcher Icons
 flutter_launcher_icons:
