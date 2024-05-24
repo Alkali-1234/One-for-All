@@ -233,10 +233,17 @@ export const generateQuiz = onCall(async (request) => {
     messages: messages,
   });
 
-  const run = await openai.beta.threads.runs.create(
+  const run = await openai.beta.threads.runs.createAndPoll(
     thread.id,
     {assistant_id: assistant.id}
   );
-  logger.info(`Run: ${run},`);
-  return run;
+
+  if (run.status === "completed") {
+    logger.info("Quiz generated: ", run, openai
+      .beta.threads.messages.list(thread.id));
+    return (await openai.beta.threads.messages.list(thread.id)).data;
+  } else {
+    logger.error("Error generating quiz: ", run);
+    return run;
+  }
 });

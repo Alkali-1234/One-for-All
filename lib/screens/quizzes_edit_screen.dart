@@ -295,7 +295,29 @@ class _QuizzesEditScreenState extends State<QuizzesEditScreen> {
                               foregroundColor: theme.onBackground,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
-                            onPressed: () => showDialog(context: context, builder: (c) => const QuizGenDialog()),
+                            onPressed: () => showDialog(
+                                context: context,
+                                builder: (c) => QuizGenDialog(onInsertQuestions: (List<QuizQuestion> questions) {
+                                      for (var question in questions) {
+                                        quizSet.questions.add(question);
+                                        listItems.add(QueryListItem(
+                                            question: question,
+                                            index: listItems.length,
+                                            setQuizSet: setQuizSet,
+                                            quizIndex: widget.index,
+                                            duplicated: true,
+                                            remveListItem: (i) => setState(() => listItems.removeAt(i)),
+                                            addListItem: (QueryListItem item) async {
+                                              final key = GlobalKey<_QueryListItemState>();
+                                              setState(() {
+                                                listItems.insert(item.index + 1, QueryListItem(key: key, question: item.question, index: item.index + 1, setQuizSet: setQuizSet, quizIndex: item.quizIndex, duplicated: true, addListItem: item.addListItem, remveListItem: (i) => setState(() => listItems.removeAt(i))));
+                                              });
+                                              await Future.delayed(const Duration(milliseconds: 50));
+                                              key.currentState!.doColorAnim();
+                                            }));
+                                      }
+                                      setState(() {});
+                                    })),
                             icon: const Icon(Icons.auto_awesome),
                             label: const Text("Generate"))),
                   ],
