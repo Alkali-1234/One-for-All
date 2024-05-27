@@ -4,6 +4,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:dart_openai/dart_openai.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
@@ -66,6 +67,9 @@ void main() async {
   }
   //* Initialize ads
   if (!kIsWeb) await MobileAds.instance.initialize();
+
+  //* initialize openai
+  OpenAI.requestsTimeOut = const Duration(minutes: 2);
 
   logger.i(
     "Initialized app! : ${Firebase.app().options.projectId}",
