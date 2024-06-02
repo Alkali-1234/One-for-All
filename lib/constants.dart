@@ -160,19 +160,21 @@ const initialLoadData = {
 
 ThemeData defaultBlueTheme = ThemeData(
   colorScheme: ColorScheme.fromSwatch().copyWith(onBackground: Colors.white, primary: const Color.fromRGBO(0, 0, 0, 0.25), secondary: const Color.fromRGBO(255, 255, 255, 0.25), tertiary: const Color.fromRGBO(255, 255, 255, 0.50), primaryContainer: const Color.fromRGBO(255, 255, 255, 0.07), onPrimary: const Color.fromRGBO(255, 255, 255, 1), onSecondary: const Color.fromRGBO(255, 255, 255, 1), background: const Color.fromRGBO(24, 4, 44, 1.0), error: Colors.red),
-  textTheme: GoogleFonts.montserratTextTheme(const TextTheme(
-    displayLarge: TextStyle(
-      color: Color.fromRGBO(255, 255, 255, 1.0),
-      fontSize: 40,
-      fontWeight: FontWeight.bold,
-      letterSpacing: -1.5,
-    ),
-    displayMedium: TextStyle(
-      color: Color.fromRGBO(255, 255, 255, 1.0),
-      fontSize: 24,
-      fontWeight: FontWeight.w500,
-      letterSpacing: -0.5,
-    ),
+  textTheme: GoogleFonts.interTextTheme(const TextTheme(
+    displayLarge: TextStyle(color: Color.fromRGBO(255, 255, 255, 1.0), fontSize: 40, fontWeight: FontWeight.bold, letterSpacing: -1.5, shadows: [
+      BoxShadow(
+        color: Colors.black,
+        blurRadius: 10,
+        offset: Offset(0, 1),
+      ),
+    ]),
+    displayMedium: TextStyle(color: Color.fromRGBO(255, 255, 255, 1.0), fontSize: 24, fontWeight: FontWeight.w500, letterSpacing: -0.5, shadows: [
+      BoxShadow(
+        color: Colors.black,
+        blurRadius: 10,
+        offset: Offset(0, 1),
+      ),
+    ]),
     displaySmall: TextStyle(
       color: Color.fromRGBO(255, 255, 255, 1.0),
       fontSize: 14,
@@ -194,18 +196,30 @@ ThemeData darkTheme = ThemeData(
     background: const Color.fromRGBO(30, 30, 30, 1.0),
     error: Colors.red,
   ),
-  textTheme: GoogleFonts.montserratTextTheme(const TextTheme(
+  textTheme: GoogleFonts.interTextTheme(const TextTheme(
     displayLarge: TextStyle(
       color: Color.fromRGBO(255, 255, 255, 1.0),
       fontSize: 40,
       fontWeight: FontWeight.bold,
-      letterSpacing: -1.5,
+      shadows: [
+        BoxShadow(
+          color: Colors.black,
+          blurRadius: 10,
+          offset: Offset(0, 1),
+        ),
+      ],
     ),
     displayMedium: TextStyle(
       color: Color.fromRGBO(255, 255, 255, 1.0),
       fontSize: 24,
       fontWeight: FontWeight.w500,
-      letterSpacing: -0.5,
+      shadows: [
+        BoxShadow(
+          color: Colors.black,
+          blurRadius: 10,
+          offset: Offset(0, 1),
+        ),
+      ],
     ),
     displaySmall: TextStyle(
       color: Color.fromRGBO(255, 255, 255, 1.0),
@@ -229,24 +243,21 @@ ThemeData lightTheme = ThemeData(
     background: const Color.fromRGBO(255, 255, 255, 1.0),
     error: Colors.red,
   ),
-  textTheme: GoogleFonts.montserratTextTheme(const TextTheme(
+  textTheme: GoogleFonts.interTextTheme(const TextTheme(
     displayLarge: TextStyle(
       color: Color.fromRGBO(0, 0, 0, 1.0),
       fontSize: 40,
       fontWeight: FontWeight.bold,
-      letterSpacing: -1.5,
     ),
     displayMedium: TextStyle(
       color: Color.fromRGBO(0, 0, 0, 1.0),
       fontSize: 24,
       fontWeight: FontWeight.w500,
-      letterSpacing: -0.5,
     ),
     displaySmall: TextStyle(
       color: Color.fromRGBO(0, 0, 0, 1.0),
       fontSize: 14,
       fontWeight: FontWeight.w400,
-      letterSpacing: 0,
     ),
   )),
   useMaterial3: true,

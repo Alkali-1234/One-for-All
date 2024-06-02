@@ -1,7 +1,7 @@
 name: oneforall
-description: A new Flutter project.
+description: For students.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.0+1
+version: 0.0.6+6
 
 environment:
   sdk: '>=3.0.5 <4.0.0'
@@ -51,6 +51,7 @@ dependencies:
   freezed_annotation: ^2.4.1
   envied: ^0.5.4+1
   dart_openai: ^5.1.0
+  json_annotation: ^4.9.0
 
 
 dev_dependencies:
@@ -65,6 +66,7 @@ dev_dependencies:
   riverpod_lint: ^2.3.10
   freezed: ^2.5.1
   envied_generator: ^0.5.4+1
+  json_serializable: ^6.8.0
 
 # * Launcher Icons
 flutter_launcher_icons:

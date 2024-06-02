@@ -43,6 +43,7 @@ import 'logger.dart';
 import 'models/quizzes_models.dart';
 import 'screens/community_screen.dart';
 // import 'screens/navigation_screen.dart';
+import 'screens/notes_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/loading_screen.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
@@ -490,7 +491,14 @@ class _MenuSelectionState extends State<MenuSelection> {
                       Navigator.pop(context);
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const CalendarScreen()));
                     }),
-                DrawerItem(disabled: true, icon: Icons.calculate, title: "Notes", onTap: () => null),
+                DrawerItem(
+                    disabled: false,
+                    icon: Icons.calculate,
+                    title: "Notes",
+                    onTap: () => {
+                          Navigator.pop(context),
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const NotesScreen()))
+                        }),
                 //* Commuity and other
                 const SizedBox(height: 20),
                 Text("Community & Other", style: textTheme.displaySmall),
