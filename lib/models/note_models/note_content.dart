@@ -39,7 +39,10 @@ class ContentTypesConverter extends JsonConverter<BaseContentTypes, Map<String, 
     if (json.containsKey('text')) {
       return TextContent(text: json['text'] as String);
     }
-    throw Exception('Unknown content type');
+    if (json.containsKey('image')) {
+      return ImageContent(type: ImageContentTypes.values[json['type']], image: json['image']);
+    }
+    throw Exception('Unknown content type whilst converting json to content types');
   }
 
   @override
@@ -49,7 +52,13 @@ class ContentTypesConverter extends JsonConverter<BaseContentTypes, Map<String, 
         'text': object.text
       };
     }
-    throw Exception('Unknown content type');
+    if (object is ImageContent) {
+      return {
+        'type': object.type.index,
+        'image': object.image
+      };
+    }
+    throw Exception('Unknown content type whilst converting content to json');
   }
 }
 
