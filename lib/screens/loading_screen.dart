@@ -207,7 +207,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                               child: Row(
                                 children: [
                                   Text(
-                                    "v0.0.6.0-preview",
+                                    "v0.0.6.0",
                                     style: TextStyle(color: Colors.grey, fontSize: 12),
                                   ),
                                 ],

@@ -11,8 +11,8 @@ import 'package:oneforall/main.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import '../models/quizzes_models.dart';
-import 'quizzes_edit_screen.dart';
-import 'quizzes_play_screen.dart';
+import 'quizzes_screen_components/quizzes_edit_screen.dart';
+import 'quizzes_play_screen/quizzes_play_screen.dart';
 
 class QuizzesScreen extends StatefulWidget {
   const QuizzesScreen({super.key});
