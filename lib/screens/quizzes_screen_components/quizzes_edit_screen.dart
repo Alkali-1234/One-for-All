@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/functions/quizzes_functions.dart';
-import 'package:oneforall/models/quizzes_models.dart';
+import 'package:oneforall/models/quiz_question.dart';
 import 'package:oneforall/premium/quiz_gen/quiz_gen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';

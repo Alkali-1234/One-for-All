@@ -7,7 +7,7 @@ import 'package:oneforall/main.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../models/quizzes_models.dart';
+import '../models/quiz_question.dart';
 
 class QuizzesFunctions {
   void refreshQuizzesFromLocal(AppState appState, bool? notifyListeners) async {

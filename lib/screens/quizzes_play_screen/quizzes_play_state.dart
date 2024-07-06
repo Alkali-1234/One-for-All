@@ -1,5 +1,5 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:oneforall/models/quizzes_models.dart";
+import "package:oneforall/models/quiz_question.dart";
 
 class CurrentQuestion extends Notifier<QuizQuestion> {
   void updateQuestion(QuizQuestion question) {

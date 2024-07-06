@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:oneforall/models/quizzes_models.dart';
+import 'package:oneforall/models/quiz_question.dart';
 
 class DropDownEdit extends StatefulWidget {
   const DropDownEdit({super.key, this.question});

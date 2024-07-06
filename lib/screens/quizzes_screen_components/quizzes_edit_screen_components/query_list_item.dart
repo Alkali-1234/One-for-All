@@ -2,7 +2,7 @@ import "package:flutter/material.dart";
 import "package:oneforall/main.dart";
 import "package:provider/provider.dart";
 
-import "../../../models/quizzes_models.dart";
+import "../../../models/quiz_question.dart";
 import "dart:math" as math;
 
 import "edit_question_dialog.dart";

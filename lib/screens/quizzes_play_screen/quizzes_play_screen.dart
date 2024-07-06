@@ -12,7 +12,7 @@ import 'package:oneforall/components/quizzes_components/three_two_one_go_modal.d
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/functions/quizzes_functions.dart';
 import 'package:oneforall/main.dart';
-import 'package:oneforall/models/quizzes_models.dart';
+import 'package:oneforall/models/quiz_question.dart';
 import 'package:oneforall/screens/interstitial_screen.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';

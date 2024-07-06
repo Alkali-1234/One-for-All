@@ -10,7 +10,7 @@ import 'package:showcaseview/showcaseview.dart';
 import '../constants.dart';
 import '../data/user_data.dart';
 import '../logger.dart';
-import '../models/quizzes_models.dart';
+import '../models/quiz_question.dart';
 import '../service/auth_service.dart';
 import 'package:email_validator/email_validator.dart';
 import '../service/community_service.dart';

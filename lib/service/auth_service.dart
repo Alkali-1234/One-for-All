@@ -14,7 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/user_data.dart';
 //ignore: unused_import
 import '../logger.dart';
-import '../models/quizzes_models.dart';
+import '../models/quiz_question.dart';
 import 'community_service.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 

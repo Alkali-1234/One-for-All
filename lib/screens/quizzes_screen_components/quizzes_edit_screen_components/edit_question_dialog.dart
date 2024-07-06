@@ -11,7 +11,7 @@ import "../../../components/quizzes_components/drag_and_drop_edit.dart";
 import "../../../components/quizzes_components/drop_down_edit.dart";
 import "../../../constants.dart";
 import "../../../main.dart";
-import "../../../models/quizzes_models.dart";
+import "../../../models/quiz_question.dart";
 
 import 'dart:math' as math;
 

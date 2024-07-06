@@ -2,7 +2,7 @@ import "package:flutter/material.dart";
 import "package:just_audio/just_audio.dart";
 
 import "../../../constants.dart";
-import "../../../models/quizzes_models.dart";
+import "../../../models/quiz_question.dart";
 
 //* Reorder Question
 class ReorderQuestion extends StatefulWidget {

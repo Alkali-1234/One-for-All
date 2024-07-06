@@ -40,7 +40,7 @@ import 'data/community_data.dart';
 
 //Screens
 import 'logger.dart';
-import 'models/quizzes_models.dart';
+import 'models/quiz_question.dart';
 import 'screens/community_screen.dart';
 // import 'screens/navigation_screen.dart';
 import 'screens/notes_screen.dart';

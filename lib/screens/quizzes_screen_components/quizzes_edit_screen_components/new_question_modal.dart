@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../constants.dart';
-import '../../../models/quizzes_models.dart';
+import '../../../models/quiz_question.dart';
 
 ///New quesetion modal
 class NewQuestionModal extends StatefulWidget {

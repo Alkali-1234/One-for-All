@@ -5,7 +5,7 @@ import "package:shared_preferences/shared_preferences.dart";
 
 import "../../../constants.dart";
 import "../../../main.dart";
-import "../../../models/quizzes_models.dart";
+import "../../../models/quiz_question.dart";
 import "../../../styles/styles.dart";
 
 class ImportQuizModal extends StatefulWidget {

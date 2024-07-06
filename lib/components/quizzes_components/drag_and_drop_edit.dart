@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 // import 'package:introduction_screen/introduction_screen.dart';
-import 'package:oneforall/models/quizzes_models.dart';
+import 'package:oneforall/models/quiz_question.dart';
 import 'package:oneforall/styles/styles.dart';
 
 class ReorderEdit extends StatefulWidget {
