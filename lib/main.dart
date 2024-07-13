@@ -115,23 +115,39 @@ class AppState extends ChangeNotifier {
 
   bool viewedShowcase = false;
 
+  Themes currentTheme = Themes.dark;
+
   // //* get theme func
   Future<ThemeData> getSavedTheme() async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey("theme")) {
       final theme = prefs.getInt("theme");
       if (theme == 0) {
-        return defaultBlueTheme;
+        currentTheme = Themes.dark;
+        notifyListeners();
+        return darkTheme;
       } else if (theme == 1) {
+        currentTheme = Themes.dark;
+        notifyListeners();
         return darkTheme;
       } else if (theme == 2) {
+        currentTheme = Themes.dark;
+        notifyListeners();
         return lightTheme;
       } else {
-        return defaultBlueTheme;
+        currentTheme = Themes.dark;
+        notifyListeners();
+        return darkTheme;
       }
     } else {
-      return defaultBlueTheme;
+      currentTheme = Themes.dark;
+      notifyListeners();
+      return darkTheme;
     }
+  }
+
+  Themes getCurrentTheme() {
+    return currentTheme;
   }
 
   //* User data section
@@ -189,7 +205,7 @@ class AppState extends ChangeNotifier {
 
   final prefs = SharedPreferences.getInstance();
 
-  ThemeData _currentUserSelectedTheme = defaultBlueTheme;
+  ThemeData _currentUserSelectedTheme = darkTheme;
   ThemeData get currentUserSelectedTheme => _currentUserSelectedTheme;
   set currentUserSelectedTheme(ThemeData theme) {
     _currentUserSelectedTheme = theme;
@@ -275,7 +291,7 @@ class _HomePageState extends State<HomePage> {
         //Main application
         body: Builder(
             builder: (context) => Container(
-                  decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
+                  decoration: BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
                   child: Column(children: [
                     Hero(
                       tag: "topAppBar",

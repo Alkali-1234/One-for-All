@@ -91,7 +91,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
     var textTheme = Theme.of(context).textTheme;
     var appState = Provider.of<AppState>(context);
     return Container(
-        decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
+        decoration: BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
         child: Scaffold(
             resizeToAvoidBottomInset: false,
             floatingActionButton: FloatingActionButton(

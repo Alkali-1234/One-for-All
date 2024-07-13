@@ -158,6 +158,7 @@ const initialLoadData = {
   }
 };
 
+@Deprecated("No longer supported for new UI")
 ThemeData defaultBlueTheme = ThemeData(
   colorScheme: ColorScheme.fromSwatch().copyWith(onBackground: Colors.white, primary: const Color.fromRGBO(0, 0, 0, 0.25), secondary: const Color.fromRGBO(255, 255, 255, 0.25), tertiary: const Color.fromRGBO(255, 255, 255, 0.50), primaryContainer: const Color.fromRGBO(255, 255, 255, 0.07), onPrimary: const Color.fromRGBO(255, 255, 255, 1), onSecondary: const Color.fromRGBO(255, 255, 255, 1), background: const Color.fromRGBO(24, 4, 44, 1.0), error: Colors.red),
   textTheme: GoogleFonts.interTextTheme(const TextTheme(
@@ -193,7 +194,7 @@ ThemeData darkTheme = ThemeData(
     primaryContainer: const Color.fromRGBO(255, 255, 255, 0.07),
     onPrimary: const Color.fromRGBO(255, 255, 255, 1),
     onSecondary: const Color.fromRGBO(255, 255, 255, 1),
-    background: const Color.fromRGBO(30, 30, 30, 1.0),
+    background: const Color(0xFF24272C),
     error: Colors.red,
   ),
   textTheme: GoogleFonts.interTextTheme(const TextTheme(
@@ -205,7 +206,7 @@ ThemeData darkTheme = ThemeData(
         BoxShadow(
           color: Colors.black,
           blurRadius: 10,
-          offset: Offset(0, 1),
+          offset: Offset(0, 4),
         ),
       ],
     ),
@@ -221,9 +222,21 @@ ThemeData darkTheme = ThemeData(
         ),
       ],
     ),
+    headlineSmall: TextStyle(
+      color: Color.fromRGBO(255, 255, 255, 1.0),
+      fontSize: 16,
+      fontWeight: FontWeight.w800,
+      letterSpacing: 0.5,
+    ),
+
+    /// Used for titles
+    headlineMedium: TextStyle(color: Color.fromRGBO(255, 255, 255, 1.0), fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 0.5, shadows: [
+      Shadow(color: Colors.white, blurRadius: 40),
+      Shadow(color: Color.fromRGBO(0, 0, 0, 0.25), offset: Offset(0, 4))
+    ]),
     displaySmall: TextStyle(
       color: Color.fromRGBO(255, 255, 255, 1.0),
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: FontWeight.w400,
       letterSpacing: 0,
     ),
@@ -240,7 +253,7 @@ ThemeData lightTheme = ThemeData(
     onPrimary: const Color.fromRGBO(0, 0, 0, 1),
     onSecondary: const Color.fromRGBO(0, 0, 0, 1),
     onBackground: const Color.fromRGBO(0, 0, 0, 1),
-    background: const Color.fromRGBO(255, 255, 255, 1.0),
+    background: const Color(0xFFF1F1F1),
     error: Colors.red,
   ),
   textTheme: GoogleFonts.interTextTheme(const TextTheme(
@@ -259,6 +272,17 @@ ThemeData lightTheme = ThemeData(
       fontSize: 14,
       fontWeight: FontWeight.w400,
     ),
+    headlineSmall: TextStyle(
+      color: Color.fromRGBO(0, 0, 0, 1.0),
+      fontSize: 16,
+      fontWeight: FontWeight.w800,
+      letterSpacing: 0.5,
+    ),
+
+    /// Used for titles
+    headlineMedium: TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 0.5, shadows: [
+      Shadow(color: Color.fromRGBO(0, 0, 0, 0.25), offset: Offset(0, 2), blurRadius: 4)
+    ]),
   )),
   useMaterial3: true,
 );
@@ -312,4 +336,9 @@ enum QuizTypes {
   trueFalse,
   dropdown,
   reorder,
+}
+
+enum Themes {
+  dark,
+  light
 }

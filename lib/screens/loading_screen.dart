@@ -69,9 +69,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
       // pass the theme in myapp
       // bismillahirrahmanirrahim this works
       if (theme == 0) {
-        passedUserTheme = defaultBlueTheme;
+        passedUserTheme = darkTheme;
         primaryGradient = defaultBluePrimaryGradient;
-        widget.appstate.currentUserSelectedTheme = defaultBlueTheme;
+        widget.appstate.currentUserSelectedTheme = darkTheme;
       } else if (theme == 1) {
         passedUserTheme = darkTheme;
         primaryGradient = darkPrimaryGradient;

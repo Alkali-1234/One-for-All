@@ -21,79 +21,69 @@ class _MainContainerState extends State<MainContainer> {
     var appState = context.watch<AppState>();
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    return Container(
-      decoration: theme == defaultBlueTheme.colorScheme
-          ? const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/images/purpwallpaper 2.png"),
-                fit: BoxFit.cover,
-              ),
-            )
-          : null,
-      child: Column(
-        children: [
-          //App Bar
-          Hero(
-            tag: "topAppBar",
-            child: Container(
-              color: theme.secondary,
-              child: SafeArea(
-                bottom: false,
-                child: SizedBox(
-                  height: 60,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            if (widget.onClose != null) {
-                              widget.onClose!();
-                            } else {
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: Icon(
-                            Icons.arrow_back,
-                            color: theme.onPrimary,
-                          ),
+    return Column(
+      children: [
+        //App Bar
+        Hero(
+          tag: "topAppBar",
+          child: Container(
+            color: theme.secondary,
+            child: SafeArea(
+              bottom: false,
+              child: SizedBox(
+                height: 60,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          if (widget.onClose != null) {
+                            widget.onClose!();
+                          } else {
+                            Navigator.pop(context);
+                          }
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: theme.onPrimary,
                         ),
-                        Text(appState.getCurrentUser.username, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-                        GestureDetector(
-                          onTap: () {
-                            if (FirebaseAuth.instance.currentUser != null) {
-                              showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) {
-                                    return ProfileViewer(uid: FirebaseAuth.instance.currentUser!.uid);
-                                  });
-                            }
-                          },
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              color: theme.onPrimary,
-                              borderRadius: BorderRadius.circular(20),
-                              gradient: getPrimaryGradient,
-                            ),
-                            child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
+                      ),
+                      Text(appState.getCurrentUser.username, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                      GestureDetector(
+                        onTap: () {
+                          if (FirebaseAuth.instance.currentUser != null) {
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return ProfileViewer(uid: FirebaseAuth.instance.currentUser!.uid);
+                                });
+                          }
+                        },
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: theme.onPrimary,
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: getPrimaryGradient,
                           ),
-                        )
-                      ],
-                    ),
+                          child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ),
             ),
           ),
-          //End of App Bar
-          Expanded(
-            child: SafeArea(top: false, child: widget.child),
-          ),
-        ],
-      ),
+        ),
+        //End of App Bar
+        Expanded(
+          child: SafeArea(top: false, child: widget.child),
+        ),
+      ],
     );
   }
 }

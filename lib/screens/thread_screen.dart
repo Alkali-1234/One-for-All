@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/components/profile_viewer.dart';
-import 'package:oneforall/constants.dart';
 // import 'package:oneforall/service/firebase_api.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -90,14 +89,7 @@ class _ThreadScreenState extends State<ThreadScreen> {
     late final localStream = FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("forum").doc(widget.threadID).snapshots();
 
     return Container(
-      decoration: appState.currentUserSelectedTheme == defaultBlueTheme
-          ? const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/purpwallpaper 2.png'),
-                fit: BoxFit.cover,
-              ),
-            )
-          : BoxDecoration(color: tm.background),
+      decoration: BoxDecoration(color: tm.background),
       child: StreamBuilder(
           stream: widget.target == "community" ? communityStream : localStream,
           builder: (context, snapshot) {

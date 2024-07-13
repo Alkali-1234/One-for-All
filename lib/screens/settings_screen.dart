@@ -54,7 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
     prefs.setInt("theme", selectedTheme);
     //* Theme
     ThemeData themeUsed = selectedTheme == 0
-        ? defaultBlueTheme
+        ? darkTheme
         : selectedTheme == 1
             ? darkTheme
             : lightTheme;
@@ -170,7 +170,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
     initializeNotifications();
 
     //* Set the theme setting to the current theme
-    widget.currentTheme.colorScheme == defaultBlueTheme.colorScheme
+    widget.currentTheme.colorScheme == darkTheme.colorScheme
         ? selectedTheme = 0
         : widget.currentTheme.colorScheme == darkTheme.colorScheme
             ? selectedTheme = 1
@@ -238,7 +238,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
     var textTheme = Theme.of(context).textTheme;
     var appState = Provider.of<AppState>(context);
     return Container(
-      decoration: appState.currentUserSelectedTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
+      decoration: BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(

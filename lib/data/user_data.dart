@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
 
-ThemeData passedUserTheme = defaultBlueTheme;
+ThemeData passedUserTheme = darkTheme;
 
 class UserData {
   UserData({required this.uid, required this.exp, required this.streak, required this.posts, required this.flashCardSets, required this.username, required this.email, required this.profilePicture, required this.assignedCommunity, required this.assignedSection, required this.roles});

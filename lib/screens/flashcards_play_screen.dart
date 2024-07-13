@@ -48,7 +48,7 @@ class _FlashcardsPlayScreen extends State<FlashcardsPlayScreen> {
 
     return Container(
         //! Appstate for some reason changes the theme to default blue theme when going to this page for some reason, maybe because after the first frame, it defaults to blue?
-        decoration: passedUserTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: passedUserTheme.colorScheme.background),
+        decoration: BoxDecoration(color: passedUserTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -776,7 +776,7 @@ class _FinishedScreenState extends State<FinishedScreen> with TickerProviderStat
     var appState = Provider.of<AppState>(context);
     return Container(
         //! Appstate for some reason changes the theme to default blue theme when going to this page for some reason, maybe because after the first frame, it defaults to blue?
-        decoration: passedUserTheme == defaultBlueTheme ? const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/purpwallpaper 2.png'), fit: BoxFit.cover)) : BoxDecoration(color: passedUserTheme.colorScheme.background),
+        decoration: BoxDecoration(color: passedUserTheme.colorScheme.background),
         child: SafeArea(
             child: Scaffold(
                 resizeToAvoidBottomInset: false,

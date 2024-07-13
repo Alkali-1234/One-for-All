@@ -6,7 +6,6 @@ import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:oneforall/components/base_shimmer.dart';
-import 'package:oneforall/constants.dart';
 import 'package:oneforall/styles/styles.dart';
 import 'package:provider/provider.dart';
 
@@ -140,14 +139,7 @@ class _CommunitySettingsScreenState extends State<CommunitySettingsScreen> {
     var textTheme = Theme.of(context).textTheme;
     // var appState = Provider.of<AppState>(context);
     return Container(
-      decoration: theme == defaultBlueTheme.colorScheme
-          ? const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/images/purpwallpaper 2.png"),
-                fit: BoxFit.cover,
-              ),
-            )
-          : BoxDecoration(color: theme.background),
+      decoration: BoxDecoration(color: theme.background),
       child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
