@@ -269,7 +269,7 @@ ThemeData lightTheme = ThemeData(
     ),
     displaySmall: TextStyle(
       color: Color.fromRGBO(0, 0, 0, 1.0),
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: FontWeight.w400,
     ),
     headlineSmall: TextStyle(

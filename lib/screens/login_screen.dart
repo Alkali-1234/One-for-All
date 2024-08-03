@@ -2,6 +2,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:oneforall/components/styled_components/elevated_button.dart';
+import 'package:oneforall/components/styled_components/primary_elevated_button.dart';
+import 'package:oneforall/components/styled_components/text_field.dart';
 import 'package:oneforall/data/user_data.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -173,179 +176,93 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    return Container(
-        decoration: const BoxDecoration(image: DecorationImage(fit: BoxFit.cover, image: AssetImage('assets/images/purpwallpaper 2.png'))),
-        child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: SafeArea(
-              child: SizedBox(
-                width: double.infinity,
-                height: double.infinity,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
+    var appState = context.watch<AppState>();
+    var ctheme = appState.getCurrentTheme(context);
+    return Scaffold(
+        body: SafeArea(
+      child: SizedBox(
+        width: double.infinity,
+        height: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 100),
+              Text(
+                "Log In",
+                style: textTheme.displayLarge,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
+              StyledTextField(
+                theme: ctheme,
+                onChanged: (value) => setState(() {
+                  emailQuery = value;
+                }),
+                hint: "Email",
+              ),
+              const SizedBox(height: 10),
+              StyledTextField(
+                onChanged: (value) => setState(() {
+                  passwordQuery = value;
+                }),
+                theme: ctheme,
+                hint: "Password",
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
-                      const SizedBox(height: 100),
-                      Text(
-                        "Log In",
-                        style: textTheme.displayLarge,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        onChanged: (value) => setState(() {
-                          emailQuery = value;
-                        }),
-                        style: textTheme.displaySmall,
-                        cursorColor: theme.onBackground,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.only(left: 10),
-                          filled: true,
-                          fillColor: theme.primary,
-                          hintText: "Email",
-                          hintStyle: textTheme.displaySmall,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: theme.onBackground, width: 1),
-                          ),
-                          disabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        onChanged: (value) => setState(() {
-                          passwordQuery = value;
-                        }),
-                        cursorColor: theme.onBackground,
-                        style: textTheme.displaySmall,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.only(left: 10),
-                          filled: true,
-                          fillColor: theme.primary,
-                          hintText: "Password",
-                          hintStyle: textTheme.displaySmall,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: theme.onBackground, width: 1),
-                          ),
-                          disabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Checkbox(
-                                  side: BorderSide(color: Theme.of(context).colorScheme.onBackground),
-                                  value: saveCredentials,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      saveCredentials = value!;
-                                    });
-                                  }),
-                              Text("Remember me", style: textTheme.displaySmall)
-                            ],
-                          ),
-                          Text("", style: textTheme.displaySmall)
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          gradient: getDefaultBluePrimaryGradient,
-                        ),
-                        width: double.infinity,
-                        height: 40,
-                        child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            onPressed: () {
-                              if (isLoading == false) {
-                                attemptLogin(context.read<AppState>());
-                              }
-                            },
-                            child: isLoading
-                                ? SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(color: theme.onBackground),
-                                  )
-                                : Text("Log In", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold))),
-                      ),
-                      const SizedBox(height: 5),
-                      error != "" ? Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error)) : Container(),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 40,
-                        child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.secondary,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              side: BorderSide(color: theme.tertiary),
-                            ),
-                            onPressed: () {
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const GetStartedScreen()));
-                            },
-                            child: Text("Create a new account", style: textTheme.displaySmall)),
-                      ),
-                      const SizedBox(height: 10),
-
-                      // Login as Guest
-                      SizedBox(
-                          width: double.infinity,
-                          height: 40,
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: theme.secondary,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(100),
-                                ),
-                                side: BorderSide(color: theme.tertiary),
-                              ),
-                              onPressed: () => loginAsGuest(context.read<AppState>()),
-                              child: Text("Login as Guest", style: textTheme.displaySmall)))
+                      Checkbox(
+                          side: BorderSide(color: Theme.of(context).colorScheme.onBackground),
+                          value: saveCredentials,
+                          onChanged: (value) {
+                            setState(() {
+                              saveCredentials = value!;
+                            });
+                          }),
+                      Text("Remember me", style: textTheme.displaySmall)
                     ],
                   ),
-                ),
+                  Text("", style: textTheme.displaySmall)
+                ],
               ),
-            )));
+              const SizedBox(height: 20),
+              StyledPrimaryElevatedButton(
+                  theme: ctheme,
+                  onPressed: () {
+                    if (isLoading == false) {
+                      attemptLogin(context.read<AppState>());
+                    }
+                  },
+                  child: isLoading
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(color: theme.onBackground),
+                        )
+                      : Text("Log In", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold))),
+              const SizedBox(height: 10),
+              error != "" ? Text(error, style: textTheme.displaySmall!.copyWith(color: theme.error)) : Container(),
+              const SizedBox(
+                height: 10,
+              ),
+              StyledElevatedButton(
+                  theme: ctheme,
+                  onPressed: () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const GetStartedScreen()));
+                  },
+                  child: Text("Create a new account", style: textTheme.displaySmall)),
+              const SizedBox(height: 20),
+
+              // Login as Guest
+              StyledElevatedButton(theme: ctheme, onPressed: () => loginAsGuest(context.read<AppState>()), child: Text("Login as Guest", style: textTheme.displaySmall))
+            ],
+          ),
+        ),
+      ),
+    ));
   }
 }

@@ -1,10 +1,14 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:oneforall/components/animations/fade_in_transition.dart';
 import 'package:oneforall/components/dotted_paginator.dart';
 import 'package:oneforall/components/styled_components/container.dart';
 import 'package:oneforall/components/styled_components/elevated_button.dart';
+import 'package:oneforall/components/styled_components/elevated_icon_button.dart';
+import 'package:oneforall/components/styled_components/inner_shadow.dart';
 import 'package:oneforall/components/styled_components/primary_elevated_button.dart';
 import 'package:oneforall/components/styled_components/text_field.dart';
 import 'package:oneforall/main.dart';
@@ -69,34 +73,36 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                 const SizedBox(
                   height: 30,
                 ),
-                PageTransitionSwitcher(
-                  transitionBuilder: (child, animation, secondaryAnimation) {
-                    return SharedAxisTransition(
-                      transitionType: SharedAxisTransitionType.horizontal,
-                      fillColor: Colors.transparent,
-                      animation: animation,
-                      secondaryAnimation: secondaryAnimation,
-                      child: child,
-                    );
-                  },
-                  child: currentStep == 0
-                      ? WelcomeScreen(
-                          textTheme: textTheme,
-                          changeCurrentStep: changeCurrentStep,
-                        )
-                      : currentStep == 1
-                          ? AccountCreationScreen(
-                              theme: theme,
-                              textTheme: textTheme,
-                              changeStep: changeCurrentStep,
-                            )
-                          : currentStep == 2
-                              ? JoinCommunityScreen(
-                                  changeStep: changeCurrentStep,
-                                )
-                              : SettingsConfigurationScreen(
-                                  changeSelectedTheme: (value) => setState(() => currentSelectedTheme = value),
-                                ),
+                Expanded(
+                  child: PageTransitionSwitcher(
+                    transitionBuilder: (child, animation, secondaryAnimation) {
+                      return SharedAxisTransition(
+                        transitionType: SharedAxisTransitionType.horizontal,
+                        fillColor: Colors.transparent,
+                        animation: animation,
+                        secondaryAnimation: secondaryAnimation,
+                        child: child,
+                      );
+                    },
+                    child: currentStep == 0
+                        ? WelcomeScreen(
+                            textTheme: textTheme,
+                            changeCurrentStep: changeCurrentStep,
+                          )
+                        : currentStep == 1
+                            ? AccountCreationScreen(
+                                theme: theme,
+                                textTheme: textTheme,
+                                changeStep: changeCurrentStep,
+                              )
+                            : currentStep == 2
+                                ? JoinCommunityScreen(
+                                    changeStep: changeCurrentStep,
+                                  )
+                                : SettingsConfigurationScreen(
+                                    changeSelectedTheme: (value) => setState(() => currentSelectedTheme = value),
+                                  ),
+                  ),
                 ),
               ],
             ),
@@ -134,11 +140,6 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<AppState>();
-    var theme = selectedTheme == 0
-        ? darkTheme.colorScheme
-        : selectedTheme == 1
-            ? darkTheme.colorScheme
-            : lightTheme.colorScheme;
     var textTheme = selectedTheme == 0
         ? darkTheme.textTheme
         : selectedTheme == 1
@@ -146,154 +147,97 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
             : lightTheme.textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          "Configure your settings.",
-          style: textTheme.headlineMedium,
-        ),
-        const SizedBox(height: 10),
-        Text("Theme", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 10),
-        //* Theme switch (Clean Dark, Bright Light)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
               children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedTheme = 1;
-                    });
-                    widget.changeSelectedTheme(1);
-                    //* change theme
-                    appState.currentUserSelectedTheme = darkTheme;
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      border: selectedTheme == 1 ? Border.all(color: theme.onBackground, width: 1) : null,
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color.fromRGBO(61, 61, 61, 1.0),
-                          Color.fromRGBO(2, 2, 2, 1.0)
-                        ],
-                      ),
-                    ),
+                Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                  Text(
+                    "Configure your settings.",
+                    style: textTheme.headlineMedium,
                   ),
-                ),
-                const SizedBox(height: 10),
-                Text("Dark", style: textTheme.displaySmall!.copyWith(fontWeight: selectedTheme == 1 ? FontWeight.bold : FontWeight.normal)),
+                  const SizedBox(height: 40),
+                  Text("Theme", style: textTheme.headlineSmall),
+                  const SizedBox(height: 10),
+                  //* Theme switch (Clean Dark, Bright Light)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      StyledIconButton(
+                        theme: selectedTheme == 2 ? Themes.light : Themes.dark,
+                        onPressed: () {
+                          setState(() {
+                            selectedTheme = 1;
+                          });
+                          widget.changeSelectedTheme(1);
+                          //* change theme
+                          appState.currentUserSelectedTheme = darkTheme;
+                        },
+                        icon: Icons.dark_mode_rounded,
+                        size: 80,
+                      ),
+                      StyledIconButton(
+                        theme: selectedTheme == 2 ? Themes.light : Themes.dark,
+                        onPressed: () {
+                          setState(() {
+                            selectedTheme = 2;
+                          });
+                          widget.changeSelectedTheme(2);
+                          //* change theme
+                          appState.currentUserSelectedTheme = lightTheme;
+                        },
+                        icon: Icons.light_mode_rounded,
+                        size: 80,
+                      )
+                    ],
+                  )
+                ]),
+                // //* Notification settings
+                const SizedBox(height: 25),
+                Text("Notifications", style: textTheme.headlineSmall),
+                const SizedBox(height: 5),
+                ListTile(
+                    leading: Text("Main Announcement Board", style: textTheme.displaySmall),
+                    trailing: Switch(
+                      value: notificationSettings["MAB"]!,
+                      onChanged: (value) => setState(() {
+                        notificationSettings["MAB"] = !notificationSettings["MAB"]!;
+                        changedNotifSettings = true;
+                      }),
+                      activeColor: Colors.green,
+                      activeTrackColor: Colors.white,
+                      inactiveThumbColor: Colors.red,
+                    )),
+                ListTile(
+                    leading: Text("Local Announcement Board", style: textTheme.displaySmall),
+                    trailing: Switch(
+                      value: notificationSettings["LAC"]!,
+                      onChanged: (value) => setState(() {
+                        notificationSettings["LAC"] = !notificationSettings["LAC"]!;
+                        changedNotifSettings = true;
+                      }),
+                      activeColor: Colors.green,
+                      activeTrackColor: Colors.white,
+                      inactiveThumbColor: Colors.red,
+                    )),
+                ListTile(
+                    leading: Text("Recent Activity", style: textTheme.displaySmall),
+                    trailing: Switch(
+                      value: notificationSettings["RA"]!,
+                      onChanged: (value) => setState(() {
+                        notificationSettings["RA"] = !notificationSettings["RA"]!;
+                        changedNotifSettings = true;
+                      }),
+                      activeColor: Colors.green,
+                      activeTrackColor: Colors.white,
+                      inactiveThumbColor: Colors.red,
+                    )),
               ],
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedTheme = 2;
-                    });
-                    widget.changeSelectedTheme(2);
-                    //* change theme
-                    appState.currentUserSelectedTheme = lightTheme;
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      border: selectedTheme == 2 ? Border.all(color: theme.onBackground, width: 1) : null,
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color.fromRGBO(255, 255, 255, 1.0),
-                          Color.fromRGBO(103, 103, 103, 1.0)
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text("Light", style: textTheme.displaySmall!.copyWith(fontWeight: selectedTheme == 2 ? FontWeight.bold : FontWeight.normal)),
-              ],
-            ),
-          ],
+          ),
         ),
-        // //* Notification settings
-        // const SizedBox(height: 25),
-        // Text("Notification Settings", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-        // const SizedBox(height: 5),
-        // ListTile(
-        //     leading: Text("MAB", style: textTheme.displaySmall),
-        //     trailing: Switch(
-        //       value: notificationSettings["MAB"]!,
-        //       onChanged: (value) => setState(() {
-        //         notificationSettings["MAB"] = !notificationSettings["MAB"]!;
-        //         changedNotifSettings = true;
-        //       }),
-        //       activeColor: Colors.green,
-        //       activeTrackColor: Colors.white,
-        //       inactiveThumbColor: Colors.red,
-        //     )),
-        // ListTile(
-        //     leading: Text("LAC", style: textTheme.displaySmall),
-        //     trailing: Switch(
-        //       value: notificationSettings["LAC"]!,
-        //       onChanged: (value) => setState(() {
-        //         notificationSettings["LAC"] = !notificationSettings["LAC"]!;
-        //         changedNotifSettings = true;
-        //       }),
-        //       activeColor: Colors.green,
-        //       activeTrackColor: Colors.white,
-        //       inactiveThumbColor: Colors.red,
-        //     )),
-        // ListTile(
-        //     leading: Text("Recent Activity", style: textTheme.displaySmall),
-        //     trailing: Switch(
-        //       value: notificationSettings["RA"]!,
-        //       onChanged: (value) => setState(() {
-        //         notificationSettings["RA"] = !notificationSettings["RA"]!;
-        //         changedNotifSettings = true;
-        //       }),
-        //       activeColor: Colors.green,
-        //       activeTrackColor: Colors.white,
-        //       inactiveThumbColor: Colors.red,
-        //     )),
-        // const Spacer(),
-        // //* Done button
-        // Container(
-        //   height: 40,
-        //   width: double.infinity,
-        //   decoration: BoxDecoration(
-        //       gradient: selectedTheme == 0
-        //           ? defaultBluePrimaryGradient
-        //           : selectedTheme == 1
-        //               ? darkPrimaryGradient
-        //               : lightPrimaryGradient,
-        //       borderRadius: const BorderRadius.all(Radius.circular(100))),
-        //   child: ElevatedButton(
-        //     onPressed: () async {
-        //       await saveSettings();
-
-        //       if (!context.mounted) return;
-        //       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
-        //     },
-        //     style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, elevation: 0, padding: const EdgeInsets.all(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))),
-        //     child: Padding(
-        //       padding: const EdgeInsets.symmetric(horizontal: 80),
-        //       child: Text("Done", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-        //     ),
-        //   ),
-        // )
         StyledPrimaryElevatedButton(
             theme: selectedTheme == 2 ? Themes.light : Themes.dark,
             onPressed: () async {
@@ -481,11 +425,14 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), border: Border.all(color: theme.tertiary, width: 1)),
               child: Stack(
                 children: [
+                  DarkStyledContainer(
+                    height: 80,
+                  ),
                   //* Left Bottom image
                   Container(
                     height: 80,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(20),
                         image: DecorationImage(
                             image: NetworkImage(
                               communityData["image"],
@@ -497,7 +444,7 @@ class _JoinCommunityScreenState extends State<JoinCommunityScreen> {
                     height: 80,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(20),
                         gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [
                           theme.background.withOpacity(0),
                           theme.background.withOpacity(1),

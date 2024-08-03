@@ -146,8 +146,10 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  Themes getCurrentTheme() {
-    return currentTheme;
+  Themes getCurrentTheme(BuildContext context) {
+    if (Theme.of(context) == darkTheme) return Themes.dark;
+    if (Theme.of(context) == lightTheme) return Themes.light;
+    return Themes.dark;
   }
 
   //* User data section

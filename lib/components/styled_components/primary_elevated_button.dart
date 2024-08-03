@@ -129,6 +129,7 @@ class _LightStyledPrimaryElevatedButtonState extends State<LightStyledPrimaryEle
                   ]
                 : null,
           ),
+          child: Center(child: widget.child),
         ),
       ),
     );
