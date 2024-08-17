@@ -4,10 +4,11 @@ import 'package:oneforall/constants.dart';
 import 'inner_shadow.dart';
 
 class StyledDarkThemeTextField extends StatefulWidget {
-  const StyledDarkThemeTextField({super.key, this.controller, this.hint, this.onChanged});
+  const StyledDarkThemeTextField({super.key, this.controller, this.hint, this.onChanged, this.textField});
   final TextEditingController? controller;
   final String? hint;
   final Function? onChanged;
+  final TextField? textField;
 
   @override
   State<StyledDarkThemeTextField> createState() => _StyledDarkThemeTextFieldState();
@@ -41,12 +42,20 @@ class _StyledDarkThemeTextFieldState extends State<StyledDarkThemeTextField> {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: TextField(
-                  onChanged: widget.onChanged != null ? (value) => widget.onChanged!(value) : null,
-                  style: textTheme.displaySmall,
-                  cursorColor: Colors.white,
-                  decoration: InputDecoration.collapsed(hintText: widget.hint, hintStyle: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: textTheme.displaySmall!.color!.withOpacity(0.5))),
-                ),
+                child: widget.textField == null
+                    ? TextField(
+                        controller: widget.controller,
+                        onChanged: widget.onChanged != null ? (value) => widget.onChanged!(value) : null,
+                        style: textTheme.displaySmall,
+                        cursorColor: Colors.white,
+                        decoration: InputDecoration.collapsed(hintText: widget.hint, hintStyle: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: textTheme.displaySmall!.color!.withOpacity(0.5))),
+                      )
+                    : copyWithTextField(
+                        textField: widget.textField,
+                        style: textTheme.displaySmall,
+                        cursorColor: Colors.white,
+                        decoration: InputDecoration.collapsed(hintText: widget.hint, hintStyle: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: textTheme.displaySmall!.color!.withOpacity(0.5))),
+                      ),
               ),
             ],
           ),
@@ -57,10 +66,11 @@ class _StyledDarkThemeTextFieldState extends State<StyledDarkThemeTextField> {
 }
 
 class StyledLightThemeTextField extends StatefulWidget {
-  const StyledLightThemeTextField({super.key, this.controller, this.hint, this.onChanged});
+  const StyledLightThemeTextField({super.key, this.controller, this.hint, this.onChanged, this.textField});
   final TextEditingController? controller;
   final String? hint;
   final Function? onChanged;
+  final TextField? textField;
 
   @override
   State<StyledLightThemeTextField> createState() => _StyledLightThemeTextFieldState();
@@ -94,11 +104,18 @@ class _StyledLightThemeTextFieldState extends State<StyledLightThemeTextField> {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: TextField(
-                  onChanged: widget.onChanged != null ? (value) => widget.onChanged!(value) : null,
-                  style: textTheme.displaySmall,
-                  decoration: InputDecoration.collapsed(hintText: widget.hint, hintStyle: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: textTheme.displaySmall!.color!.withOpacity(0.5))),
-                ),
+                child: widget.textField == null
+                    ? TextField(
+                        controller: widget.controller,
+                        onChanged: widget.onChanged != null ? (value) => widget.onChanged!(value) : null,
+                        style: textTheme.displaySmall,
+                        decoration: InputDecoration.collapsed(hintText: widget.hint, hintStyle: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: textTheme.displaySmall!.color!.withOpacity(0.5))),
+                      )
+                    : copyWithTextField(
+                        textField: widget.textField,
+                        style: textTheme.displaySmall,
+                        decoration: InputDecoration.collapsed(hintText: widget.hint, hintStyle: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: textTheme.displaySmall!.color!.withOpacity(0.5))),
+                      ),
               ),
             ],
           ),
@@ -109,11 +126,12 @@ class _StyledLightThemeTextFieldState extends State<StyledLightThemeTextField> {
 }
 
 class StyledTextField extends StatelessWidget {
-  const StyledTextField({super.key, required this.theme, this.onChanged, this.controller, this.hint});
+  const StyledTextField({super.key, required this.theme, this.onChanged, this.controller, this.hint, this.textField});
   final Themes theme;
   final Function(String)? onChanged;
   final TextEditingController? controller;
   final String? hint;
+  final TextField? textField;
 
   @override
   Widget build(BuildContext context) {
@@ -122,12 +140,50 @@ class StyledTextField extends StatelessWidget {
         onChanged: onChanged,
         controller: controller,
         hint: hint,
+        textField: textField,
       );
     }
     return StyledLightThemeTextField(
       onChanged: onChanged,
       controller: controller,
       hint: hint,
+      textField: textField,
     );
   }
+}
+
+TextField copyWithTextField({
+  TextField? textField,
+  TextEditingController? controller,
+  String? hintText,
+  TextStyle? style,
+  TextInputType? keyboardType,
+  TextInputAction? textInputAction,
+  bool? obscureText,
+  bool? autofocus,
+  bool? enabled,
+  FocusNode? focusNode,
+  Function(String)? onChanged,
+  Function(String)? onSubmitted,
+  InputDecoration? decoration,
+  Color? cursorColor,
+}) {
+  return TextField(
+    controller: controller ?? textField?.controller,
+    onChanged: onChanged ?? textField?.onChanged,
+    onSubmitted: onSubmitted ?? textField?.onSubmitted,
+    keyboardType: keyboardType ?? textField?.keyboardType,
+    textInputAction: textInputAction ?? textField?.textInputAction,
+    obscureText: obscureText ?? textField?.obscureText ?? false,
+    autofocus: autofocus ?? textField?.autofocus ?? false,
+    enabled: enabled ?? textField?.enabled,
+    focusNode: focusNode ?? textField?.focusNode,
+    style: style ?? textField?.style,
+    cursorColor: cursorColor ?? textField?.cursorColor,
+    decoration: decoration ??
+        textField?.decoration?.copyWith(
+          hintText: hintText ?? textField.decoration?.hintText,
+          hintStyle: style ?? textField.decoration?.hintStyle,
+        ),
+  );
 }

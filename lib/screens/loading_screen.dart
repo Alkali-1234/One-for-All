@@ -1,6 +1,5 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:oneforall/components/styled_components/style_constants.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/user_data.dart';
 import 'package:oneforall/service/auth_service.dart';
@@ -148,81 +147,53 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(image: AssetImage("assets/images/purpwallpaper 2.png"), fit: BoxFit.cover),
-        ),
-        child: Center(
-          child: Stack(
+      backgroundColor: StyleConstants.darkBackgroundColor,
+      body: Column(
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 200,
+                  height: 200,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(filterQuality: FilterQuality.none, image: AssetImage("assets/images/logoanim.gif"), fit: BoxFit.cover),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "One for All",
+                  style: darkTheme.textTheme.displayLarge,
+                ),
+                Text(
+                  '$verbose$loadingDots',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Column(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              //* Blur background
-              SizedBox.expand(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Text(
+                      "v0.0.6.0",
+                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                  ],
                 ),
               ),
-
-              Column(
-                children: [
-                  // const BannerAdWidget(),
-                  Expanded(flex: 1, child: Container()),
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 200,
-                          height: 200,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(filterQuality: FilterQuality.none, image: AssetImage("assets/images/logoanim.gif"), fit: BoxFit.cover),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          "One for All",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          '$verbose$loadingDots',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Expanded(
-                      flex: 1,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          SafeArea(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    "v0.0.6.0",
-                                    style: TextStyle(color: Colors.grey, fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                        ],
-                      )),
-                  // const BannerAdWidget(),
-                ],
-              ),
+              SizedBox(height: 10),
             ],
           ),
-        ),
+        ],
       ),
     );
   }

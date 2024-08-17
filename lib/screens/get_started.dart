@@ -1,15 +1,13 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:oneforall/components/animations/fade_in_transition.dart';
 import 'package:oneforall/components/dotted_paginator.dart';
 import 'package:oneforall/components/styled_components/container.dart';
 import 'package:oneforall/components/styled_components/elevated_button.dart';
 import 'package:oneforall/components/styled_components/elevated_icon_button.dart';
-import 'package:oneforall/components/styled_components/inner_shadow.dart';
 import 'package:oneforall/components/styled_components/primary_elevated_button.dart';
+import 'package:oneforall/components/styled_components/switch.dart';
 import 'package:oneforall/components/styled_components/text_field.dart';
 import 'package:oneforall/main.dart';
 import 'package:oneforall/screens/login_screen.dart';
@@ -120,7 +118,7 @@ class SettingsConfigurationScreen extends StatefulWidget {
 }
 
 class _SettingsConfigurationScreenState extends State<SettingsConfigurationScreen> {
-  int selectedTheme = 0;
+  int selectedTheme = 1;
 
   bool changedNotifSettings = false;
   Map<String, bool> notificationSettings = {
@@ -129,9 +127,11 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
     "RA": true,
   };
 
-  Future<void> saveSettings() async {
+  Future<void> saveSettings(AppState appState) async {
     var prefs = await SharedPreferences.getInstance();
     prefs.setInt("theme", selectedTheme);
+    //* Set the theme
+    appState.currentUserSelectedTheme = selectedTheme == 2 ? lightTheme : darkTheme;
     prefs.setBool("notification_settings_MAB", notificationSettings["MAB"]!);
     prefs.setBool("notification_settings_LAC", notificationSettings["LAC"]!);
     prefs.setBool("notification_settings_RA", notificationSettings["RA"]!);
@@ -200,39 +200,28 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
                 const SizedBox(height: 5),
                 ListTile(
                     leading: Text("Main Announcement Board", style: textTheme.displaySmall),
-                    trailing: Switch(
-                      value: notificationSettings["MAB"]!,
+                    trailing: NeumorphicSwitch(
+                      initialValue: notificationSettings["MAB"]!,
                       onChanged: (value) => setState(() {
                         notificationSettings["MAB"] = !notificationSettings["MAB"]!;
                         changedNotifSettings = true;
                       }),
-                      activeColor: Colors.green,
-                      activeTrackColor: Colors.white,
-                      inactiveThumbColor: Colors.red,
                     )),
                 ListTile(
                     leading: Text("Local Announcement Board", style: textTheme.displaySmall),
-                    trailing: Switch(
-                      value: notificationSettings["LAC"]!,
+                    trailing: NeumorphicSwitch(
                       onChanged: (value) => setState(() {
                         notificationSettings["LAC"] = !notificationSettings["LAC"]!;
                         changedNotifSettings = true;
                       }),
-                      activeColor: Colors.green,
-                      activeTrackColor: Colors.white,
-                      inactiveThumbColor: Colors.red,
                     )),
                 ListTile(
                     leading: Text("Recent Activity", style: textTheme.displaySmall),
-                    trailing: Switch(
-                      value: notificationSettings["RA"]!,
+                    trailing: NeumorphicSwitch(
                       onChanged: (value) => setState(() {
                         notificationSettings["RA"] = !notificationSettings["RA"]!;
                         changedNotifSettings = true;
                       }),
-                      activeColor: Colors.green,
-                      activeTrackColor: Colors.white,
-                      inactiveThumbColor: Colors.red,
                     )),
               ],
             ),
@@ -241,7 +230,7 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
         StyledPrimaryElevatedButton(
             theme: selectedTheme == 2 ? Themes.light : Themes.dark,
             onPressed: () async {
-              await saveSettings();
+              await saveSettings(appState);
 
               if (!context.mounted) return;
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));

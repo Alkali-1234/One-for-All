@@ -10,6 +10,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:oneforall/components/profile_viewer.dart';
+import 'package:oneforall/components/styled_components/container.dart';
+import 'package:oneforall/components/styled_components/elevated_button.dart';
+import 'package:oneforall/components/styled_components/elevated_icon_button.dart';
+import 'package:oneforall/components/styled_components/filled_elevated_button.dart';
+import 'package:oneforall/components/styled_components/style_constants.dart';
+import 'package:oneforall/components/styled_components/toggleable_button.dart';
 import 'package:oneforall/screens/calendar_screen.dart';
 import 'package:oneforall/screens/flashcards_screen.dart';
 import 'package:oneforall/screens/forum_screen.dart';
@@ -28,7 +34,7 @@ import 'package:oneforall/data/user_data.dart';
 import 'package:provider/provider.dart';
 import 'constants.dart';
 import 'package:intl/intl.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+// import 'package:carousel_slider/carousel_slider.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:path_provider/path_provider.dart';
 // import 'package:introduction_screen/introduction_screen.dart';
@@ -264,6 +270,7 @@ class _HomePageState extends State<HomePage> {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     var appState = Provider.of<AppState>(context);
+    var ctheme = theme == lightTheme.colorScheme ? Themes.light : Themes.dark;
 
     void setSelectedScreen(int index) {
       setState(() {
@@ -283,6 +290,54 @@ class _HomePageState extends State<HomePage> {
         _key.currentState?.openDrawer();
       },
       child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          elevation: 10,
+          shadowColor: Colors.black,
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: theme.background,
+          leading: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+            child: Showcase(
+              key: showcase2,
+              description: "This is the menu button. Tap it to access all of the features!",
+              child: SizedBox(
+                width: 50,
+                child: StyledIconButton(
+                  size: 32,
+                  theme: ctheme,
+                  onPressed: () => {
+                    _key.currentState?.openDrawer(),
+                  },
+                  icon: Icons.menu_rounded,
+                ),
+              ),
+            ),
+          ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              RichText(
+                text: TextSpan(children: [
+                  TextSpan(text: appState.getCurrentUser.username, style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.w900)),
+                ]),
+              ),
+              GestureDetector(
+                onTap: () => showModalBottomSheet(context: context, builder: (c) => ProfileViewer(uid: FirebaseAuth.instance.currentUser!.uid)),
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: theme.onPrimary,
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: getPrimaryGradient,
+                  ),
+                  child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
+                ),
+              )
+            ],
+          ),
+        ),
         resizeToAvoidBottomInset: false,
         //Global key for the scaffold
         key: _key,
@@ -292,123 +347,69 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: theme.background,
         //Main application
         body: Builder(
-            builder: (context) => Container(
-                  decoration: BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
-                  child: Column(children: [
-                    Hero(
-                      tag: "topAppBar",
-                      child: Container(
-                        width: double.infinity,
-                        color: theme.secondary,
-                        //Top App Bar
-                        child: SafeArea(
-                          bottom: false,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                GestureDetector(
-                                  onTap: () => {
-                                    _key.currentState?.openDrawer(),
-                                  },
-                                  child: Showcase(
-                                    key: showcase2,
-                                    description: "This is the menu button. Tap it to access all of the features!",
-                                    child: Icon(
-                                      Icons.menu,
-                                      color: theme.onPrimary,
-                                      size: 30,
-                                    ),
-                                  ),
-                                ),
-                                Text(appState.getCurrentUser.username, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-                                GestureDetector(
-                                  onTap: () => showModalBottomSheet(context: context, builder: (c) => ProfileViewer(uid: FirebaseAuth.instance.currentUser!.uid)),
-                                  child: Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                      color: theme.onPrimary,
-                                      borderRadius: BorderRadius.circular(20),
-                                      gradient: getPrimaryGradient,
-                                    ),
-                                    child: ClipRRect(borderRadius: const BorderRadius.all(Radius.circular(15)), child: Image.network(appState.getCurrentUser.profilePicture, fit: BoxFit.cover)),
-                                  ),
+            builder: (context) => Column(children: [
+                  //Main Content
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: PageTransitionSwitcher(
+                          reverse: reverseTransition,
+                          transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
+                                transitionType: SharedAxisTransitionType.horizontal,
+                                fillColor: Colors.transparent,
+                                animation: primaryAnimation,
+                                secondaryAnimation: secondaryAnimation,
+                                child: child,
+                              ),
+                          child: selectedScreen == 0
+                              ? HomeScreen(
+                                  showcase1Key: showcase1,
                                 )
-                              ],
-                            ),
-                          ),
-                        ), //END OF TOP APP BAR
+                              : selectedScreen == 1
+                                  ? const ProfileScreen()
+                                  : Container()),
+                    ),
+                  ),
+                  //END OF MAIN CONTENT
+                ])),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: StyledContainer(
+            theme: theme == lightTheme.colorScheme ? Themes.light : Themes.dark,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(
+                    width: 50,
+                    child: StyledToggleableButton(
+                      value: (selectedScreen == 0),
+                      theme: theme == lightTheme.colorScheme ? Themes.light : Themes.dark,
+                      onPressed: selectedScreen == 0 ? null : () => setSelectedScreen(0),
+                      child: Icon(
+                        selectedScreen == 0 ? Icons.home_rounded : Icons.home_outlined,
+                        color: theme.onBackground,
                       ),
                     ),
-                    //Main Content
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: PageTransitionSwitcher(
-                            reverse: reverseTransition,
-                            transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
-                                  transitionType: SharedAxisTransitionType.horizontal,
-                                  fillColor: Colors.transparent,
-                                  animation: primaryAnimation,
-                                  secondaryAnimation: secondaryAnimation,
-                                  child: child,
-                                ),
-                            child: selectedScreen == 0
-                                ? HomeScreen(
-                                    showcase1Key: showcase1,
-                                  )
-                                : selectedScreen == 1
-                                    ? const ProfileScreen()
-                                    : Container()),
+                  ),
+                  SizedBox(
+                    width: 50,
+                    child: StyledToggleableButton(
+                      value: (selectedScreen == 1),
+                      theme: theme == lightTheme.colorScheme ? Themes.light : Themes.dark,
+                      onPressed: selectedScreen == 1 ? null : () => setSelectedScreen(1),
+                      child: Icon(
+                        selectedScreen == 1 ? Icons.person_rounded : Icons.person_outline_rounded,
+                        color: theme.onBackground,
                       ),
                     ),
-                    //END OF MAIN CONTENT
-
-                    //Bottom Nav Bar
-                    SafeArea(
-                      top: false,
-                      child: Container(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.all(Radius.circular(10)),
-                          child: BottomNavigationBar(
-                            showSelectedLabels: false,
-                            showUnselectedLabels: false,
-                            backgroundColor: theme.secondary,
-                            elevation: 0,
-                            items: [
-                              BottomNavigationBarItem(
-                                  icon: Icon(
-                                    selectedScreen == 0 ? Icons.home_rounded : Icons.home_outlined,
-                                    color: theme.onPrimary,
-                                  ),
-                                  label: "Home",
-                                  tooltip: "Home"),
-                              // BottomNavigationBarItem(
-                              //   icon: Icon(
-                              //     selectedScreen == 1 ? Icons.grid_view_rounded : Icons.grid_view_outlined,
-                              //     color: theme.onPrimary,
-                              //   ),
-                              //   label: "Navigation",
-                              // ),
-                              BottomNavigationBarItem(
-                                  icon: Icon(
-                                    selectedScreen == 1 ? Icons.person_rounded : Icons.person_outline,
-                                    color: theme.onPrimary,
-                                  ),
-                                  label: "Profile",
-                                  tooltip: "Profile"),
-                            ],
-                            onTap: (index) => setSelectedScreen(index),
-                            currentIndex: selectedScreen,
-                          ),
-                        ),
-                      ),
-                    )
-                  ]),
-                )),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -640,222 +641,99 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
 
-    var appState = Provider.of<AppState>(context);
+    Provider.of<AppState>(context);
+    var ctheme = theme == lightTheme.colorScheme ? Themes.light : Themes.dark;
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         //WIDGET
         Flexible(
           flex: 3,
           child: Column(
             children: [
-              const SizedBox(height: 4),
-              //Widget Title
-              Container(
-                decoration: BoxDecoration(
-                  color: theme.secondary,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 10),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                      isExpanded: true,
-                      dropdownColor: theme.secondary,
-                      iconEnabledColor: Colors.white,
-                      iconDisabledColor: Colors.white,
-                      hint: Text("MAB - Widget", style: textTheme.displayMedium),
-                      items: [
-                        DropdownMenuItem(
-                          value: 1,
-                          child: Text(
-                            "",
-                            style: textTheme.displayMedium,
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: 2,
-                          child: Text(
-                            "More coming soon!",
-                            style: textTheme.displayMedium,
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: 3,
-                          child: Text(
-                            "More coming soon!",
-                            style: textTheme.displayMedium,
-                          ),
-                        ),
-                      ],
-                      onChanged: (value) {},
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               //Widget Content
               Expanded(
                 child: Showcase(
                   key: widget.showcase1Key,
                   description: "This is your home screen widget. Currently it is set to the Main Announcement Board widget.",
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: theme.primaryContainer,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: theme.secondary,
-                          width: 1,
-                        )),
+                  child: StyledContainer(
+                    theme: ctheme,
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
+                          Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              child: FittedBox(
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "Main Announcement Board",
+                                      style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                          const SizedBox(
+                            height: 16,
+                          ),
                           //Filters
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               //Filter 1 (ALL)
                               Expanded(
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      width: double.infinity,
-                                      height: 38,
-                                      decoration: BoxDecoration(
-                                          //Bit spaghetti but it works
-                                          //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
-                                          borderRadius: BorderRadius.circular(10),
-                                          gradient: mabSelectedFilter == 0 ? getPrimaryGradient : null,
-                                          boxShadow: mabSelectedFilter == 0
-                                              ? [
-                                                  const BoxShadow(
-                                                    color: Colors.black,
-                                                    blurRadius: 2,
-                                                    offset: Offset(0, 2),
-                                                  )
-                                                ]
-                                              : null,
-                                          color: mabSelectedFilter == 0 ? null : theme.secondary),
-                                      child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.transparent,
-                                            shadowColor: Colors.transparent,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                          ),
-                                          onPressed: () => {
-                                                setMABSelectedFilter(0)
-                                              },
-                                          child: FittedBox(
-                                            child: Text(
-                                              "All",
-                                              style: textTheme.displaySmall!.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          )),
-                                    ),
-                                    SizedBox(height: mabSelectedFilter == 0 ? 2 : 0),
-                                  ],
-                                ),
+                                child: StyledToggleableButton(
+                                    value: mabSelectedFilter == 0,
+                                    theme: ctheme,
+                                    onPressed: () => {
+                                          setMABSelectedFilter(0)
+                                        },
+                                    child: Text(
+                                      "All",
+                                      style: textTheme.displaySmall,
+                                    )),
                               ),
-                              const SizedBox(width: 5),
+                              const SizedBox(width: 10),
                               //Filter 2 (Announcements)
                               Expanded(
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      height: 38,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                          //Bit spaghetti but it works
-                                          //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
-                                          borderRadius: BorderRadius.circular(10),
-                                          gradient: mabSelectedFilter == 1 ? getPrimaryGradient : null,
-                                          boxShadow: mabSelectedFilter == 1
-                                              ? [
-                                                  const BoxShadow(
-                                                    color: Colors.black,
-                                                    blurRadius: 2,
-                                                    offset: Offset(0, 2),
-                                                  )
-                                                ]
-                                              : null,
-                                          color: mabSelectedFilter == 1 ? null : theme.secondary),
-                                      child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.transparent,
-                                              foregroundColor: theme.onSecondary,
-                                              shadowColor: Colors.transparent,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                              )),
-                                          onPressed: () => setMABSelectedFilter(1),
-                                          child: FittedBox(
-                                            child: Text(
-                                              "Announces",
-                                              style: textTheme.displaySmall!.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          )),
-                                    ),
-                                    SizedBox(height: mabSelectedFilter == 1 ? 2 : 0),
-                                  ],
-                                ),
+                                child: StyledToggleableButton(
+                                    value: mabSelectedFilter == 1,
+                                    theme: ctheme,
+                                    onPressed: () => {
+                                          setMABSelectedFilter(1)
+                                        },
+                                    child: Text(
+                                      "Announces",
+                                      style: textTheme.displaySmall,
+                                    )),
                               ),
-                              const SizedBox(width: 5),
+                              const SizedBox(width: 10),
                               Expanded(
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      height: 38,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                          //Bit spaghetti but it works
-                                          //Basically if the filter is 0 (all) then it will have a gradient and a shadow, else it will be the secondary color
-                                          borderRadius: BorderRadius.circular(10),
-                                          gradient: mabSelectedFilter == 2 ? getPrimaryGradient : null,
-                                          boxShadow: mabSelectedFilter == 2
-                                              ? [
-                                                  const BoxShadow(
-                                                    color: Colors.black,
-                                                    blurRadius: 2,
-                                                    offset: Offset(0, 2),
-                                                  )
-                                                ]
-                                              : null,
-                                          color: mabSelectedFilter == 2 ? null : theme.secondary),
-                                      child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.transparent,
-                                              foregroundColor: theme.onSecondary,
-                                              shadowColor: Colors.transparent,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                              )),
-                                          onPressed: () => setMABSelectedFilter(2),
-                                          child: FittedBox(
-                                            child: Text(
-                                              "Tasks",
-                                              style: textTheme.displaySmall!.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          )),
-                                    ),
-                                    SizedBox(height: mabSelectedFilter == 2 ? 2 : 0),
-                                  ],
-                                ),
+                                child: StyledToggleableButton(
+                                    value: mabSelectedFilter == 2,
+                                    theme: ctheme,
+                                    onPressed: () => {
+                                          setMABSelectedFilter(2)
+                                        },
+                                    child: Text(
+                                      "Tasks",
+                                      style: textTheme.displaySmall,
+                                    )),
                               ),
                             ],
                           ),
-
-                          Divider(
-                            color: theme.onPrimary,
-                            thickness: 1,
+                          const SizedBox(
+                            height: 5,
                           ),
+                          Divider(
+                            color: theme.onBackground.withOpacity(0.5),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+
                           Expanded(
                             child: StreamBuilder(
                                 initialData: null,
@@ -902,6 +780,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ]);
                                   mabData.posts.sort((a, b) => b.dueDate.difference(DateTime.now()).inMilliseconds.compareTo(a.dueDate.difference(DateTime.now()).inMilliseconds));
                                   return ListView.builder(
+                                    physics: const ClampingScrollPhysics(),
                                     padding: EdgeInsets.zero,
                                     itemCount: mabData.posts.length,
                                     itemBuilder: (context, index) {
@@ -915,17 +794,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: mabSelectedFilter == 0 || post.type == mabSelectedFilter
                                             ? Padding(
                                                 padding: const EdgeInsets.only(bottom: 5.0),
-                                                child: ElevatedButton(
-                                                  style: ElevatedButton.styleFrom(
-                                                    padding: const EdgeInsets.all(8),
-                                                    backgroundColor: theme.secondary,
-                                                    foregroundColor: theme.onSecondary,
-                                                    shadowColor: Colors.black,
-                                                    elevation: 0,
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(10),
-                                                    ),
-                                                  ),
+                                                child: StyledElevatedButton(
+                                                  theme: ctheme,
                                                   onPressed: () => {
                                                     showDialog(
                                                         context: context,
@@ -936,22 +806,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               attatchements: post.fileAttatchments,
                                                             ))
                                                   },
-                                                  child: Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Text(
-                                                          post.title,
-                                                          style: textTheme.displaySmall,
-                                                          textAlign: TextAlign.left,
-                                                          overflow: TextOverflow.ellipsis,
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                                    child: Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child: Text(
+                                                            post.title,
+                                                            style: textTheme.displaySmall,
+                                                            textAlign: TextAlign.left,
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
                                                         ),
-                                                      ),
-                                                      Text(
-                                                        //days left due, and the day it is due
-                                                        "${post.dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(post.dueDate)})",
-                                                        style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: post.dueDate.difference(DateTime.now()).inDays < 0 ? Colors.red : theme.onBackground),
-                                                      )
-                                                    ],
+                                                        Text(
+                                                          //days left due, and the day it is due
+                                                          "${post.dueDate.difference(DateTime.now()).inDays} Days (${DateFormat("E").format(post.dueDate)})",
+                                                          style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: post.dueDate.difference(DateTime.now()).inDays < 0 ? Colors.red : theme.onBackground),
+                                                        )
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               )
@@ -990,90 +863,87 @@ class _HomeScreenState extends State<HomeScreen> {
         //Card format: Left: User profile, Rright: Top: {user} just posted a new {acitivity} Bottom: {X minutes ago} {subject} {any relevant e.g number of questions}
         //In this example is a Quiz card
 
-        Flexible(
-          flex: 2,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RecentActivityCarousel(theme: theme, textTheme: textTheme),
-              Expanded(
-                child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                  Column(mainAxisSize: MainAxisSize.min, children: [
-                    //Top
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.star_rounded,
-                          color: Colors.yellow,
-                          size: 36,
-                        ),
-                        Text(appState.getCurrentUser.exp.toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
-                      ],
-                    ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RecentActivityCarousel(theme: theme, textTheme: textTheme),
+            // Expanded(
+            //   child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+            //     Column(mainAxisSize: MainAxisSize.min, children: [
+            //       //Top
+            //       Row(
+            //         children: [
+            //           const Icon(
+            //             Icons.star_rounded,
+            //             color: Colors.yellow,
+            //             size: 36,
+            //           ),
+            //           Text(appState.getCurrentUser.exp.toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+            //         ],
+            //       ),
 
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "EXP",
-                          style: textTheme.displaySmall,
-                          textAlign: TextAlign.end,
-                        ),
-                      ],
-                    ),
-                  ]),
-                  Column(mainAxisSize: MainAxisSize.min, children: [
-                    //Top
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.local_fire_department_rounded,
-                          color: Colors.orange,
-                          size: 36,
-                        ),
-                        Text(appState.getCurrentUser.streak.toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
-                      ],
-                    ),
+            //       Row(
+            //         mainAxisSize: MainAxisSize.min,
+            //         children: [
+            //           Text(
+            //             "EXP",
+            //             style: textTheme.displaySmall,
+            //             textAlign: TextAlign.end,
+            //           ),
+            //         ],
+            //       ),
+            //     ]),
+            //     Column(mainAxisSize: MainAxisSize.min, children: [
+            //       //Top
+            //       Row(
+            //         children: [
+            //           const Icon(
+            //             Icons.local_fire_department_rounded,
+            //             color: Colors.orange,
+            //             size: 36,
+            //           ),
+            //           Text(appState.getCurrentUser.streak.toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+            //         ],
+            //       ),
 
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Streak",
-                          style: textTheme.displaySmall,
-                          textAlign: TextAlign.end,
-                        ),
-                      ],
-                    ),
-                  ]),
-                  Column(mainAxisSize: MainAxisSize.min, children: [
-                    //Top
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.send_rounded,
-                          color: Color.fromRGBO(201, 201, 201, 1),
-                          size: 36,
-                        ),
-                        Text(appState.getCurrentUser.posts.toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
-                      ],
-                    ),
+            //       Row(
+            //         mainAxisSize: MainAxisSize.min,
+            //         children: [
+            //           Text(
+            //             "Streak",
+            //             style: textTheme.displaySmall,
+            //             textAlign: TextAlign.end,
+            //           ),
+            //         ],
+            //       ),
+            //     ]),
+            //     Column(mainAxisSize: MainAxisSize.min, children: [
+            //       //Top
+            //       Row(
+            //         children: [
+            //           const Icon(
+            //             Icons.send_rounded,
+            //             color: Color.fromRGBO(201, 201, 201, 1),
+            //             size: 36,
+            //           ),
+            //           Text(appState.getCurrentUser.posts.toString(), style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
+            //         ],
+            //       ),
 
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Posts",
-                          style: textTheme.displaySmall,
-                          textAlign: TextAlign.end,
-                        ),
-                      ],
-                    ),
-                  ]),
-                ]),
-              )
-            ],
-          ),
+            //       Row(
+            //         mainAxisSize: MainAxisSize.min,
+            //         children: [
+            //           Text(
+            //             "Posts",
+            //             style: textTheme.displaySmall,
+            //             textAlign: TextAlign.end,
+            //           ),
+            //         ],
+            //       ),
+            //     ]),
+            //   ]),
+            // )
+          ],
         ),
       ],
     );
@@ -1093,28 +963,28 @@ class RecentActivityCarousel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = Provider.of<AppState>(context);
-    CarouselController controller = CarouselController();
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        CarouselSlider(
-          carouselController: controller,
-          items: [
-            for (int i = 0; i < appState.getRecentActivities.activities.length; i++)
-              RecentActivityCard(
-                theme: theme,
-                textTheme: textTheme,
-                activity: appState.getRecentActivities.activities[i],
-              ),
-          ],
-          options: CarouselOptions(
-            height: MediaQuery.of(context).size.height * 0.09,
-            enableInfiniteScroll: false,
-            viewportFraction: 1,
-            enlargeCenterPage: true,
-            scrollDirection: Axis.horizontal,
-          ),
-        ),
+        // CarouselSlider(
+        //   carouselController: controller,
+        //   items: [
+        //     for (int i = 0; i < appState.getRecentActivities.activities.length; i++)
+        //       RecentActivityCard(
+        //         theme: theme,
+        //         textTheme: textTheme,
+        //         activity: appState.getRecentActivities.activities[i],
+        //       ),
+        //   ],
+        //   options: CarouselOptions(
+        //     height: MediaQuery.of(context).size.height * 0.09,
+        //     enableInfiniteScroll: false,
+        //     viewportFraction: 1,
+        //     enlargeCenterPage: true,
+        //     scrollDirection: Axis.horizontal,
+        //   ),
+        // ),
+        RecentActivityCard(theme: theme, textTheme: textTheme, activity: appState.getRecentActivities.activities[0]),
       ],
     );
   }
@@ -1134,17 +1004,20 @@ class RecentActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context).colorScheme;
+    var ctheme = getThemeFromTheme(theme);
     return Stack(
       alignment: Alignment.center,
       children: [
         Container(
             //this is the background of the card
             width: double.infinity,
-            height: double.infinity,
+            height: 80,
             //Clip any overflowed items
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
-              color: theme.secondary,
+              color: theme.background,
+              boxShadow: ctheme == Themes.dark ? StyleConstants.darkShadows.map((e) => BoxShadow(offset: e.offset, blurRadius: e.blurRadius, color: e.color)).toList() : StyleConstants.lightShadows.map((e) => BoxShadow(offset: e.offset, blurRadius: e.blurRadius, color: e.color)).toList(),
               borderRadius: BorderRadius.circular(10),
             ),
             //Overflowbox to prevent error
@@ -1173,7 +1046,7 @@ class RecentActivityCard extends StatelessWidget {
                                             : activity.type == 2
                                                 ? Icons.import_contacts
                                                 : Icons.extension,
-                                    color: theme.secondary)),
+                                    color: theme.secondary.withOpacity(0.2))),
                             const SizedBox(width: 8)
                           ],
                         ),
@@ -1199,7 +1072,7 @@ class RecentActivityCard extends StatelessWidget {
                                               : activity.type == 2
                                                   ? Icons.import_contacts
                                                   : Icons.extension,
-                                      color: theme.secondary)),
+                                      color: theme.secondary.withOpacity(0.2))),
                               const SizedBox(width: 8)
                             ],
                           ),
@@ -1225,7 +1098,7 @@ class RecentActivityCard extends StatelessWidget {
                                               : activity.type == 2
                                                   ? Icons.import_contacts
                                                   : Icons.extension,
-                                      color: theme.secondary)),
+                                      color: theme.secondary.withOpacity(0.2))),
                               const SizedBox(width: 8)
                             ],
                           ),
@@ -1320,6 +1193,7 @@ class MABModal extends StatelessWidget {
       await launch(downloadURL);
     }
 
+    var ctheme = theme == lightTheme.colorScheme ? Themes.light : Themes.dark;
     return Dialog(
       surfaceTintColor: Colors.transparent,
       backgroundColor: theme.background,
@@ -1327,23 +1201,24 @@ class MABModal extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const SizedBox(height: 8),
             //Main header
             Text(
               title,
               style: textTheme.displayMedium,
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.start,
             ),
             const SizedBox(height: 8),
             //Sub header
-            Text(description, style: textTheme.displaySmall, textAlign: TextAlign.center),
+            Text(description, style: textTheme.displaySmall, textAlign: TextAlign.start),
             const SizedBox(height: 8),
             //Image
-            Container(
+            StyledContainer(
+                theme: ctheme,
                 width: double.infinity,
                 height: 250,
-                decoration: BoxDecoration(color: theme.primaryContainer, borderRadius: const BorderRadius.all(Radius.circular(10)), border: Border.all(color: theme.secondary, width: 1)),
                 child: InkWell(
                   splashColor: image == null || image == "" ? Colors.transparent : theme.secondary.withOpacity(0.5),
                   highlightColor: image == null || image == "" ? Colors.transparent : theme.secondary.withOpacity(0.5),
@@ -1434,29 +1309,15 @@ class MABModal extends StatelessWidget {
                 }),
             const SizedBox(height: 16),
             //Back button
-            Container(
-              height: 40,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: getPrimaryGradient,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () => {
-                  Navigator.pop(context)
-                },
-                child: Text(
-                  "Back",
-                  style: textTheme.displaySmall!.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+            FilledElevatedButton(
+              color: Colors.red,
+              onPressed: () => {
+                Navigator.pop(context)
+              },
+              child: Text(
+                "Back",
+                style: textTheme.displaySmall!.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             )
