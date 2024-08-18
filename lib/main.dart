@@ -12,10 +12,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:oneforall/components/profile_viewer.dart';
 import 'package:oneforall/components/styled_components/container.dart';
 import 'package:oneforall/components/styled_components/elevated_button.dart';
-import 'package:oneforall/components/styled_components/elevated_icon_button.dart';
 import 'package:oneforall/components/styled_components/filled_elevated_button.dart';
 import 'package:oneforall/components/styled_components/style_constants.dart';
 import 'package:oneforall/components/styled_components/toggleable_button.dart';
+import 'package:oneforall/components/navigation_overlay.dart';
 import 'package:oneforall/screens/calendar_screen.dart';
 import 'package:oneforall/screens/flashcards_screen.dart';
 import 'package:oneforall/screens/forum_screen.dart';
@@ -301,17 +301,7 @@ class _HomePageState extends State<HomePage> {
             child: Showcase(
               key: showcase2,
               description: "This is the menu button. Tap it to access all of the features!",
-              child: SizedBox(
-                width: 50,
-                child: StyledIconButton(
-                  size: 32,
-                  theme: ctheme,
-                  onPressed: () => {
-                    _key.currentState?.openDrawer(),
-                  },
-                  icon: Icons.menu_rounded,
-                ),
-              ),
+              child: NavigationButton(ctheme: ctheme),
             ),
           ),
           title: Row(
