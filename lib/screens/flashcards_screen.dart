@@ -3,6 +3,12 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/components/main_container.dart';
+import 'package:oneforall/components/styled_components/container.dart';
+import 'package:oneforall/components/styled_components/filled_elevated_button.dart';
+import 'package:oneforall/components/styled_components/primary_elevated_button.dart';
+import 'package:oneforall/components/styled_components/style_constants.dart';
+import 'package:oneforall/components/styled_components/text_field.dart';
+import 'package:oneforall/components/styled_components/touchable_container.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/functions/flashcards_functions.dart';
 import 'package:oneforall/main.dart';
@@ -34,13 +40,18 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     var appState = Provider.of<AppState>(context);
+    var ctheme = getThemeFromTheme(theme);
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showDialog(context: context, builder: (context) => const NewSetOptions());
-          },
-          backgroundColor: theme.secondary,
-          child: const Icon(Icons.add),
+        floatingActionButton: SizedBox(
+          height: 60,
+          width: 60,
+          child: StyledTouchableContainer(
+              theme: ctheme,
+              onPressed: () => showDialog(context: context, builder: (context) => const NewSetOptions()),
+              child: Icon(
+                Icons.add_rounded,
+                color: theme.onBackground,
+              )),
         ),
         // bottomNavigationBar: const BannerAdWidget(),
         resizeToAvoidBottomInset: false,
@@ -51,26 +62,12 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
               children: [
                 Flexible(
                   flex: 3,
-                  child: TextField(
+                  child: StyledTextField(
+                    theme: ctheme,
                     onChanged: (value) => setState(() {
                       searchQuery = value;
                     }),
-                    keyboardAppearance: Brightness.dark,
-                    cursorColor: theme.onPrimary,
-                    style: textTheme.displayMedium!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
-                    decoration: InputDecoration(
-                        filled: true,
-                        fillColor: theme.primary,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(
-                            width: 0,
-                            style: BorderStyle.none,
-                          ),
-                        ),
-                        hintText: 'Search',
-                        suffixIcon: Icon(Icons.search, color: theme.onPrimary, size: 50),
-                        hintStyle: textTheme.displayMedium!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
+                    hint: "Search",
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -113,6 +110,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                       if (appState.getCurrentUser.flashCardSets.isNotEmpty)
                         Expanded(
                           child: ListView.builder(
+                              physics: const ClampingScrollPhysics(),
                               padding: EdgeInsets.zero,
                               scrollDirection: Axis.vertical,
                               itemCount: appState.getCurrentUser.flashCardSets.length,
@@ -120,40 +118,23 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                                 return isItemValid(appState.getCurrentUser.flashCardSets[index].title)
                                     ? Padding(
                                         padding: const EdgeInsets.only(bottom: 8),
-                                        child: Container(
-                                          height: MediaQuery.of(context).size.height * 0.1,
-                                          width: double.infinity,
-                                          decoration: BoxDecoration(
-                                            color: theme.secondary,
-                                            borderRadius: BorderRadius.circular(10),
-                                            border: Border.all(
-                                              color: theme.tertiary,
-                                            ),
-                                          ),
-                                          child: ElevatedButton(
-                                              onPressed: () {
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (context) => SelectedSetModal(
-                                                          flashcardSet: appState.getCurrentUser.flashCardSets.length - 1 >= index ? appState.getCurrentUser.flashCardSets[index] : FlashcardSet(id: 0, flashcards: [], title: "", description: ""),
-                                                          index: index,
-                                                        ));
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                elevation: 0,
-                                                backgroundColor: Colors.transparent,
-                                                shadowColor: Colors.transparent,
-                                                foregroundColor: theme.onPrimary,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(10),
-                                                ),
-                                              ),
-                                              child: Center(
-                                                  child: Text(
+                                        child: StyledTouchableContainer(
+                                            theme: ctheme,
+                                            onPressed: () {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) => SelectedSetModal(
+                                                        flashcardSet: appState.getCurrentUser.flashCardSets.length - 1 >= index ? appState.getCurrentUser.flashCardSets[index] : FlashcardSet(id: 0, flashcards: [], title: "", description: ""),
+                                                        index: index,
+                                                      ));
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(32.0),
+                                              child: Text(
                                                 appState.getCurrentUser.flashCardSets[index].title,
                                                 style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
-                                              ))),
-                                        ),
+                                              ),
+                                            )),
                                       )
                                     : Container();
                               }),
@@ -285,97 +266,86 @@ class _NewSetOptionsState extends State<NewSetOptions> {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     // var appState = Provider.of<AppState>(context);
+    var ctheme = getThemeFromTheme(theme);
     return Dialog(
         backgroundColor: theme.background,
         surfaceTintColor: Colors.transparent,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(32),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              InkWell(
-                highlightColor: Colors.transparent,
-                splashColor: theme.onBackground.withOpacity(0.125),
-                onTap: () => {
-                  Navigator.pop(context),
-                  showDialog(context: context, builder: (context) => const NewSetModal())
-                },
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: theme.primary,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      padding: const EdgeInsets.all(16),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 48,
+                    width: 48,
+                    child: StyledTouchableContainer(
+                      theme: ctheme,
+                      onPressed: () => {
+                        Navigator.pop(context),
+                        showDialog(context: context, builder: (context) => const NewSetModal())
+                      },
                       child: Icon(Icons.add, color: theme.onBackground, size: 24),
                     ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Create",
-                      style: textTheme.displaySmall,
-                    )
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Create",
+                    style: textTheme.displaySmall,
+                  )
+                ],
               ),
-              InkWell(
-                highlightColor: Colors.transparent,
-                splashColor: theme.onBackground.withOpacity(0.125),
-                // onTap: () => showDialog(context: context, builder: (context) => const ImportQuizModal()),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: theme.primary,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      padding: const EdgeInsets.all(16),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 48,
+                    width: 48,
+                    child: StyledTouchableContainer(
+                      theme: ctheme,
+                      onPressed: () => {},
                       child: Icon(Icons.smart_toy, color: theme.onBackground, size: 24),
                     ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Generate",
-                      style: textTheme.displaySmall,
-                    )
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Generate",
+                    style: textTheme.displaySmall,
+                  )
+                ],
               ),
-              InkWell(
-                highlightColor: Colors.transparent,
-                splashColor: theme.onBackground.withOpacity(0.125),
-                onTap: () => {
-                  Navigator.pop(context),
-                  showDialog(context: context, builder: (context) => const ImportSetModal())
-                },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: theme.primary,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      padding: const EdgeInsets.all(16),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 48,
+                    width: 48,
+                    child: StyledTouchableContainer(
+                      theme: ctheme,
+                      onPressed: () => {
+                        Navigator.pop(context),
+                        showDialog(context: context, builder: (context) => const ImportSetModal())
+                      },
                       child: Icon(Icons.download, color: theme.onBackground, size: 24),
                     ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Import",
-                      style: textTheme.displaySmall,
-                    )
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Import",
+                    style: textTheme.displaySmall,
+                  )
+                ],
               )
             ],
           ),
@@ -398,6 +368,7 @@ class _GenerateFlashcardsModalState extends State<GenerateFlashcardsModal> {
     var appState = context.watch<AppState>();
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var ctheme = getThemeFromTheme(theme);
     return Dialog(
       child: Container(
         decoration: BoxDecoration(color: theme.background, borderRadius: const BorderRadius.all(Radius.circular(20.0))),
@@ -434,21 +405,17 @@ class _GenerateFlashcardsModalState extends State<GenerateFlashcardsModal> {
             const SizedBox(
               height: 5,
             ),
-            Container(
-              height: 40,
-              decoration: BoxDecoration(gradient: getPrimaryGradient, borderRadius: const BorderRadius.all(Radius.circular(10))),
-              child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, elevation: 0, shadowColor: Colors.transparent, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))),
-                  onPressed: () {
-                    if (selectedQuiz == null) return;
-                    appState.getCurrentUser.flashCardSets.add(FlashcardSet(id: appState.getCurrentUser.flashCardSets.length + 1, title: appState.getQuizzes[selectedQuiz!].title, description: appState.getQuizzes[selectedQuiz!].description, flashcards: [
-                      for (int i = 0; i < appState.getQuizzes[selectedQuiz!].questions.length; i++) ...[
-                        Flashcard(hints: [], id: i, image: appState.getQuizzes[selectedQuiz!].questions[i].imagePath, question: appState.getQuizzes[selectedQuiz!].questions[i].type == QuizTypes.multipleChoice ? appState.getQuizzes[selectedQuiz!].questions[i].question : "not supported", answer: appState.getQuizzes[selectedQuiz!].questions[i].type == QuizTypes.multipleChoice ? List<String>.generate(appState.getQuizzes[selectedQuiz!].questions[i].correctAnswer.length, (index) => appState.getQuizzes[selectedQuiz!].questions[i].answers[index]).join(", ") : "not supported")
-                      ]
-                    ]));
-                  },
-                  child: Text("Generate", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold))),
-            )
+            StyledPrimaryElevatedButton(
+                theme: ctheme,
+                onPressed: () {
+                  if (selectedQuiz == null) return;
+                  appState.getCurrentUser.flashCardSets.add(FlashcardSet(id: appState.getCurrentUser.flashCardSets.length + 1, title: appState.getQuizzes[selectedQuiz!].title, description: appState.getQuizzes[selectedQuiz!].description, flashcards: [
+                    for (int i = 0; i < appState.getQuizzes[selectedQuiz!].questions.length; i++) ...[
+                      Flashcard(hints: [], id: i, image: appState.getQuizzes[selectedQuiz!].questions[i].imagePath, question: appState.getQuizzes[selectedQuiz!].questions[i].type == QuizTypes.multipleChoice ? appState.getQuizzes[selectedQuiz!].questions[i].question : "not supported", answer: appState.getQuizzes[selectedQuiz!].questions[i].type == QuizTypes.multipleChoice ? List<String>.generate(appState.getQuizzes[selectedQuiz!].questions[i].correctAnswer.length, (index) => appState.getQuizzes[selectedQuiz!].questions[i].answers[index]).join(", ") : "not supported")
+                    ]
+                  ]));
+                },
+                child: Text("Generate", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)))
           ],
         ),
       ),
@@ -541,6 +508,7 @@ class _NewSetModalState extends State<NewSetModal> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var ctheme = getThemeFromTheme(theme);
     return Dialog(
         child: Container(
             decoration: BoxDecoration(
@@ -551,40 +519,16 @@ class _NewSetModalState extends State<NewSetModal> {
               padding: const EdgeInsets.all(16.0),
               child: SingleChildScrollView(
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Text("New Set", style: textTheme.displayLarge),
+                  Text("Create Set", style: textTheme.displayLarge),
                   const Divider(),
                   const SizedBox(height: 10),
                   //Title Text Field
-                  SizedBox(
-                    height: 40,
-                    child: TextField(
-                      onChanged: (value) => setState(() {
-                        titleQuery = value;
-                      }),
-                      keyboardAppearance: Brightness.dark,
-                      cursorColor: theme.onPrimary,
-                      style: textTheme.displaySmall!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
-                      decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                          filled: true,
-                          fillColor: theme.primary,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              width: 0,
-                              style: BorderStyle.none,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              width: 2,
-                              color: theme.onBackground,
-                            ),
-                          ),
-                          hintText: 'Title',
-                          hintStyle: textTheme.displaySmall!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
-                    ),
+                  StyledTextField(
+                    onChanged: (value) => setState(() {
+                      titleQuery = value;
+                    }),
+                    theme: ctheme,
+                    hint: "Title",
                   ),
                   const SizedBox(height: 10),
                   //How to use
@@ -604,35 +548,35 @@ class _NewSetModalState extends State<NewSetModal> {
                   Text("You may put as much question as you will, each flashcard set are stored locally (CACHED!). Each set represents one collection of cards. For each card you encounter you must think of the answer in your head, and then flip the card by tapping it, revealing the answer. You then must choose the following buttons depending on your performance on the question (The buttons mentioned are the 100% knew it, 50% some, 0% didn’t know). Each question has a weight, depending on your performance on the question, the weight can go down and up. In which if it goes up it will show more frequently per as if it goes down it will show less frequently. For more information, look at the *docs*", style: textTheme.displaySmall),
                   const SizedBox(height: 10),
                   //Buttons: Create and Cancel
-                  Row(
+                  Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.secondary,
-                            foregroundColor: theme.onPrimary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
+                      StyledPrimaryElevatedButton(
+                          theme: ctheme,
                           onPressed: () {
                             createSet(context.read<AppState>());
                           },
                           child: isLoading
                               ? const CircularProgressIndicator()
                               : success
-                                  ? const Icon(Icons.check)
-                                  : const Text("Create")),
-                      ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.secondary,
-                            foregroundColor: theme.onPrimary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
+                                  ? Icon(
+                                      Icons.check,
+                                      color: theme.onBackground,
+                                    )
+                                  : Text(
+                                      "Create",
+                                      style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+                                    )),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      FilledElevatedButton(
+                          color: Colors.red,
                           onPressed: () => Navigator.pop(context),
-                          child: const Text("Cancel")),
+                          child: Text(
+                            "Cancel",
+                            style: textTheme.displaySmall,
+                          )),
                     ],
                   )
                 ]),
@@ -649,6 +593,7 @@ class SelectedSetModal extends StatelessWidget {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var ctheme = getThemeFromTheme(theme);
     return Dialog(
       child: Container(
         height: MediaQuery.of(context).size.height * 0.5,
@@ -728,13 +673,10 @@ class SelectedSetModal extends StatelessWidget {
                   const Divider(),
                   const SizedBox(height: 10),
                   //Middle
-                  Container(
-                    decoration: BoxDecoration(
-                      color: theme.primaryContainer,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                  StyledContainer(
+                    theme: ctheme,
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                         Text("Number of questions", style: textTheme.displaySmall),
                         Text(flashcardSet.flashcards.length.toString(), style: textTheme.displaySmall)
@@ -744,47 +686,44 @@ class SelectedSetModal extends StatelessWidget {
                 ],
               ),
               //Bottom
-              Row(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.secondary,
-                        foregroundColor: theme.onPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
+                  FilledElevatedButton(
+                      color: Colors.green,
                       onPressed: () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) {
                           return FlashcardsPlayScreen(flashcardsSet: flashcardSet);
                         }));
                       },
-                      child: const Text("Open")),
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.secondary,
-                        foregroundColor: theme.onPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
+                      child: Text(
+                        "Open",
+                        style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+                      )),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  FilledElevatedButton(
+                      color: Colors.blue,
                       onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) {
                             return FlashcardsEditScreen(
                                 //Index is the index of the set in the user list of sets
                                 setIndex: index);
                           })),
-                      child: const Text("Edit")),
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.secondary,
-                        foregroundColor: theme.onPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
+                      child: Text(
+                        "Edit",
+                        style: textTheme.displaySmall,
+                      )),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  FilledElevatedButton(
+                      color: Colors.red,
                       onPressed: () => Navigator.pop(context),
-                      child: const Text("Close")),
+                      child: Text(
+                        "Close",
+                        style: textTheme.displaySmall,
+                      )),
                 ],
               )
             ],
