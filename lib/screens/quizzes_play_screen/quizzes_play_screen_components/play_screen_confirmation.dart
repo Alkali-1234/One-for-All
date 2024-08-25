@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:oneforall/components/styled_components/primary_elevated_button.dart';
+import 'package:oneforall/components/styled_components/style_constants.dart';
 import 'package:provider/provider.dart';
 
+import '../../../components/styled_components/elevated_button.dart';
 import '../../../constants.dart';
 import '../../../functions/quizzes_functions.dart';
 import '../../../main.dart';
@@ -14,25 +17,19 @@ class PlayScreenConfirmation extends StatelessWidget {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var ctheme = getThemeFromTheme(theme);
     return LayoutBuilder(builder: (context, c) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text("Quizzes", style: textTheme.displayLarge!.copyWith(fontStyle: FontStyle.italic)),
           Text("Let's get started.", style: textTheme.displaySmall),
           const SizedBox(height: 100),
-          Container(
+          SizedBox(
             width: c.maxWidth * 0.7,
-            height: 50,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(100),
-              gradient: primaryGradient,
-            ),
-            child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                ),
+            child: StyledPrimaryElevatedButton(
+                theme: ctheme,
                 onPressed: () {
                   changeScreenFunction(1);
                 },
@@ -41,15 +38,11 @@ class PlayScreenConfirmation extends StatelessWidget {
                   style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
                 )),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 16),
           SizedBox(
             width: c.maxWidth * 0.7,
-            height: 50,
-            child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  backgroundColor: theme.primaryContainer,
-                ),
+            child: StyledElevatedButton(
+                theme: ctheme,
                 onPressed: () {
                   QuizzesFunctions().refreshQuizzesFromLocal(context.read<AppState>(), false);
                   Navigator.pop(context);

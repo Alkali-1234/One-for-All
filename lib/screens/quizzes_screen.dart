@@ -2,6 +2,11 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:oneforall/components/styled_components/container.dart';
+import 'package:oneforall/components/styled_components/filled_elevated_button.dart';
+import 'package:oneforall/components/styled_components/primary_elevated_button.dart';
+import 'package:oneforall/components/styled_components/style_constants.dart';
+import 'package:oneforall/components/styled_components/touchable_container.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/functions/quizzes_functions.dart';
 import 'package:oneforall/styles/styles.dart';
@@ -10,6 +15,7 @@ import '../components/main_container.dart';
 import 'package:oneforall/main.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
+import '../components/styled_components/text_field.dart';
 import '../models/quiz_question.dart';
 import 'quizzes_screen_components/quizzes_edit_screen.dart';
 import 'quizzes_play_screen/quizzes_play_screen.dart';
@@ -28,14 +34,19 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
     var appState = context.watch<AppState>();
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var ctheme = getThemeFromTheme(theme);
     return Scaffold(
       backgroundColor: theme.background,
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showDialog(context: context, builder: (context) => const NewSetOptions());
-          },
-          backgroundColor: theme.secondary,
-          child: Icon(Icons.add, color: theme.onBackground)),
+      floatingActionButton: SizedBox(
+        height: 60,
+        width: 60,
+        child: StyledTouchableContainer(
+            onPressed: () {
+              showDialog(context: context, builder: (context) => const NewSetOptions());
+            },
+            theme: ctheme,
+            child: Icon(Icons.add, color: theme.onBackground)),
+      ),
       // bottomNavigationBar: const BannerAdWidget(),
       body: MainContainer(
           child: Padding(
@@ -43,18 +54,11 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
         child: Column(
           children: [
             //* Search bar
-            TextField(
-                onChanged: (value) => setState(() => _searchText = value),
-                style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
-                cursorColor: theme.onBackground,
-                decoration: InputDecoration(
-                  hintStyle: textTheme.displayMedium!.copyWith(color: theme.onBackground.withOpacity(0.25), fontWeight: FontWeight.bold),
-                  filled: true,
-                  fillColor: theme.primary,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                  hintText: "Search",
-                  suffixIcon: Icon(Icons.search, color: theme.onBackground, size: 50),
-                )),
+            StyledTextField(
+              onChanged: (value) => setState(() => _searchText = value),
+              theme: ctheme,
+              hint: "Search",
+            ),
             const SizedBox(
               height: 15,
             ),
@@ -101,6 +105,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
                 : Expanded(
                     child: ListView.builder(
                         padding: EdgeInsets.zero,
+                        physics: const ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           if (!appState.getQuizzes[index].title.toLowerCase().contains(_searchText.toLowerCase()) && !appState.getQuizzes[index].description.toLowerCase().contains(_searchText.toLowerCase())) return const SizedBox.shrink();
                           return ListItem(
@@ -126,22 +131,16 @@ class ListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var ctheme = getThemeFromTheme(theme);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          shadowColor: Colors.transparent,
-          elevation: 0,
-          surfaceTintColor: Colors.transparent,
-          backgroundColor: theme.secondary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: theme.tertiary)),
-        ),
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: StyledTouchableContainer(
+        theme: ctheme,
         onPressed: () => showDialog(context: context, builder: (context) => SelectedQuizModal(quiz: context.read<AppState>().getQuizzes[index], index: index)),
-        child: Center(
-            child: Padding(
+        child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 32.0),
           child: Text(title, style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold)),
-        )),
+        ),
       ),
     );
   }
@@ -179,6 +178,7 @@ class SelectedQuizModal extends StatelessWidget {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var ctheme = getThemeFromTheme(theme);
     return Dialog(
         backgroundColor: theme.background,
         child: Container(
@@ -246,18 +246,17 @@ class SelectedQuizModal extends StatelessWidget {
                 const Divider(),
                 const SizedBox(height: 10),
                 //Some information
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: theme.primaryContainer,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Questions", style: textTheme.displaySmall),
-                      Text(quiz.questions.length.toString(), style: textTheme.displaySmall),
-                    ],
+                StyledContainer(
+                  theme: ctheme,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Questions", style: textTheme.displaySmall),
+                        Text(quiz.questions.length.toString(), style: textTheme.displaySmall),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -265,17 +264,14 @@ class SelectedQuizModal extends StatelessWidget {
                 const SizedBox(height: 10),
                 SelectableText(getSetJson(), style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold), maxLines: 5),
                 const SizedBox(
-                  height: 10,
+                  height: 32,
                 ),
                 //Open, Edit, and Close
-                Row(
+                Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryContainer,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide.none),
-                        ),
+                    FilledElevatedButton(
+                        color: Colors.green,
                         onPressed: () {
                           Navigator.pop(context);
                           QuizSet modifiedQuiz = QuizSet(
@@ -318,23 +314,20 @@ class SelectedQuizModal extends StatelessWidget {
                           Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuizzesPlayScreen(quizSet: modifiedQuiz)));
                         },
                         child: Text("Open", style: textTheme.displaySmall)),
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryContainer,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide.none),
-                        ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    FilledElevatedButton(
+                        color: Colors.blue,
                         onPressed: () => {
                               Navigator.pop(context),
                               Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuizzesEditScreen(index: index))),
                             },
                         child: Text("Edit", style: textTheme.displaySmall)),
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryContainer,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide.none),
-                        ),
-                        onPressed: () => Navigator.pop(context),
-                        child: Text("Close", style: textTheme.displaySmall)),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    FilledElevatedButton(color: Colors.red, onPressed: () => Navigator.pop(context), child: Text("Close", style: textTheme.displaySmall)),
                   ],
                 )
               ],
@@ -396,6 +389,7 @@ class _NewQuizModalState extends State<NewQuizModal> {
     var appState = context.watch<AppState>();
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var ctheme = getThemeFromTheme(theme);
     return Dialog(
         backgroundColor: theme.background,
         child: Container(
@@ -405,60 +399,31 @@ class _NewQuizModalState extends State<NewQuizModal> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text("New Quiz", style: textTheme.displayLarge),
+                Text("Create Quiz", style: textTheme.displayLarge),
                 const SizedBox(
-                  height: 10,
+                  height: 15,
                 ),
-                TextField(
-                    onChanged: (value) => setState(() => _title = value),
-                    style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
-                    cursorColor: theme.onBackground,
-                    decoration: InputDecoration(
-                      hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.25), fontWeight: FontWeight.bold),
-                      filled: true,
-                      fillColor: theme.primary,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                      hintText: "Title",
-                    )),
+                StyledTextField(hint: "Title", onChanged: (value) => setState(() => _title = value), style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold), theme: ctheme),
                 const SizedBox(
-                  height: 10,
+                  height: 16,
                 ),
-                TextField(
-                    onChanged: (value) => setState(() => _description = value),
-                    style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
-                    cursorColor: theme.onBackground,
-                    decoration: InputDecoration(
-                      hintStyle: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.25), fontWeight: FontWeight.bold),
-                      filled: true,
-                      fillColor: theme.primary,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                      hintText: "Description",
-                    )),
+                StyledTextField(
+                  hint: "Description",
+                  onChanged: (value) => setState(() => _description = value),
+                  style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+                  theme: ctheme,
+                ),
                 _error.isNotEmpty ? Text(_error, style: textTheme.displaySmall!.copyWith(color: theme.error)) : const SizedBox.shrink(),
                 const SizedBox(
-                  height: 10,
+                  height: 32,
                 ),
 
                 //Add and Cancel buttons
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryContainer,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide.none),
-                        ),
-                        onPressed: () => addQuiz(appState),
-                        child: Text("Add", style: textTheme.displaySmall)),
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryContainer,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide.none),
-                        ),
-                        onPressed: () => Navigator.pop(context),
-                        child: Text("Cancel", style: textTheme.displaySmall)),
-                  ]),
-                )
+                StyledPrimaryElevatedButton(theme: ctheme, onPressed: () => addQuiz(appState), child: Text("Add", style: textTheme.displaySmall)),
+                const SizedBox(
+                  height: 16,
+                ),
+                FilledElevatedButton(color: Colors.red, onPressed: () => Navigator.pop(context), child: Text("Cancel", style: textTheme.displaySmall))
               ],
             ),
           ),
@@ -479,6 +444,7 @@ class _NewSetOptionsState extends State<NewSetOptions> {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     // var appState = Provider.of<AppState>(context);
+    var ctheme = getThemeFromTheme(theme);
     return Dialog(
         backgroundColor: theme.background,
         surfaceTintColor: Colors.transparent,
@@ -487,89 +453,77 @@ class _NewSetOptionsState extends State<NewSetOptions> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              InkWell(
-                highlightColor: Colors.transparent,
-                splashColor: theme.onBackground.withOpacity(0.125),
-                onTap: () => {
-                  Navigator.pop(context),
-                  showDialog(context: context, builder: (context) => const NewQuizModal())
-                },
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: theme.primary,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      padding: const EdgeInsets.all(16),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 48,
+                    width: 48,
+                    child: StyledTouchableContainer(
+                      theme: ctheme,
+                      onPressed: () => {
+                        Navigator.pop(context),
+                        showDialog(context: context, builder: (context) => const NewQuizModal())
+                      },
                       child: Icon(Icons.add, color: theme.onBackground, size: 24),
                     ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Create",
-                      style: textTheme.displaySmall,
-                    )
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Create",
+                    style: textTheme.displaySmall,
+                  )
+                ],
               ),
-              InkWell(
-                highlightColor: Colors.transparent,
-                splashColor: theme.onBackground.withOpacity(0.125),
-                // onTap: () => showDialog(context: context, builder: (context) => const ImportQuizModal()),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: theme.primary,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      padding: const EdgeInsets.all(16),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 48,
+                    width: 48,
+                    child: StyledTouchableContainer(
+                      theme: ctheme,
+                      onPressed: () => {},
                       child: Icon(Icons.smart_toy, color: theme.onBackground, size: 24),
                     ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Generate",
-                      style: textTheme.displaySmall,
-                    )
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Generate",
+                    style: textTheme.displaySmall,
+                  )
+                ],
               ),
-              InkWell(
-                highlightColor: Colors.transparent,
-                splashColor: theme.onBackground.withOpacity(0.125),
-                onTap: () => {
-                  Navigator.pop(context),
-                  showDialog(context: context, builder: (context) => const ImportQuizModal())
-                },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: theme.primary,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      padding: const EdgeInsets.all(16),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 48,
+                    width: 48,
+                    child: StyledTouchableContainer(
+                      theme: ctheme,
+                      onPressed: () => {
+                        Navigator.pop(context),
+                        showDialog(context: context, builder: (context) => const ImportQuizModal())
+                      },
                       child: Icon(Icons.download, color: theme.onBackground, size: 24),
                     ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Import",
-                      style: textTheme.displaySmall,
-                    )
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Import",
+                    style: textTheme.displaySmall,
+                  )
+                ],
               )
             ],
           ),

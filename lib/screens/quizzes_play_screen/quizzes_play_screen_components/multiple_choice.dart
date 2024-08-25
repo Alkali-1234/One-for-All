@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:oneforall/components/styled_components/container.dart';
+import 'package:oneforall/components/styled_components/filled_elevated_button.dart';
+import 'package:oneforall/components/styled_components/primary_elevated_button.dart';
+import 'package:oneforall/components/styled_components/style_constants.dart';
+import 'package:oneforall/components/styled_components/toggleable_button.dart';
+import 'package:oneforall/components/styled_components/touchable_container.dart';
 
 import '../../../constants.dart';
 import '../../../models/quiz_question.dart';
@@ -69,7 +75,8 @@ class MultipleChoiceState extends State<MultipleChoice> {
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
-    // var textTheme = Theme.of(context).textTheme;
+    var textTheme = Theme.of(context).textTheme;
+    var ctheme = getThemeFromTheme(theme);
     return Column(
       children: [
         //* Question
@@ -95,74 +102,114 @@ class MultipleChoiceState extends State<MultipleChoice> {
           height: 50,
         ),
         //* Validate answer button
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            gradient: selectedAnswers.isNotEmpty && !showAnswers ? primaryGradient : null,
-            border: selectedAnswers.isEmpty || showAnswers ? Border.all(color: theme.onBackground.withOpacity(0.25)) : null,
-          ),
-          width: double.infinity,
-          child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                foregroundColor: theme.onBackground,
-                disabledForegroundColor: theme.onBackground.withOpacity(0.5),
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        selectedAnswers.isNotEmpty
+            ? StyledPrimaryElevatedButton(
+                theme: ctheme,
+                onPressed: () => validateAnswer(),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.check,
+                      color: theme.onBackground,
+                    ),
+                    const SizedBox(
+                      width: 16,
+                    ),
+                    Text(
+                      "Validate Answer",
+                      style: Theme.of(context).textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ))
+            : SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: theme.onBackground,
+                      disabledForegroundColor: theme.onBackground.withOpacity(0.5),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: selectedAnswers.isNotEmpty && !showAnswers ? () => validateAnswer() : null,
+                    icon: const Icon(Icons.check),
+                    label: const Text("Validate Answer")),
               ),
-              onPressed: selectedAnswers.isNotEmpty && !showAnswers ? () => validateAnswer() : null,
-              icon: const Icon(Icons.check),
-              label: const Text("Validate Answer")),
-        ),
         const SizedBox(height: 10),
         //* Choices
         Expanded(
             child: Column(
           children: [
             for (var answer in widget.question.answers) ...[
-              Flexible(
+              Expanded(
                 flex: 1,
-                child: SizedBox.expand(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      //* Change color based on answer
-                      //* If question answer is correct, turn green
-                      //* If user answers wrong, turn red
-                      //* If answer is not selected, turn default color
-                      backgroundColor: !showAnswers
-                          ? theme.primaryContainer
-                          : showAnswers && widget.question.correctAnswer.contains(widget.question.answers.indexOf(answer))
-                              ? Colors.green
-                              : showAnswers && !widget.question.correctAnswer.contains(widget.question.answers.indexOf(answer)) && selectedAnswers.contains(widget.question.answers.indexOf(answer))
-                                  ? Colors.red
-                                  : theme.primaryContainer,
+                child: !showAnswers
+                    ? StyledToggleableButton(
+                        theme: ctheme,
+                        value: selectedAnswers.contains(widget.question.answers.indexOf(answer)),
+                        // style: ElevatedButton.styleFrom(
+                        //   //* Change color based on answer
+                        //   //* If question answer is correct, turn green
+                        //   //* If user answers wrong, turn red
+                        //   //* If answer is not selected, turn default color
+                        //   backgroundColor: !showAnswers
+                        //       ? theme.primaryContainer
+                        //       : showAnswers && widget.question.correctAnswer.contains(widget.question.answers.indexOf(answer))
+                        //           ? Colors.green
+                        //           : showAnswers && !widget.question.correctAnswer.contains(widget.question.answers.indexOf(answer)) && selectedAnswers.contains(widget.question.answers.indexOf(answer))
+                        //               ? Colors.red
+                        //               : theme.primaryContainer,
 
-                      foregroundColor: theme.onBackground,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      side: selectedAnswers.contains(widget.question.answers.indexOf(answer)) ? BorderSide(color: theme.onBackground, width: 2) : const BorderSide(color: Colors.transparent, width: 2),
-                    ),
-                    onPressed: showAnswers
-                        ? () {}
-                        : () => setState(() {
-                              if (widget.question.correctAnswer.length > 1) {
-                                if (selectedAnswers.contains(widget.question.answers.indexOf(answer))) {
-                                  selectedAnswers.remove(widget.question.answers.indexOf(answer));
-                                } else {
-                                  selectedAnswers.add(widget.question.answers.indexOf(answer));
-                                }
-                              } else {
-                                selectedAnswers = [
-                                  widget.question.answers.indexOf(answer)
-                                ];
-                              }
-                            }),
-                    child: Text(answer),
-                  ),
-                ),
+                        //   foregroundColor: theme.onBackground,
+                        //   elevation: 0,
+                        //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        //   side: selectedAnswers.contains(widget.question.answers.indexOf(answer)) ? BorderSide(color: theme.onBackground, width: 2) : const BorderSide(color: Colors.transparent, width: 2),
+                        // ),
+                        onPressed: showAnswers
+                            ? () {}
+                            : () => setState(() {
+                                  if (widget.question.correctAnswer.length > 1) {
+                                    if (selectedAnswers.contains(widget.question.answers.indexOf(answer))) {
+                                      selectedAnswers.remove(widget.question.answers.indexOf(answer));
+                                    } else {
+                                      selectedAnswers.add(widget.question.answers.indexOf(answer));
+                                    }
+                                  } else {
+                                    selectedAnswers = [
+                                      widget.question.answers.indexOf(answer)
+                                    ];
+                                  }
+                                }),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: SingleChildScrollView(
+                            child: Text(
+                              answer,
+                              style: textTheme.displaySmall,
+                            ),
+                          ),
+                        ),
+                      )
+                    : FilledElevatedButton(
+                        onPressed: () {},
+                        color: widget.question.correctAnswer.contains(widget.question.answers.indexOf(answer))
+                            ? Colors.green
+                            : showAnswers && !widget.question.correctAnswer.contains(widget.question.answers.indexOf(answer)) && selectedAnswers.contains(widget.question.answers.indexOf(answer))
+                                ? Colors.red
+                                : theme.background,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: SingleChildScrollView(
+                            child: Text(
+                              answer,
+                              style: textTheme.displaySmall,
+                            ),
+                          ),
+                        )),
               ),
               const SizedBox(
-                height: 10,
+                height: 16,
               ),
             ],
           ],

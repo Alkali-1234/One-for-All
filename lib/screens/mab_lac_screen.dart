@@ -1,15 +1,22 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:oneforall/components/main_container.dart';
+import 'package:oneforall/components/styled_components/elevated_button.dart';
+import 'package:oneforall/components/styled_components/elevated_icon_button.dart';
+import 'package:oneforall/components/styled_components/style_constants.dart';
+import 'package:oneforall/components/styled_components/text_field.dart';
+import 'package:oneforall/components/styled_components/touchable_container.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/logger.dart';
 import 'package:photo_view/photo_view.dart';
 // import 'package:oneforall/data/user_data.dart';
 import 'package:provider/provider.dart';
+import '../components/styled_components/container.dart';
 import '../data/community_data.dart';
 import '../main.dart';
 import '../service/community_service.dart';
@@ -85,354 +92,324 @@ class _MABLACScreenState extends State<MABLACScreen> {
     logger.d(lacDataStream);
   }
 
+  /// Reverse the animation
+  bool reverse = false;
+
+  void toggleSection() {
+    setState(() {
+      if (selectedSection == 0) {
+        selectedSection = 1;
+      } else {
+        selectedSection = 0;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     var appState = Provider.of<AppState>(context);
-    return Container(
-        decoration: BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
-        child: Scaffold(
-            resizeToAvoidBottomInset: false,
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (context) => NewEventModal(
-                          selectedSection: selectedSection,
-                        ));
-              },
-              backgroundColor: theme.secondary,
-              child: const Icon(Icons.add),
-            ),
-            backgroundColor: Colors.transparent,
-            body: MainContainer(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: LayoutBuilder(builder: (context, constraints) {
-                  return Column(children: [
-                    //Top selection
-                    Row(crossAxisAlignment: CrossAxisAlignment.end, verticalDirection: VerticalDirection.down, children: [
-                      SizedBox(
-                        height: selectedSection == 0 ? 60 : 50,
-                        width: constraints.maxWidth / 2,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              selectedSection = 0;
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            elevation: 0,
-                            shadowColor: Colors.transparent,
-                            backgroundColor: selectedSection == 0 ? theme.primaryContainer : theme.secondary,
-                            foregroundColor: theme.onPrimary,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10),
-                              ),
-                            ),
-                          ),
-                          child: Text(
-                            "Main",
-                            style: textTheme.displaySmall,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: selectedSection == 1 ? 60 : 50,
-                        width: constraints.maxWidth / 2,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              selectedSection = 1;
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            elevation: 0,
-                            shadowColor: Colors.transparent,
-                            backgroundColor: selectedSection == 1 ? theme.primaryContainer : theme.secondary,
-                            foregroundColor: theme.onPrimary,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10),
-                              ),
-                            ),
-                          ),
-                          child: Text(
-                            "Local",
-                            style: textTheme.displaySmall,
-                          ),
-                        ),
-                      ),
-                    ]),
-                    Expanded(
-                      child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(10),
-                            ),
-                            color: theme.primaryContainer,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(children: [
-                              //Search bar
-                              TextField(
-                                controller: searchController,
-                                onChanged: (value) => setState(() {
-                                  searchQuery = value;
-                                }),
-                                keyboardAppearance: Brightness.dark,
-                                cursorColor: theme.onPrimary,
-                                style: textTheme.displayMedium!.copyWith(color: theme.onPrimary, fontWeight: FontWeight.bold),
-                                decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: theme.primary,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: const BorderSide(
-                                        width: 0,
-                                        style: BorderStyle.none,
+    var ctheme = getThemeFromTheme(theme);
+    return Scaffold(
+        resizeToAvoidBottomInset: false,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (context) => NewEventModal(
+                      selectedSection: selectedSection,
+                    ));
+          },
+          backgroundColor: theme.secondary,
+          child: const Icon(Icons.add),
+        ),
+        backgroundColor: Colors.transparent,
+        body: MainContainer(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: LayoutBuilder(builder: (context, constraints) {
+              return Column(children: [
+                const SizedBox(
+                  height: 16,
+                ),
+                //* Title Text
+                Wrap(
+                  children: [
+                    Text(
+                      selectedSection == 0 ? "Main" : "Local",
+                      style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    StyledIconButton(
+                      theme: ctheme,
+                      onPressed: () {
+                        setState(() {
+                          reverse = false;
+                        });
+
+                        toggleSection();
+                      },
+                      icon: Icons.cached_rounded,
+                      size: 24,
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    Text(
+                      "Announcement",
+                      style: textTheme.displayMedium,
+                    ),
+                    const SizedBox(
+                      width: 4,
+                    ),
+                    Text(
+                      "Board",
+                      style: textTheme.displayMedium,
+                    )
+                  ],
+                ),
+
+                const SizedBox(
+                  height: 16,
+                ),
+                Expanded(
+                  child: Column(children: [
+                    //Search bar
+                    StyledTextField(
+                      theme: ctheme,
+                      controller: searchController,
+                      onChanged: (value) => setState(() {
+                        searchQuery = value;
+                      }),
+                      hint: "Search",
+                    ),
+                    const SizedBox(height: 16),
+                    //Filters
+                    Column(mainAxisSize: MainAxisSize.min, children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          //Filter by
+
+                          //All
+                          Flexible(
+                            flex: 1,
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: DropdownButton(
+                                isExpanded: true,
+                                value: selectedTypeFilter,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedTypeFilter = value as int;
+                                  });
+                                },
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: 0,
+                                    child: Text(
+                                      "All",
+                                      style: TextStyle(color: Colors.white),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 1,
+                                    child: FittedBox(
+                                      child: Text(
+                                        "Announces",
+                                        style: TextStyle(color: Colors.white),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    hintText: 'Search',
-                                    suffixIcon: Icon(Icons.search, color: theme.onPrimary, size: 50),
-                                    hintStyle: textTheme.displayMedium!.copyWith(color: theme.onPrimary.withOpacity(0.25), fontWeight: FontWeight.bold)),
-                              ),
-                              const SizedBox(height: 10),
-                              //Filters
-                              Column(mainAxisSize: MainAxisSize.min, children: [
-                                Flexible(
-                                  flex: 1,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      //Filter by
-
-                                      //All
-                                      Flexible(
-                                        flex: 1,
-                                        child: SizedBox(
-                                          width: double.infinity,
-                                          child: DropdownButton(
-                                            isExpanded: true,
-                                            value: selectedTypeFilter,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                selectedTypeFilter = value as int;
-                                              });
-                                            },
-                                            items: const [
-                                              DropdownMenuItem(
-                                                value: 0,
-                                                child: Text(
-                                                  "All",
-                                                  style: TextStyle(color: Colors.white),
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 1,
-                                                child: FittedBox(
-                                                  child: Text(
-                                                    "Announces",
-                                                    style: TextStyle(color: Colors.white),
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 2,
-                                                child: Text(
-                                                  "Tasks",
-                                                  style: TextStyle(color: Colors.white),
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      //Subject
-                                      Flexible(
-                                        flex: 1,
-                                        child: SizedBox(
-                                          width: double.infinity,
-                                          child: DropdownButton(
-                                              isExpanded: true,
-                                              value: selectedSubjectFilter,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  selectedSubjectFilter = value as int;
-                                                });
-                                              },
-                                              items: List.generate(
-                                                  getSubjects.length + 1,
-                                                  (index) => DropdownMenuItem(
-                                                        value: index,
-                                                        child: index == 0 ? const Text("All", style: TextStyle(color: Colors.white)) : FittedBox(child: Text(getSubjects[index - 1], style: const TextStyle(color: Colors.white))),
-                                                      ))),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      //Due
-                                      Flexible(
-                                        flex: 1,
-                                        child: SizedBox(
-                                          width: double.infinity,
-                                          child: DropdownButton(
-                                            isExpanded: true,
-                                            value: selectedDueFilter,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                selectedDueFilter = value as int;
-                                              });
-                                            },
-                                            items: const [
-                                              DropdownMenuItem(
-                                                value: 0,
-                                                child: Text("All", style: TextStyle(color: Colors.white)),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 1,
-                                                child: FittedBox(
-                                                  child: Text("3 Days", style: TextStyle(color: Colors.white)),
-                                                ),
-                                              ),
-                                              DropdownMenuItem(
-                                                value: 2,
-                                                child: Text("7 Days", style: TextStyle(color: Colors.white)),
-                                              ),
-                                              DropdownMenuItem(value: 3, child: Text("14 Days", style: TextStyle(color: Colors.white)))
-                                            ].map((e) => DropdownMenuItem(value: e.value, child: FittedBox(child: e.child))).toList(),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
                                   ),
-                                ),
-                                const SizedBox(height: 5),
-                              ]),
-                              const SizedBox(height: 10),
-                              //List of items
-                              Expanded(
-                                child: selectedSection == 0
-                                    ? StreamBuilder(
-                                        stream: mabDataStream,
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return Center(
-                                                child: Text(
-                                              "Loading...",
-                                              style: textTheme.displaySmall,
-                                            ));
-                                          }
-                                          if (snapshot.hasError) {
-                                            return Center(
-                                                child: Text(
-                                              "Error: ${snapshot.error}",
-                                              style: textTheme.displaySmall!.copyWith(color: theme.error),
-                                            ));
-                                          }
-                                          if (!snapshot.hasData) {
-                                            return Center(
-                                                child: Text(
-                                              "No data",
-                                              style: textTheme.displaySmall,
-                                            ));
-                                          }
-                                          MabData mabData = MabData(uid: 0, posts: [
-                                            for (var post in (selectedSection == 0 ? snapshot.data?.docs ?? [] : snapshot.data?.docs ?? []))
-                                              MabPost(
-                                                  uid: 0,
-                                                  title: post["title"],
-                                                  description: post["description"],
-                                                  date: DateTime.parse(post["date"].toDate().toString()),
-                                                  authorUID: 0,
-                                                  image: post["image"] ?? "",
-                                                  fileAttatchments: [
-                                                    for (String file in post["files"]) file
-                                                  ],
-                                                  dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
-                                                  type: post["type"],
-                                                  subject: post["subject"])
-                                          ]);
-                                          mabData.posts.sort((a, b) => b.date.compareTo(a.date));
-                                          return ListView.builder(
-                                              padding: EdgeInsets.zero,
-                                              //MabData is misleading, it's actually both !!!!! (no way) (crazy right?)
-                                              itemCount: mabData.posts.length,
-                                              itemBuilder: (context, index) {
-                                                MabPost post = mabData.posts[index];
-                                                return isItemValid(post) ? ListItem(theme: theme, textTheme: textTheme, post: post) : const SizedBox();
-                                              });
-                                        })
-                                    : StreamBuilder(
-                                        stream: lacDataStream,
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return Center(
-                                                child: Text(
-                                              "Loading...",
-                                              style: textTheme.displaySmall,
-                                            ));
-                                          }
-                                          if (snapshot.hasError) {
-                                            return Center(
-                                                child: Text(
-                                              "Error: ${snapshot.error}",
-                                              style: textTheme.displaySmall!.copyWith(color: theme.error),
-                                            ));
-                                          }
-                                          if (!snapshot.hasData) {
-                                            return Center(
-                                                child: Text(
-                                              "No data",
-                                              style: textTheme.displaySmall,
-                                            ));
-                                          }
-                                          MabData mabData = MabData(uid: 0, posts: [
-                                            for (var post in (selectedSection == 0 ? snapshot.data?.docs ?? [] : snapshot.data?.docs ?? []))
-                                              MabPost(
-                                                  uid: 0,
-                                                  title: post["title"],
-                                                  description: post["description"],
-                                                  date: DateTime.parse(post["date"].toDate().toString()),
-                                                  authorUID: 0,
-                                                  image: post["image"] ?? "",
-                                                  fileAttatchments: [
-                                                    for (String file in post["files"]) file
-                                                  ],
-                                                  dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
-                                                  type: post["type"],
-                                                  subject: post["subject"])
-                                          ]);
-                                          mabData.posts.sort((a, b) => b.date.compareTo(a.date));
-                                          return ListView.builder(
-                                              padding: EdgeInsets.zero,
-                                              //MabData is misleading, it's actually both !!!!! (no way) (crazy right?)
-                                              itemCount: mabData.posts.length,
-                                              itemBuilder: (context, index) {
-                                                MabPost post = mabData.posts[index];
-                                                return isItemValid(post) ? ListItem(theme: theme, textTheme: textTheme, post: post) : const SizedBox();
-                                              });
-                                        }),
+                                  DropdownMenuItem(
+                                    value: 2,
+                                    child: Text(
+                                      "Tasks",
+                                      style: TextStyle(color: Colors.white),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ]),
-                          )),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          //Subject
+                          Flexible(
+                            flex: 1,
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: DropdownButton(
+                                  isExpanded: true,
+                                  value: selectedSubjectFilter,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedSubjectFilter = value as int;
+                                    });
+                                  },
+                                  items: List.generate(
+                                      getSubjects.length + 1,
+                                      (index) => DropdownMenuItem(
+                                            value: index,
+                                            child: index == 0 ? const Text("All", style: TextStyle(color: Colors.white)) : FittedBox(child: Text(getSubjects[index - 1], style: const TextStyle(color: Colors.white))),
+                                          ))),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          //Due
+                          Flexible(
+                            flex: 1,
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: DropdownButton(
+                                isExpanded: true,
+                                value: selectedDueFilter,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedDueFilter = value as int;
+                                  });
+                                },
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: 0,
+                                    child: Text("All", style: TextStyle(color: Colors.white)),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 1,
+                                    child: FittedBox(
+                                      child: Text("3 Days", style: TextStyle(color: Colors.white)),
+                                    ),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 2,
+                                    child: Text("7 Days", style: TextStyle(color: Colors.white)),
+                                  ),
+                                  DropdownMenuItem(value: 3, child: Text("14 Days", style: TextStyle(color: Colors.white)))
+                                ].map((e) => DropdownMenuItem(value: e.value, child: FittedBox(child: e.child))).toList(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ]),
+                    const SizedBox(height: 16),
+                    //List of items
+                    Expanded(
+                      child: selectedSection == 0
+                          ? StreamBuilder(
+                              stream: mabDataStream,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Center(
+                                      child: Text(
+                                    "Loading...",
+                                    style: textTheme.displaySmall,
+                                  ));
+                                }
+                                if (snapshot.hasError) {
+                                  return Center(
+                                      child: Text(
+                                    "Error: ${snapshot.error}",
+                                    style: textTheme.displaySmall!.copyWith(color: theme.error),
+                                  ));
+                                }
+                                if (!snapshot.hasData) {
+                                  return Center(
+                                      child: Text(
+                                    "No data",
+                                    style: textTheme.displaySmall,
+                                  ));
+                                }
+                                MabData mabData = MabData(uid: 0, posts: [
+                                  for (var post in (selectedSection == 0 ? snapshot.data?.docs ?? [] : snapshot.data?.docs ?? []))
+                                    MabPost(
+                                        uid: 0,
+                                        title: post["title"],
+                                        description: post["description"],
+                                        date: DateTime.parse(post["date"].toDate().toString()),
+                                        authorUID: 0,
+                                        image: post["image"] ?? "",
+                                        fileAttatchments: [
+                                          for (String file in post["files"]) file
+                                        ],
+                                        dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
+                                        type: post["type"],
+                                        subject: post["subject"])
+                                ]);
+                                mabData.posts.sort((a, b) => b.date.compareTo(a.date));
+                                return ListView.builder(
+                                    physics: const ClampingScrollPhysics(),
+                                    padding: EdgeInsets.zero,
+                                    //MabData is misleading, it's actually both !!!!! (no way) (crazy right?)
+                                    itemCount: mabData.posts.length,
+                                    itemBuilder: (context, index) {
+                                      MabPost post = mabData.posts[index];
+                                      return isItemValid(post) ? ListItem(theme: theme, textTheme: textTheme, post: post) : const SizedBox();
+                                    });
+                              })
+                          : StreamBuilder(
+                              stream: lacDataStream,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Center(
+                                      child: Text(
+                                    "Loading...",
+                                    style: textTheme.displaySmall,
+                                  ));
+                                }
+                                if (snapshot.hasError) {
+                                  return Center(
+                                      child: Text(
+                                    "Error: ${snapshot.error}",
+                                    style: textTheme.displaySmall!.copyWith(color: theme.error),
+                                  ));
+                                }
+                                if (!snapshot.hasData) {
+                                  return Center(
+                                      child: Text(
+                                    "No data",
+                                    style: textTheme.displaySmall,
+                                  ));
+                                }
+                                MabData mabData = MabData(uid: 0, posts: [
+                                  for (var post in (selectedSection == 0 ? snapshot.data?.docs ?? [] : snapshot.data?.docs ?? []))
+                                    MabPost(
+                                        uid: 0,
+                                        title: post["title"],
+                                        description: post["description"],
+                                        date: DateTime.parse(post["date"].toDate().toString()),
+                                        authorUID: 0,
+                                        image: post["image"] ?? "",
+                                        fileAttatchments: [
+                                          for (String file in post["files"]) file
+                                        ],
+                                        dueDate: DateTime.parse(post["dueDate"].toDate().toString()),
+                                        type: post["type"],
+                                        subject: post["subject"])
+                                ]);
+                                mabData.posts.sort((a, b) => b.date.compareTo(a.date));
+                                return ListView.builder(
+                                    physics: const ClampingScrollPhysics(),
+                                    padding: EdgeInsets.zero,
+                                    //MabData is misleading, it's actually both !!!!! (no way) (crazy right?)
+                                    itemCount: mabData.posts.length,
+                                    itemBuilder: (context, index) {
+                                      MabPost post = mabData.posts[index];
+                                      return isItemValid(post) ? ListItem(theme: theme, textTheme: textTheme, post: post) : const SizedBox();
+                                    });
+                              }),
                     ),
-                  ]);
-                }),
-              ),
-            )));
+                  ]),
+                ),
+              ]);
+            }),
+          ),
+        ));
   }
 }
 
@@ -819,36 +796,77 @@ class ListItem extends StatelessWidget {
     List<String> attatchements = post.fileAttatchments;
     int type = post.type;
     DateTime due = post.dueDate;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ListTile(
-          onTap: () => showDialog(context: context, builder: (context) => MABModal(title: title, description: description, image: image, attatchements: attatchements, date: due, posterUID: post.authorUID)),
-          leading: Icon(type == 1 ? Icons.announcement_rounded : Icons.task, color: theme.onBackground),
-          title: Row(
+    var theme = Theme.of(context).colorScheme;
+    var ctheme = getThemeFromTheme(theme);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: StyledTouchableContainer(
+        theme: ctheme,
+        onPressed: () => showDialog(context: context, builder: (context) => MABModal(title: title, description: description, image: image, attatchements: attatchements, date: due, posterUID: post.authorUID)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                title,
-                style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
-                maxLines: 2,
+              Container(
+                height: 60,
+                width: 60,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    gradient: LinearGradient(
+                        colors: post.type == 1
+                            ? [
+                                const Color(0xFF21B38F),
+                                const Color(0xFF19C17E),
+                              ]
+                            : [
+                                const Color(0xFF723EDC),
+                                const Color(0xFF683BDB)
+                              ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight)),
+                child: Icon(
+                  post.type == 1 ? Icons.campaign_rounded : Icons.task_rounded,
+                  color: theme.onBackground,
+                  size: 32,
+                ),
               ),
-              const SizedBox(width: 8),
-              //* Show in days until due unless it's more than 7 days away
-              Text(
-                due.difference(DateTime.now()).inDays > 7 ? DateFormat("dd/MM/yyyy").format(due) : "${due.difference(DateTime.now()).inDays} days",
-                style: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+              const SizedBox(
+                width: 16,
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      title,
+                      style: textTheme.displayMedium!.copyWith(fontWeight: FontWeight.bold),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    //* Show in days until due unless it's more than 7 days away
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          due.difference(DateTime.now()).inDays > 7 ? DateFormat("dd/MM/yyyy").format(due) : "${due.difference(DateTime.now()).inDays} days",
+                          style: textTheme.displaySmall!.copyWith(color: due.difference(DateTime.now()).inDays < 3 ? Colors.red : theme.onBackground.withOpacity(0.5)),
+                        ),
+                        Text(
+                          subjects[post.subject]!,
+                          style: textTheme.displaySmall!.copyWith(color: theme.onBackground.withOpacity(0.5)),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               )
             ],
           ),
-          trailing: Icon(Icons.chevron_right, color: theme.onBackground.withOpacity(0.5)),
         ),
-        Container(
-          height: 0.5,
-          width: double.infinity,
-          color: theme.onBackground.withOpacity(0.5),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -882,6 +900,7 @@ class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var ctheme = getThemeFromTheme(theme);
 
     void downloadFile(String downloadURL) async {
       //* Put download url link to cliboard and show snackbar
@@ -905,6 +924,7 @@ class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 8),
               //Main header
@@ -913,7 +933,7 @@ class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
                   Expanded(
                       child: Row(
                     children: [
-                      IconButton(onPressed: () => Navigator.pop(context), icon: Icon(Icons.close, color: theme.onBackground.withOpacity(0.5))),
+                      StyledIconButton(theme: ctheme, onPressed: () => Navigator.pop(context), icon: Icons.close),
                     ],
                   )),
                   Expanded(
@@ -930,44 +950,54 @@ class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
                   Expanded(child: Container())
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               //Sub header
-              Text(widget.description, style: textTheme.displaySmall, textAlign: TextAlign.center),
-              const SizedBox(height: 8),
+              Text(widget.description, style: textTheme.displaySmall),
+              const SizedBox(height: 16),
               //Image
-              Container(
-                  width: double.infinity,
-                  height: 250,
-                  decoration: BoxDecoration(color: theme.primaryContainer, borderRadius: const BorderRadius.all(Radius.circular(10)), border: Border.all(color: theme.secondary, width: 1)),
-                  child: InkWell(
-                    splashColor: widget.image == null || widget.image == "" ? Colors.transparent : theme.secondary.withOpacity(0.5),
-                    highlightColor: widget.image == null || widget.image == "" ? Colors.transparent : theme.secondary.withOpacity(0.5),
-                    onTap: () => {
-                      if (widget.image != null && widget.image != "")
-                        showDialog(
-                            context: context,
-                            builder: (context) => Dialog(
-                                  backgroundColor: Colors.transparent,
-                                  surfaceTintColor: Colors.transparent,
-                                  child: SizedBox(
-                                      height: 300,
-                                      child: PhotoView(
-                                        backgroundDecoration: const BoxDecoration(color: Colors.transparent),
-                                        imageProvider: NetworkImage(widget.image!),
-                                      )),
-                                ))
-                    },
-                    child: Center(
-                      child: widget.image == null || widget.image == ""
-                          ? Text(
-                              "No Image",
-                              style: textTheme.displaySmall,
-                            )
-                          : Image.network(widget.image!),
+              widget.image?.isEmpty ?? false
+                  ? StyledContainer(
+                      theme: ctheme,
+                      height: 250,
+                      width: 250,
+                      child: Text(
+                        "No image",
+                        style: textTheme.displaySmall,
+                      ),
+                    )
+                  : SizedBox(
+                      height: 250,
+                      width: 250,
+                      child: InkWell(
+                        splashColor: widget.image == null || widget.image == "" ? Colors.transparent : theme.secondary.withOpacity(0.5),
+                        highlightColor: widget.image == null || widget.image == "" ? Colors.transparent : theme.secondary.withOpacity(0.5),
+                        onTap: () => {
+                          if (widget.image != null && widget.image != "")
+                            showDialog(
+                                context: context,
+                                builder: (context) => Dialog(
+                                      backgroundColor: Colors.transparent,
+                                      surfaceTintColor: Colors.transparent,
+                                      child: SizedBox(
+                                          height: 300,
+                                          child: PhotoView(
+                                            backgroundDecoration: const BoxDecoration(color: Colors.transparent),
+                                            imageProvider: NetworkImage(widget.image!),
+                                          )),
+                                    ))
+                        },
+                        child: Center(
+                          child: widget.image == null || widget.image == ""
+                              ? Text(
+                                  "No Image",
+                                  style: textTheme.displaySmall,
+                                )
+                              : Image.network(widget.image!),
+                        ),
+                      ),
                     ),
-                  )),
 
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               //* Date of post and user
               Row(
                 children: [
@@ -994,34 +1024,24 @@ class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.only(top: 8.0),
-                        child: ElevatedButton(
+                        child: StyledElevatedButton(
+                          theme: ctheme,
                           onPressed: () => {
                             downloadFile(widget.attatchements[index]),
                           },
-                          style: ElevatedButton.styleFrom(
-                            side: BorderSide(color: theme.secondary, width: 1),
-                            padding: const EdgeInsets.all(0),
-                            backgroundColor: theme.secondary,
-                            foregroundColor: theme.onSecondary,
-                            shadowColor: Colors.black,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 //Replace with actual name
-                                Flexible(flex: 3, child: Text(extractFilenameFromUrl(widget.attatchements[index]), style: textTheme.displaySmall)),
-                                Flexible(
-                                  flex: 1,
-                                  child: Icon(
-                                    Icons.download_sharp,
-                                    color: theme.onSecondary,
-                                  ),
+                                Expanded(child: Text(extractFilenameFromUrl(widget.attatchements[index]), style: textTheme.displaySmall)),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                Icon(
+                                  Icons.download_sharp,
+                                  color: theme.onSecondary,
                                 ),
                               ],
                             ),

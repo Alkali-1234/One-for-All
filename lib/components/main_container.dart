@@ -37,7 +37,7 @@ class _MainContainerState extends State<MainContainer> {
                 tag: "menu",
                 child: StyledIconButton(
                   theme: ctheme,
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: widget.onClose ?? () => Navigator.of(context).pop(),
                   icon: Icons.arrow_back_rounded,
                   size: 32,
                 ),

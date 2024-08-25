@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/components/styled_components/container.dart';
 import 'package:oneforall/components/styled_components/filled_elevated_button.dart';
@@ -60,19 +61,15 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                Flexible(
-                  flex: 3,
-                  child: StyledTextField(
-                    theme: ctheme,
-                    onChanged: (value) => setState(() {
-                      searchQuery = value;
-                    }),
-                    hint: "Search",
-                  ),
+                StyledTextField(
+                  theme: ctheme,
+                  onChanged: (value) => setState(() {
+                    searchQuery = value;
+                  }),
+                  hint: "Search",
                 ),
                 const SizedBox(height: 20),
-                Flexible(
-                  flex: 10,
+                Expanded(
                   child: Column(
                     children: [
                       Row(

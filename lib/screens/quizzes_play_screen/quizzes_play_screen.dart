@@ -90,7 +90,7 @@ class _QuizzesPlayScreenState extends State<QuizzesPlayScreen> {
                     child: child,
                   ),
                   child: currentScreen == 0
-                      ? PlayScreenConfirmation(changeScreenFunction: changeScreen)
+                      ? Center(child: PlayScreenConfirmation(changeScreenFunction: changeScreen))
                       : currentScreen == 1
                           ? PlayScreen(key: playScreenKey, quizSet: widget.quizSet)
                           : const Placeholder(),

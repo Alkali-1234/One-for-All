@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:oneforall/components/main_container.dart';
+import 'package:oneforall/components/styled_components/elevated_button.dart';
+import 'package:oneforall/components/styled_components/filled_elevated_button.dart';
+import 'package:oneforall/components/styled_components/primary_elevated_button.dart';
+import 'package:oneforall/components/styled_components/style_constants.dart';
 import 'package:oneforall/main.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_view/photo_view.dart';
@@ -100,6 +104,7 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
     var theme = passedUserTheme.colorScheme;
     var textTheme = passedUserTheme.textTheme;
     var appState = context.watch<AppState>();
+    var ctheme = getThemeFromTheme(theme);
     return Scaffold(
       body: MainContainer(
           child: Column(
@@ -125,14 +130,9 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
           //New Question button
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
+            child: StyledPrimaryElevatedButton(
+                theme: ctheme,
                 onPressed: () => addCard(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.secondary,
-                  shadowColor: Colors.transparent,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -322,23 +322,17 @@ class _FlashcardsEditScreenState extends State<FlashcardsEditScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: ElevatedButton(
+                  child: FilledElevatedButton(
                     onPressed: () => saveFlashcards(appState),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
+                    color: Colors.green,
                     child: Text("Save", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: ElevatedButton(
+                  child: FilledElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
+                    color: Colors.red,
                     child: Text("Discard", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
                 ),

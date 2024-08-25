@@ -4,11 +4,12 @@ import 'package:oneforall/constants.dart';
 import 'inner_shadow.dart';
 
 class StyledDarkThemeTextField extends StatefulWidget {
-  const StyledDarkThemeTextField({super.key, this.controller, this.hint, this.onChanged, this.textField});
+  const StyledDarkThemeTextField({super.key, this.controller, this.hint, this.onChanged, this.textField, this.style});
   final TextEditingController? controller;
   final String? hint;
   final Function? onChanged;
   final TextField? textField;
+  final TextStyle? style;
 
   @override
   State<StyledDarkThemeTextField> createState() => _StyledDarkThemeTextFieldState();
@@ -46,7 +47,7 @@ class _StyledDarkThemeTextFieldState extends State<StyledDarkThemeTextField> {
                     ? TextField(
                         controller: widget.controller,
                         onChanged: widget.onChanged != null ? (value) => widget.onChanged!(value) : null,
-                        style: textTheme.displaySmall,
+                        style: widget.style ?? textTheme.displaySmall,
                         cursorColor: Colors.white,
                         decoration: InputDecoration.collapsed(hintText: widget.hint, hintStyle: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold, color: textTheme.displaySmall!.color!.withOpacity(0.5))),
                       )
@@ -126,22 +127,18 @@ class _StyledLightThemeTextFieldState extends State<StyledLightThemeTextField> {
 }
 
 class StyledTextField extends StatelessWidget {
-  const StyledTextField({super.key, required this.theme, this.onChanged, this.controller, this.hint, this.textField});
+  const StyledTextField({super.key, required this.theme, this.onChanged, this.controller, this.hint, this.textField, this.style});
   final Themes theme;
   final Function(String)? onChanged;
   final TextEditingController? controller;
   final String? hint;
   final TextField? textField;
+  final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {
     if (theme == Themes.dark) {
-      return StyledDarkThemeTextField(
-        onChanged: onChanged,
-        controller: controller,
-        hint: hint,
-        textField: textField,
-      );
+      return StyledDarkThemeTextField(onChanged: onChanged, controller: controller, hint: hint, textField: textField, style: style);
     }
     return StyledLightThemeTextField(
       onChanged: onChanged,
