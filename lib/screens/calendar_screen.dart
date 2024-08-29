@@ -2,6 +2,11 @@ import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:oneforall/components/main_container.dart';
+import 'package:oneforall/components/styled_components/container.dart';
+import 'package:oneforall/components/styled_components/elevated_button.dart';
+import 'package:oneforall/components/styled_components/elevated_icon_button.dart';
+import 'package:oneforall/components/styled_components/primary_elevated_button.dart';
+import 'package:oneforall/components/styled_components/style_constants.dart';
 import 'package:oneforall/constants.dart';
 import 'package:oneforall/data/community_data.dart';
 import 'package:oneforall/logger.dart';
@@ -222,6 +227,7 @@ class _CalendarScreenState extends riverpod.ConsumerState<CalendarScreen> {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     final calendar = ref.watch(calendarProvider);
+    var ctheme = getThemeFromTheme(theme);
     return Scaffold(
         resizeToAvoidBottomInset: false,
         body: MainContainer(
@@ -242,7 +248,8 @@ class _CalendarScreenState extends riverpod.ConsumerState<CalendarScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
+                    StyledIconButton(
+                      theme: ctheme,
                       onPressed: () {
                         setState(() {
                           reversed = true;
@@ -254,14 +261,12 @@ class _CalendarScreenState extends riverpod.ConsumerState<CalendarScreen> {
                         });
                         // calendarKey.currentState!.initializeCalendarEvents(appState);
                       },
-                      icon: Icon(
-                        Icons.arrow_left_rounded,
-                        color: theme.onPrimary,
-                        size: 48,
-                      ),
+                      icon: Icons.arrow_left_rounded,
+                      size: 48,
                     ),
                     Text(getMonthsOfTheYear[selectedMonth], style: textTheme.displayLarge),
-                    IconButton(
+                    StyledIconButton(
+                      theme: ctheme,
                       onPressed: () {
                         setState(() {
                           reversed = false;
@@ -273,11 +278,8 @@ class _CalendarScreenState extends riverpod.ConsumerState<CalendarScreen> {
                         });
                         // calendarKey.currentState!.initializeCalendarEvents(appState);
                       },
-                      icon: Icon(
-                        Icons.arrow_right_rounded,
-                        color: theme.onPrimary,
-                        size: 48,
-                      ),
+                      icon: Icons.arrow_right_rounded,
+                      size: 48,
                     ),
                   ],
                 ),
@@ -412,94 +414,115 @@ class CalendarWidget extends riverpod.ConsumerWidget {
   Widget build(BuildContext context, riverpod.WidgetRef ref) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
+    var ctheme = getThemeFromTheme(theme);
 
     final currentMonthData = ref.watch(calendarProvider.notifier).getMonthEvents(selectedMonth, selectedYear);
     final calendarMonthsData = ref.watch(calendarProvider)!.months;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer,
-        border: Border.all(color: theme.secondary),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        children: [
-          //Days of the week
-          const SizedBox(height: 10),
-          Flexible(
-            flex: 1,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Text("S", style: textTheme.displaySmall),
-                Text("M", style: textTheme.displaySmall),
-                Text("T", style: textTheme.displaySmall),
-                Text("W", style: textTheme.displaySmall),
-                Text("Th", style: textTheme.displaySmall),
-                Text("F", style: textTheme.displaySmall),
-                Text("S", style: textTheme.displaySmall),
-              ],
+    return StyledContainer(
+      theme: ctheme,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            //Days of the week
+            const SizedBox(height: 10),
+            Flexible(
+              flex: 1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text("S", style: textTheme.displaySmall),
+                  Text("M", style: textTheme.displaySmall),
+                  Text("T", style: textTheme.displaySmall),
+                  Text("W", style: textTheme.displaySmall),
+                  Text("Th", style: textTheme.displaySmall),
+                  Text("F", style: textTheme.displaySmall),
+                  Text("S", style: textTheme.displaySmall),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          for (int week = 0; week < 6; week++) ...[
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                for (int day = 0; day < 7; day++)
-                  Container(
-                    width: 30,
-                    height: 30,
-                    decoration: selectedYear == DateTime.now().year.toInt() && selectedMonth == DateTime.now().month.toInt() && getCurrentDate(currentMonthData, week, day) == DateTime.now().day.toInt() && getDateColor(getCurrentDate(currentMonthData, week, day), week, theme, calendarMonthsData) != Colors.transparent
-                        ? BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            gradient: getPrimaryGradient,
+            const SizedBox(height: 10),
+            for (int week = 0; week < 6; week++) ...[
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  for (int day = 0; day < 7; day++)
+                    selectedYear == DateTime.now().year.toInt() && selectedMonth == DateTime.now().month.toInt() && getCurrentDate(currentMonthData, week, day) == DateTime.now().day.toInt() && getDateColor(getCurrentDate(currentMonthData, week, day), week, theme, calendarMonthsData) != Colors.transparent
+                        ? SizedBox(
+                            height: 30,
+                            width: 30,
+                            child: StyledPrimaryElevatedButton(
+                              theme: ctheme,
+                              onPressed: () {
+                                if (getCurrentDate(currentMonthData, week, day) != 0) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return SelectedDateModal(
+                                          lacPosts: const [],
+                                          //* Check if it was last month's date
+                                          mabPosts: getEvents(getCurrentDate(currentMonthData, week, day), week, currentMonthData, calendarMonthsData),
+                                          title: "${getEvents(getCurrentDate(currentMonthData, week, day), week, currentMonthData, calendarMonthsData).length} Events",
+                                          description: "${getCurrentDate(currentMonthData, week, day)} of ${getMonthsOfTheYear[selectedMonth]}, $selectedYear",
+                                        );
+                                      });
+                                } else {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return const SelectedDateModal(
+                                          title: "Invalid Date",
+                                          description: "Please select a valid date",
+                                          mabPosts: [],
+                                          lacPosts: [],
+                                        );
+                                      });
+                                }
+                              },
+                              child: Text(getCurrentDate(currentMonthData, week, day).toString(), style: textTheme.displaySmall!.copyWith(color: getDateColor(getCurrentDate(currentMonthData, week, day), week, theme, calendarMonthsData) != Colors.transparent ? theme.onBackground : theme.onBackground.withOpacity(0.5))),
+                            ),
                           )
-                        : BoxDecoration(borderRadius: BorderRadius.circular(20), color: getDateColor(getCurrentDate(currentMonthData, week, day), week, theme, calendarMonthsData), border: getDateColor(getCurrentDate(currentMonthData, week, day), week, theme, calendarMonthsData) != Colors.transparent ? Border.all(color: theme.tertiary) : null),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (getCurrentDate(currentMonthData, week, day) != 0) {
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return SelectedDateModal(
-                                  lacPosts: const [],
-                                  //* Check if it was last month's date
-                                  mabPosts: getEvents(getCurrentDate(currentMonthData, week, day), week, currentMonthData, calendarMonthsData),
-                                  title: "${getEvents(getCurrentDate(currentMonthData, week, day), week, currentMonthData, calendarMonthsData).length} Events",
-                                  description: "${getCurrentDate(currentMonthData, week, day)} of ${getMonthsOfTheYear[selectedMonth]}, $selectedYear",
-                                );
-                              });
-                        } else {
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return const SelectedDateModal(
-                                  title: "Invalid Date",
-                                  description: "Please select a valid date",
-                                  mabPosts: [],
-                                  lacPosts: [],
-                                );
-                              });
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        padding: const EdgeInsets.all(0),
-                        backgroundColor: Colors.transparent,
-                        foregroundColor: theme.onPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: Text(getCurrentDate(currentMonthData, week, day).toString(), style: textTheme.displaySmall!.copyWith(color: getDateColor(getCurrentDate(currentMonthData, week, day), week, theme, calendarMonthsData) != Colors.transparent ? theme.onBackground : theme.onBackground.withOpacity(0.5))),
-                    ),
-                  ),
-              ],
-            ),
-          ]
-        ],
+                        : SizedBox(
+                            height: 30,
+                            width: 30,
+                            child: StyledElevatedButton(
+                              theme: ctheme,
+                              onPressed: () {
+                                if (getCurrentDate(currentMonthData, week, day) != 0) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return SelectedDateModal(
+                                          lacPosts: const [],
+                                          //* Check if it was last month's date
+                                          mabPosts: getEvents(getCurrentDate(currentMonthData, week, day), week, currentMonthData, calendarMonthsData),
+                                          title: "${getEvents(getCurrentDate(currentMonthData, week, day), week, currentMonthData, calendarMonthsData).length} Events",
+                                          description: "${getCurrentDate(currentMonthData, week, day)} of ${getMonthsOfTheYear[selectedMonth]}, $selectedYear",
+                                        );
+                                      });
+                                } else {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return const SelectedDateModal(
+                                          title: "Invalid Date",
+                                          description: "Please select a valid date",
+                                          mabPosts: [],
+                                          lacPosts: [],
+                                        );
+                                      });
+                                }
+                              },
+                              child: Text(getCurrentDate(currentMonthData, week, day).toString(), style: textTheme.displaySmall!.copyWith(color: getDateColor(getCurrentDate(currentMonthData, week, day), week, theme, calendarMonthsData) != Colors.transparent ? theme.onBackground : theme.onBackground.withOpacity(0.5))),
+                            ),
+                          ),
+                ],
+              ),
+            ]
+          ],
+        ),
       ),
     );
   }

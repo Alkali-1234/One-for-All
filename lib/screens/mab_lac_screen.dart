@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/components/styled_components/elevated_button.dart';
 import 'package:oneforall/components/styled_components/elevated_icon_button.dart';
+import 'package:oneforall/components/styled_components/filled_elevated_button.dart';
 import 'package:oneforall/components/styled_components/style_constants.dart';
 import 'package:oneforall/components/styled_components/text_field.dart';
 import 'package:oneforall/components/styled_components/touchable_container.dart';
@@ -113,16 +115,23 @@ class _MABLACScreenState extends State<MABLACScreen> {
     var ctheme = getThemeFromTheme(theme);
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (context) => NewEventModal(
-                      selectedSection: selectedSection,
-                    ));
-          },
-          backgroundColor: theme.secondary,
-          child: const Icon(Icons.add),
+        floatingActionButton: SizedBox(
+          height: 55,
+          width: 55,
+          child: StyledTouchableContainer(
+            theme: ctheme,
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (context) => NewEventModal(
+                        selectedSection: selectedSection,
+                      ));
+            },
+            child: Icon(
+              Icons.add,
+              color: theme.onBackground,
+            ),
+          ),
         ),
         backgroundColor: Colors.transparent,
         body: MainContainer(
@@ -484,196 +493,148 @@ class _NewEventModalState extends State<NewEventModal> {
       Navigator.pop(context);
     }
 
+    var ctheme = getThemeFromTheme(theme);
     return Dialog(
       surfaceTintColor: Colors.transparent,
       backgroundColor: Theme.of(context).colorScheme.background,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("New Event", style: textTheme.displayLarge),
-            const SizedBox(height: 8),
-            //* Title textfield
-            SizedBox(
-              height: 40,
-              child: TextField(
+        child: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Create Event", style: textTheme.displayLarge),
+              const SizedBox(height: 8),
+              //* Title textfield
+              StyledTextField(
+                theme: ctheme,
                 onChanged: (value) => setState(() {
                   title = value;
                 }),
+                hint: "Title",
                 style: textTheme.displaySmall,
-                cursorColor: theme.onBackground,
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.only(left: 10),
-                  filled: true,
-                  fillColor: theme.primary.withOpacity(0.125),
-                  hintText: "Title",
-                  hintStyle: textTheme.displaySmall,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: theme.onBackground, width: 1),
-                  ),
-                  disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                  ),
-                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            //* Description textfield
-            SizedBox(
-              height: 40,
-              child: TextField(
+              const SizedBox(height: 8),
+              //* Description textfield
+              StyledTextField(
+                theme: ctheme,
                 onChanged: (value) => setState(() {
                   description = value;
                 }),
+                hint: "Description",
                 style: textTheme.displaySmall,
-                cursorColor: theme.onBackground,
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.only(left: 10),
-                  filled: true,
-                  fillColor: theme.primary.withOpacity(0.125),
-                  hintText: "Description",
-                  hintStyle: textTheme.displaySmall,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: theme.onBackground, width: 1),
-                  ),
-                  disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.transparent, width: 0),
-                  ),
-                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            //* Due date field
-            Row(
-              children: [
-                Text("Due date:", style: textTheme.displaySmall),
-                TextButton(
-                  onPressed: () async {
-                    DateTime? picked = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 365)),
-                        fieldLabelText: Text("Due date:", style: TextStyle(color: theme.onBackground)).data,
-                        builder: (context, child) => Theme(
-                              data: ThemeData.dark().copyWith(
-                                colorScheme: ColorScheme.dark(
-                                  primary: theme.secondary,
-                                  onPrimary: theme.onBackground,
-                                  surface: theme.background,
-                                  onSurface: theme.onPrimary,
-                                  background: theme.background,
-                                  onBackground: theme.onBackground,
+              const SizedBox(height: 8),
+              //* Due date field
+              Row(
+                children: [
+                  Text("Due date:", style: textTheme.displaySmall),
+                  TextButton(
+                    onPressed: () async {
+                      DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime.now().add(const Duration(days: 365)),
+                          fieldLabelText: Text("Due date:", style: TextStyle(color: theme.onBackground)).data,
+                          builder: (context, child) => Theme(
+                                data: ThemeData.dark().copyWith(
+                                  colorScheme: ColorScheme.dark(
+                                    primary: theme.secondary,
+                                    onPrimary: theme.onBackground,
+                                    surface: theme.background,
+                                    onSurface: theme.onPrimary,
+                                    background: theme.background,
+                                    onBackground: theme.onBackground,
+                                  ),
+                                  dialogBackgroundColor: theme.background,
+                                  textButtonTheme: TextButtonThemeData(
+                                      style: TextButton.styleFrom(
+                                    foregroundColor: theme.onBackground,
+                                  )),
                                 ),
-                                dialogBackgroundColor: theme.background,
-                                textButtonTheme: TextButtonThemeData(
-                                    style: TextButton.styleFrom(
-                                  foregroundColor: theme.onBackground,
-                                )),
-                              ),
-                              child: child!,
-                            ));
-                    if (picked != null) {
-                      setState(() {
-                        dueDate = Timestamp.fromDate(picked);
-                      });
-                    }
-                  },
-                  child: Text(dueDate == null ? "Select a date" : DateFormat("dd/MM/yyyy").format(dueDate!.toDate()), style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 8),
-            //* Subject field
-            Row(
-              children: [
-                Text("Subject: ", style: textTheme.displaySmall),
-                const SizedBox(width: 8),
-                SizedBox(
-                  height: 40,
-                  child: DropdownButton(
-                    padding: const EdgeInsets.all(8),
-                    borderRadius: BorderRadius.circular(30),
-                    hint: const Text("Subject"),
-                    value: subject,
-                    icon: const Icon(null),
-                    underline: Container(),
-                    onChanged: (value) {
-                      setState(() {
-                        subject = value as int;
-                      });
+                                child: child!,
+                              ));
+                      if (picked != null) {
+                        setState(() {
+                          dueDate = Timestamp.fromDate(picked);
+                        });
+                      }
                     },
-                    items: List.generate(getSubjects.length, (index) => DropdownMenuItem(value: index, child: Text(getSubjects[index], textAlign: TextAlign.center, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)))),
+                    child: Text(dueDate == null ? "Select a date" : DateFormat("dd/MM/yyyy").format(dueDate!.toDate()), style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
 
-            const SizedBox(height: 8),
-            //* Type field
-            Row(
-              children: [
-                Text("Type: ", style: textTheme.displaySmall),
-                const SizedBox(width: 8),
-                SizedBox(
-                  height: 40,
-                  child: DropdownButton(
-                    padding: const EdgeInsets.all(8),
-                    borderRadius: BorderRadius.circular(30),
-                    hint: const Text("Type"),
-                    value: type,
-                    icon: const Icon(null),
-                    underline: Container(),
-                    onChanged: (value) {
-                      setState(() {
-                        type = value as int;
-                      });
-                    },
-                    items: [
-                      DropdownMenuItem(
-                        value: 1,
-                        child: Text("Announcement", textAlign: TextAlign.center, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-                      ),
-                      DropdownMenuItem(
-                        value: 2,
-                        child: Text("Task", textAlign: TextAlign.center, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-                      ),
-                    ],
+              const SizedBox(height: 8),
+              //* Subject field
+              Row(
+                children: [
+                  Text("Subject: ", style: textTheme.displaySmall),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    height: 40,
+                    child: DropdownButton(
+                      padding: const EdgeInsets.all(8),
+                      borderRadius: BorderRadius.circular(30),
+                      hint: const Text("Subject"),
+                      value: subject,
+                      icon: const Icon(null),
+                      underline: Container(),
+                      onChanged: (value) {
+                        setState(() {
+                          subject = value as int;
+                        });
+                      },
+                      items: List.generate(getSubjects.length, (index) => DropdownMenuItem(value: index, child: Text(getSubjects[index], textAlign: TextAlign.center, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)))),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            //* Image field
-            Row(
-              children: [
-                Text("Image: ", style: textTheme.displaySmall),
-                const SizedBox(width: 8),
-                SizedBox(
-                  height: 40,
-                  child: ElevatedButton(
+                ],
+              ),
+
+              const SizedBox(height: 8),
+              //* Type field
+              Row(
+                children: [
+                  Text("Type: ", style: textTheme.displaySmall),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    height: 40,
+                    child: DropdownButton(
+                      padding: const EdgeInsets.all(8),
+                      borderRadius: BorderRadius.circular(30),
+                      hint: const Text("Type"),
+                      value: type,
+                      icon: const Icon(null),
+                      underline: Container(),
+                      onChanged: (value) {
+                        setState(() {
+                          type = value as int;
+                        });
+                      },
+                      items: [
+                        DropdownMenuItem(
+                          value: 1,
+                          child: Text("Announcement", textAlign: TextAlign.center, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                        ),
+                        DropdownMenuItem(
+                          value: 2,
+                          child: Text("Task", textAlign: TextAlign.center, style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              //* Image field
+              Row(
+                children: [
+                  Text("Image: ", style: textTheme.displaySmall),
+                  const SizedBox(width: 8),
+                  StyledIconButton(
+                    theme: ctheme,
                     onPressed: () async {
                       //* Show image picker
                       final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 50, maxWidth: 500, maxHeight: 500);
@@ -682,43 +643,29 @@ class _NewEventModalState extends State<NewEventModal> {
                         image = File(pickedFile.path);
                       });
                     },
-                    style: ElevatedButton.styleFrom(
-                      elevation: 2,
-                      padding: const EdgeInsets.all(8),
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Text(
-                      "Select an image",
-                      style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
-                    ),
+                    icon: Icons.add_a_photo_rounded,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              //* Show image if there is one
+              if (image != null)
+                Container(
+                  width: double.infinity,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    image: DecorationImage(image: FileImage(image!), fit: BoxFit.cover),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            //* Show image if there is one
-            if (image != null)
-              Container(
-                width: double.infinity,
-                height: 200,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  image: DecorationImage(image: FileImage(image!), fit: BoxFit.cover),
-                ),
-              ),
-            const SizedBox(height: 8),
-            //* Attatchements field
-            Row(
-              children: [
-                Text("Attatchements: ", style: textTheme.displaySmall),
-                const SizedBox(width: 8),
-                SizedBox(
-                  height: 40,
-                  child: ElevatedButton(
+              const SizedBox(height: 8),
+              //* Attatchements field
+              Row(
+                children: [
+                  Text("Attatchements: ", style: textTheme.displaySmall),
+                  const SizedBox(width: 8),
+                  StyledIconButton(
+                    theme: ctheme,
                     onPressed: () async {
                       //* Show image picker
                       final pickedFiles = await ImagePicker().pickMultipleMedia(imageQuality: 50, maxWidth: 500, maxHeight: 500);
@@ -728,37 +675,26 @@ class _NewEventModalState extends State<NewEventModal> {
                         }
                       });
                     },
-                    style: ElevatedButton.styleFrom(
-                      elevation: 2,
-                      padding: const EdgeInsets.all(8),
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Text(
-                      "Pick attatchements",
-                      style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
-                    ),
+                    icon: Icons.upload_file_rounded,
                   ),
-                ),
+                ],
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              for (var i in attatchements) ...[
+                Text(
+                  i.path,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: textTheme.displaySmall,
+                )
               ],
-            ),
-            const SizedBox(height: 16),
-            //* Confirm button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
+              const SizedBox(height: 16),
+              //* Confirm button
+              FilledElevatedButton(
                 onPressed: () => addNewEvent(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
+                color: Colors.green,
                 //* Confirm button text : if loading, show loading indicator, if not loading and there is error, show error text, else show confirm text
                 child: isLoading
                     ? SizedBox(height: 25, width: 25, child: CircularProgressIndicator(color: theme.onBackground))
@@ -767,9 +703,9 @@ class _NewEventModalState extends State<NewEventModal> {
                         : success
                             ? Icon(Icons.check, color: theme.onBackground)
                             : Text("Confirm", style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold)),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -955,47 +891,51 @@ class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
               Text(widget.description, style: textTheme.displaySmall),
               const SizedBox(height: 16),
               //Image
-              widget.image?.isEmpty ?? false
-                  ? StyledContainer(
-                      theme: ctheme,
-                      height: 250,
-                      width: 250,
-                      child: Text(
-                        "No image",
-                        style: textTheme.displaySmall,
-                      ),
-                    )
-                  : SizedBox(
-                      height: 250,
-                      width: 250,
-                      child: InkWell(
-                        splashColor: widget.image == null || widget.image == "" ? Colors.transparent : theme.secondary.withOpacity(0.5),
-                        highlightColor: widget.image == null || widget.image == "" ? Colors.transparent : theme.secondary.withOpacity(0.5),
-                        onTap: () => {
-                          if (widget.image != null && widget.image != "")
-                            showDialog(
-                                context: context,
-                                builder: (context) => Dialog(
-                                      backgroundColor: Colors.transparent,
-                                      surfaceTintColor: Colors.transparent,
-                                      child: SizedBox(
-                                          height: 300,
-                                          child: PhotoView(
-                                            backgroundDecoration: const BoxDecoration(color: Colors.transparent),
-                                            imageProvider: NetworkImage(widget.image!),
-                                          )),
-                                    ))
-                        },
+              LayoutBuilder(builder: (context, constraints) {
+                return widget.image?.isEmpty ?? false
+                    ? StyledContainer(
+                        theme: ctheme,
+                        height: constraints.maxWidth / 1.5,
+                        width: constraints.maxWidth / 1.5,
                         child: Center(
-                          child: widget.image == null || widget.image == ""
-                              ? Text(
-                                  "No Image",
-                                  style: textTheme.displaySmall,
-                                )
-                              : Image.network(widget.image!),
+                          child: Text(
+                            "No image",
+                            style: textTheme.displaySmall,
+                          ),
                         ),
-                      ),
-                    ),
+                      )
+                    : SizedBox(
+                        height: 250,
+                        width: 250,
+                        child: InkWell(
+                          splashColor: widget.image == null || widget.image == "" ? Colors.transparent : theme.secondary.withOpacity(0.5),
+                          highlightColor: widget.image == null || widget.image == "" ? Colors.transparent : theme.secondary.withOpacity(0.5),
+                          onTap: () => {
+                            if (widget.image != null && widget.image != "")
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        surfaceTintColor: Colors.transparent,
+                                        child: SizedBox(
+                                            height: 300,
+                                            child: PhotoView(
+                                              backgroundDecoration: const BoxDecoration(color: Colors.transparent),
+                                              imageProvider: NetworkImage(widget.image!),
+                                            )),
+                                      ))
+                          },
+                          child: Center(
+                            child: widget.image == null || widget.image == ""
+                                ? Text(
+                                    "No Image",
+                                    style: textTheme.displaySmall,
+                                  )
+                                : Image.network(widget.image!),
+                          ),
+                        ),
+                      );
+              }),
 
               const SizedBox(height: 8),
               //* Date of post and user

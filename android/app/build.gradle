@@ -72,8 +72,8 @@ android {
         multiDexEnabled true
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 0061
-        versionName "Pre-Beta v0.0.6.0"
+        versionCode 0062
+        versionName "Pre-Beta v0.0.6.2-REV"
     }
 
     
