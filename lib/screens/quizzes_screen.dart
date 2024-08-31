@@ -85,19 +85,28 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
                           const SizedBox(
                             height: 10,
                           ),
-                          ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: theme.primaryContainer,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          StyledTouchableContainer(
+                            theme: getThemeFromTheme(theme),
+                            onPressed: () {
+                              showDialog(context: context, builder: (context) => const NewSetOptions());
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Create Quiz",
+                                    style: textTheme.displaySmall,
+                                  ),
+                                  const SizedBox(
+                                    width: 16,
+                                  ),
+                                  Icon(Icons.add, color: theme.onBackground)
+                                ],
                               ),
-                              onPressed: () {
-                                showDialog(context: context, builder: (context) => const NewSetOptions());
-                              },
-                              icon: Icon(
-                                Icons.add,
-                                color: theme.onBackground,
-                              ),
-                              label: Text("Create Quiz", style: textTheme.displaySmall)),
+                            ),
+                          ),
                         ],
                       ),
                     ),

@@ -88,19 +88,28 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                             children: [
                               Text("You don't have any Flashcards", style: textTheme.displayMedium),
                               const SizedBox(height: 10),
-                              ElevatedButton.icon(
-                                  icon: const Icon(Icons.add),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: theme.secondary,
-                                    foregroundColor: theme.onPrimary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
+                              StyledTouchableContainer(
+                                theme: getThemeFromTheme(theme),
+                                onPressed: () {
+                                  showDialog(context: context, builder: (context) => const NewSetOptions());
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "Create Flashcard",
+                                        style: textTheme.displaySmall,
+                                      ),
+                                      const SizedBox(
+                                        width: 16,
+                                      ),
+                                      Icon(Icons.add, color: theme.onBackground)
+                                    ],
                                   ),
-                                  onPressed: () {
-                                    showDialog(context: context, builder: (context) => const NewSetOptions());
-                                  },
-                                  label: const Text("Create Flashcard")),
+                                ),
+                              ),
                             ],
                           )),
                         ),

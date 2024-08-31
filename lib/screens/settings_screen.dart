@@ -1,11 +1,17 @@
 import 'dart:ui';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:oneforall/components/main_container.dart';
+import 'package:oneforall/components/styled_components/filled_elevated_button.dart';
+import 'package:oneforall/components/styled_components/primary_elevated_button.dart';
+import 'package:oneforall/components/styled_components/style_constants.dart';
 import 'package:oneforall/functions/community_functions.dart';
 import 'package:oneforall/logger.dart';
 import 'package:oneforall/screens/login_screen.dart';
 import 'package:oneforall/styles/styles.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import '../components/styled_components/elevated_icon_button.dart';
+import '../components/styled_components/switch.dart';
 import '../constants.dart';
 import '../data/user_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -237,321 +243,167 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     var appState = Provider.of<AppState>(context);
-    return Container(
-      decoration: BoxDecoration(color: appState.currentUserSelectedTheme.colorScheme.background),
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            onPressed: () {
-              if (currentLoading != 0) return;
-              if (Theme.of(context) != passedUserTheme) {
-                appState.currentUserSelectedTheme = passedUserTheme;
-              }
-              Navigator.pop(context);
-            },
-            icon: Icon(
-              Icons.arrow_back,
-              color: theme.onBackground,
-            ),
-          ),
-          title: Text(
-            "Settings",
-            style: textTheme.displayMedium,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        body: SafeArea(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Positioned.fill(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(
+    return MainContainer(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            //* Back button
+            Expanded(
+              child: ListView(
+                physics: const ClampingScrollPhysics(),
+                shrinkWrap: true,
+                children: [
+                  Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                    const SizedBox(height: 32),
+                    Row(
+                      children: [
+                        Text("Theme", style: textTheme.headlineSmall),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    //* Theme switch (Clean Dark, Bright Light)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        StyledIconButton(
+                          theme: selectedTheme == 2 ? Themes.light : Themes.dark,
+                          onPressed: () {
+                            setState(() {
+                              selectedTheme = 1;
+                            });
+                            //* change theme
+                            appState.currentUserSelectedTheme = darkTheme;
+                          },
+                          icon: Icons.dark_mode_rounded,
+                          size: 80,
+                        ),
+                        StyledIconButton(
+                          theme: selectedTheme == 2 ? Themes.light : Themes.dark,
+                          onPressed: () {
+                            setState(() {
+                              selectedTheme = 2;
+                            });
+                            //* change theme
+                            appState.currentUserSelectedTheme = lightTheme;
+                          },
+                          icon: Icons.light_mode_rounded,
+                          size: 80,
+                        )
+                      ],
+                    )
+                  ]),
+                  // //* Notification settings
+                  const SizedBox(height: 25),
+                  Text("Notifications", style: textTheme.headlineSmall),
+                  const SizedBox(height: 5),
+                  ListTile(
+                      leading: Text("Main Announcement Board", style: textTheme.displaySmall),
+                      trailing: NeumorphicSwitch(
+                        initialValue: notificationSettings["MAB"]!,
+                        onChanged: (value) => setState(() {
+                          notificationSettings["MAB"] = !notificationSettings["MAB"]!;
+                          changedNotifSettings = true;
+                        }),
+                      )),
+                  ListTile(
+                      leading: Text("Local Announcement Board", style: textTheme.displaySmall),
+                      trailing: NeumorphicSwitch(
+                        onChanged: (value) => setState(() {
+                          notificationSettings["LAC"] = !notificationSettings["LAC"]!;
+                          changedNotifSettings = true;
+                        }),
+                      )),
+                  ListTile(
+                      leading: Text("Recent Activity", style: textTheme.displaySmall),
+                      trailing: NeumorphicSwitch(
+                        onChanged: (value) => setState(() {
+                          notificationSettings["RA"] = !notificationSettings["RA"]!;
+                          changedNotifSettings = true;
+                        }),
+                      )),
+
+                  const SizedBox(height: 25),
+                  Text("Community Settings", style: textTheme.displaySmall),
+                  const SizedBox(height: 10),
+                  Container(
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: theme.primaryContainer,
-                        border: Border.all(color: theme.secondary, width: 1),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      //* Back button
-                      Expanded(
-                        child: ListView(
-                          physics: const ClampingScrollPhysics(),
-                          shrinkWrap: true,
-                          children: [
-                            //* Theme
-                            const SizedBox(height: 10),
-                            Text("Theme", style: textTheme.displaySmall),
-                            const SizedBox(height: 10),
-                            //* Theme switch (Great Default Blue, Clean Dark, Bright Light)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      selectedTheme = 0;
-                                    });
-                                    //* change theme
-                                    appState.currentUserSelectedTheme = defaultBlueTheme;
-                                  },
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      AnimatedContainer(
-                                        duration: const Duration(milliseconds: 150),
-                                        height: 50,
-                                        width: 50,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(25),
-                                          border: selectedTheme == 0 ? Border.all(color: theme.onBackground, width: 1) : null,
-                                          gradient: const LinearGradient(
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                            colors: [
-                                              Color.fromRGBO(0, 0, 128, 1.0),
-                                              Color.fromRGBO(0, 11, 53, 1.0)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Text("Blue", style: textTheme.displaySmall!.copyWith(fontWeight: selectedTheme == 0 ? FontWeight.bold : FontWeight.normal)),
-                                    ],
-                                  ),
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          selectedTheme = 1;
-                                        });
-                                        //* change theme
-                                        appState.currentUserSelectedTheme = darkTheme;
-                                      },
-                                      child: AnimatedContainer(
-                                        duration: const Duration(milliseconds: 150),
-                                        height: 50,
-                                        width: 50,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(25),
-                                          border: selectedTheme == 1 ? Border.all(color: theme.onBackground, width: 1) : null,
-                                          gradient: const LinearGradient(
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                            colors: [
-                                              Color.fromRGBO(61, 61, 61, 1.0),
-                                              Color.fromRGBO(2, 2, 2, 1.0)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Text("Dark", style: textTheme.displaySmall!.copyWith(fontWeight: selectedTheme == 1 ? FontWeight.bold : FontWeight.normal)),
-                                  ],
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          selectedTheme = 2;
-                                        });
-                                        //* change theme
-                                        appState.currentUserSelectedTheme = lightTheme;
-                                      },
-                                      child: AnimatedContainer(
-                                        duration: const Duration(milliseconds: 150),
-                                        height: 50,
-                                        width: 50,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(25),
-                                          border: selectedTheme == 2 ? Border.all(color: theme.onBackground, width: 1) : null,
-                                          gradient: const LinearGradient(
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                            colors: [
-                                              Color.fromRGBO(255, 255, 255, 1.0),
-                                              Color.fromRGBO(103, 103, 103, 1.0)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Text("Light", style: textTheme.displaySmall!.copyWith(fontWeight: selectedTheme == 2 ? FontWeight.bold : FontWeight.normal)),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            //* Notification settings
-                            const SizedBox(height: 25),
-                            Text("Notification Settings", style: textTheme.displaySmall),
-                            const SizedBox(height: 5),
-                            ListTile(
-                                leading: Text("MAB", style: textTheme.displaySmall),
-                                trailing: Switch(
-                                  value: notificationSettings["MAB"]!,
-                                  onChanged: (value) => setState(() {
-                                    notificationSettings["MAB"] = !notificationSettings["MAB"]!;
-                                    changedNotifSettings = true;
-                                  }),
-                                  activeColor: Colors.green,
-                                  activeTrackColor: Colors.white,
-                                  inactiveThumbColor: Colors.red,
-                                )),
-                            ListTile(
-                                leading: Text("LAC", style: textTheme.displaySmall),
-                                trailing: Switch(
-                                  value: notificationSettings["LAC"]!,
-                                  onChanged: (value) => setState(() {
-                                    notificationSettings["LAC"] = !notificationSettings["LAC"]!;
-                                    changedNotifSettings = true;
-                                  }),
-                                  activeColor: Colors.green,
-                                  activeTrackColor: Colors.white,
-                                  inactiveThumbColor: Colors.red,
-                                )),
-                            ListTile(
-                                leading: Text("Recent Activity", style: textTheme.displaySmall),
-                                trailing: Switch(
-                                  value: notificationSettings["RA"]!,
-                                  onChanged: (value) => setState(() {
-                                    notificationSettings["RA"] = !notificationSettings["RA"]!;
-                                    changedNotifSettings = true;
-                                  }),
-                                  activeColor: Colors.green,
-                                  activeTrackColor: Colors.white,
-                                  inactiveThumbColor: Colors.red,
-                                )),
-
-                            const SizedBox(height: 25),
-                            Text("Community Settings", style: textTheme.displaySmall),
-                            const SizedBox(height: 10),
-                            Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: theme.primaryContainer,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Text("Your Community:", style: textTheme.displaySmall),
-                                    Expanded(
-                                      child: Text(
-                                        appState.getCurrentUser.assignedCommunity != "0" ? appState.getCurrentUser.assignedCommunity! : "None",
-                                        style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                )),
-                            const SizedBox(height: 5),
-                            Row(
-                              children: [
-                                if (appState.getCurrentUser.assignedCommunity == "0")
-                                  Expanded(
-                                    child: TextFormField(
-                                      cursorColor: theme.onBackground,
-                                      style: textTheme.displaySmall,
-                                      decoration: TextInputStyle(textTheme: textTheme, theme: theme).getTextInputStyle().copyWith(hintText: "Community ID", hintStyle: textTheme.displaySmall),
-                                      onChanged: (value) => setState(() {
-                                        communityIDQuery = value;
-                                      }),
-                                    ),
-                                  ),
-                                const SizedBox(width: 10),
-                                if (appState.getCurrentUser.assignedCommunity == "0")
-                                  Expanded(
-                                    child: TextFormField(
-                                      cursorColor: theme.onBackground,
-                                      style: textTheme.displaySmall,
-                                      decoration: TextInputStyle(textTheme: textTheme, theme: theme).getTextInputStyle().copyWith(hintText: "Password", hintStyle: textTheme.displaySmall),
-                                      onChanged: (value) => setState(() {
-                                        passwordQuery = value;
-                                      }),
-                                    ),
-                                  ),
-                              ],
-                            ),
-
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: appState.getCurrentUser.assignedCommunity != "0" ? Colors.red : Colors.green,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  onPressed: appState.getCurrentUser.assignedCommunity != "0" ? () => _leaveCommunity() : () => _joinCommunity(),
-                                  child: loadingCommunity
-                                      ? SizedBox(
-                                          height: 15,
-                                          width: 15,
-                                          child: CircularProgressIndicator(
-                                            color: theme.onBackground,
-                                          ),
-                                        )
-                                      : Text(
-                                          appState.getCurrentUser.assignedCommunity != "0" ? "Leave Community" : "Join Community",
-                                        )),
-                            )
-                          ],
-                        ),
-                      ),
-                      //* Save button
-                      Column(
+                      child: Row(
                         children: [
-                          Container(
-                            height: 40,
-                            padding: EdgeInsets.zero,
-                            margin: EdgeInsets.zero,
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), gradient: getPrimaryGradient),
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                saveSettings();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                foregroundColor: Colors.white,
-                                surfaceTintColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: const Text("Save"),
+                          Text("Your Community:", style: textTheme.displaySmall),
+                          Expanded(
+                            child: Text(
+                              appState.getCurrentUser.assignedCommunity != "0" ? appState.getCurrentUser.assignedCommunity! : "None",
+                              style: textTheme.displaySmall!.copyWith(fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          // ),
                         ],
-                      ),
+                      )),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      if (appState.getCurrentUser.assignedCommunity == "0")
+                        Expanded(
+                          child: TextFormField(
+                            cursorColor: theme.onBackground,
+                            style: textTheme.displaySmall,
+                            decoration: TextInputStyle(textTheme: textTheme, theme: theme).getTextInputStyle().copyWith(hintText: "Community ID", hintStyle: textTheme.displaySmall),
+                            onChanged: (value) => setState(() {
+                              communityIDQuery = value;
+                            }),
+                          ),
+                        ),
+                      const SizedBox(width: 10),
+                      if (appState.getCurrentUser.assignedCommunity == "0")
+                        Expanded(
+                          child: TextFormField(
+                            cursorColor: theme.onBackground,
+                            style: textTheme.displaySmall,
+                            decoration: TextInputStyle(textTheme: textTheme, theme: theme).getTextInputStyle().copyWith(hintText: "Password", hintStyle: textTheme.displaySmall),
+                            onChanged: (value) => setState(() {
+                              passwordQuery = value;
+                            }),
+                          ),
+                        ),
                     ],
                   ),
-                ),
-              ],
+
+                  FilledElevatedButton(
+                      color: appState.getCurrentUser.assignedCommunity != "0" ? Colors.red : Colors.green,
+                      onPressed: appState.getCurrentUser.assignedCommunity != "0" ? () => _leaveCommunity() : () => _joinCommunity(),
+                      child: loadingCommunity
+                          ? SizedBox(
+                              height: 15,
+                              width: 15,
+                              child: CircularProgressIndicator(
+                                color: theme.onBackground,
+                              ),
+                            )
+                          : Text(
+                              appState.getCurrentUser.assignedCommunity != "0" ? "Leave Community" : "Join Community",
+                              style: textTheme.displaySmall,
+                            ))
+                ],
+              ),
             ),
-          ),
+            //* Save button
+            StyledPrimaryElevatedButton(
+              theme: getThemeFromTheme(theme),
+              onPressed: () {
+                saveSettings();
+              },
+              child: Text(
+                "Save",
+                style: textTheme.headlineSmall,
+              ),
+            ),
+          ],
         ),
       ),
     );
