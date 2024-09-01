@@ -137,6 +137,19 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
     prefs.setBool("notification_settings_RA", notificationSettings["RA"]!);
   }
 
+  Future<void> initNotifications() async {
+    final prefs = await SharedPreferences.getInstance();
+    notificationSettings["MAB"] = prefs.getBool("setting_notifications_MAB") ?? true;
+    notificationSettings["LAC"] = prefs.getBool("setting_notifications_LAC") ?? true;
+    notificationSettings["RA"] = prefs.getBool("setting_notifications_RecentActivity") ?? true;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initNotifications();
+  }
+
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<AppState>();
@@ -210,6 +223,7 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
                 ListTile(
                     leading: Text("Local Announcement Board", style: textTheme.displaySmall),
                     trailing: NeumorphicSwitch(
+                      initialValue: notificationSettings["LAC"]!,
                       onChanged: (value) => setState(() {
                         notificationSettings["LAC"] = !notificationSettings["LAC"]!;
                         changedNotifSettings = true;
@@ -218,6 +232,7 @@ class _SettingsConfigurationScreenState extends State<SettingsConfigurationScree
                 ListTile(
                     leading: Text("Recent Activity", style: textTheme.displaySmall),
                     trailing: NeumorphicSwitch(
+                      initialValue: notificationSettings["RA"]!,
                       onChanged: (value) => setState(() {
                         notificationSettings["RA"] = !notificationSettings["RA"]!;
                         changedNotifSettings = true;

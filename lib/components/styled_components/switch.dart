@@ -34,7 +34,7 @@ class _NeumorphicSwitchState extends State<NeumorphicSwitch> {
             value = !value;
             tapDown = false;
           });
-          widget.onChanged();
+          widget.onChanged(value);
         },
         onHorizontalDragUpdate: (details) {
           setState(() {

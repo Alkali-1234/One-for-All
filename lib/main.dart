@@ -300,6 +300,7 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
             child: Showcase(
               key: showcase2,
+              title: "Menu button",
               description: "This is the menu button. Tap it to access all of the features!",
               child: NavigationButton(ctheme: ctheme),
             ),

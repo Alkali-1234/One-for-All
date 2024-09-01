@@ -50,7 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
     "RA": true,
   };
 
-  void saveSettings() async {
+  void saveSettings(BuildContext context) async {
     if (currentLoading != 0) return;
     setState(() {
       currentLoading = 1;
@@ -301,6 +301,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                   ListTile(
                       leading: Text("Main Announcement Board", style: textTheme.displaySmall),
                       trailing: NeumorphicSwitch(
+                        key: ValueKey(notificationSettings["MAB"]!),
                         initialValue: notificationSettings["MAB"]!,
                         onChanged: (value) => setState(() {
                           notificationSettings["MAB"] = !notificationSettings["MAB"]!;
@@ -310,6 +311,8 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                   ListTile(
                       leading: Text("Local Announcement Board", style: textTheme.displaySmall),
                       trailing: NeumorphicSwitch(
+                        key: ValueKey(notificationSettings["LAC"]!),
+                        initialValue: notificationSettings["LAC"]!,
                         onChanged: (value) => setState(() {
                           notificationSettings["LAC"] = !notificationSettings["LAC"]!;
                           changedNotifSettings = true;
@@ -318,6 +321,8 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                   ListTile(
                       leading: Text("Recent Activity", style: textTheme.displaySmall),
                       trailing: NeumorphicSwitch(
+                        key: ValueKey(notificationSettings["RA"]!),
+                        initialValue: notificationSettings["RA"]!,
                         onChanged: (value) => setState(() {
                           notificationSettings["RA"] = !notificationSettings["RA"]!;
                           changedNotifSettings = true;
@@ -325,7 +330,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
                       )),
 
                   const SizedBox(height: 25),
-                  Text("Community Settings", style: textTheme.displaySmall),
+                  Text("Community", style: textTheme.headlineSmall),
                   const SizedBox(height: 10),
                   Container(
                       padding: const EdgeInsets.all(8),
@@ -396,7 +401,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
             StyledPrimaryElevatedButton(
               theme: getThemeFromTheme(theme),
               onPressed: () {
-                saveSettings();
+                saveSettings(context);
               },
               child: Text(
                 "Save",

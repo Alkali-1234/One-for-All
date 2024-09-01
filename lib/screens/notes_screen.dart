@@ -6,6 +6,8 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:image_picker/image_picker.dart";
 import "package:oneforall/components/animations/fade_in_transition.dart";
 import "package:oneforall/components/base_shimmer.dart";
+import "package:oneforall/components/styled_components/elevated_icon_button.dart";
+import "package:oneforall/components/styled_components/style_constants.dart";
 import "package:oneforall/logger.dart";
 import "package:oneforall/models/note_models/note_content.dart";
 import "package:oneforall/models/note_models/note_contents.dart";
@@ -53,6 +55,50 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
     });
 
     return Scaffold(
+      floatingActionButton: StyledIconButton(
+          theme: getThemeFromTheme(theme),
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (context) => Dialog(
+                      backgroundColor: theme.background,
+                      surfaceTintColor: Colors.transparent,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Notes: How to use",
+                              style: textTheme.displayMedium,
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            Text(
+                              "Text: Click on the text to edit the text, operations on the text are shown on the right.",
+                              style: textTheme.displaySmall,
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            Text(
+                              "Text Formatting: You may wrap text with these to style it: <h1></h1> (For a heading style) ; <h2></h2> (For a subheading style) ; <bl></bl> (For a bold style)",
+                              style: textTheme.displaySmall,
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            Text(
+                              "Image: Click on the Image to see options",
+                              style: textTheme.displaySmall,
+                            )
+                          ],
+                        ),
+                      ),
+                    ));
+          },
+          icon: Icons.info),
       body: MainContainer(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -85,7 +131,7 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                           disabledForegroundColor: theme.onBackground.withOpacity(0.5),
                         ),
                         padding: EdgeInsets.zero,
-                        onPressed: noteIndex == -1
+                        onPressed: noteIndex == -1 || noteIndex == 0
                             ? null
                             : () {
                                 setState(() {

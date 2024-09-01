@@ -8,6 +8,7 @@ import 'package:oneforall/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:oneforall/logger.dart';
 import 'package:oneforall/screens/quizzes_screen.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../screens/calendar_screen.dart';
 import '../screens/community_screen.dart';
@@ -182,7 +183,14 @@ class _NavigationButtonState extends State<NavigationButton> with SingleTickerPr
                                           title: "Announcement Board",
                                           gradientColor1: const Color(0xFF723EDC),
                                           gradientColor2: const Color(0xFF683BDB),
-                                          route: const MABLACScreen(),
+                                          route: ShowCaseWidget(
+                                            onStart: (p0, p1) {
+                                              logger.i("Starting showcase");
+                                            },
+                                            builder: Builder(builder: (context) {
+                                              return const MABLACScreen();
+                                            }),
+                                          ),
                                           controller: _controller,
                                           overlayEntry: this.overlayEntry!,
                                         ),

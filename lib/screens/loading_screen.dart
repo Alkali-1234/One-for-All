@@ -28,17 +28,17 @@ class _LoadingScreenState extends State<LoadingScreen> {
     return;
   }
 
-  // void loadingScreenAnimation() async {
-  //   for (var i = 0; i < 4; i++) {
-  //     if (mounted) {
-  //       setState(() {
-  //         loadingDots = "." * (i + 1);
-  //       });
-  //     }
-  //     await Future.delayed(const Duration(milliseconds: 500));
-  //   }
-  //   if (loadingStatus == false) loadingScreenAnimation();
-  // }
+  void loadingScreenAnimation() async {
+    for (var i = 0; i < 4; i++) {
+      if (mounted) {
+        setState(() {
+          loadingDots = "." * (i + 1);
+        });
+      }
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+    if (loadingStatus == false) loadingScreenAnimation();
+  }
 
   void initializeApp(AppState appState) async {
     //is it there because of the loading screen????
@@ -136,7 +136,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
-    // loadingScreenAnimation();
+    loadingScreenAnimation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       initializeApp(context.read<AppState>());
     });
@@ -184,7 +184,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                 child: Row(
                   children: [
                     Text(
-                      "v0.0.6.0",
+                      "v0.0.6.1 REV-1",
                       style: TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                   ],

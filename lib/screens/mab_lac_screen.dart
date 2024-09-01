@@ -18,6 +18,8 @@ import 'package:oneforall/logger.dart';
 import 'package:photo_view/photo_view.dart';
 // import 'package:oneforall/data/user_data.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:showcaseview/showcaseview.dart';
 import '../components/styled_components/container.dart';
 import '../data/community_data.dart';
 import '../main.dart';
@@ -85,6 +87,9 @@ class _MABLACScreenState extends State<MABLACScreen> {
   late Stream mabDataStream;
   late Stream lacDataStream;
 
+  //* Showcase keys
+  GlobalKey showcase1 = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -92,10 +97,25 @@ class _MABLACScreenState extends State<MABLACScreen> {
     mabDataStream = appState.getCurrentUser.assignedCommunity != "0" ? FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("MAB").snapshots() : const Stream.empty();
     lacDataStream = appState.getCurrentUser.assignedSection != "0" ? FirebaseFirestore.instance.collection("communities").doc(appState.getCurrentUser.assignedCommunity).collection("sections").doc(appState.getCurrentUser.assignedSection).collection("LAC").snapshots() : const Stream.empty();
     logger.d(lacDataStream);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      showcaseInit();
+    });
   }
 
   /// Reverse the animation
   bool reverse = false;
+
+  Future<void> showcaseInit() async {
+    if ((Provider.of<AppState>(context, listen: false).getCurrentUser.assignedCommunity?.isEmpty ?? true) || Provider.of<AppState>(context, listen: false).getCurrentUser.assignedCommunity == "0") return;
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey("MAB_SHOWCASE")) {
+      prefs.setBool("MAB_SHOWCASE", true);
+      if (!mounted) return;
+      ShowCaseWidget.of(context).startShowCase([
+        showcase1
+      ]);
+    }
+  }
 
   void toggleSection() {
     setState(() {
@@ -152,17 +172,22 @@ class _MABLACScreenState extends State<MABLACScreen> {
                     const SizedBox(
                       width: 8,
                     ),
-                    StyledIconButton(
-                      theme: ctheme,
-                      onPressed: () {
-                        setState(() {
-                          reverse = false;
-                        });
+                    Showcase(
+                      key: showcase1,
+                      title: "Main & Local Toggle",
+                      description: "Announcement boards are split into two: Main Announcement Board, and Local Announcement Board, the Main Announcement board represents the announcement board of the whole Community, while the Local one represents the section you are in, if any.",
+                      child: StyledIconButton(
+                        theme: ctheme,
+                        onPressed: () {
+                          setState(() {
+                            reverse = false;
+                          });
 
-                        toggleSection();
-                      },
-                      icon: Icons.cached_rounded,
-                      size: 24,
+                          toggleSection();
+                        },
+                        icon: Icons.cached_rounded,
+                        size: 24,
+                      ),
                     ),
                     const SizedBox(
                       width: 8,
