@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:oneforall/components/styled_components/container.dart';
 import 'package:oneforall/components/styled_components/filled_elevated_button.dart';
 import 'package:oneforall/components/styled_components/primary_elevated_button.dart';
 import 'package:oneforall/components/styled_components/style_constants.dart';
 import 'package:oneforall/components/styled_components/toggleable_button.dart';
-import 'package:oneforall/components/styled_components/touchable_container.dart';
-
-import '../../../constants.dart';
 import '../../../models/quiz_question.dart';
 
 //* Multiple choice question

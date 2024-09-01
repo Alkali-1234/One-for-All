@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:oneforall/components/main_container.dart';
-import 'package:oneforall/components/styled_components/elevated_button.dart';
 import 'package:oneforall/components/styled_components/filled_elevated_button.dart';
 import 'package:oneforall/components/styled_components/primary_elevated_button.dart';
 import 'package:oneforall/components/styled_components/style_constants.dart';

@@ -285,10 +285,6 @@ class _HomePageState extends State<HomePage> {
 
     return PopScope(
       canPop: false,
-      onPopInvoked: (_) async {
-        // Open the app drawer
-        _key.currentState?.openDrawer();
-      },
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -771,7 +767,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ]);
                                   mabData.posts.sort((a, b) => b.dueDate.difference(DateTime.now()).inMilliseconds.compareTo(a.dueDate.difference(DateTime.now()).inMilliseconds));
                                   return ListView.builder(
-                                    physics: const ClampingScrollPhysics(),
+                                    physics: const BouncingScrollPhysics(),
                                     padding: EdgeInsets.zero,
                                     itemCount: mabData.posts.length,
                                     itemBuilder: (context, index) {
@@ -784,7 +780,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         child: mabSelectedFilter == 0 || post.type == mabSelectedFilter
                                             ? Padding(
-                                                padding: const EdgeInsets.only(bottom: 5.0),
+                                                padding: const EdgeInsets.only(top: 16.0, left: 16, right: 16),
                                                 child: StyledElevatedButton(
                                                   theme: ctheme,
                                                   onPressed: () => {
@@ -1257,21 +1253,11 @@ class MABModal extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.only(top: 8.0),
-                    child: ElevatedButton(
+                    child: StyledElevatedButton(
+                      theme: getThemeFromTheme(theme),
                       onPressed: () => {
                         downloadFile(attatchements[index]),
                       },
-                      style: ElevatedButton.styleFrom(
-                        side: BorderSide(color: theme.secondary, width: 1),
-                        padding: const EdgeInsets.all(0),
-                        backgroundColor: theme.secondary,
-                        foregroundColor: theme.onSecondary,
-                        shadowColor: Colors.black,
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(

@@ -5,6 +5,7 @@ import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/components/styled_components/container.dart';
 import 'package:oneforall/components/styled_components/elevated_button.dart';
 import 'package:oneforall/components/styled_components/elevated_icon_button.dart';
+import 'package:oneforall/components/styled_components/filled_elevated_button.dart';
 import 'package:oneforall/components/styled_components/primary_elevated_button.dart';
 import 'package:oneforall/components/styled_components/style_constants.dart';
 import 'package:oneforall/constants.dart';
@@ -360,12 +361,12 @@ class CalendarWidget extends riverpod.ConsumerWidget {
 
     //* Check if month exists
     if (calendarMonthsData.where((element) => element.month == month && element.year == selectedYear).isEmpty) {
-      return theme.secondary;
+      return theme.background;
     }
 
     //* Check if date exists
     if (calendarMonthsData.where((element) => element.month == month && element.year == selectedYear).first.daysList.where((element) => element.keys.first == date).isEmpty) {
-      return theme.secondary;
+      return theme.background;
     }
 
     final events = calendarMonthsData.where((element) => element.month == month && element.year == selectedYear).first.daysList.where((element) => element.keys.first == date).first.values.first;
@@ -487,8 +488,8 @@ class CalendarWidget extends riverpod.ConsumerWidget {
                         : SizedBox(
                             height: 30,
                             width: 30,
-                            child: StyledElevatedButton(
-                              theme: ctheme,
+                            child: FilledElevatedButton(
+                              color: getDateColor(getCurrentDate(currentMonthData, week, day), week, theme, calendarMonthsData),
                               onPressed: () {
                                 if (getCurrentDate(currentMonthData, week, day) != 0) {
                                   showDialog(

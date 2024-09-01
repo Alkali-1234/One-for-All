@@ -91,7 +91,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
                               showDialog(context: context, builder: (context) => const NewSetOptions());
                             },
                             child: Padding(
-                              padding: EdgeInsets.all(16),
+                              padding: const EdgeInsets.all(16),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -114,7 +114,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
                 : Expanded(
                     child: ListView.builder(
                         padding: EdgeInsets.zero,
-                        physics: const ClampingScrollPhysics(),
+                        physics: const BouncingScrollPhysics(),
                         itemBuilder: (context, index) {
                           if (!appState.getQuizzes[index].title.toLowerCase().contains(_searchText.toLowerCase()) && !appState.getQuizzes[index].description.toLowerCase().contains(_searchText.toLowerCase())) return const SizedBox.shrink();
                           return ListItem(
@@ -142,7 +142,7 @@ class ListItem extends StatelessWidget {
     var textTheme = Theme.of(context).textTheme;
     var ctheme = getThemeFromTheme(theme);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.only(top: 16.0, left: 16, right: 16),
       child: StyledTouchableContainer(
         theme: ctheme,
         onPressed: () => showDialog(context: context, builder: (context) => SelectedQuizModal(quiz: context.read<AppState>().getQuizzes[index], index: index)),

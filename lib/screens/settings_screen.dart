@@ -78,7 +78,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
     prefs.setBool("setting_notifications_LAC", notificationSettings["LAC"]!);
     prefs.setBool("setting_notifications_RecentActivity", notificationSettings["RA"]!);
 
-    if (!mounted) return;
+    if (!context.mounted) return;
     var appState = context.read<AppState>();
 
     //* Subscribe and unsubscribe from topics
@@ -102,7 +102,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
       }
     }
 
-    if (!mounted) return;
+    if (!context.mounted) return;
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(

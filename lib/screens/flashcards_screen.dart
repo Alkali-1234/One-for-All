@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:oneforall/components/main_container.dart';
 import 'package:oneforall/components/styled_components/container.dart';
 import 'package:oneforall/components/styled_components/filled_elevated_button.dart';
@@ -116,14 +115,14 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                       if (appState.getCurrentUser.flashCardSets.isNotEmpty)
                         Expanded(
                           child: ListView.builder(
-                              physics: const ClampingScrollPhysics(),
+                              physics: const BouncingScrollPhysics(),
                               padding: EdgeInsets.zero,
                               scrollDirection: Axis.vertical,
                               itemCount: appState.getCurrentUser.flashCardSets.length,
                               itemBuilder: (context, index) {
                                 return isItemValid(appState.getCurrentUser.flashCardSets[index].title)
                                     ? Padding(
-                                        padding: const EdgeInsets.only(bottom: 8),
+                                        padding: const EdgeInsets.only(top: 8, left: 16, right: 16),
                                         child: StyledTouchableContainer(
                                             theme: ctheme,
                                             onPressed: () {

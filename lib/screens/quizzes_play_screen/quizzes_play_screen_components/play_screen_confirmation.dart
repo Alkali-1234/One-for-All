@@ -4,7 +4,6 @@ import 'package:oneforall/components/styled_components/style_constants.dart';
 import 'package:provider/provider.dart';
 
 import '../../../components/styled_components/elevated_button.dart';
-import '../../../constants.dart';
 import '../../../functions/quizzes_functions.dart';
 import '../../../main.dart';
 

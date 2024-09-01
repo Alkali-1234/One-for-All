@@ -1,7 +1,5 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -131,7 +129,6 @@ class _MABLACScreenState extends State<MABLACScreen> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
-    var appState = Provider.of<AppState>(context);
     var ctheme = getThemeFromTheme(theme);
     return Scaffold(
         resizeToAvoidBottomInset: false,
@@ -377,7 +374,7 @@ class _MABLACScreenState extends State<MABLACScreen> {
                                 ]);
                                 mabData.posts.sort((a, b) => b.date.compareTo(a.date));
                                 return ListView.builder(
-                                    physics: const ClampingScrollPhysics(),
+                                    physics: const BouncingScrollPhysics(),
                                     padding: EdgeInsets.zero,
                                     //MabData is misleading, it's actually both !!!!! (no way) (crazy right?)
                                     itemCount: mabData.posts.length,
@@ -755,12 +752,11 @@ class ListItem extends StatelessWidget {
     String description = post.description;
     String image = post.image;
     List<String> attatchements = post.fileAttatchments;
-    int type = post.type;
     DateTime due = post.dueDate;
     var theme = Theme.of(context).colorScheme;
     var ctheme = getThemeFromTheme(theme);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.only(top: 16.0, left: 16, right: 16),
       child: StyledTouchableContainer(
         theme: ctheme,
         onPressed: () => showDialog(context: context, builder: (context) => MABModal(title: title, description: description, image: image, attatchements: attatchements, date: due, posterUID: post.authorUID)),
@@ -889,27 +885,14 @@ class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
             children: [
               const SizedBox(height: 8),
               //Main header
-              Row(
-                children: [
-                  Expanded(
-                      child: Row(
-                    children: [
-                      StyledIconButton(theme: ctheme, onPressed: () => Navigator.pop(context), icon: Icons.close),
-                    ],
-                  )),
-                  Expanded(
-                    child: Center(
-                      child: FittedBox(
-                        child: Text(
-                          widget.title,
-                          style: textTheme.displayMedium,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(child: Container())
-                ],
+              StyledIconButton(theme: ctheme, onPressed: () => Navigator.pop(context), icon: Icons.close),
+              const SizedBox(
+                height: 16,
+              ),
+              Text(
+                widget.title,
+                style: textTheme.displayMedium,
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
               //Sub header
@@ -921,7 +904,7 @@ class _MABModalState extends State<MABModal> with TickerProviderStateMixin {
                     ? StyledContainer(
                         theme: ctheme,
                         height: constraints.maxWidth / 1.5,
-                        width: constraints.maxWidth / 1.5,
+                        width: constraints.maxWidth,
                         child: Center(
                           child: Text(
                             "No image",

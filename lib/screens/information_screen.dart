@@ -30,7 +30,7 @@ class InformationScreen extends StatelessWidget {
             ListItem(
               textTheme: textTheme,
               title: "Version",
-              subtitle: "v0.0.6.1 REV-1",
+              subtitle: "v0.0.6.2 REV-1",
             ),
             ListItem(textTheme: textTheme, title: "Build Number", subtitle: "-"),
             ListItem(textTheme: textTheme, title: "Branch", subtitle: "(development) main/stable"),
